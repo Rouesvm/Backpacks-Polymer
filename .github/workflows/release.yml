@@ -1,35 +1,35 @@
-name: Release
-on:
-  workflow_dispatch:
-  release:
-    types:
-      - published
-
-permissions:
-  contents: write
+name: build
+on: 
+  push:
+     tags-ignore:
+      - '*'
 
 jobs:
   build:
+    strategy:
+      matrix:
+        # Use these Java versions
+        java: [
+          21,    # Current Java LTS
+        ]
     runs-on: ubuntu-22.04
-    container:
-      image: mcr.microsoft.com/openjdk/jdk:21-ubuntu
-      options: --user root
     steps:
-      - uses: actions/checkout@v4
-      - name: Set version in gradle.properties
-        run: |
-          TAG_VERSION=${{ github.event.release.tag_name }}
-          MOD_VERSION=${TAG_VERSION#v}
-          sed -i "s/^mod_version=.*$/mod_version=$MOD_VERSION/" gradle.properties
-      - run: ./gradlew runDatagen build publishMods
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHANGELOG: ${{ github.event.release.body }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-
-      - name: Upload GitHub release
-        uses: AButler/upload-release-assets@v2.0
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v2
+      - name: setup jdk ${{ matrix.java }}
+        uses: actions/setup-java@v4
         with:
-          files: 'build/libs/*.jar;!build/libs/*-dev.jar'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          java-version: ${{ matrix.java }}
+          distribution: 'microsoft'
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build
+        run: ./gradlew build
+      - name: capture build artifacts
+        if: ${{ matrix.java == '21' }} # Only upload artifacts built from latest java
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artifacts
+          path: build/libs/

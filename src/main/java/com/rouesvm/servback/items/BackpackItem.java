@@ -3,6 +3,7 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.ui.BackpackGui;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
+import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.component.ComponentMap;
@@ -44,8 +45,8 @@ public class BackpackItem extends Item implements PolymerItem {
         this.name = id;
     }
     
-    public void getGui(ServerPlayerEntity player, ItemStack stack) {
-        new BackpackGui(player, stack, this.slots);
+    public SimpleGui getGui(ServerPlayerEntity player, ItemStack stack) {
+        return new BackpackGui(player, stack, this.slots);
     }
 
     @Override

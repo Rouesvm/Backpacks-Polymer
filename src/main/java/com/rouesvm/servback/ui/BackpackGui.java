@@ -1,6 +1,5 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.slots.DisabledSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
@@ -23,9 +22,9 @@ public class BackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = new SimpleInventory(readItemStack(this.stack, slots).toArray(ItemStack[]::new));
 
-        setTitle(Text.of("Backpack"));
-        fillChest();
-        open();
+        this.setTitle(Text.of("Backpack"));
+        this.fillChest();
+        this.open();
     }
 
     public static ScreenHandlerType<?> getHandler(int slots) {

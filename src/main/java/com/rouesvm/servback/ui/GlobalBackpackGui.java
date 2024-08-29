@@ -19,9 +19,9 @@ public class GlobalBackpackGui extends SimpleGui {
     public GlobalBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
 
-        setTitle(Text.literal("Global Backpack"));
-        fillChest();
-        open();
+        this.setTitle(Text.literal("Global Backpack"));
+        this.fillChest();
+        this.open();
 
         int disableSlot = player.getInventory().getSlotWithStack(stack);
         screenHandler.setSlot(slots + 27 + disableSlot, new DisabledSlot(this.inventory, slots, slots,0));

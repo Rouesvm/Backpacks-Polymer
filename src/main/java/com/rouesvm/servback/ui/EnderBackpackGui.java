@@ -17,9 +17,9 @@ public class EnderBackpackGui extends SimpleGui {
     public EnderBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
 
-        setTitle(Text.of("Ender Backpack"));
-        fillChest();
-        open();
+        this.setTitle(Text.literal("Ender Backpack"));
+        this.fillChest();
+        this.open();
 
         int disableSlot = player.getInventory().getSlotWithStack(stack);
         screenHandler.setSlot(slots + 27 + disableSlot, new DisabledSlot(this.inventory, slots, slots,0));

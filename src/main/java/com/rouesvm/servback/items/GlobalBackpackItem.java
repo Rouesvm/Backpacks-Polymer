@@ -1,5 +1,6 @@
 package com.rouesvm.servback.items;
 
+import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -12,7 +13,7 @@ public class GlobalBackpackItem extends BackpackItem {
     }
 
     @Override
-    public void getGui(ServerPlayerEntity player, ItemStack stack) {
-        new GlobalBackpackGui(player, stack);
+    public SimpleGui getGui(ServerPlayerEntity player, ItemStack stack) {
+        return new GlobalBackpackGui(player, stack);
     }
 }

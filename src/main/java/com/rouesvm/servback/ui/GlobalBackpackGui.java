@@ -25,9 +25,6 @@ public class GlobalBackpackGui extends SimpleGui {
         this.setTitle(Text.literal("Global Backpack"));
         this.fillChest();
         this.open();
-
-        int disableSlot = player.getInventory().getSlotWithStack(stack);
-        screenHandler.setSlot(slots + 27 + disableSlot, new DisabledSlot(Main.getInventory(), slots, slots,0));
     }
 
     @Override

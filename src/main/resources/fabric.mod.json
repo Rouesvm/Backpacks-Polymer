@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "serverbackpacks",
+  "version": "${version}",
+
+  "name": "Server Backpacks",
+  "description": "Backpacks for your server!",
+  "authors": [
+    "Oliver-makes-code"
+  ],
+  "contact": {
+    "homepage": "http://olivermakesco.de",
+    "sources": "http://olivermakesco.de/git/server-backpacks"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/serverbackpacks/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.rouesvm.servback.Main"
+    ]
+  },
+  "mixins": [
+    "servback.mixin.json"
+  ],
+
+  "depends": {
+    "fabric": "*",
+    "minecraft": "1.21.x",
+    "java": ">=21"
+  }
+}

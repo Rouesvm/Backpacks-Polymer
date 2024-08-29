@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#i#",
+    "SES",
+    " A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:leather"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "minecraft:string"
+    },
+    "E": {
+      "item": "serverbackpacks:small"
+    },
+    "A": {
+      "item": "minecraft:ender_eye"
+    }
+  },
+  "result": {
+    "id": "serverbackpacks:ender",
+    "count": 1
+  }
+}

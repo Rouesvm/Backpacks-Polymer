@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S  ",
+    "#E#",
+    " S  "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:shulker_shell"
+    },
+    "E": {
+      "item": "minecraft:chest"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "id": "serverbackpacks:large",
+    "count": 1
+  }
+}

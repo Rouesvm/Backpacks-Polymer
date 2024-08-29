@@ -38,7 +38,7 @@ public class Main implements ModInitializer {
 		}));
 	}
 
-    public static Inventory getInventory() {
-        return new SimpleInventory(globalInventory);
-    }
+    	public static Inventory getInventory() {
+     	   return new SimpleInventory(globalInventory);
+    	}
 }

@@ -89,7 +89,7 @@ public class BackpackItem extends Item implements PolymerItem {
     }
 
     public Item getPolymerItem() {
-        return Items.BUNDLE;
+        return Items.LEATHER;
     }
 
     @Override

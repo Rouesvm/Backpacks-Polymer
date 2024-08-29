@@ -6,12 +6,9 @@
   "name": "Server Backpacks",
   "description": "Backpacks for your server!",
   "authors": [
-    "Oliver-makes-code"
+    "Oliver-makes-code",
+    "Rouesvm"
   ],
-  "contact": {
-    "homepage": "http://olivermakesco.de",
-    "sources": "http://olivermakesco.de/git/server-backpacks"
-  },
 
   "license": "CC0-1.0",
   "icon": "assets/serverbackpacks/icon.png",

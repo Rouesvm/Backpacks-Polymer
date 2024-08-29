@@ -1,9 +1,6 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.slots.DisabledSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.inventory.EnderChestInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -13,9 +10,7 @@ import com.rouesvm.servback.Main;
 
 public class GlobalBackpackGui extends SimpleGui {
 
-    protected int slots = 27;
     protected final ItemStack stack;
-
 
     public GlobalBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);

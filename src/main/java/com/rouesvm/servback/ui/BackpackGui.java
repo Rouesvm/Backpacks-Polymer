@@ -65,6 +65,6 @@ public class BackpackGui extends SimpleGui {
 
     @Override
     public void onClose() {
-        saveItemStack();
+        this.saveItemStack();
     }
 }

@@ -12,6 +12,8 @@ import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.*;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryWrapper;
@@ -46,7 +48,16 @@ public class BackpackItem extends Item implements PolymerItem {
     }
     
     public SimpleGui getGui(ServerPlayerEntity player, ItemStack stack) {
-        return new BackpackGui(player, stack, this.slots);
+        return new BackpackGui(player, stack, getInventory(stack));
+    }
+
+    public Inventory getInventory(ItemStack stack) {
+        ContainerComponent component = stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
+
+        DefaultedList<ItemStack> list = DefaultedList.ofSize(slots, ItemStack.EMPTY);
+        component.copyTo(list);
+
+        return new SimpleInventory(list.toArray(ItemStack[]::new));
     }
 
     @Override
@@ -59,19 +70,19 @@ public class BackpackItem extends Item implements PolymerItem {
     }
 
         @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 
-        ItemStack stack = user.getStackInHand(hand);
+        ItemStack stack = player.getStackInHand(hand);
 
-        var cast = user.raycast(5,0,false);
+        var cast = player.raycast(5,0,false);
         if (cast.getType() == HitResult.Type.BLOCK)
             return TypedActionResult.pass(stack);
-        if (!(user instanceof ServerPlayerEntity player))
+        if (!(player instanceof ServerPlayerEntity serverPlayer))
             return TypedActionResult.pass(stack);
         if (player.isSneaking())
             return TypedActionResult.pass(stack);
 
-        getGui(player, stack);
+        getGui(serverPlayer, stack);
 
         return TypedActionResult.success(stack);
     }

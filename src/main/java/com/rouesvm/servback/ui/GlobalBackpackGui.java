@@ -13,22 +13,34 @@ import com.rouesvm.servback.Main;
 
 public class GlobalBackpackGui extends SimpleGui {
 
-    private final int slots = 27;
-    private final Inventory inventory = Main.getInventory();
+    protected int slots = 27;
+    protected final ItemStack stack;
+
 
     public GlobalBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
+
+        this.stack = stack;
 
         this.setTitle(Text.literal("Global Backpack"));
         this.fillChest();
         this.open();
 
         int disableSlot = player.getInventory().getSlotWithStack(stack);
-        screenHandler.setSlot(slots + 27 + disableSlot, new DisabledSlot(this.inventory, slots, slots,0));
+        screenHandler.setSlot(slots + 27 + disableSlot, new DisabledSlot(Main.getInventory(), slots, slots,0));
+    }
+
+    @Override
+    public void onTick() {
+        if (this.stack.isEmpty()) {
+            this.close(false);
+        }
+
+        super.onTick();
     }
 
     public void fillChest() {
         for (int i = 0; i < 27; i++)
-            setSlotRedirect(i, new Slot(this.inventory, i, i, 0));
+            setSlotRedirect(i, new Slot(Main.getInventory(), i, i, 0));
     }
 }

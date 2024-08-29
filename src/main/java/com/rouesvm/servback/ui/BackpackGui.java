@@ -1,26 +1,26 @@
 package com.rouesvm.servback.ui;
 
+import com.rouesvm.servback.slots.BackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
-import com.rouesvm.servback.slots.BackpackSlot;
 
 public class BackpackGui extends SimpleGui {
-    private final ItemStack stack;
-    private final Inventory inventory;
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
-        super(getHandler(slots), player, false);
+    protected final ItemStack stack;
+    protected final Inventory inventory;
+
+    public BackpackGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+        super(getHandler(inventory.size()), player, false);
 
         this.stack = stack;
-        this.inventory = new SimpleInventory(readItemStack(this.stack, slots).toArray(ItemStack[]::new));
+        this.inventory = inventory;
 
         this.setTitle(Text.of("Backpack"));
         this.fillChest();
@@ -36,20 +36,11 @@ public class BackpackGui extends SimpleGui {
         };
     }
 
-
-    public DefaultedList<ItemStack> readItemStack(ItemStack stack, int slots) {
-        ContainerComponent component = stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
-
-        DefaultedList<ItemStack> list = DefaultedList.ofSize(slots, ItemStack.EMPTY);
-        component.copyTo(list);
-        return list;
-    }
-
     public void saveItemStack() {
         DefaultedList<ItemStack> storedItems = DefaultedList.ofSize(this.inventory.size(), ItemStack.EMPTY);
 
         for (int i = 0; i < storedItems.size(); i++) {
-            ItemStack stack = inventory.getStack(i);
+            ItemStack stack = this.inventory.getStack(i);
             storedItems.set(i, stack);
         }
 
@@ -58,15 +49,15 @@ public class BackpackGui extends SimpleGui {
 
     public void fillChest() {
         for (int i = 0; i < this.inventory.size(); i++)
-            setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
+            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
     }
 
     @Override
     public void onTick() {
-        saveItemStack();
+        this.saveItemStack();
 
         if (this.stack.isEmpty()) {
-            close(false);
+            this.close(false);
         }
 
         super.onTick();

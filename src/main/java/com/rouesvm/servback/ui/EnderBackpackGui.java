@@ -2,7 +2,6 @@ package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.slots.DisabledSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -11,21 +10,33 @@ import net.minecraft.text.Text;
 
 public class EnderBackpackGui extends SimpleGui {
 
-    private final int slots = 27;
-    private final EnderChestInventory inventory = player.getEnderChestInventory();;
+    protected int slots = 27;
+    protected final ItemStack stack;
 
     public EnderBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
+
+        this.stack = stack;
 
         this.setTitle(Text.literal("Ender Backpack"));
         this.fillChest();
         this.open();
 
         int disableSlot = player.getInventory().getSlotWithStack(stack);
-        screenHandler.setSlot(slots + 27 + disableSlot, new DisabledSlot(this.inventory, slots, slots,0));
+        screenHandler.setSlot(slots + 27 + disableSlot, new DisabledSlot(player.getEnderChestInventory(), slots, slots,0));
     }
+
+    @Override
+    public void onTick() {
+        if (this.stack.isEmpty()) {
+            this.close(false);
+        }
+
+        super.onTick();
+    }
+
     public void fillChest() {
         for (int i = 0; i < 27; i++)
-            setSlotRedirect(i, new Slot(this.inventory, i, i, 0));
+            setSlotRedirect(i, new Slot(player.getEnderChestInventory(), i, i, 0));
     }
 }

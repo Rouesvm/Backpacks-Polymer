@@ -66,7 +66,7 @@ public class BackpackItem extends Item implements PolymerItem {
     }
 
     public Text getType() {
-        return Text.of(this.name + "Irsyad");
+        return Text.of(this.name);
     }
 
         @Override

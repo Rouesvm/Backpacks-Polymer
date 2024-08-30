@@ -40,8 +40,7 @@ public class BackpackGui extends SimpleGui {
         DefaultedList<ItemStack> storedItems = DefaultedList.ofSize(this.inventory.size(), ItemStack.EMPTY);
 
         for (int i = 0; i < storedItems.size(); i++) {
-            ItemStack stack = this.inventory.getStack(i);
-            storedItems.set(i, stack);
+            storedItems.set(i, this.inventory.getStack(i));
         }
 
         this.stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(storedItems));

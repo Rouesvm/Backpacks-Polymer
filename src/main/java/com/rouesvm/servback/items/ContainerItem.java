@@ -1,5 +1,6 @@
 package com.rouesvm.servback.items;
 
+import com.rouesvm.servback.Main;
 import com.rouesvm.servback.ui.BackpackGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
@@ -13,6 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.HitResult;
@@ -26,6 +28,10 @@ public class ContainerItem extends Item {
         super(new Item.Settings().maxCount(1));
         this.slots = slots;
         this.name = id;
+    }
+
+    public Identifier getIdentifier() {
+        return Identifier.of(Main.MOD_ID, this.name.toLowerCase());
     }
 
     @Override

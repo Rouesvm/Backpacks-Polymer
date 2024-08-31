@@ -8,9 +8,9 @@ import com.rouesvm.servback.Main;
 
 public class ItemList {
 
-    public static Item SMALL_BACKPACK = register(new BackpackItem("Small", 9), "small");
-    public static Item MEDIUM_BACKPACK = register(new BackpackItem("Medium", 9 * 2), "medium");
-    public static Item LARGE_BACKPACK = register(new BackpackItem("Large", 9 * 3), "large");
+    public static Item SMALL_BACKPACK = register(new BasicPolymerItem("Small", 9), "small");
+    public static Item MEDIUM_BACKPACK = register(new BasicPolymerItem("Medium", 9 * 2), "medium");
+    public static Item LARGE_BACKPACK = register(new BasicPolymerItem("Large", 9 * 3), "large");
 
     public static Item ENDER_BACKPACK = register(new EnderBackpackItem(), "ender");
     public static Item GLOBAL_BACKPACK = register(new GlobalBackpackItem(), "global");

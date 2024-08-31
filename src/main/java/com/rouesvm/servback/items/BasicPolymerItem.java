@@ -13,15 +13,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-public class BackpackItem extends ContainerItem implements PolymerItem, PolymerKeepModel {
+public class BasicPolymerItem extends ContainerItem implements PolymerItem, PolymerKeepModel {
 
     private final PolymerModelData model;
 
-    public BackpackItem(String id, int slots) {
+    public BasicPolymerItem(String id, int slots) {
         super(id, slots);
         this.model = PolymerResourcePackUtils.requestModel(Items.LEATHER,
-                Identifier.of(Main.MOD_ID + "item/"
-                        + Registries.ITEM.getId(Items.LEATHER).getPath().replace("shovel", id)));
+                Identifier.of(Main.MOD_ID , "item/" + this.getIdentifier().getPath()));
     }
 
     @Override

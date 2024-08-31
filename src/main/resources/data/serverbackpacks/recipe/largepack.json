@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#i#",
+    "SLS",
+    "   "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:string"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "minecraft:shulker_shell"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    }
+  },
+  "result": {
+    "id": "serverbackpacks:large",
+    "count": 1
+  }
+}

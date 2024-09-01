@@ -16,7 +16,7 @@
       "item": "minecraft:shulker_shell"
     },
     "L": {
-      "item": "minecraft:leather"
+      "item": "serverbackpacks:medium"
     }
   },
   "result": {

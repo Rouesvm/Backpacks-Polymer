@@ -17,17 +17,16 @@ public class GlobalBackpackGui extends SimpleGui {
 
         this.stack = stack;
 
-        this.setTitle(Text.literal("Global Backpack"));
-        this.fillChest();
-        this.open();
+        setTitle(Text.literal("Global Backpack"));
+        fillChest();
+        open();
     }
 
     @Override
     public void onTick() {
-        if (this.stack.isEmpty()) {
-            this.close(false);
+        if (stack.isEmpty()) {
+            close(false);
         }
-
         super.onTick();
     }
 

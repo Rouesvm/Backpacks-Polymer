@@ -1,9 +1,9 @@
 {
   "required": true,
-  "minVersion": "0.8",
-  "package": "olivermakesco.de.servback.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "package": "com.rouesvm.servback.mixin",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ShapedRecipeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -31,24 +31,22 @@ public class ContainerItem extends BasicPolymerItem {
 
     @Override
     public Text getName() {
-        return Text.of(this.getActualName() + " Backpack");
+        return Text.of(getActualName() + " Backpack");
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-
         ItemStack stack = player.getStackInHand(hand);
 
         var cast = player.raycast(5,0,false);
-        if (cast.getType() == HitResult.Type.BLOCK)
-            return TypedActionResult.pass(stack);
         if (!(player instanceof ServerPlayerEntity serverPlayer))
             return TypedActionResult.pass(stack);
         if (player.isSneaking())
             return TypedActionResult.pass(stack);
+        if (cast.getType() == HitResult.Type.BLOCK)
+            return TypedActionResult.pass(stack);
 
         createGui(serverPlayer, stack);
-
         return TypedActionResult.success(stack);
     }
 
@@ -60,7 +58,6 @@ public class ContainerItem extends BasicPolymerItem {
             return ActionResult.PASS;
 
         createGui(player, context.getStack());
-
         return ActionResult.PASS;
     }
 

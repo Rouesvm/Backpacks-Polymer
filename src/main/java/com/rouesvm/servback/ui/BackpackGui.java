@@ -22,9 +22,9 @@ public class BackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = inventory;
 
-        this.setTitle(Text.of("Backpack"));
-        this.fillChest();
-        this.open();
+        setTitle(Text.of("Backpack"));
+        fillChest();
+        open();
     }
 
     public static ScreenHandlerType<?> getHandler(int slots) {
@@ -37,33 +37,32 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void saveItemStack() {
-        DefaultedList<ItemStack> storedItems = DefaultedList.ofSize(this.inventory.size(), ItemStack.EMPTY);
+        DefaultedList<ItemStack> storedItems = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
 
         for (int i = 0; i < storedItems.size(); i++) {
-            storedItems.set(i, this.inventory.getStack(i));
+            storedItems.set(i, inventory.getStack(i));
         }
 
-        this.stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(storedItems));
+        stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(storedItems));
     }
 
     public void fillChest() {
-        for (int i = 0; i < this.inventory.size(); i++)
-            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
+        for (int i = 0; i < inventory.size(); i++)
+            setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
     }
 
     @Override
     public void onTick() {
-        this.saveItemStack();
+        saveItemStack();
 
-        if (this.stack.isEmpty()) {
-            this.close(false);
+        if (stack.isEmpty()) {
+            close(false);
         }
-
         super.onTick();
     }
 
     @Override
     public void onClose() {
-        this.saveItemStack();
+        saveItemStack();
     }
 }

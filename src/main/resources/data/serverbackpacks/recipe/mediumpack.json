@@ -16,7 +16,7 @@
       "item": "minecraft:string"
     },
     "E": {
-      "item": "minecraft:chest"
+      "item": "serverbackpacks:small"
     },
     "O": {
       "item": "minecraft:oak_planks"

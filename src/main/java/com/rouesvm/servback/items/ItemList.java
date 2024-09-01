@@ -15,7 +15,7 @@ public class ItemList {
     public static Item ENDER_BACKPACK = register(new EnderBackpackItem());
     public static Item GLOBAL_BACKPACK = register(new GlobalBackpackItem());
 
-    public static Item register(ContainerItem item) {
+    public static Item register(BasicPolymerItem item) {
        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 

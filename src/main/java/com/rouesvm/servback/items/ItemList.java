@@ -8,15 +8,15 @@ import com.rouesvm.servback.Main;
 
 public class ItemList {
 
-    public static Item SMALL_BACKPACK = register(new BasicPolymerItem("Small", 9), "small");
-    public static Item MEDIUM_BACKPACK = register(new BasicPolymerItem("Medium", 9 * 2), "medium");
-    public static Item LARGE_BACKPACK = register(new BasicPolymerItem("Large", 9 * 3), "large");
+    public static Item SMALL_BACKPACK = register(new ContainerItem("Small", 9));
+    public static Item MEDIUM_BACKPACK = register(new ContainerItem("Medium", 9 * 2));
+    public static Item LARGE_BACKPACK = register(new ContainerItem("Large", 9 * 3));
 
-    public static Item ENDER_BACKPACK = register(new EnderBackpackItem(), "ender");
-    public static Item GLOBAL_BACKPACK = register(new GlobalBackpackItem(), "global");
+    public static Item ENDER_BACKPACK = register(new EnderBackpackItem());
+    public static Item GLOBAL_BACKPACK = register(new GlobalBackpackItem());
 
-    public static Item register(Item item, String id) {
-       return Registry.register(Registries.ITEM, Identifier.of(Main.MOD_ID, id), item);
+    public static Item register(ContainerItem item) {
+       return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 
     public static void initialize() {}

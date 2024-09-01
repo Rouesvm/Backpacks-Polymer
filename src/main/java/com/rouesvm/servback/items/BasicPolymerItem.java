@@ -18,14 +18,24 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-public class BasicPolymerItem extends ContainerItem implements PolymerItem, PolymerKeepModel {
+public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepModel {
 
+    private final String name;
     private final PolymerModelData model;
 
-    public BasicPolymerItem(String id, int slots) {
-        super(id, slots);
+    public BasicPolymerItem(String name) {
+        super(new Settings().maxCount(1));
+        this.name = name;
         this.model = PolymerResourcePackUtils.requestModel(Items.LEATHER,
                 Identifier.of(Main.MOD_ID , "item/" + this.getIdentifier().getPath()));
+    }
+
+    public Identifier getIdentifier() {
+        return Identifier.of(Main.MOD_ID, this.name.toLowerCase());
+    }
+
+    public String getActualName() {
+        return name;
     }
 
     @Override

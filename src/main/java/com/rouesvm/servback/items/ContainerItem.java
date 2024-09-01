@@ -2,6 +2,7 @@ package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.ui.BackpackGui;
+import eu.pb4.polymer.core.api.item.PolymerItem;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,23 +21,17 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
 
-public class ContainerItem extends Item {
+public class ContainerItem extends BasicPolymerItem {
     private final int slots;
-    private final String name;
 
     public ContainerItem(String id, int slots) {
-        super(new Item.Settings().maxCount(1));
+        super(id);
         this.slots = slots;
-        this.name = id;
-    }
-
-    public Identifier getIdentifier() {
-        return Identifier.of(Main.MOD_ID, this.name.toLowerCase());
     }
 
     @Override
     public Text getName() {
-        return Text.of(this.name + " Backpack");
+        return Text.of(this.getActualName() + " Backpack");
     }
 
     @Override

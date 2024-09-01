@@ -4,7 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import com.rouesvm.servback.ui.GlobalBackpackGui;
 
-public class GlobalBackpackItem extends BasicPolymerItem {
+public class GlobalBackpackItem extends ContainerItem {
     public GlobalBackpackItem() {
         super("Global", 0);
     }

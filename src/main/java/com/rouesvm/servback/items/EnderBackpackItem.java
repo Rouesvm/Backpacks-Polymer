@@ -4,7 +4,7 @@ import com.rouesvm.servback.ui.EnderBackpackGui;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class EnderBackpackItem extends BasicPolymerItem {
+public class EnderBackpackItem extends ContainerItem {
     public EnderBackpackItem() {
         super("Ender", 0);
     }

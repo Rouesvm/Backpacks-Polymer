@@ -7,7 +7,8 @@ Updated code for 1.21.
 
 https://modrinth.com/mod/serverbacksnow
 
-[resourcepack]([url](https://polymer.pb4.eu/polymer/resource-packs/#making-pack-required:~:text=Identifier(%22minecraft%22%2C%20%22default%22)%3B%0A%7D-,Making%20pack%20required,will%20be%20located%20in%20your%20server%20folder%20as%20polymer%2Dresourcepack.zip.,-Previous))
+<a href="[url](https://polymer.pb4.eu/polymer/resource-packs/#making-pack-required:~:text=Identifier(%22minecraft%22%2C%20%22default%22)%3B%0A%7D-,Making%20pack%20required,will%20be%20located%20in%20your%20server%20folder%20as%20polymer%2Dresourcepack.zip.,-Previous)">resourcepack instructions</a>
+
 
 crafting recepies
 small

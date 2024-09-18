@@ -39,9 +39,8 @@ public class BackpackGui extends SimpleGui {
     public void saveItemStack() {
         DefaultedList<ItemStack> storedItems = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
 
-        for (int i = 0; i < storedItems.size(); i++) {
+        for (int i = 0; i < storedItems.size(); i++)
             storedItems.set(i, inventory.getStack(i));
-        }
 
         stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(storedItems));
     }
@@ -55,9 +54,8 @@ public class BackpackGui extends SimpleGui {
     public void onTick() {
         saveItemStack();
 
-        if (stack.isEmpty()) {
+        if (stack.isEmpty())
             close(false);
-        }
         super.onTick();
     }
 

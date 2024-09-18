@@ -23,9 +23,8 @@ public class EnderBackpackGui extends SimpleGui {
 
     @Override
     public void onTick() {
-        if (stack.isEmpty()) {
+        if (stack.isEmpty())
             close(false);
-        }
         super.onTick();
     }
 

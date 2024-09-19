@@ -19,7 +19,7 @@
       "item": "serverbackpacks:small"
     },
     "O": {
-      "item": "minecraft:oak_planks"
+      "tag": "minecraft:planks"
     }
   },
   "result": {

@@ -1,5 +1,6 @@
 package com.rouesvm.servback.ui;
 
+import com.rouesvm.servback.slots.BackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
@@ -31,6 +32,6 @@ public class GlobalBackpackGui extends SimpleGui {
 
     public void fillChest() {
         for (int i = 0; i < 27; i++)
-            setSlotRedirect(i, new Slot(Main.getInventory(), i, i, 0));
+            setSlotRedirect(i, new BackpackSlot(Main.getInventory(), i, i, 0));
     }
 }

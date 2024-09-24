@@ -19,7 +19,6 @@ public class EnderBackpackGui extends SimpleGui {
 
         setTitle(Text.literal("Ender Backpack"));
         fillChest();
-        open();
     }
 
     @Override

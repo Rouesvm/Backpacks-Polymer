@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
 public class BackpackGui extends SimpleGui {
-
     protected final ItemStack stack;
     protected final Inventory inventory;
 
@@ -24,7 +23,6 @@ public class BackpackGui extends SimpleGui {
 
         setTitle(Text.of("Backpack"));
         fillChest();
-        open();
     }
 
     public static ScreenHandlerType<?> getHandler(int slots) {
@@ -32,6 +30,9 @@ public class BackpackGui extends SimpleGui {
             case 1 -> ScreenHandlerType.GENERIC_9X1;
             case 2 -> ScreenHandlerType.GENERIC_9X2;
             case 3 -> ScreenHandlerType.GENERIC_9X3;
+            case 4 -> ScreenHandlerType.GENERIC_9X4;
+            case 5 -> ScreenHandlerType.GENERIC_9X5;
+            case 6 -> ScreenHandlerType.GENERIC_9X6;
             default -> null;
         };
     }
@@ -56,6 +57,7 @@ public class BackpackGui extends SimpleGui {
 
         if (stack.isEmpty())
             close(false);
+
         super.onTick();
     }
 

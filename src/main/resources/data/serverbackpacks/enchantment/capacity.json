@@ -1,0 +1,27 @@
+{
+  "description": "Capacity",
+  "supported_items": "serverbackpacks:large",
+  "primary_items": "serverbackpacks:large",
+  "weight": 4,
+  "max_level": 3,
+  "min_cost": {
+    "base": 4,
+    "per_level_above_first": 7
+  },
+  "max_cost": {
+    "base": 6,
+    "per_level_above_first": 18
+  },
+  "anvil_cost": 0,
+  "slots": [],
+  "effects": {
+    "minecraft:projectile_spawned": [
+      {
+        "effect": {
+          "type": "minecraft:run_function",
+          "function": "empty"
+        }
+      }
+    ]
+  }
+}

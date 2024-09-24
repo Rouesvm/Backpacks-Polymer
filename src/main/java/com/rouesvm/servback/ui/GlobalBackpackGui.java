@@ -20,7 +20,6 @@ public class GlobalBackpackGui extends SimpleGui {
 
         setTitle(Text.literal("Global Backpack"));
         fillChest();
-        open();
     }
 
     @Override

@@ -3,14 +3,15 @@ package com.rouesvm.servback;
 import com.rouesvm.servback.items.ItemList;
 import com.rouesvm.servback.items.ModItemGroup;
 import com.rouesvm.servback.state.StateSaverAndLoader;
-import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -18,6 +19,8 @@ public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 
 	public static ItemStack[] globalInventory = new ItemStack[27];
+
+	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
 
 	@Override
 	public void onInitialize() {

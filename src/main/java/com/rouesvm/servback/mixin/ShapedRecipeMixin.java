@@ -26,6 +26,7 @@ public abstract class ShapedRecipeMixin {
                 if (resultStack.getItem() instanceof ContainerItem) {
                     resultStack.set(DataComponentTypes.CONTAINER, stack.get(DataComponentTypes.CONTAINER));
                     callBack.setReturnValue(resultStack);
+                    break;
                 }
             }
         }

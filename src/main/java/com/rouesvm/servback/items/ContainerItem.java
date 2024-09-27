@@ -1,13 +1,19 @@
 package com.rouesvm.servback.items;
 
+import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ui.BackpackGui;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.*;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.nbt.NbtInt;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -15,6 +21,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -24,15 +32,44 @@ public class ContainerItem extends GuiItem {
     private final int slots;
     private int extendedSlots;
 
+    protected final int RADIUS = 5;
+
     public ContainerItem(String id, int slots) {
         super(id);
         this.slots = slots;
     }
 
+    // [
+    // @Override
+    // public void inventoryTick(ItemStack stack, World world, Entity enttiy, int slot, boolean selected) {
+    //        if (world.isClient() || !entity.isPlayer()) return;
+    //        ServerPlayerEntity player = (ServerPlayerEntity) entity;
+    //
+    //        Integer nbt = stack.get(DataComponentTypes.REPAIR_COST);
+    //        if (nbt != null && nbt != 1) {
+    //            Box area = new Box(player.getPos().add(-RADIUS, -RADIUS, -RADIUS), player.getPos().add(RADIUS, RADIUS, RADIUS));
+    //
+    //            List<ItemEntity> itemEntities = world.getEntitiesByType(EntityType.ITEM, area, Entity::isAlive);
+    //            SimpleInventory itemList = getInventory(stack);
+    //
+    //
+    //            for (ItemEntity item : itemEntities) {
+    //                item.setPos(player.getX(), player.getY(), player.getZ());
+    //                if (item.cannotPickup())
+    //                    continue;
+    //
+    //                item.setPickupDelay(0);
+    //                item.kill();
+    //                itemList.addStack(item.getStack());
+    //            }
+    //
+    //            BackpackGui.saveItemStack(stack, itemList);
+    //        }
+    //    }
+    // ]
+
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-
         ContainerComponent containerComponent = stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
 
         int capacityMaxShow = 0;
@@ -53,9 +90,20 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return (getName().contains(Text.literal("Large")));
+    }
+
+    @Override
     public SimpleGui createGui(ServerPlayerEntity player, ItemStack stack) {
-        hasExtended(stack, player);
-        return new BackpackGui(player, stack, new SimpleInventory(getItemList(stack).toArray(ItemStack[]::new)));
+        onEnchanted(stack, player);
+
+        stack.set(DataComponentTypes.REPAIR_COST, 1);
+        return new BackpackGui(player, stack, getInventory(stack));
+    }
+
+    public SimpleInventory getInventory(ItemStack stack) {
+        return new SimpleInventory(getItemList(stack).toArray(ItemStack[]::new));
     }
 
     public DefaultedList<ItemStack> getItemList(ItemStack stack) {
@@ -64,7 +112,7 @@ public class ContainerItem extends GuiItem {
         return list;
     }
 
-    public void hasExtended(ItemStack stack, ServerPlayerEntity player) {
+    public void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
         DefaultedList<ItemStack> inventory = getItemList(stack);
 
         DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();

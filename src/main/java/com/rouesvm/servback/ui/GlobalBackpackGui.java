@@ -4,7 +4,6 @@ import com.rouesvm.servback.slots.BackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import com.rouesvm.servback.Main;

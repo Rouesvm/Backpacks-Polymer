@@ -4,22 +4,23 @@ import com.rouesvm.servback.slots.BackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
 
 public class BackpackGui extends SimpleGui {
     protected final ItemStack stack;
-    protected final Inventory inventory;
+    protected final SimpleInventory inventory;
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+    public BackpackGui(ServerPlayerEntity player, ItemStack stack, SimpleInventory inventory) {
         super(getHandler(inventory.size()), player, false);
 
         this.stack = stack;
         this.inventory = inventory;
+
+        stack.set(DataComponentTypes.REPAIR_COST, 1);
 
         setTitle(Text.of("Backpack"));
         fillChest();
@@ -37,13 +38,8 @@ public class BackpackGui extends SimpleGui {
         };
     }
 
-    public void saveItemStack() {
-        DefaultedList<ItemStack> storedItems = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
-
-        for (int i = 0; i < storedItems.size(); i++)
-            storedItems.set(i, inventory.getStack(i));
-
-        stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(storedItems));
+    public static void saveItemStack(ItemStack stack, SimpleInventory inventory) {
+        stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(inventory.heldStacks));
     }
 
     public void fillChest() {
@@ -53,8 +49,6 @@ public class BackpackGui extends SimpleGui {
 
     @Override
     public void onTick() {
-        saveItemStack();
-
         if (stack.isEmpty())
             close(false);
 
@@ -62,7 +56,9 @@ public class BackpackGui extends SimpleGui {
     }
 
     @Override
-    public void onClose() {
-        saveItemStack();
+    public void close(boolean screenHandlerIsClosed) {
+        saveItemStack(this.stack, this.inventory);
+        stack.set(DataComponentTypes.REPAIR_COST, 2);
+        super.close(screenHandlerIsClosed);
     }
 }

@@ -59,6 +59,7 @@ public class BackpackGui extends SimpleGui {
     public void close(boolean screenHandlerIsClosed) {
         saveItemStack(this.stack, this.inventory);
         stack.set(DataComponentTypes.REPAIR_COST, 2);
+
         super.close(screenHandlerIsClosed);
     }
 }

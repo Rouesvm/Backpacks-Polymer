@@ -28,6 +28,8 @@ public class ContainerItem extends GuiItem {
     private final int slots;
     private int extendedSlots;
 
+    private boolean enabled = false;
+
     protected final int RADIUS = 5;
 
     public ContainerItem(String id, int slots) {
@@ -35,34 +37,34 @@ public class ContainerItem extends GuiItem {
         this.slots = slots;
     }
 
-    // [
-    // @Override
-    // public void inventoryTick(ItemStack stack, World world, Entity enttiy, int slot, boolean selected) {
-    //        if (world.isClient() || !entity.isPlayer()) return;
-    //        ServerPlayerEntity player = (ServerPlayerEntity) entity;
-    //
-    //        Integer nbt = stack.get(DataComponentTypes.REPAIR_COST);
-    //        if (nbt != null && nbt != 1) {
-    //            Box area = new Box(player.getPos().add(-RADIUS, -RADIUS, -RADIUS), player.getPos().add(RADIUS, RADIUS, RADIUS));
-    //
-    //            List<ItemEntity> itemEntities = world.getEntitiesByType(EntityType.ITEM, area, Entity::isAlive);
-    //            SimpleInventory itemList = getInventory(stack);
-    //
-    //
-    //            for (ItemEntity item : itemEntities) {
-    //                item.setPos(player.getX(), player.getY(), player.getZ());
-    //                if (item.cannotPickup())
-    //                    continue;
-    //
-    //                item.setPickupDelay(0);
-    //                item.kill();
-    //                itemList.addStack(item.getStack());
-    //            }
-    //
-    //            BackpackGui.saveItemStack(stack, itemList);
-    //        }
-    //    }
-    // ]
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        if (!enabled) return;
+        if (world.isClient() || !entity.isPlayer()) return;
+        ServerPlayerEntity player = (ServerPlayerEntity) entity;
+
+        Integer nbt = stack.get(DataComponentTypes.REPAIR_COST);
+        if (nbt != null && nbt != 1) {
+            Box area = new Box(player.getPos().add(-RADIUS, -RADIUS, -RADIUS), player.getPos().add(RADIUS, RADIUS, RADIUS));
+
+            List<ItemEntity> itemEntities = world.getEntitiesByType(EntityType.ITEM, area, Entity::isAlive);
+            SimpleInventory itemList = getInventory(stack);
+
+
+            for (ItemEntity item : itemEntities) {
+                item.setPos(player.getX(), player.getY(), player.getZ());
+                if (item.cannotPickup())
+                    continue;
+
+                item.setPickupDelay(0);
+                item.kill();
+                itemList.addStack(item.getStack());
+            }
+
+            BackpackGui.saveItemStack(stack, itemList);
+        }
+    }
+
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {

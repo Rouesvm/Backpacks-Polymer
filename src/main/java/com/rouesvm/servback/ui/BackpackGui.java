@@ -1,5 +1,6 @@
 package com.rouesvm.servback.ui;
 
+import com.rouesvm.servback.Main;
 import com.rouesvm.servback.slots.BackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
@@ -58,7 +59,7 @@ public class BackpackGui extends SimpleGui {
     @Override
     public void close(boolean screenHandlerIsClosed) {
         saveItemStack(this.stack, this.inventory);
-        stack.set(DataComponentTypes.REPAIR_COST, 2);
+        stack.set(Main.BOOLEAN_TYPE, true);
 
         super.close(screenHandlerIsClosed);
     }

@@ -1,5 +1,6 @@
 package com.rouesvm.servback.items;
 
+import com.rouesvm.servback.Main;
 import com.rouesvm.servback.ui.BackpackGui;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
@@ -21,6 +22,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.rouesvm.servback.Main.CAPACITY;
 
@@ -43,16 +45,15 @@ public class ContainerItem extends GuiItem {
         if (world.isClient() || !entity.isPlayer()) return;
         ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
-        Integer nbt = stack.get(DataComponentTypes.REPAIR_COST);
-        if (nbt != null && nbt != 1) {
+        boolean nbt = stack.getOrDefault(Main.BOOLEAN_TYPE, false);
+        if (!nbt) {
             Box area = new Box(player.getPos().add(-RADIUS, -RADIUS, -RADIUS), player.getPos().add(RADIUS, RADIUS, RADIUS));
 
             List<ItemEntity> itemEntities = world.getEntitiesByType(EntityType.ITEM, area, Entity::isAlive);
             SimpleInventory itemList = getInventory(stack);
 
-
             for (ItemEntity item : itemEntities) {
-                item.setPos(player.getX(), player.getY(), player.getZ());
+                item.setPosition(player.getX(), player.getY(), player.getZ());
                 if (item.cannotPickup())
                     continue;
 
@@ -96,7 +97,7 @@ public class ContainerItem extends GuiItem {
     public SimpleGui createGui(ServerPlayerEntity player, ItemStack stack) {
         onEnchanted(stack, player);
 
-        stack.set(DataComponentTypes.REPAIR_COST, 1);
+        stack.set(Main.BOOLEAN_TYPE, false);
         return new BackpackGui(player, stack, getInventory(stack));
     }
 

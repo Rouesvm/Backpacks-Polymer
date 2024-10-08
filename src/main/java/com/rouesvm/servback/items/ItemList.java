@@ -29,6 +29,8 @@ public class ItemList {
         }
     });
 
+    public static Item ITEM_FILTER = register(new FilterItem("Filter"));
+
     public static Item register(BasicPolymerItem item) {
        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }

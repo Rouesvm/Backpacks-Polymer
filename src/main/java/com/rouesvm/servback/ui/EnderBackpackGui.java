@@ -9,7 +9,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public class EnderBackpackGui extends SimpleGui {
-
     protected final ItemStack stack;
 
     public EnderBackpackGui(ServerPlayerEntity player, ItemStack stack) {

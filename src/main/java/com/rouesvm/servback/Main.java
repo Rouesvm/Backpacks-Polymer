@@ -9,11 +9,8 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
@@ -57,7 +54,7 @@ public class Main implements ModInitializer {
 		return new SimpleInventory(globalInventory.toArray(ItemStack[]::new));
 	}
 
-	public static void setList(SimpleInventory simpleInventory) {
-		globalInventory = simpleInventory.getHeldStacks();
+	public static void setGlobalInventory(SimpleInventory inventory) {
+		globalInventory = inventory.getHeldStacks();
 	}
 }

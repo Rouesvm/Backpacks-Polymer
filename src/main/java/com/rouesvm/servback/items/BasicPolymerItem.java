@@ -23,19 +23,8 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepMo
                 Identifier.of(Main.MOD_ID, "item/" + getIdentifier().getPath()));
     }
 
-    public BasicPolymerItem(String name) {
-        super(new Settings().maxCount(1));
-        this.name = name;
-        this.model = PolymerResourcePackUtils.requestModel(Items.POISONOUS_POTATO,
-                Identifier.of(Main.MOD_ID, "item/" + getIdentifier().getPath()));
-    }
-
     public Identifier getIdentifier() {
-        return Identifier.of(Main.MOD_ID, getActualName().toLowerCase());
-    }
-
-    public String getActualName() {
-        return this.name;
+        return Identifier.of(Main.MOD_ID, this.name);
     }
 
     @Override

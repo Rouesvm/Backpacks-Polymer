@@ -1,6 +1,5 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.slots.BackpackSlot;
 import com.rouesvm.servback.slots.DisabledSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.inventory.SimpleInventory;
@@ -11,7 +10,6 @@ import net.minecraft.text.Text;
 import com.rouesvm.servback.Main;
 
 public class GlobalBackpackGui extends SimpleGui {
-
     protected final ItemStack stack;
     protected final SimpleInventory inventory;
 
@@ -34,7 +32,7 @@ public class GlobalBackpackGui extends SimpleGui {
 
     @Override
     public void close(boolean screenHandlerIsClosed) {
-        Main.setList(inventory);
+        Main.setGlobalInventory(inventory);
         super.close(screenHandlerIsClosed);
     }
 

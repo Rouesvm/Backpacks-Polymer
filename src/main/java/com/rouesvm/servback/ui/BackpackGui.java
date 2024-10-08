@@ -27,6 +27,20 @@ public class BackpackGui extends SimpleGui {
         fillChest();
     }
 
+    @Override
+    public void onTick() {
+        if (stack.isEmpty())
+            close(false);
+        super.onTick();
+    }
+
+    @Override
+    public void close(boolean screenHandlerIsClosed) {
+        saveItemStack(stack, inventory);
+        stack.set(Main.BOOLEAN_TYPE, true);
+        super.close(screenHandlerIsClosed);
+    }
+
     public static ScreenHandlerType<?> getHandler(int slots) {
         return switch (slots/9) {
             case 1 -> ScreenHandlerType.GENERIC_9X1;
@@ -46,21 +60,5 @@ public class BackpackGui extends SimpleGui {
     public void fillChest() {
         for (int i = 0; i < inventory.size(); i++)
             setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
-    }
-
-    @Override
-    public void onTick() {
-        if (stack.isEmpty())
-            close(false);
-
-        super.onTick();
-    }
-
-    @Override
-    public void close(boolean screenHandlerIsClosed) {
-        saveItemStack(this.stack, this.inventory);
-        stack.set(Main.BOOLEAN_TYPE, true);
-
-        super.close(screenHandlerIsClosed);
     }
 }

@@ -18,11 +18,6 @@ public class GuiItem extends BasicPolymerItem {
     }
 
     @Override
-    public Text getName() {
-        return Text.of(getActualName() + " Backpack");
-    }
-
-    @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 

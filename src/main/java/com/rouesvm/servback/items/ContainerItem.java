@@ -10,7 +10,6 @@ import net.minecraft.entity.*;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -22,7 +21,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Objects;
 
 import static com.rouesvm.servback.Main.CAPACITY;
 
@@ -30,12 +28,12 @@ public class ContainerItem extends GuiItem {
     private final int slots;
     private int extendedSlots;
 
-    private boolean enabled = false;
+    private final boolean enabled = false;
 
     protected final int RADIUS = 5;
 
-    public ContainerItem(String id, int slots) {
-        super(id);
+    public ContainerItem(String name, int slots) {
+        super(name);
         this.slots = slots;
     }
 
@@ -65,7 +63,6 @@ public class ContainerItem extends GuiItem {
             BackpackGui.saveItemStack(stack, itemList);
         }
     }
-
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {

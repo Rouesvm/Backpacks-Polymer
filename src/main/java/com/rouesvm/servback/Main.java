@@ -13,6 +13,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
@@ -25,7 +26,7 @@ import net.minecraft.util.collection.DefaultedList;
 public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 
-	public static ItemStack[] globalInventory = new ItemStack[27];
+	public static DefaultedList<ItemStack> globalInventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
 
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
 	public static final ComponentType<Boolean> BOOLEAN_TYPE = ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
@@ -43,25 +44,20 @@ public class Main implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
 			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
-			globalInventory = serverState.globalInventory.toArray(ItemStack[]::new);
+			globalInventory = serverState.globalInventory;
 		}));
 
 		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
 			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
-			DefaultedList<ItemStack> inventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
-			for (int i = 0; i < 27; i++) {
-				ItemStack stack = globalInventory[i];
-				if (stack == null)
-					stack = ItemStack.EMPTY;
-
-				inventory.set(i, stack);
-			}
-
-			serverState.globalInventory = inventory;
+			serverState.globalInventory = globalInventory;
 		}));
 	}
 
-	public static Inventory getInventory() {
-		return new SimpleInventory(globalInventory);
+	public static SimpleInventory getInventory() {
+		return new SimpleInventory(globalInventory.toArray(ItemStack[]::new));
+	}
+
+	public static void setList(SimpleInventory simpleInventory) {
+		globalInventory = simpleInventory.getHeldStacks();
 	}
 }

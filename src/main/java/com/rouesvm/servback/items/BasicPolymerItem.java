@@ -16,10 +16,17 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepMo
     private final String name;
     private final PolymerModelData model;
 
+    public BasicPolymerItem(String name, Item vanillaItem) {
+        super(new Settings().maxCount(1));
+        this.name = name;
+        this.model = PolymerResourcePackUtils.requestModel(vanillaItem,
+                Identifier.of(Main.MOD_ID, "item/" + getIdentifier().getPath()));
+    }
+
     public BasicPolymerItem(String name) {
         super(new Settings().maxCount(1));
         this.name = name;
-        this.model = PolymerResourcePackUtils.requestModel(Items.LEATHER,
+        this.model = PolymerResourcePackUtils.requestModel(Items.POISONOUS_POTATO,
                 Identifier.of(Main.MOD_ID, "item/" + getIdentifier().getPath()));
     }
 

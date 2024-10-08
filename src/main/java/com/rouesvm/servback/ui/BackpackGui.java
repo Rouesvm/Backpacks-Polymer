@@ -40,7 +40,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public static void saveItemStack(ItemStack stack, SimpleInventory inventory) {
-        stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(inventory.heldStacks));
+        stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(inventory.getHeldStacks()));
     }
 
     public void fillChest() {

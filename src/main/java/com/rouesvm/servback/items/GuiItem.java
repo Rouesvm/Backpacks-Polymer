@@ -3,6 +3,7 @@ package com.rouesvm.servback.items;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -13,7 +14,7 @@ import net.minecraft.world.World;
 
 public class GuiItem extends BasicPolymerItem {
     public GuiItem(String name) {
-        super(name);
+        super(name, Items.LEATHER);
     }
 
     @Override

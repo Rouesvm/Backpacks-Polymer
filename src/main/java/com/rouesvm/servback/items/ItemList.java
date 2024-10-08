@@ -5,6 +5,7 @@ import com.rouesvm.servback.ui.GlobalBackpackGui;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,6 +28,8 @@ public class ItemList {
             return new GlobalBackpackGui(player, stack);
         }
     });
+
+    public static Item ITEM_FILTER = register(new BasicPolymerItem("filter", Items.POISONOUS_POTATO));
 
     public static Item register(BasicPolymerItem item) {
        return Registry.register(Registries.ITEM, item.getIdentifier(), item);

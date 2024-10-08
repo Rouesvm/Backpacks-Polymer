@@ -16,6 +16,7 @@ public class ModItemGroup {
         entries.add(ItemList.LARGE_BACKPACK);
         entries.add(ItemList.GLOBAL_BACKPACK);
         entries.add(ItemList.ENDER_BACKPACK);
+        entries.add(ItemList.ITEM_FILTER);
     }
 
     public static void initialize() {

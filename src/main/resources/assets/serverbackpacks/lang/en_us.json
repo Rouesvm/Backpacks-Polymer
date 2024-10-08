@@ -4,5 +4,6 @@
   "item.serverbackpacks.large" : "Large Backpack",
 
   "item.serverbackpacks.global" : "GlobalPack",
-  "item.serverbackpacks.ender" : "EnderPack"
+  "item.serverbackpacks.ender" : "EnderPack",
+  "item.serverbackpacks.filter" : "Magnet Filter"
 }

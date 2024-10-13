@@ -21,16 +21,14 @@ public class BackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = inventory;
 
-        stack.set(DataComponentTypes.REPAIR_COST, 1);
-
-        setTitle(Text.of("Backpack"));
-        fillChest();
+        this.setTitle(Text.of("Backpack"));
+        this.fillChest();
     }
 
     @Override
     public void onTick() {
         if (stack.isEmpty())
-            close(false);
+            this.close(false);
         super.onTick();
     }
 
@@ -58,7 +56,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int i = 0; i < inventory.size(); i++)
-            setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
+        for (int i = 0; i < this.inventory.size(); i++)
+            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
     }
 }

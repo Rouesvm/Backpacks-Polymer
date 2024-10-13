@@ -1,6 +1,6 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.slots.DisabledSlot;
+import com.rouesvm.servback.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -19,14 +19,14 @@ public class GlobalBackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = Main.getInventory();
 
-        setTitle(Text.literal("Global Backpack"));
-        fillChest();
+        this.setTitle(Text.literal("Global Backpack"));
+        this.fillChest();
     }
 
     @Override
     public void onTick() {
         if (stack.isEmpty())
-            close(false);
+            this.close(false);
         super.onTick();
     }
 
@@ -38,6 +38,6 @@ public class GlobalBackpackGui extends SimpleGui {
 
     public void fillChest() {
         for (int i = 0; i < 27; i++)
-            setSlotRedirect(i, new DisabledSlot(this.inventory, i, i, 0));
+            this.setSlotRedirect(i, new NonBackpackSlot(this.inventory, i, i, 0));
     }
 }

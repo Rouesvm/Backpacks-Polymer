@@ -2,7 +2,6 @@ package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.ui.BackpackGui;
-import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -60,7 +59,7 @@ public class ContainerItem extends GuiItem {
                 itemList.addStack(item.getStack());
             }
 
-            BackpackGui.saveItemStack(stack, itemList);
+            stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(itemList.getHeldStacks()));
         }
     }
 
@@ -91,11 +90,11 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
-    public SimpleGui createGui(ServerPlayerEntity player, ItemStack stack) {
+    public void openGui(ServerPlayerEntity player, ItemStack stack) {
         onEnchanted(stack, player);
 
         stack.set(Main.BOOLEAN_TYPE, false);
-        return new BackpackGui(player, stack, getInventory(stack));
+        new BackpackGui(player, stack, getInventory(stack));
     }
 
     public SimpleInventory getInventory(ItemStack stack) {

@@ -20,13 +20,14 @@ public class EnderBackpackGui extends SimpleGui {
 
         this.setTitle(Text.literal("Ender Backpack"));
         this.fillChest();
+
+        this.open();
     }
 
     @Override
     public void onTick() {
-        if (stack.isEmpty())
-            this.close(false);
-        super.onTick();
+        if (this.stack.isEmpty())
+            this.close();
     }
 
     public void fillChest() {

@@ -2,7 +2,6 @@ package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.ui.EnderBackpackGui;
 import com.rouesvm.servback.ui.GlobalBackpackGui;
-import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -16,15 +15,15 @@ public class ItemList {
 
     public static Item ENDER_BACKPACK = register(new GuiItem("ender") {
         @Override
-        public SimpleGui createGui(ServerPlayerEntity player, ItemStack stack) {
-            return new EnderBackpackGui(player, stack);
+        public void openGui(ServerPlayerEntity player, ItemStack stack) {
+            new EnderBackpackGui(player, stack);
         }
     });
 
     public static Item GLOBAL_BACKPACK = register(new GuiItem("global") {
         @Override
-        public SimpleGui createGui(ServerPlayerEntity player, ItemStack stack) {
-            return new GlobalBackpackGui(player, stack);
+        public void openGui(ServerPlayerEntity player, ItemStack stack) {
+            new GlobalBackpackGui(player, stack);
         }
     });
 

@@ -2,8 +2,12 @@ package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -21,19 +25,28 @@ public class GlobalBackpackGui extends SimpleGui {
 
         this.setTitle(Text.literal("Global Backpack"));
         this.fillChest();
+
+        this.open();
+        this.afterOpened();
+    }
+
+    public void afterOpened() {
+        this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
+            @Override
+            public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
+                Main.setGlobalInventory(inventory);
+            }
+            @Override
+            public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
+
+            }
+        });
     }
 
     @Override
     public void onTick() {
-        if (stack.isEmpty())
-            this.close(false);
-        super.onTick();
-    }
-
-    @Override
-    public void close(boolean screenHandlerIsClosed) {
-        Main.setGlobalInventory(inventory);
-        super.close(screenHandlerIsClosed);
+        if (this.stack.isEmpty())
+            this.close();
     }
 
     public void fillChest() {

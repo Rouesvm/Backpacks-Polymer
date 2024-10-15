@@ -7,7 +7,6 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -31,7 +30,7 @@ public class GuiItem extends BasicPolymerItem {
         if (cast.getType() == HitResult.Type.BLOCK)
             return TypedActionResult.pass(stack);
 
-        createGui(serverPlayer, stack).open();
+        openGui(serverPlayer, stack);
 
         return TypedActionResult.success(stack);
     }
@@ -43,11 +42,11 @@ public class GuiItem extends BasicPolymerItem {
         if (serverPlayer.isSneaking())
             return ActionResult.PASS;
 
-        createGui(serverPlayer, context.getStack()).open();
+        openGui(serverPlayer, context.getStack());
         return ActionResult.success(true);
     }
 
-    public SimpleGui createGui(ServerPlayerEntity player, ItemStack stack) {
-        return new SimpleGui(ScreenHandlerType.ANVIL, player, false);
+    public void openGui(ServerPlayerEntity player, ItemStack stack) {
+        new SimpleGui(ScreenHandlerType.ANVIL, player, false);
     }
 }

@@ -27,12 +27,6 @@ jobs:
           distribution: 'microsoft'
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: Get Version
-        if: ${{ (success() || failure()) && github.repository == 'Rouesvm/Backpacks-Polymer' }}
-        id: get-version
-        run: |
-          version=$(cat gradle.properties | grep -o "mod_version=[0-9\\.]*" | cut -d"=" -f2)
-          echo "VERSION=${version}" >> $GITHUB_OUTPUT
       - name: build
         run: ./gradlew build
       - name: capture build artifacts

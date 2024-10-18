@@ -1,0 +1,13 @@
+{
+  "item.serverbackpacks.small" : "小型背包",
+  "item.serverbackpacks.medium" : "中型背包",
+  "item.serverbackpacks.large" : "大型背包",
+
+  "item.serverbackpacks.global" : "共有背包",
+  "item.serverbackpacks.ender" : "末影背包",
+
+  "item.serverbackpacks.gui_backpacks" : "背包",
+  "item.serverbackpacks.gui_backpack" : "背包",
+  "item.serverbackpacks.gui_ender" : "末影背包",
+  "item.serverbackpacks.gui_global" : "共有背包"
+}

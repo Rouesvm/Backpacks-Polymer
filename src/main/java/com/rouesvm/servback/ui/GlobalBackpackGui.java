@@ -23,7 +23,7 @@ public class GlobalBackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = Main.getInventory();
 
-        this.setTitle(Text.literal("Global Backpack"));
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_global"));
         this.fillChest();
 
         this.open();

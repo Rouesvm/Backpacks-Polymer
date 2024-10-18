@@ -18,7 +18,7 @@ public class EnderBackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = player.getEnderChestInventory();
 
-        this.setTitle(Text.literal("Ender Backpack"));
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_ender"));
         this.fillChest();
 
         this.open();

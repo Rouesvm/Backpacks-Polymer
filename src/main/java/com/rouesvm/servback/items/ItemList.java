@@ -19,7 +19,6 @@ public class ItemList {
             new EnderBackpackGui(player, stack);
         }
     });
-
     public static Item GLOBAL_BACKPACK = register(new GuiItem("global") {
         @Override
         public void openGui(ServerPlayerEntity player, ItemStack stack) {

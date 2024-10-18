@@ -21,7 +21,7 @@ public class ModItemGroup {
     public static void initialize() {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(Main.MOD_ID + "items"), PolymerItemGroupUtils.builder()
                 .icon(() -> new ItemStack(ItemList.ENDER_BACKPACK))
-                .displayName(Text.of("Backpacks"))
+                .displayName(Text.translatable("item.serverbackpacks.gui_backpacks"))
                 .entries(((context, entries) -> addItems(entries))).build()
         );
     }

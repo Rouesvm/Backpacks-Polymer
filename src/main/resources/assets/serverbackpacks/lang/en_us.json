@@ -1,8 +1,0 @@
-{
-  "item.serverbackpacks.small" : "Small Backpack",
-  "item.serverbackpacks.medium" : "Medium Backpack",
-  "item.serverbackpacks.large" : "Large Backpack",
-
-  "item.serverbackpacks.global" : "GlobalPack",
-  "item.serverbackpacks.ender" : "EnderPack"
-}

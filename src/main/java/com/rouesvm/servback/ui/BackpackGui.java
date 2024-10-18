@@ -22,7 +22,7 @@ public class BackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = inventory;
 
-        this.setTitle(Text.of("Backpack"));
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         this.fillChest();
 
         this.open();

@@ -10,6 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
+import org.geysermc.geyser.api.item.custom.NonVanillaCustomItemData;
 import org.jetbrains.annotations.Nullable;
 
 public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepModel {
@@ -37,3 +39,4 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepMo
         return this.model.value();
     }
 }
+

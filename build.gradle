@@ -20,7 +20,6 @@ loom {
     mods {
         "serverbackpacks" {
             sourceSet sourceSets.main
-            sourceSet sourceSets.client
         }
     }
 
@@ -30,8 +29,9 @@ dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+    // Depend only
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation include("eu.pb4:polymer-core:${project.polymer}+${project.minecraft_version}")

@@ -1,12 +1,13 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.Main;
 import com.rouesvm.servback.slots.BackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -21,24 +22,31 @@ public class BackpackGui extends SimpleGui {
         this.stack = stack;
         this.inventory = inventory;
 
-        stack.set(DataComponentTypes.REPAIR_COST, 1);
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
+        this.fillChest();
 
-        setTitle(Text.of("Backpack"));
-        fillChest();
+        this.open();
+        this.afterOpened();
+    }
+
+    public void afterOpened() {
+        this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
+            @Override
+            public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
+                ContainerComponent newContents = ContainerComponent.fromStacks(inventory.getHeldStacks());
+                stack.set(DataComponentTypes.CONTAINER, newContents);
+            }
+            @Override
+            public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
+
+            }
+        });
     }
 
     @Override
     public void onTick() {
-        if (stack.isEmpty())
-            close(false);
-        super.onTick();
-    }
-
-    @Override
-    public void close(boolean screenHandlerIsClosed) {
-        saveItemStack(stack, inventory);
-        stack.set(Main.BOOLEAN_TYPE, true);
-        super.close(screenHandlerIsClosed);
+        if (this.stack.isEmpty())
+            this.close();
     }
 
     public static ScreenHandlerType<?> getHandler(int slots) {
@@ -53,12 +61,8 @@ public class BackpackGui extends SimpleGui {
         };
     }
 
-    public static void saveItemStack(ItemStack stack, SimpleInventory inventory) {
-        stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(inventory.getHeldStacks()));
-    }
-
     public void fillChest() {
-        for (int i = 0; i < inventory.size(); i++)
-            setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
+        for (int i = 0; i < this.inventory.size(); i++)
+            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
     }
 }

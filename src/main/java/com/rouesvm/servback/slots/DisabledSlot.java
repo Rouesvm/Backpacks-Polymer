@@ -1,7 +1,6 @@
 package com.rouesvm.servback.slots;
 
-import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.items.GuiItem;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -12,7 +11,17 @@ public class DisabledSlot extends Slot {
     }
 
     @Override
+    public boolean canTakeItems(PlayerEntity playerEntity) {
+        return false;
+    }
+
+    @Override
     public boolean canInsert(ItemStack stack) {
-        return !(stack.getItem() instanceof GuiItem);
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

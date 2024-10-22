@@ -16,7 +16,7 @@
       "item": "minecraft:string"
     },
     "E": {
-      "item": "serverbackpacks:small"
+      "item": "serverbackpacks:large"
     },
     "A": {
       "item": "minecraft:ender_eye"

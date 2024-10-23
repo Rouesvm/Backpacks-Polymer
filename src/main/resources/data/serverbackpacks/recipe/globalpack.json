@@ -1,26 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "#i#",
+    "LiL",
     "SES",
     " N "
   ],
   "key": {
-    "#": {
-      "item": "minecraft:ender_eye"
-    },
-    "i": {
-      "item": "minecraft:iron_ingot"
-    },
-    "S": {
-      "item": "minecraft:string"
-    },
-    "E": {
-      "item": "serverbackpacks:ender"
-    },
-    "N": {
-      "item": "minecraft:nether_star"
-    }
+    "L": "minecraft:ender_eye",
+    "i": "minecraft:iron_ingot",
+    "S": "minecraft:string",
+    "E": "serverbackpacks:ender",
+    "N": "minecraft:nether_star"
   },
   "result": {
     "id": "serverbackpacks:global",

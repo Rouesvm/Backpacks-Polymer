@@ -1,26 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "#i#",
+    "LiL",
     "SES",
     " A "
   ],
   "key": {
-    "#": {
-      "item": "minecraft:leather"
-    },
-    "i": {
-      "item": "minecraft:iron_ingot"
-    },
-    "S": {
-      "item": "minecraft:string"
-    },
-    "E": {
-      "item": "serverbackpacks:large"
-    },
-    "A": {
-      "item": "minecraft:ender_eye"
-    }
+    "L": "minecraft:leather",
+    "i": "minecraft:iron_ingot",
+    "S": "minecraft:string",
+    "E": "serverbackpacks:large",
+    "A": "minecraft:ender_eye"
   },
   "result": {
     "id": "serverbackpacks:ender",

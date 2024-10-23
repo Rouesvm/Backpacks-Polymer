@@ -31,7 +31,6 @@ public class GuiItem extends BasicPolymerItem {
             return ActionResult.PASS;
 
         openGui(serverPlayer, stack);
-
         return ActionResult.SUCCESS;
     }
 

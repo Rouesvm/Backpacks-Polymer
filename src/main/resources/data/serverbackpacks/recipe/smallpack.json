@@ -1,20 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "#S#",
+    "RSR",
     "SCS",
-    " # "
+    " R "
   ],
   "key": {
-    "#": {
-      "item": "minecraft:leather"
-    },
-    "S": {
-      "item": "minecraft:string"
-    },
-    "C": {
-      "item": "minecraft:chest"
-    }
+    "R": "minecraft:leather",
+    "S": "minecraft:string",
+    "C": "minecraft:chest"
   },
   "result": {
     "id": "serverbackpacks:small",

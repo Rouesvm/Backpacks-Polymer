@@ -19,7 +19,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
-import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
 
 public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";

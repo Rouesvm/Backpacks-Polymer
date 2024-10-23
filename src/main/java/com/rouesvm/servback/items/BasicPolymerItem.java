@@ -3,40 +3,36 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.Main;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
-import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
-import org.geysermc.geyser.api.item.custom.NonVanillaCustomItemData;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepModel {
-    private final String name;
-    private final PolymerModelData model;
+    private final Identifier id;
+    private final Item vanillaItem;
 
     public BasicPolymerItem(String name, Item vanillaItem) {
-        super(new Settings().maxCount(1));
-        this.name = name;
-        this.model = PolymerResourcePackUtils.requestModel(vanillaItem,
-                Identifier.of(Main.MOD_ID, "item/" + getIdentifier().getPath()));
+        super(new Settings().maxCount(1).registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Main.MOD_ID, name))));
+        this.id = Identifier.of(Main.MOD_ID, name);
+        this.vanillaItem = vanillaItem;
+    }
+
+    @Override
+    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
+        return this.vanillaItem;
+    }
+
+    @Override
+    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context) {
+        return this.id;
     }
 
     public Identifier getIdentifier() {
-        return Identifier.of(Main.MOD_ID, this.name);
-    }
-
-    @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return this.model.item();
-    }
-
-    @Override
-    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return this.model.value();
+        return this.id;
     }
 }
 

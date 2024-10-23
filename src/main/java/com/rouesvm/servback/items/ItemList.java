@@ -7,13 +7,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
 
 import java.util.ArrayList;
 
 public class ItemList {
-    public static ArrayList<BasicPolymerItem> basicPolymerItems = new ArrayList<>();
-
     public static Item SMALL_BACKPACK = register(new ContainerItem("small", 9));
     public static Item MEDIUM_BACKPACK = register(new ContainerItem("medium", 9 * 2));
     public static Item LARGE_BACKPACK = register(new ContainerItem("large", 9 * 3));

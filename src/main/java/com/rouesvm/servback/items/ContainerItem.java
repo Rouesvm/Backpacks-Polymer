@@ -2,6 +2,7 @@ package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.ui.BackpackGui;
+import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -13,6 +14,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
@@ -40,13 +42,14 @@ public class ContainerItem extends GuiItem {
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         if (!enabled) return;
         if (world.isClient() || !entity.isPlayer()) return;
+        ServerWorld serverWorld = (ServerWorld) world;
         ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
         boolean nbt = stack.getOrDefault(Main.BOOLEAN_TYPE, false);
         if (!nbt) {
             Box area = new Box(player.getPos().add(-RADIUS, -RADIUS, -RADIUS), player.getPos().add(RADIUS, RADIUS, RADIUS));
 
-            List<ItemEntity> itemEntities = world.getEntitiesByType(EntityType.ITEM, area, Entity::isAlive);
+            List<ItemEntity> itemEntities = serverWorld.getEntitiesByType(EntityType.ITEM, area, Entity::isAlive);
             SimpleInventory itemList = getInventory(stack);
 
             for (ItemEntity item : itemEntities) {
@@ -55,7 +58,7 @@ public class ContainerItem extends GuiItem {
                     continue;
 
                 item.setPickupDelay(0);
-                item.kill();
+                item.kill(serverWorld);
                 itemList.addStack(item.getStack());
             }
 
@@ -85,8 +88,11 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return this.slots == 9 * 2 || this.slots == 9 * 3;
+    public boolean canBeEnchantedWith(ItemStack stack, RegistryEntry<Enchantment> enchantment, EnchantingContext context) {
+        if (slots == 9)
+            return false;
+
+        return super.canBeEnchantedWith(stack, enchantment, context);
     }
 
     @Override
@@ -111,7 +117,7 @@ public class ContainerItem extends GuiItem {
         DefaultedList<ItemStack> inventory = getItemList(stack);
 
         DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
+        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
         extendedSlots = 9 * level;

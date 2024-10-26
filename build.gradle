@@ -34,9 +34,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation include("eu.pb4:polymer-core:${project.polymer}+${project.last_version}")
-    modImplementation include("eu.pb4:polymer-blocks:${project.polymer}+${project.last_version}")
-    modImplementation include("eu.pb4:polymer-resource-pack:${project.polymer}+${project.last_version}")
+    modImplementation include("eu.pb4:polymer-core:${project.polymer}+${project.minecraft_version}")
+    modImplementation include("eu.pb4:polymer-blocks:${project.polymer}+${project.minecraft_version}")
+    modImplementation include("eu.pb4:polymer-resource-pack:${project.polymer}+${project.minecraft_version}")
 
     modImplementation include("eu.pb4:sgui:${project.sgui}+${project.last_version}")
 }

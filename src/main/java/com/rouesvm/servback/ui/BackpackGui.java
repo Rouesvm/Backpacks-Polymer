@@ -59,8 +59,7 @@ public class BackpackGui extends SimpleGui {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
                 inventory.setInventoryDirectly(simpleInventory.getHeldStacks());
-                boolean success = Main.backpackManager.saveBackpack(uuid, inventory);
-                System.out.println(success);
+                Main.backpackManager.saveBackpack(uuid, inventory);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {

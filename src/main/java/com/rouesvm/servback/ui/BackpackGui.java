@@ -1,10 +1,9 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.Main;
-import com.rouesvm.servback.components.BackpacksDataComponentsType;
+import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
-import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.utils.BackpackInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
@@ -17,7 +16,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class BackpackGui extends SimpleGui {
@@ -31,9 +29,9 @@ public class BackpackGui extends SimpleGui {
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
         super(getHandler(slots), player, false);
 
-        stack.set(BackpacksDataComponentsType.BOOLEAN_TYPE, true);
+        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
 
-        this.uuid = UUID.fromString(stack.get(BackpacksDataComponentsType.UUID_TYPE));
+        this.uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
         this.stack = stack;
 
         this.inventory = Main.backpackManager.getInventory(uuid, slots);

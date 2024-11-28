@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
 
 import static com.rouesvm.servback.Main.*;
 
-public class BackpacksDataComponentsType {
+public class BackpacksDataComponentTypes {
     public static final ComponentType<Boolean> BOOLEAN_TYPE = register(
             ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build(),
             "boolean"

@@ -1,6 +1,7 @@
 package com.rouesvm.servback.state;
 
 import com.rouesvm.servback.utils.BackpackInstance;
+import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -23,23 +24,14 @@ public class StateSaverAndLoader extends PersistentState {
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         Inventories.writeNbt(nbt, globalInventory, registryLookup);
-
-        if (!storedInventories.isEmpty()) {
-            NbtList nbtList = new NbtList();
-            storedInventories.forEach(instance -> nbtList.add(instance.save(registryLookup)));
-            nbt.put("backpackContents", nbtList);
-        }
-
+        BackpackManager.saveNbt(storedInventories, nbt, registryLookup);
         return nbt;
     }
 
     public static StateSaverAndLoader createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         StateSaverAndLoader state = new StateSaverAndLoader();
         Inventories.readNbt(tag, state.globalInventory, registryLookup);
-
-        tag.getList("backpackContents", NbtCompound.COMPOUND_TYPE).forEach(element ->
-                state.storedInventories.add(BackpackInstance.load((NbtCompound) element, registryLookup)));
-
+        BackpackManager.loadNbt(state.storedInventories, tag, registryLookup);
         return state;
     }
 

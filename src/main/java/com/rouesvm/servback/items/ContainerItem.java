@@ -77,16 +77,16 @@ public class ContainerItem extends GuiItem {
         return list;
     }
 
-    private DefaultedList<ItemStack> getItemList(ItemStack stack) {
+    private BackpackInventory getItemList(ItemStack stack) {
         UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
-        return Main.backpackManager.getInventory(uuid, this.slots).getInventory();
+        return Main.backpackManager.getInventory(uuid, this.slots);
     }
 
     private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
-        DefaultedList<ItemStack> inventory = getItemList(stack);
+        BackpackInventory inventory = getItemList(stack);
 
         DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
+        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
         this.extendedSlots = 9 * level;

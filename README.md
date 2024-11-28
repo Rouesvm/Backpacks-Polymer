@@ -1,31 +1,36 @@
-Serverside Backpacks!
+## Serverside Backpacks!
 This is a fork of the original `Server Backpacks` mod by [Oliver-makes-code](https://github.com/Oliver-makes-code/server-backpacks). 
 
 For the purpose of supporting 1.21 and beyond!
 
 https://modrinth.com/mod/serverbacksnow
 
-<a href="https://polymer.pb4.eu/polymer/resource-packs/#making-pack-required:~:text=Identifier(%22minecraft%22%2C%20%22default%22)%3B%0A%7D-,Making%20pack%20required,will%20be%20located%20in%20your%20server%20folder%20as%20polymer%2Dresourcepack.zip.,-Previous">resourcepack instructions</a>
+[resourcepack instructions](https://polymer.pb4.eu/polymer/resource-packs/#building-resource-pack)
 
+## Crafting Recipes:
 
-Crafting Recipes
+Small Backpack
 
-Small
+![small_backpack](https://github.com/user-attachments/assets/4f8a359d-99e4-420d-b2c7-b4ad4cc757a1)
 
-![small_backpack](https://github.com/user-attachments/assets/a02db5c2-9aea-43ba-b182-7cd2a542cbcc)
+Medium Backpack
 
-Medium
+![medium_backpack](https://github.com/user-attachments/assets/3c40ee49-3159-4fe9-8817-8ef62e659090)
 
-![medium_backpack](https://github.com/user-attachments/assets/b3d9a2fe-f200-42cf-a33b-8adcc13c69bd)
+Large Backpack
 
-Large
+![large_backpack](https://github.com/user-attachments/assets/79423efb-844c-4a2c-be58-0b79ea8dee71)
 
-![large_backpack](https://github.com/user-attachments/assets/2dc78559-304d-4398-b21c-4d027166a704)
+EnderPack
 
-Ender
+![enderpack](https://github.com/user-attachments/assets/07524697-7083-4f47-93e0-ada22404f639)
 
-![ender_backpack](https://github.com/user-attachments/assets/0ff1371c-5970-4610-b9a5-316fb3149a0e)
+GlobalPack
 
-Global
+![globalpack](https://github.com/user-attachments/assets/16285c3e-0983-4436-88fe-6eb1ddbe0485)
 
-![global_backpack](https://github.com/user-attachments/assets/c928dea7-22ed-47de-a0de-d55754ea3720)
+## Geyser Support:
+1. Build your java resource pack with [polymer](https://polymer.pb4.eu/polymer/resource-packs/#building-resource-pack).
+2. Convert it to a bedrock resource pack using tools like [java2bedrock.sh](https://github.com/Kas-tle/java2bedrock.sh).
+3. Follow the [guide](https://geysermc.org/wiki/geyser/faq/#general-questions) on Geyser for bedrock edition players to load the pack.
+4. Optionally add the [language files](https://github.com/Rouesvm/Backpacks-Polymer/tree/1.21.1/src/main/resources/data/serverbackpacks/lang) to Geyser for localization, follow the guides [here](https://geysermc.org/wiki/geyser/translations#modifyingadding-minecraft-java-translations).

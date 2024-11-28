@@ -9,11 +9,6 @@ public class BackpackInstance {
     public UUID uuid;
     public BackpackInventory backpackInventory;
 
-    public BackpackInstance(int slots) {
-        this.uuid = UUID.randomUUID();
-        this.backpackInventory = new BackpackInventory(slots);
-    }
-
     public BackpackInstance(UUID uuid, BackpackInventory inventory) {
         this.uuid = uuid;
         this.backpackInventory = inventory;
@@ -28,13 +23,8 @@ public class BackpackInstance {
 
     public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
         UUID uuid = compound.getUuid("uuid");
-        BackpackInventory inventory = new BackpackInventory(27);
-
+        BackpackInventory inventory = new BackpackInventory();
         inventory.load(compound.getCompound("contents"), registryLookup);
-
-        BackpackInstance backpackInstance = new BackpackInstance(27);
-        backpackInstance.backpackInventory = inventory;
-        backpackInstance.uuid = uuid;
-        return backpackInstance;
+        return new BackpackInstance(uuid, inventory);
     }
 }

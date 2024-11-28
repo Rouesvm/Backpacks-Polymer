@@ -3,7 +3,6 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackInventory;
-import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -18,6 +17,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.rouesvm.servback.Main.CAPACITY;
@@ -62,15 +62,21 @@ public class ContainerItem extends GuiItem {
         if (stack.get(Main.UUID_TYPE) == null)
             stack.set(Main.UUID_TYPE, UUID.randomUUID().toString());
 
-       // onEnchanted(stack, player);
+        onEnchanted(stack, player);
 
         stack.set(Main.BOOLEAN_TYPE, false);
-        new BackpackGui(player, stack, slots);
+        new BackpackGui(player, stack, this.slots);
+    }
+
+    public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
+        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots + this.extendedSlots, ItemStack.EMPTY);
+        stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
+        return list;
     }
 
     private DefaultedList<ItemStack> getItemList(ItemStack stack) {
         UUID uuid = UUID.fromString(stack.get(Main.UUID_TYPE));
-        return Main.backpackManager.getInventory(uuid).getInventory();
+        return Main.backpackManager.getInventory(uuid, this.slots).getInventory();
     }
 
     private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
@@ -83,9 +89,9 @@ public class ContainerItem extends GuiItem {
         extendedSlots = 9 * level;
 
         if (extendedSlots != 0) return;
-        if (inventory.size() < slots) return;
+        if (inventory.size() < this.slots) return;
 
-        for (int i = inventory.size(); i > slots; --i)
+        for (int i = inventory.size(); i > this.slots; --i)
             player.dropItem(inventory.get(i - 1), true);
     }
 }

@@ -9,11 +9,12 @@ public class BackpackManager {
     public HashMap<UUID, BackpackInventory> storedInventories = new HashMap<>();
 
     public BackpackInventory getInventory(UUID uuid, int slots) {
-        return this.storedInventories.getOrDefault(uuid, new BackpackInventory(slots));
-    }
-
-    public BackpackInventory getInventory(UUID uuid) {
-        return this.storedInventories.getOrDefault(uuid, new BackpackInventory(27));
+        if (this.storedInventories.containsKey(uuid)) {
+            BackpackInventory backpackInventory = this.storedInventories.get(uuid);
+            if (backpackInventory.getInventory().isEmpty())
+                return new BackpackInventory(slots);
+            else return backpackInventory;
+        } else return new BackpackInventory(slots);
     }
 
     public boolean saveBackpack(UUID uuid, BackpackInventory backpackInventory) {

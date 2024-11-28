@@ -9,9 +9,16 @@ import net.minecraft.util.collection.DefaultedList;
 
 public class BackpackInventory {
     private DefaultedList<ItemStack> inventory;
+    private int size;
 
     public BackpackInventory(int slots) {
         this.inventory = DefaultedList.ofSize(slots, ItemStack.EMPTY);
+        this.size = slots;
+    }
+
+    public BackpackInventory() {
+        this.inventory = DefaultedList.of();
+        this.size = this.inventory.size();
     }
 
     public boolean insertItems(DefaultedList<ItemStack> itemStacks) {
@@ -33,10 +40,11 @@ public class BackpackInventory {
 
     public void load(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
         Inventories.readNbt(nbtCompound, this.inventory, registryLookup);
+        this.size = this.inventory.size();
     }
 
-    public int slots() {
-        return this.inventory.size();
+    public int size() {
+        return this.size;
     }
 
     public void setInventory(DefaultedList<ItemStack> inventory) {

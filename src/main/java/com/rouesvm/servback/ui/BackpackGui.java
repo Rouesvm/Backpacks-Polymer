@@ -1,12 +1,12 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.Main;
+import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
-import com.rouesvm.servback.utils.BackpackInstance;
+import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.utils.BackpackInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -14,7 +14,9 @@ import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.collection.DefaultedList;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class BackpackGui extends SimpleGui {
@@ -28,12 +30,21 @@ public class BackpackGui extends SimpleGui {
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
         super(getHandler(slots), player, false);
 
+        stack.set(Main.BOOLEAN_TYPE, true);
+
         this.uuid = UUID.fromString(stack.get(Main.UUID_TYPE));
 
         this.stack = stack;
+
         this.inventory = Main.backpackManager.getInventory(uuid, slots);
 
-        this.simpleInventory = inventory.getSimpleInventory();
+        if (stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+            DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
+            this.inventory.insertItems(itemStacks);
+            stack.set(DataComponentTypes.CONTAINER, null);
+        }
+
+        this.simpleInventory = this.inventory.getSimpleInventory();
 
         this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         this.fillChest();
@@ -75,7 +86,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int i = 0; i < this.inventory.slots(); i++)
-            this.setSlotRedirect(i, new BackpackSlot(this.simpleInventory, i, i,0));
+        for (int j = 0; j < this.inventory.size(); ++j)
+            this.setSlotRedirect(j, new BackpackSlot(this.simpleInventory, j, j,0));
     }
 }

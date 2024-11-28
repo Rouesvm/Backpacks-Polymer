@@ -21,8 +21,16 @@ public class BackpackInventory {
         this.size = this.inventory.size();
     }
 
+    public int size() {
+        return this.size;
+    }
+
+    public void setStack(int slot, ItemStack stack) {
+        this.inventory.set(slot, stack);
+    }
+
     public boolean insertItems(DefaultedList<ItemStack> itemStacks) {
-        if (itemStacks != null) {
+        if (itemStacks != null && !itemStacks.isEmpty()) {
             SimpleInventory itemList = getSimpleInventory();
             itemStacks.forEach(itemList::addStack);
 
@@ -31,6 +39,13 @@ public class BackpackInventory {
         }
 
         return false;
+    }
+
+    public void copyTo(BackpackInventory inventory) {
+        for(int i = 0; i < inventory.size(); ++i) {
+            ItemStack itemStack = i < this.inventory.size() ? this.inventory.get(i) : ItemStack.EMPTY;
+            inventory.setStack(i, itemStack.copy());
+        }
     }
 
     public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {
@@ -43,11 +58,7 @@ public class BackpackInventory {
         this.size = this.inventory.size();
     }
 
-    public int size() {
-        return this.size;
-    }
-
-    public void setInventory(DefaultedList<ItemStack> inventory) {
+    public void setInventoryDirectly(DefaultedList<ItemStack> inventory) {
         this.inventory = inventory;
     }
 

@@ -1,8 +1,8 @@
 package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.Main;
+import com.rouesvm.servback.components.BackpacksDataComponentsType;
 import com.rouesvm.servback.ui.BackpackGui;
-import com.rouesvm.servback.utils.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -17,7 +17,6 @@ import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static com.rouesvm.servback.Main.CAPACITY;
@@ -59,12 +58,12 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        if (stack.get(Main.UUID_TYPE) == null)
-            stack.set(Main.UUID_TYPE, UUID.randomUUID().toString());
+        if (stack.get(BackpacksDataComponentsType.UUID_TYPE) == null)
+            stack.set(BackpacksDataComponentsType.UUID_TYPE, UUID.randomUUID().toString());
 
         onEnchanted(stack, player);
 
-        stack.set(Main.BOOLEAN_TYPE, false);
+        stack.set(BackpacksDataComponentsType.BOOLEAN_TYPE, false);
         new BackpackGui(player, stack, this.slots);
     }
 
@@ -75,7 +74,7 @@ public class ContainerItem extends GuiItem {
     }
 
     private DefaultedList<ItemStack> getItemList(ItemStack stack) {
-        UUID uuid = UUID.fromString(stack.get(Main.UUID_TYPE));
+        UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentsType.UUID_TYPE));
         return Main.backpackManager.getInventory(uuid, this.slots).getInventory();
     }
 

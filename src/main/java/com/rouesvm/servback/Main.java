@@ -1,6 +1,7 @@
 package com.rouesvm.servback;
 
 import com.mojang.serialization.Codec;
+import com.rouesvm.servback.components.BackpacksDataComponentsType;
 import com.rouesvm.servback.items.ItemList;
 import com.rouesvm.servback.items.ModItemGroup;
 import com.rouesvm.servback.state.StateSaverAndLoader;
@@ -27,8 +28,6 @@ public class Main implements ModInitializer {
 	public static DefaultedList<ItemStack> globalInventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
 
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
-	public static final ComponentType<Boolean> BOOLEAN_TYPE = ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build();
-	public static final ComponentType<String> UUID_TYPE = ComponentType.<String>builder().codec(Codec.STRING).packetCodec(PacketCodecs.STRING).build();
 
 	public static final BackpackManager backpackManager = new BackpackManager();
 
@@ -37,10 +36,7 @@ public class Main implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
-		Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(MOD_ID, "boolean"), BOOLEAN_TYPE);
-		Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(MOD_ID, "uuid"), UUID_TYPE);
-		PolymerComponent.registerDataComponent(UUID_TYPE);
-		PolymerComponent.registerDataComponent(BOOLEAN_TYPE);
+		BackpacksDataComponentsType.initialize();
 
 		ItemList.initialize();
 		ModItemGroup.initialize();
@@ -48,13 +44,13 @@ public class Main implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
 			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
 			globalInventory = serverState.globalInventory;
-			backpackManager.load(serverState.storedInventories);
+			backpackManager.loadNbt(serverState.storedInventories);
 		}));
 
 		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
 			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
 			serverState.globalInventory = globalInventory;
-			serverState.storedInventories = backpackManager.save();
+			serverState.storedInventories = backpackManager.saveNbt();
 		}));
 	}
 

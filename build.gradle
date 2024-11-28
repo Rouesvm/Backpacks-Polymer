@@ -34,13 +34,12 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation include("eu.pb4:polymer-core:${project.polymer}+${project.minecraft_version}")
-    modImplementation include("eu.pb4:polymer-blocks:${project.polymer}+${project.minecraft_version}")
-    modImplementation include("eu.pb4:polymer-resource-pack:${project.polymer}+${project.minecraft_version}")
+    modImplementation ("eu.pb4:polymer-core:${project.polymer}+${project.minecraft_version}")
+    modImplementation ("eu.pb4:polymer-blocks:${project.polymer}+${project.minecraft_version}")
+    modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}+${project.minecraft_version}")
 
-    modImplementation include("eu.pb4:sgui:${project.sgui}+${project.minecraft_version}")
-
-    modImplementation include("xyz.nucleoid:server-translations-api:2.3.1+1.21-pre2")
+    modImplementation include("eu.pb4:sgui:${project.sgui}")
+    modImplementation include("xyz.nucleoid:server-translations-api:2.4.0+1.21.2-rc1")
 }
 
 processResources {

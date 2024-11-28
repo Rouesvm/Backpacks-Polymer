@@ -3,6 +3,7 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.ui.BackpackGui;
+import com.rouesvm.servback.utils.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -64,7 +65,7 @@ public class ContainerItem extends GuiItem {
         onEnchanted(stack, player);
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
-        new BackpackGui(player, stack, this.slots);
+        new BackpackGui(player, stack, this.extendedSlots + this.slots);
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
@@ -73,25 +74,44 @@ public class ContainerItem extends GuiItem {
         return list;
     }
 
-    private DefaultedList<ItemStack> getItemList(ItemStack stack) {
+    private BackpackInventory getItemList(ItemStack stack) {
         UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
-        return Main.backpackManager.getInventory(uuid, this.slots).getInventory();
+        return Main.backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
     }
 
     private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
-        DefaultedList<ItemStack> inventory = getItemList(stack);
+        BackpackInventory inventory = getItemList(stack);
 
         DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();
         RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
-        extendedSlots = 9 * level;
+        this.extendedSlots = 9 * level;
 
-        if (extendedSlots != 0) return;
-        if (inventory.size() < this.slots) return;
+        if (this.extendedSlots > 0) {
+            int totalSlots = this.extendedSlots + this.slots;
+            if (inventory.size() != totalSlots)
+                resizeAndSaveInventory(stack, inventory, totalSlots);
+            return;
+        }
 
-        for (int i = inventory.size(); i > this.slots; --i)
-            player.dropItem(inventory.get(i - 1), true);
+        if (inventory.size() > this.slots)
+            dropExcessItems(inventory, this.slots, player);
+        resizeAndSaveInventory(stack, inventory, this.slots);
+    }
+
+    private void resizeAndSaveInventory(ItemStack stack, BackpackInventory inventory, int newSize) {
+        BackpackInventory newInventory = new BackpackInventory(newSize);
+        inventory.copyTo(newInventory);
+        UUID backpackUUID = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
+        Main.backpackManager.saveBackpack(backpackUUID, newInventory);
+    }
+
+    private void dropExcessItems(BackpackInventory inventory, int maxSlots, ServerPlayerEntity player) {
+        for (int i = inventory.size(); i > maxSlots; --i) {
+            ItemStack excessItem = inventory.getInventory().get(i - 1);
+            player.dropItem(excessItem, true);
+        }
     }
 }
 

@@ -38,10 +38,10 @@ public class BackpackGui extends SimpleGui {
 
         if (stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            inventory.insertItems(itemStacks);
-            inventory.setInventory(inventory.getInventory());
-            Main.backpackManager.saveBackpack(uuid, inventory);
-
+            if (inventory.insertItems(itemStacks)) {
+                inventory.setInventoryDirectly(inventory.getInventory());
+                Main.backpackManager.saveBackpack(uuid, inventory);
+            }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
 
@@ -58,8 +58,9 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                inventory.setInventory(simpleInventory.getHeldStacks());
-                Main.backpackManager.saveBackpack(uuid, inventory);
+                inventory.setInventoryDirectly(simpleInventory.getHeldStacks());
+                boolean success = Main.backpackManager.saveBackpack(uuid, inventory);
+                System.out.println(success);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {

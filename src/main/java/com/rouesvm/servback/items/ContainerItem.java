@@ -2,11 +2,11 @@ package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.ui.BackpackGui;
+import com.rouesvm.servback.utils.BackpackInventory;
+import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.*;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -16,10 +16,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.rouesvm.servback.Main.CAPACITY;
 
@@ -27,40 +26,9 @@ public class ContainerItem extends GuiItem {
     private final int slots;
     private int extendedSlots;
 
-    private final boolean enabled = false;
-
-    protected final int RADIUS = 5;
-
     public ContainerItem(String name, int slots) {
         super(name);
         this.slots = slots;
-    }
-
-    @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (!enabled) return;
-        if (world.isClient() || !entity.isPlayer()) return;
-        ServerPlayerEntity player = (ServerPlayerEntity) entity;
-
-        boolean nbt = stack.getOrDefault(Main.BOOLEAN_TYPE, false);
-        if (!nbt) {
-            Box area = new Box(player.getPos().add(-RADIUS, -RADIUS, -RADIUS), player.getPos().add(RADIUS, RADIUS, RADIUS));
-
-            List<ItemEntity> itemEntities = world.getEntitiesByType(EntityType.ITEM, area, Entity::isAlive);
-            SimpleInventory itemList = getInventory(stack);
-
-            for (ItemEntity item : itemEntities) {
-                item.setPosition(player.getX(), player.getY(), player.getZ());
-                if (item.cannotPickup())
-                    continue;
-
-                item.setPickupDelay(0);
-                item.kill();
-                itemList.addStack(item.getStack());
-            }
-
-            stack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(itemList.getHeldStacks()));
-        }
     }
 
     @Override
@@ -91,23 +59,21 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        onEnchanted(stack, player);
+        if (stack.get(Main.UUID_TYPE) == null)
+            stack.set(Main.UUID_TYPE, UUID.randomUUID().toString());
+
+       // onEnchanted(stack, player);
 
         stack.set(Main.BOOLEAN_TYPE, false);
-        new BackpackGui(player, stack, getInventory(stack));
+        new BackpackGui(player, stack, slots);
     }
 
-    public SimpleInventory getInventory(ItemStack stack) {
-        return new SimpleInventory(getItemList(stack).toArray(ItemStack[]::new));
+    private DefaultedList<ItemStack> getItemList(ItemStack stack) {
+        UUID uuid = UUID.fromString(stack.get(Main.UUID_TYPE));
+        return Main.backpackManager.getInventory(uuid).getInventory();
     }
 
-    public DefaultedList<ItemStack> getItemList(ItemStack stack) {
-        DefaultedList<ItemStack> list = DefaultedList.ofSize(slots + extendedSlots, ItemStack.EMPTY);
-        stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
-        return list;
-    }
-
-    public void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
+    private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
         DefaultedList<ItemStack> inventory = getItemList(stack);
 
         DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();

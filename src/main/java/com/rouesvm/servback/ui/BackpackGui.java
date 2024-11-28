@@ -1,6 +1,9 @@
 package com.rouesvm.servback.ui;
 
+import com.rouesvm.servback.Main;
 import com.rouesvm.servback.slots.BackpackSlot;
+import com.rouesvm.servback.utils.BackpackInstance;
+import com.rouesvm.servback.utils.BackpackInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
@@ -12,15 +15,25 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import java.util.UUID;
+
 public class BackpackGui extends SimpleGui {
     protected final ItemStack stack;
-    protected final SimpleInventory inventory;
+    protected final BackpackInventory inventory;
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, SimpleInventory inventory) {
-        super(getHandler(inventory.size()), player, false);
+    protected final SimpleInventory simpleInventory;
+
+    protected final UUID uuid;
+
+    public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
+        super(getHandler(slots), player, false);
+
+        this.uuid = UUID.fromString(stack.get(Main.UUID_TYPE));
 
         this.stack = stack;
-        this.inventory = inventory;
+        this.inventory = Main.backpackManager.getInventory(uuid, slots);
+
+        this.simpleInventory = inventory.getSimpleInventory();
 
         this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         this.fillChest();
@@ -33,8 +46,8 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                ContainerComponent newContents = ContainerComponent.fromStacks(inventory.getHeldStacks());
-                stack.set(DataComponentTypes.CONTAINER, newContents);
+                inventory.setInventory(simpleInventory.getHeldStacks());
+                Main.backpackManager.saveBackpack(uuid, inventory);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
@@ -62,7 +75,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int i = 0; i < this.inventory.size(); i++)
-            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
+        for (int i = 0; i < this.inventory.slots(); i++)
+            this.setSlotRedirect(i, new BackpackSlot(this.simpleInventory, i, i,0));
     }
 }

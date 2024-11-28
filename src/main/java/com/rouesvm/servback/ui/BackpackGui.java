@@ -38,14 +38,14 @@ public class BackpackGui extends SimpleGui {
 
         if (stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            this.inventory.insertItems(itemStacks);
-            this.inventory.setInventory(this.inventory.getInventory());
+            inventory.insertItems(itemStacks);
+            inventory.setInventory(inventory.getInventory());
             Main.backpackManager.saveBackpack(uuid, inventory);
 
             stack.set(DataComponentTypes.CONTAINER, null);
         }
 
-        this.simpleInventory = this.inventory.getSimpleInventory();
+        this.simpleInventory = inventory.getSimpleInventory();
 
         this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         this.fillChest();

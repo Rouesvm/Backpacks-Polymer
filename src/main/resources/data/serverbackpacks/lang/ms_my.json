@@ -1,0 +1,13 @@
+{
+  "item.serverbackpacks.small" : "Beg Kecil",
+  "item.serverbackpacks.medium" : "Beg Sederhana",
+  "item.serverbackpacks.large" : "Beg Besar",
+
+  "item.serverbackpacks.global" : "Beg Global",
+  "item.serverbackpacks.ender" : "Beg Ender",
+
+  "item.serverbackpacks.gui_backpacks" : "Beg",
+  "item.serverbackpacks.gui_backpack" : "Beg",
+  "item.serverbackpacks.gui_ender" : "Beg Ender",
+  "item.serverbackpacks.gui_global" : "Beg Global"
+}

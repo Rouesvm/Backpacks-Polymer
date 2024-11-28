@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.7-SNAPSHOT'
+    id 'fabric-loom' version '1.8-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -20,6 +20,7 @@ loom {
     mods {
         "serverbackpacks" {
             sourceSet sourceSets.main
+            sourceSet sourceSets.client
         }
     }
 
@@ -29,16 +30,17 @@ dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-
-    // Depend only
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation include("eu.pb4:polymer-core:${project.polymer}+${project.minecraft_version}")
     modImplementation include("eu.pb4:polymer-blocks:${project.polymer}+${project.minecraft_version}")
     modImplementation include("eu.pb4:polymer-resource-pack:${project.polymer}+${project.minecraft_version}")
 
-    modImplementation include("eu.pb4:sgui:${project.sgui}+${project.last_version}")
+    modImplementation include("eu.pb4:sgui:${project.sgui}+${project.minecraft_version}")
+
+    modImplementation include("xyz.nucleoid:server-translations-api:2.3.1+1.21-pre2")
 }
 
 processResources {

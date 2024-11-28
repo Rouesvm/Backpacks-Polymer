@@ -1,9 +1,12 @@
 package com.rouesvm.servback.ui;
 
+import com.rouesvm.servback.Main;
+import com.rouesvm.servback.components.BackpacksDataComponentTypes;
+import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
+import com.rouesvm.servback.utils.BackpackInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -11,16 +14,38 @@ import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.collection.DefaultedList;
+
+import java.util.UUID;
 
 public class BackpackGui extends SimpleGui {
     protected final ItemStack stack;
-    protected final SimpleInventory inventory;
+    protected final BackpackInventory inventory;
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, SimpleInventory inventory) {
-        super(getHandler(inventory.size()), player, false);
+    protected final SimpleInventory simpleInventory;
 
+    protected final UUID uuid;
+
+    public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
+        super(getHandler(slots), player, false);
+
+        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
+
+        this.uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
         this.stack = stack;
-        this.inventory = inventory;
+
+        this.inventory = Main.backpackManager.getInventory(uuid, slots);
+
+        if (stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+            DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
+            inventory.insertItems(itemStacks);
+            inventory.setInventory(inventory.getInventory());
+            Main.backpackManager.saveBackpack(uuid, inventory);
+
+            stack.set(DataComponentTypes.CONTAINER, null);
+        }
+
+        this.simpleInventory = inventory.getSimpleInventory();
 
         this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         this.fillChest();
@@ -33,8 +58,8 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                ContainerComponent newContents = ContainerComponent.fromStacks(inventory.getHeldStacks());
-                stack.set(DataComponentTypes.CONTAINER, newContents);
+                inventory.setInventory(simpleInventory.getHeldStacks());
+                Main.backpackManager.saveBackpack(uuid, inventory);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
@@ -62,7 +87,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int i = 0; i < this.inventory.size(); i++)
-            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i,0));
+        for (int j = 0; j < this.inventory.size(); ++j)
+            this.setSlotRedirect(j, new BackpackSlot(this.simpleInventory, j, j,0));
     }
 }

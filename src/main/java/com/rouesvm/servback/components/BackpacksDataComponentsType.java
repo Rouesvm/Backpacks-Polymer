@@ -26,4 +26,7 @@ public class BackpacksDataComponentsType {
         PolymerComponent.registerDataComponent(registry);
         return registry;
     }
+
+    public static void initialize() {
+    }
 }

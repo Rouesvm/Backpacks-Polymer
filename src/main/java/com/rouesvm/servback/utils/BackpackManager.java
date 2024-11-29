@@ -13,8 +13,8 @@ public class BackpackManager {
     public HashMap<UUID, BackpackInventory> storedInventories = new HashMap<>();
 
     public BackpackInventory getInventory(UUID uuid, int slots) {
-        if (this.storedInventories.containsKey(uuid)) {
-            BackpackInventory backpackInventory = this.storedInventories.get(uuid);
+        if (storedInventories.containsKey(uuid)) {
+            BackpackInventory backpackInventory = storedInventories.get(uuid);
             if (backpackInventory.getInventory().isEmpty())
                 return new BackpackInventory(slots);
             else return backpackInventory;
@@ -23,8 +23,8 @@ public class BackpackManager {
 
     public boolean saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
         if (uuid != null && backpackInventory != null) {
-            this.storedInventories.remove(uuid);
-            this.storedInventories.put(uuid, backpackInventory);
+            storedInventories.remove(uuid);
+            storedInventories.put(uuid, backpackInventory);
             return true;
         }
         return false;
@@ -47,13 +47,13 @@ public class BackpackManager {
         }
     }
 
-    public void loadNbt(Set<BackpackInstance> instances) {
-        instances.forEach(backpackInstance -> this.storedInventories.put(backpackInstance.uuid, backpackInstance.backpackInventory));
+    public void load(Set<BackpackInstance> instances) {
+        instances.forEach(backpackInstance -> storedInventories.put(backpackInstance.uuid, backpackInstance.backpackInventory));
     }
 
-    public Set<BackpackInstance> saveNbt() {
+    public Set<BackpackInstance> save() {
         Set<BackpackInstance> backpackInstances = new HashSet<>();
-        this.storedInventories.forEach((key, value) -> backpackInstances.add(new BackpackInstance(key, value)));
+        storedInventories.forEach((key, value) -> backpackInstances.add(new BackpackInstance(key, value)));
         return backpackInstances;
     }
 }

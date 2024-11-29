@@ -30,6 +30,7 @@ public class GuiItem extends BasicPolymerItem {
             return ActionResult.PASS;
 
         openGui(serverPlayer, stack);
+        player.swingHand(hand, true);
         return ActionResult.SUCCESS;
     }
 
@@ -40,6 +41,7 @@ public class GuiItem extends BasicPolymerItem {
         if (serverPlayer.isSneaking())
             return ActionResult.PASS;
 
+        serverPlayer.swingHand(context.getHand(), true);
         openGui(serverPlayer, context.getStack());
         return ActionResult.SUCCESS;
     }

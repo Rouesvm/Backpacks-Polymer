@@ -38,13 +38,13 @@ public class Main implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
 			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
 			globalInventory = serverState.globalInventory;
-			backpackManager.loadNbt(serverState.storedInventories);
+			backpackManager.load(serverState.storedInventories);
 		}));
 
 		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
 			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
 			serverState.globalInventory = globalInventory;
-			serverState.storedInventories = backpackManager.saveNbt();
+			serverState.storedInventories = backpackManager.save();
 		}));
 	}
 

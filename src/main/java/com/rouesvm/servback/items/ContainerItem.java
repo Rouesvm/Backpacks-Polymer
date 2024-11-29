@@ -8,12 +8,15 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
@@ -21,7 +24,7 @@ import net.minecraft.util.collection.DefaultedList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.rouesvm.servback.Main.CAPACITY;
+import static com.rouesvm.servback.Main.*;
 
 public class ContainerItem extends GuiItem {
     private final int slots;
@@ -66,6 +69,7 @@ public class ContainerItem extends GuiItem {
             stack.set(BackpacksDataComponentTypes.UUID_TYPE, UUID.randomUUID().toString());
 
         onEnchanted(stack, player);
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
         new BackpackGui(player, stack, this.extendedSlots + this.slots);
@@ -115,6 +119,7 @@ public class ContainerItem extends GuiItem {
             ItemStack excessItem = inventory.getInventory().get(i - 1);
             player.dropItem(excessItem, true);
         }
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 }
 

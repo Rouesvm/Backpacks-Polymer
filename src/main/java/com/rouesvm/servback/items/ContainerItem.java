@@ -6,6 +6,7 @@ import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackInventory;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BundleContentsComponent;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
@@ -37,7 +38,7 @@ public class ContainerItem extends GuiItem {
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         BackpackInventory itemList = this.getItemList(stack);
-        if (itemList.getInventory().isEmpty()) return;
+        if (itemList.getSimpleInventory().isEmpty()) return;
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
@@ -84,6 +85,8 @@ public class ContainerItem extends GuiItem {
     }
 
     private BackpackInventory getItemList(ItemStack stack) {
+        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null)
+            stack.set(BackpacksDataComponentTypes.UUID_TYPE, UUID.randomUUID().toString());
         UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
         return Main.backpackManager.getInventory(uuid, this.slots);
     }

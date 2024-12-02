@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.rouesvm.servback.Main.CAPACITY;
+import static com.rouesvm.servback.Main.backpackManager;
 
 public class ContainerItem extends GuiItem {
     private final int slots;
@@ -33,12 +34,15 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        ContainerComponent containerComponent = stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
+        BackpackInventory itemList = this.getItemList(stack);
+        if (itemList.getInventory().isEmpty()) return;
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
 
-        for (ItemStack itemStack : containerComponent.iterateNonEmpty()) {
+        for (ItemStack itemStack : itemList.getInventory()) {
+            if (itemStack.isEmpty()) continue;
+
             capacityAmount++;
 
             if (capacityMaxShow <= 4) {
@@ -76,7 +80,7 @@ public class ContainerItem extends GuiItem {
 
     private BackpackInventory getItemList(ItemStack stack) {
         UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
-        return Main.backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
+        return backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
     }
 
     private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {

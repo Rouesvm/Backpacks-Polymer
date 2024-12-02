@@ -37,6 +37,7 @@ public class ContainerItem extends GuiItem {
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         BackpackInventory itemList = this.getItemList(stack);
+        if (itemList.getInventory().isEmpty()) return;
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;

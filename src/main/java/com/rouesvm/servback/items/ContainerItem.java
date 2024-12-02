@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -37,12 +36,14 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        ContainerComponent containerComponent = stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT);
+        BackpackInventory itemList = this.getItemList(stack);
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
 
-        for (ItemStack itemStack : containerComponent.iterateNonEmpty()) {
+        for (ItemStack itemStack : itemList.getInventory()) {
+            if (itemStack == ItemStack.EMPTY) continue;
+
             capacityAmount++;
 
             if (capacityMaxShow <= 4) {

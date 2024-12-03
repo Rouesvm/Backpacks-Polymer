@@ -79,6 +79,9 @@ public class ContainerItem extends GuiItem {
     }
 
     private BackpackInventory getItemList(ItemStack stack) {
+        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null)
+            stack.set(BackpacksDataComponentTypes.UUID_TYPE, UUID.randomUUID().toString());
+
         UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
         return backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
     }

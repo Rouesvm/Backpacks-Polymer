@@ -15,6 +15,9 @@ public class BackpackManager {
     public BackpackInventory getInventory(UUID uuid, int slots) {
         if (this.storedInventories.containsKey(uuid)) {
             BackpackInventory backpackInventory = this.storedInventories.get(uuid);
+            backpackInventory.setSize(slots);
+
+            saveBackpack(uuid, backpackInventory);
             if (backpackInventory.getInventory().isEmpty())
                 return new BackpackInventory(slots);
             else return backpackInventory;

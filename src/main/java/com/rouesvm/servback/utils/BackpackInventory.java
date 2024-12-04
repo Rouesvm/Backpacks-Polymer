@@ -4,6 +4,8 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -17,12 +19,16 @@ public class BackpackInventory {
     }
 
     public BackpackInventory() {
-        this.inventory = DefaultedList.of();
+        this.inventory = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
         this.size = this.inventory.size();
     }
 
     public int size() {
         return this.size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public void setStack(int slot, ItemStack stack) {

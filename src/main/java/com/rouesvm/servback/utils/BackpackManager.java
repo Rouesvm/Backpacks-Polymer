@@ -50,11 +50,11 @@ public class BackpackManager {
         }
     }
 
-    public void loadNbt(Set<BackpackInstance> instances) {
+    public void load(Set<BackpackInstance> instances) {
         instances.forEach(backpackInstance -> this.storedInventories.put(backpackInstance.uuid, backpackInstance.backpackInventory));
     }
 
-    public Set<BackpackInstance> saveNbt() {
+    public Set<BackpackInstance> save() {
         Set<BackpackInstance> backpackInstances = new HashSet<>();
         this.storedInventories.forEach((key, value) -> backpackInstances.add(new BackpackInstance(key, value)));
         return backpackInstances;

@@ -23,7 +23,7 @@ public class BackpacksDataComponentTypes {
 
     private static <T> ComponentType<T> register(ComponentType<T> type, String name) {
         var registry = Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(MOD_ID, name), type);
-        PolymerComponent.registerDataComponent(type);
+        PolymerComponent.registerDataComponent(registry);
         return registry;
     }
 

@@ -60,9 +60,7 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public boolean canBeEnchantedWith(ItemStack stack, RegistryEntry<Enchantment> enchantment, EnchantingContext context) {
-        if (slots == 9)
-            return false;
-        return super.canBeEnchantedWith(stack, enchantment, context);
+        return slots != 9;
     }
 
     @Override

@@ -16,13 +16,12 @@ public class BackpackManager {
 
     public UUID getStackUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
-        if (uuidString == null) createNewUUID(stack);
-
-        assert uuidString != null;
+        if (uuidString == null)
+            uuidString = String.valueOf(createNewUUID(stack));
         return UUID.fromString(uuidString);
     }
 
-    public void createNewUUID(ItemStack stack) {
+    public UUID createNewUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
             UUID uuid = UUID.randomUUID();
@@ -31,7 +30,9 @@ public class BackpackManager {
 
             uuidString = uuid.toString();
             stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuidString);
+            return uuid;
         }
+        return UUID.fromString(uuidString);
     }
 
     public BackpackInventory getInventory(UUID uuid, int slots) {

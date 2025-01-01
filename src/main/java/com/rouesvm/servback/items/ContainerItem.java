@@ -58,7 +58,7 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
-        return (getName().contains(Text.literal("Large")) || getName().contains(Text.literal("Medium")));
+        return slots != 9;
     }
 
     @Override

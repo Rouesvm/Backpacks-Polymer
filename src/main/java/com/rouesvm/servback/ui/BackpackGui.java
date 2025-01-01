@@ -4,6 +4,7 @@ import com.rouesvm.servback.Main;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
+import com.rouesvm.servback.state.StateSaverAndLoader;
 import com.rouesvm.servback.utils.BackpackInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
@@ -66,6 +67,13 @@ public class BackpackGui extends SimpleGui {
 
             }
         });
+    }
+
+    @Override
+    public void onClose() {
+        if (this.getPlayer().getWorld().getServer() == null) return;
+        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(this.getPlayer().getWorld().getServer());
+        serverState.storedInventories = Main.backpackManager.saveNbt();
     }
 
     @Override

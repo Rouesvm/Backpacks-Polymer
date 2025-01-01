@@ -43,7 +43,7 @@ public class ContainerItem extends GuiItem {
         int capacityAmount = 0;
 
         for (ItemStack itemStack : itemList.getInventory()) {
-            if (itemStack == ItemStack.EMPTY) continue;
+            if (itemStack.isEmpty()) continue;
 
             capacityAmount++;
 
@@ -67,11 +67,9 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null)
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, UUID.randomUUID().toString());
+        backpackManager.createNewUUID(stack);
 
         onEnchanted(stack, player);
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
         new BackpackGui(player, stack, this.extendedSlots + this.slots);
@@ -84,11 +82,8 @@ public class ContainerItem extends GuiItem {
     }
 
     private BackpackInventory getItemList(ItemStack stack) {
-        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null)
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, UUID.randomUUID().toString());
-
-        UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
-        return Main.backpackManager.getInventory(uuid, this.slots);
+        UUID uuid = backpackManager.getStackUUID(stack);
+        return backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
     }
 
     private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
@@ -115,7 +110,7 @@ public class ContainerItem extends GuiItem {
     private void resizeAndSaveInventory(ItemStack stack, BackpackInventory inventory, int newSize) {
         BackpackInventory newInventory = new BackpackInventory(newSize);
         inventory.copyTo(newInventory);
-        UUID backpackUUID = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
+        UUID backpackUUID = backpackManager.getStackUUID(stack);
         Main.backpackManager.saveBackpack(backpackUUID, newInventory);
     }
 
@@ -124,7 +119,6 @@ public class ContainerItem extends GuiItem {
             ItemStack excessItem = inventory.getInventory().get(i - 1);
             player.dropItem(excessItem, true);
         }
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 }
 

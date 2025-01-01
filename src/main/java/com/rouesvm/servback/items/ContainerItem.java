@@ -63,8 +63,7 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null)
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, UUID.randomUUID().toString());
+        backpackManager.createNewUUID(stack);
 
         onEnchanted(stack, player);
 
@@ -79,10 +78,7 @@ public class ContainerItem extends GuiItem {
     }
 
     private BackpackInventory getItemList(ItemStack stack) {
-        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null)
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, UUID.randomUUID().toString());
-
-        UUID uuid = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
+        UUID uuid = backpackManager.getStackUUID(stack);
         return backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
     }
 
@@ -110,7 +106,7 @@ public class ContainerItem extends GuiItem {
     private void resizeAndSaveInventory(ItemStack stack, BackpackInventory inventory, int newSize) {
         BackpackInventory newInventory = new BackpackInventory(newSize);
         inventory.copyTo(newInventory);
-        UUID backpackUUID = UUID.fromString(stack.get(BackpacksDataComponentTypes.UUID_TYPE));
+        UUID backpackUUID = backpackManager.getStackUUID(stack);
         Main.backpackManager.saveBackpack(backpackUUID, newInventory);
     }
 

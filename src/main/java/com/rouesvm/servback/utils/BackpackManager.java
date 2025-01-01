@@ -1,5 +1,7 @@
 package com.rouesvm.servback.utils;
 
+import com.rouesvm.servback.components.BackpacksDataComponentTypes;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
@@ -11,6 +13,26 @@ import java.util.UUID;
 
 public class BackpackManager {
     public HashMap<UUID, BackpackInventory> storedInventories = new HashMap<>();
+
+    public UUID getStackUUID(ItemStack stack) {
+        String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
+        if (uuidString == null) createNewUUID(stack);
+
+        assert uuidString != null;
+        return UUID.fromString(uuidString);
+    }
+
+    public void createNewUUID(ItemStack stack) {
+        String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
+        if (uuidString == null) {
+            UUID uuid = UUID.randomUUID();
+            if (storedInventories.containsKey(uuid))
+                uuid = UUID.randomUUID();
+
+            uuidString = uuid.toString();
+            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuidString);
+        }
+    }
 
     public BackpackInventory getInventory(UUID uuid, int slots) {
         if (this.storedInventories.containsKey(uuid)) {

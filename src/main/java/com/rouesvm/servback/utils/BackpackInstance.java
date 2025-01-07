@@ -3,6 +3,7 @@ package com.rouesvm.servback.utils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class BackpackInstance {
@@ -23,8 +24,19 @@ public class BackpackInstance {
 
     public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
         UUID uuid = compound.getUuid("uuid");
-        BackpackInventory inventory = new BackpackInventory();
-        inventory.load(compound.getCompound("contents"), registryLookup);
+        BackpackInventory inventory = BackpackInventory.load(compound.getCompound("contents"), registryLookup);
         return new BackpackInstance(uuid, inventory);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BackpackInstance that = (BackpackInstance) o;
+        return Objects.equals(uuid, that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(uuid);
     }
 }

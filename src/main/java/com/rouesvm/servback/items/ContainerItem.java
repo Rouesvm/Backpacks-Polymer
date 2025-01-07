@@ -35,12 +35,13 @@ public class ContainerItem extends GuiItem {
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         BackpackInventory itemList = this.getItemList(stack);
-        if (itemList.getInventory().isEmpty()) return;
+        if (itemList == null) return;
+        if (itemList.getHeldStacks().isEmpty()) return;
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
 
-        for (ItemStack itemStack : itemList.getInventory()) {
+        for (ItemStack itemStack : itemList.getHeldStacks()) {
             if (itemStack.isEmpty()) continue;
 
             capacityAmount++;
@@ -78,12 +79,14 @@ public class ContainerItem extends GuiItem {
     }
 
     private BackpackInventory getItemList(ItemStack stack) {
+        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = backpackManager.getStackUUID(stack);
         return backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
     }
 
     private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
         BackpackInventory inventory = getItemList(stack);
+        if (inventory == null) return;
 
         DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();
         RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
@@ -112,7 +115,7 @@ public class ContainerItem extends GuiItem {
 
     private void dropExcessItems(BackpackInventory inventory, int maxSlots, ServerPlayerEntity player) {
         for (int i = inventory.size(); i > maxSlots; --i) {
-            ItemStack excessItem = inventory.getInventory().get(i - 1);
+            ItemStack excessItem = inventory.getHeldStacks().get(i - 1);
             player.dropItem(excessItem, true);
         }
     }

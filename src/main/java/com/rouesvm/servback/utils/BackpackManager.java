@@ -38,26 +38,32 @@ public class BackpackManager {
     public BackpackInventory getInventory(UUID uuid, int slots) {
         if (this.storedInventories.containsKey(uuid)) {
             BackpackInventory backpackInventory = this.storedInventories.get(uuid);
-            backpackInventory.setSize(slots);
+            if (backpackInventory.size() != slots) {
+                BackpackInventory newInventory = new BackpackInventory(slots);
+                newInventory.insertItems(backpackInventory.getHeldStacks());
 
-            saveBackpack(uuid, backpackInventory);
-            if (backpackInventory.getInventory().isEmpty())
+                backpackInventory = newInventory;
+                saveBackpack(uuid, backpackInventory);
+            }
+
+            if (backpackInventory.getHeldStacks().isEmpty())
                 return new BackpackInventory(slots);
             else return backpackInventory;
         } else return new BackpackInventory(slots);
     }
 
+    public boolean saveBackpack(BackpackInstance instance) {
+        return saveBackpack(instance.uuid, instance.backpackInventory);
+    }
+
     public boolean saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
         if (uuid != null && backpackInventory != null) {
-            this.storedInventories.remove(uuid);
-            this.storedInventories.put(uuid, backpackInventory);
+            BackpackInventory inventory = this.storedInventories.get(uuid);
+            this.storedInventories.putIfAbsent(uuid, backpackInventory);
+            inventory = backpackInventory;
             return true;
         }
         return false;
-    }
-
-    public boolean saveBackpack(BackpackInstance backpackInstance) {
-        return saveBackpack(backpackInstance.uuid, backpackInstance.backpackInventory);
     }
 
     public static void loadNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {

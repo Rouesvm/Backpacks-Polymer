@@ -30,6 +30,8 @@ GlobalPack
 ![globalpack](https://github.com/user-attachments/assets/16285c3e-0983-4436-88fe-6eb1ddbe0485)
 
 ## Geyser Support:
+### Does not support 1.21.2 or later versions.
+
 1. Build your java resource pack with [polymer](https://polymer.pb4.eu/polymer/resource-packs/#building-resource-pack).
 2. Convert it to a bedrock resource pack using tools like [java2bedrock.sh](https://github.com/Kas-tle/java2bedrock.sh).
 3. Follow the [guide](https://geysermc.org/wiki/geyser/faq/#general-questions) on Geyser for bedrock edition players to load the pack.

@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.Nullable;
@@ -50,11 +51,11 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     }
 
     public ItemStack getStack(int slot) {
-        return slot >= 0 && slot < this.heldStacks.size() ? (ItemStack)this.heldStacks.get(slot) : ItemStack.EMPTY;
+        return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : ItemStack.EMPTY;
     }
 
     public List<ItemStack> clearToList() {
-        List<ItemStack> list = (List)this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).collect(Collectors.toList());
+        List<ItemStack> list = this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).collect(Collectors.toList());
         this.clear();
         return list;
     }
@@ -119,7 +120,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     }
 
     public ItemStack removeStack(int slot) {
-        ItemStack itemStack = (ItemStack)this.heldStacks.get(slot);
+        ItemStack itemStack = this.heldStacks.get(slot);
         if (itemStack.isEmpty()) {
             return ItemStack.EMPTY;
         } else {
@@ -166,15 +167,17 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         this.markDirty();
     }
 
+
+
+    @Override
     public void provideRecipeInputs(RecipeFinder finder) {
         for(ItemStack itemStack : this.heldStacks) {
             finder.addInput(itemStack);
         }
-
     }
 
     public String toString() {
-        return ((List)this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).collect(Collectors.toList())).toString();
+        return (this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).toList()).toString();
     }
 
     private void addToNewSlot(ItemStack stack) {

@@ -58,9 +58,7 @@ public class BackpackManager {
 
     public boolean saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
         if (uuid != null && backpackInventory != null) {
-            BackpackInventory inventory = this.storedInventories.get(uuid);
             this.storedInventories.putIfAbsent(uuid, backpackInventory);
-            inventory = backpackInventory;
             return true;
         }
         return false;

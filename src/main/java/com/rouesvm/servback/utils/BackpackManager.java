@@ -40,7 +40,7 @@ public class BackpackManager {
             BackpackInventory backpackInventory = this.storedInventories.get(uuid);
             if (backpackInventory.size() != slots) {
                 BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.insertItems(backpackInventory.getHeldStacks());
+                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
 
                 backpackInventory = newInventory;
                 saveBackpack(uuid, backpackInventory);
@@ -58,9 +58,7 @@ public class BackpackManager {
 
     public boolean saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
         if (uuid != null && backpackInventory != null) {
-            BackpackInventory inventory = this.storedInventories.get(uuid);
             this.storedInventories.putIfAbsent(uuid, backpackInventory);
-            inventory = backpackInventory;
             return true;
         }
         return false;

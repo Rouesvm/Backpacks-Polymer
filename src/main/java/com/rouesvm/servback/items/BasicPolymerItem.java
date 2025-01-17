@@ -21,8 +21,9 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepMo
         this.vanillaItem = vanillaItem;
     }
 
+
     @Override
-    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
+    public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
         return this.vanillaItem;
     }
 

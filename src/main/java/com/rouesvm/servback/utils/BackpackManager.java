@@ -40,7 +40,7 @@ public class BackpackManager {
             BackpackInventory backpackInventory = this.storedInventories.get(uuid);
             if (backpackInventory.size() != slots) {
                 BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.insertItems(backpackInventory.getHeldStacks());
+                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
 
                 backpackInventory = newInventory;
                 saveBackpack(uuid, backpackInventory);

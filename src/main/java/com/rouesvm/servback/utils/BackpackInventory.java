@@ -1,23 +1,19 @@
 package com.rouesvm.servback.utils;
 
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 
-public class BackpackInventory extends SimpleInventory {
-
+public class BackpackInventory extends BaseInventory {
     public BackpackInventory(int slots) {
         super(slots);
     }
 
     public BackpackInventory(DefaultedList<ItemStack> stacks) {
         super(stacks.size());
-
-        this.heldStacks.clear();
-        this.heldStacks.addAll(stacks);
+        this.heldStacks = stacks;
     }
 
     public boolean insertItems(DefaultedList<ItemStack> itemStacks) {
@@ -50,7 +46,6 @@ public class BackpackInventory extends SimpleInventory {
     }
 
     public void setInventoryDirectly(DefaultedList<ItemStack> inventory) {
-        this.heldStacks.clear();
-        this.heldStacks.addAll(inventory);
+        this.heldStacks = inventory;
     }
 }

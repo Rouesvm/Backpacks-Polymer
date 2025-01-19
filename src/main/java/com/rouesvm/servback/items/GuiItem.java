@@ -41,8 +41,8 @@ public class GuiItem extends BasicPolymerItem {
         if (serverPlayer.isSneaking())
             return ActionResult.PASS;
 
-        serverPlayer.swingHand(context.getHand(), true);
         openGui(serverPlayer, context.getStack());
+        serverPlayer.swingHand(context.getHand(), true);
         return ActionResult.SUCCESS;
     }
 

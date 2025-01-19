@@ -18,10 +18,12 @@ public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
 
-	public static final BackpackManager backpackManager = new BackpackManager();
+	public static BackpackManager backpackManager;
 
 	@Override
 	public void onInitialize() {
+		backpackManager = new BackpackManager();
+
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 

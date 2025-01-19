@@ -14,6 +14,11 @@ public class DisabledSlot extends Slot {
     }
 
     @Override
+    public boolean canInsert(ItemStack stack) {
+        return !stack.equals(this.stack);
+    }
+
+    @Override
     public boolean canTakeItems(PlayerEntity playerEntity) {
         return !this.getStack().equals(this.stack);
     }

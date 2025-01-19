@@ -4,6 +4,7 @@ import com.rouesvm.servback.Main;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
+import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.utils.BackpackInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
@@ -51,6 +52,15 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void afterOpened() {
+        final int slots = backpackInventory.size();
+        for(int j = 0; j <= 3; ++j) {
+            for(int k = 0; k < 9; ++k) {
+                final int index;
+                if (j == 0) index = k + (9 * 4 + slots) - 9;
+                else index = slots + (k + j * 9) - 9;
+                this.screenHandler.setSlot(index, new DisabledSlot(stack, player.getInventory(), k + j * 9, k + j * 9, 0));
+            }
+        }
 
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
@@ -62,6 +72,12 @@ public class BackpackGui extends SimpleGui {
 
             }
         });
+    }
+
+    @Override
+    public ItemStack quickMove(int index) {
+        if (this.screenHandler.getSlot(index).getStack() == stack) return ItemStack.EMPTY;
+        return super.quickMove(index);
     }
 
     @Override

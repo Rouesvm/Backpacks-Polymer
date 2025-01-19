@@ -5,7 +5,7 @@ import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
 import com.rouesvm.servback.slots.DisabledSlot;
-import com.rouesvm.servback.utils.BackpackInventory;
+import com.rouesvm.servback.utils.BackpackInstance;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -21,7 +21,7 @@ import java.util.UUID;
 public class BackpackGui extends SimpleGui {
     protected final ItemStack stack;
 
-    protected final BackpackInventory backpackInventory;
+    protected final BackpackInstance backpackInstance;
 
     protected final UUID uuid;
 
@@ -33,13 +33,14 @@ public class BackpackGui extends SimpleGui {
         this.uuid = Main.backpackManager.getStackUUID(stack);
         this.stack = stack;
 
-        this.backpackInventory = Main.backpackManager.getInventory(uuid, slots);
+        this.backpackInstance = Main.backpackManager.getInstance(uuid, slots);
+        this.backpackInstance.setLastAccessed();
 
         if (stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            if (backpackInventory.insertItems(itemStacks)) {
-                backpackInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
-                Main.backpackManager.saveBackpack(uuid, backpackInventory);
+            if (backpackInstance.backpackInventory.insertItems(itemStacks)) {
+                backpackInstance.backpackInventory.setInventoryDirectly(backpackInstance.backpackInventory.getHeldStacks());
+                Main.backpackManager.saveBackpack(uuid, backpackInstance.backpackInventory);
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
@@ -52,7 +53,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void afterOpened() {
-        final int slots = backpackInventory.size();
+        final int slots = backpackInstance.backpackInventory.size();
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
                 final int index;
@@ -65,7 +66,7 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                Main.backpackManager.saveBackpack(uuid, backpackInventory);
+                Main.backpackManager.saveBackpack(backpackInstance);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
@@ -99,7 +100,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int j = 0; j < this.backpackInventory.size(); ++j)
-            this.setSlotRedirect(j, new BackpackSlot(this.backpackInventory, j, j,0));
+        for (int j = 0; j < this.backpackInstance.backpackInventory.size(); ++j)
+            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.backpackInventory, j, j,0));
     }
 }

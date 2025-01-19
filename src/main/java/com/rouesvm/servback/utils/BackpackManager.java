@@ -11,7 +11,7 @@ import java.util.*;
 
 public class BackpackManager {
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
-    public Map<UUID, BackpackInventory> storedInventories = new HashMap<>();
+    public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
     public UUID getStackUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
@@ -24,7 +24,7 @@ public class BackpackManager {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
             UUID uuid = UUID.randomUUID();
-            if (storedInventories.containsKey(uuid))
+            if (storedInstances.containsKey(uuid))
                 uuid = UUID.randomUUID();
 
             uuidString = uuid.toString();
@@ -34,9 +34,28 @@ public class BackpackManager {
         return UUID.fromString(uuidString);
     }
 
+    public BackpackInstance getInstance(UUID uuid, int slots) {
+        if (this.storedInstances.containsKey(uuid)) {
+            BackpackInstance backpack = this.storedInstances.get(uuid);
+            BackpackInventory backpackInventory = backpack.backpackInventory;
+            if (backpackInventory.size() != slots) {
+                BackpackInventory newInventory = new BackpackInventory(slots);
+                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
+
+                backpack.backpackInventory = newInventory;
+                saveBackpack(backpack);
+            }
+
+            if (!backpackInventory.getHeldStacks().isEmpty())
+                return backpack;
+        }
+        return new BackpackInstance(uuid, new BackpackInventory(slots));
+    }
+
     public BackpackInventory getInventory(UUID uuid, int slots) {
-        if (this.storedInventories.containsKey(uuid)) {
-            BackpackInventory backpackInventory = this.storedInventories.get(uuid);
+        if (this.storedInstances.containsKey(uuid)) {
+            BackpackInstance backpack = this.storedInstances.get(uuid);
+            BackpackInventory backpackInventory = backpack.backpackInventory;
             if (backpackInventory.size() != slots) {
                 BackpackInventory newInventory = new BackpackInventory(slots);
                 newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
@@ -45,22 +64,21 @@ public class BackpackManager {
                 saveBackpack(uuid, backpackInventory);
             }
 
-            if (backpackInventory.getHeldStacks().isEmpty())
-                return new BackpackInventory(slots);
-            else return backpackInventory;
-        } else return new BackpackInventory(slots);
-    }
-
-    public boolean saveBackpack(BackpackInstance instance) {
-        return saveBackpack(instance.uuid, instance.backpackInventory);
-    }
-
-    public boolean saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
-        if (uuid != null && backpackInventory != null) {
-            this.storedInventories.putIfAbsent(uuid, backpackInventory);
-            return true;
+            if (!backpackInventory.getHeldStacks().isEmpty())
+                return backpackInventory;
         }
-        return false;
+
+        return new BackpackInventory(slots);
+    }
+
+    public void saveBackpack(BackpackInstance instance) {
+        if (instance.uuid != null && instance.backpackInventory != null) {
+            this.storedInstances.putIfAbsent(instance.uuid, instance);
+        }
+    }
+
+    public void saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
+        saveBackpack(new BackpackInstance(uuid, backpackInventory));
     }
 
     public static void loadNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
@@ -82,7 +100,7 @@ public class BackpackManager {
 
     public Set<BackpackInstance> save() {
         Set<BackpackInstance> backpackInstances = new HashSet<>();
-        this.storedInventories.forEach((key, value) -> backpackInstances.add(new BackpackInstance(key, value)));
+        this.storedInstances.forEach((key, value) -> backpackInstances.add(value));
         return backpackInstances;
     }
 

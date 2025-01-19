@@ -9,5 +9,7 @@
   "item.serverbackpacks.gui_backpacks" : "Backpacks",
   "item.serverbackpacks.gui_backpack" : "Backpack",
   "item.serverbackpacks.gui_ender" : "Ender Backpack",
-  "item.serverbackpacks.gui_global" : "Global Backpack"
+  "item.serverbackpacks.gui_global" : "Global Backpack",
+
+  "enchantment.serverbackpacks.capacity" : "Capacity"
 }

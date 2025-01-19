@@ -1,5 +1,8 @@
 {
-  "description": "Capacity",
+  "description": {
+    "translate": "enchantment.serverbackpacks.capacity",
+    "fallback": "Capacity"
+  },
   "supported_items": [
     "serverbackpacks:large",
     "serverbackpacks:medium"

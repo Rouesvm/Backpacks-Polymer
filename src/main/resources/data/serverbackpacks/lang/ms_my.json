@@ -9,5 +9,7 @@
   "item.serverbackpacks.gui_backpacks" : "Beg",
   "item.serverbackpacks.gui_backpack" : "Beg",
   "item.serverbackpacks.gui_ender" : "Beg Ender",
-  "item.serverbackpacks.gui_global" : "Beg Global"
+  "item.serverbackpacks.gui_global" : "Beg Global",
+
+  "enchantment.serverbackpacks.capacity" : "Kapasiti"
 }

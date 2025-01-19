@@ -78,7 +78,7 @@ public class BackpackManager {
     }
 
     public void load(Set<BackpackInstance> instances) {
-        instances.forEach(backpackInstance -> this.storedInventories.put(backpackInstance.uuid, backpackInstance.backpackInventory));
+        instances.forEach(this::saveBackpack);
     }
 
     public Set<BackpackInstance> save() {

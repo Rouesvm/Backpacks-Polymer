@@ -27,7 +27,7 @@ public class GuiItem extends BasicPolymerItem {
         if (player.isSneaking())
             return ActionResult.PASS;
         if (cast.getType() == HitResult.Type.BLOCK)
-            return ActionResult.PASS;
+            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
         openGui(serverPlayer, stack);
         player.swingHand(hand, true);

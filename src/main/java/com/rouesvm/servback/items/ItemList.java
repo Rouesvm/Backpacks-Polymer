@@ -8,8 +8,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.ArrayList;
-
 public class ItemList {
     public static Item SMALL_BACKPACK = register(new ContainerItem("small", 9));
     public static Item MEDIUM_BACKPACK = register(new ContainerItem("medium", 9 * 2));

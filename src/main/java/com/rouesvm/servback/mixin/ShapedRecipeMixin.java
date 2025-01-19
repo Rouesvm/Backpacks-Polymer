@@ -19,7 +19,7 @@ public abstract class ShapedRecipeMixin {
     @Shadow @Final
     ItemStack result;
 
-    @Inject(method = "craft", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)
     private void onCraft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registriesLookup, CallbackInfoReturnable<ItemStack> callBack) {
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStackInSlot(i);

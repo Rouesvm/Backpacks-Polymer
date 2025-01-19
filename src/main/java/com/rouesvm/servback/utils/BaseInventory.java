@@ -38,7 +38,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         if (this.listeners == null) {
             this.listeners = Lists.newArrayList();
         }
-
         this.listeners.add(listener);
     }
 
@@ -46,7 +45,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         if (this.listeners != null) {
             this.listeners.remove(listener);
         }
-
     }
 
     public ItemStack getStack(int slot) {

@@ -5,14 +5,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.collection.DefaultedList;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class BackpackManager {
-    public HashMap<UUID, BackpackInventory> storedInventories = new HashMap<>();
+    public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
+    public Map<UUID, BackpackInventory> storedInventories = new HashMap<>();
 
     public UUID getStackUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
@@ -85,5 +84,9 @@ public class BackpackManager {
         Set<BackpackInstance> backpackInstances = new HashSet<>();
         this.storedInventories.forEach((key, value) -> backpackInstances.add(new BackpackInstance(key, value)));
         return backpackInstances;
+    }
+
+    public void setGlobalInventory(DefaultedList<ItemStack> stacks) {
+        this.globalInventory.setInventoryDirectly(stacks);
     }
 }

@@ -8,14 +8,15 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
+import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,8 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        BackpackInventory itemList = this.getItemList(stack);
+    public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, @Nullable ServerPlayerEntity player) {
+        BackpackInventory itemList = this.getItemList(polymerStack);
         if (itemList == null) return;
         if (itemList.getHeldStacks().isEmpty()) return;
 

@@ -1,10 +1,8 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.slots.NonBackpackSlot;
+import com.rouesvm.servback.utils.BaseInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
@@ -15,7 +13,7 @@ import com.rouesvm.servback.Main;
 
 public class GlobalBackpackGui extends SimpleGui {
     protected final ItemStack stack;
-    protected final SimpleInventory inventory;
+    protected final BaseInventory inventory;
 
     public GlobalBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
@@ -34,7 +32,7 @@ public class GlobalBackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                Main.setGlobalInventory(inventory);
+                Main.backpackManager.setGlobalInventory(inventory.heldStacks);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {

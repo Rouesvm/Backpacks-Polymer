@@ -10,7 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
-import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +38,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         if (this.listeners == null) {
             this.listeners = Lists.newArrayList();
         }
-
         this.listeners.add(listener);
     }
 
@@ -47,7 +45,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         if (this.listeners != null) {
             this.listeners.remove(listener);
         }
-
     }
 
     public ItemStack getStack(int slot) {

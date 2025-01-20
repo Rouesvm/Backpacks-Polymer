@@ -7,6 +7,10 @@ assignees: ''
 
 ---
 
+**Extra Info**
+Mod Version: 
+Minecraft Version:
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 

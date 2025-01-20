@@ -67,7 +67,7 @@ public class ContainerItem extends GuiItem {
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         backpackManager.createNewUUID(stack);
 
-        onEnchanted(stack, player);
+        checkEnchantments(stack, player);
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
         new BackpackGui(player, stack, getExtendedSlots(stack) + this.slots);
@@ -92,7 +92,7 @@ public class ContainerItem extends GuiItem {
         else return 0;
     }
 
-    private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
+    private void checkEnchantments(ItemStack stack, ServerPlayerEntity player) {
         BackpackInventory inventory = getItemList(stack);
         if (inventory == null) return;
 

@@ -6,8 +6,10 @@ import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -25,7 +27,6 @@ import static com.rouesvm.servback.Main.backpackManager;
 
 public class ContainerItem extends GuiItem {
     private final int slots;
-    private int extendedSlots;
 
     public ContainerItem(String name, int slots) {
         super(name);
@@ -69,11 +70,11 @@ public class ContainerItem extends GuiItem {
         onEnchanted(stack, player);
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
-        new BackpackGui(player, stack, this.extendedSlots + this.slots);
+        new BackpackGui(player, stack, getExtendedSlots(stack) + this.slots);
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
-        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots + this.extendedSlots, ItemStack.EMPTY);
+        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots + getExtendedSlots(stack), ItemStack.EMPTY);
         stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
         return list;
     }
@@ -81,7 +82,14 @@ public class ContainerItem extends GuiItem {
     private BackpackInventory getItemList(ItemStack stack) {
         if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = backpackManager.getStackUUID(stack);
-        return backpackManager.getInventory(uuid, this.extendedSlots + this.slots);
+        return backpackManager.getInventory(uuid, getExtendedSlots(stack) + this.slots);
+    }
+
+    private int getExtendedSlots(ItemStack stack) {
+        NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
+        if (component.copyNbt().contains("level"))
+            return 9 * component.copyNbt().getInt("level");
+        else return 0;
     }
 
     private void onEnchanted(ItemStack stack, ServerPlayerEntity player) {
@@ -92,10 +100,14 @@ public class ContainerItem extends GuiItem {
         RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
-        this.extendedSlots = 9 * level;
+        int currentSize = 9 * level;
 
-        if (this.extendedSlots > 0) {
-            int totalSlots = this.extendedSlots + this.slots;
+        NbtCompound compound = new NbtCompound();
+        compound.putInt("level", level);
+        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
+
+        if (currentSize > 0) {
+            int totalSlots = currentSize + this.slots;
             if (inventory.size() != totalSlots)
                 resizeAndSaveInventory(stack, inventory, totalSlots);
             return;

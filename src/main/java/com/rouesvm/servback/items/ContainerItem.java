@@ -87,8 +87,9 @@ public class ContainerItem extends GuiItem {
 
     private int getExtendedSlots(ItemStack stack) {
         NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
-        if (component.copyNbt().contains("level"))
-            return 9 * component.copyNbt().getInt("level");
+        NbtCompound compound = component.copyNbt();
+        if (compound.contains("level"))
+            return 9 * compound.getInt("level");
         else return 0;
     }
 

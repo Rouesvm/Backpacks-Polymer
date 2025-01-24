@@ -21,11 +21,12 @@ public abstract class ShapedRecipeMixin {
 
     @Inject(method = "craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)
     private void onCraft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registriesLookup, CallbackInfoReturnable<ItemStack> callBack) {
-        for (int i = 0; i < inventory.getSize(); i++) {
-            ItemStack stack = inventory.getStackInSlot(i);
-            if (stack.getItem() instanceof ContainerItem) {
-                ItemStack resultStack = this.result.copy();
-                if (resultStack.getItem() instanceof ContainerItem) {
+        ItemStack resultStack = this.result.copy();
+
+        if (resultStack.getItem() instanceof ContainerItem) {
+            for (int i = 0; i < inventory.getSize(); i++) {
+                ItemStack stack = inventory.getStackInSlot(i);
+                if (stack.getItem() instanceof ContainerItem) {
                     resultStack.set(BackpacksDataComponentTypes.UUID_TYPE, stack.get(BackpacksDataComponentTypes.UUID_TYPE));
                     callBack.setReturnValue(resultStack);
                     break;

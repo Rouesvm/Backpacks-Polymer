@@ -36,7 +36,7 @@ public class BackpackGui extends SimpleGui {
         this.backpackInstance = Main.backpackManager.getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
 
-        if (stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+        if (this.backpackInstance.backpackInventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (backpackInstance.backpackInventory.insertItems(itemStacks)) {
                 backpackInstance.backpackInventory.setInventoryDirectly(backpackInstance.backpackInventory.getHeldStacks());

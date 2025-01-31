@@ -1,0 +1,21 @@
+{
+  "resource_pack_name" : "serverbackpacks",
+  "texture_name" : "atlas.items",
+  "texture_data" : {
+    "serverbackpacks:small" : {
+      "textures" : "textures/serverbackpacks/item/small"
+    },
+    "serverbackpacks:medium" : {
+      "textures" : "textures/serverbackpacks/item/medium"
+    },
+    "serverbackpacks:large" : {
+      "textures" : "textures/serverbackpacks/item/large"
+    },
+    "serverbackpacks:global" : {
+      "textures" : "textures/serverbackpacks/item/global"
+    },
+    "serverbackpacks:ender" : {
+      "textures" : "textures/serverbackpacks/item/ender"
+    }
+  }
+}

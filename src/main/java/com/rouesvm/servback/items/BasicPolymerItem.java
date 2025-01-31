@@ -1,6 +1,8 @@
 package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.Main;
+import com.rouesvm.servback.utils.bedrock.BedrockItem;
+import com.rouesvm.servback.utils.bedrock.GeyserEntry;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.item.Item;
@@ -11,7 +13,7 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepModel {
+public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepModel, BedrockItem {
     private final Identifier id;
     private final Item vanillaItem;
 
@@ -23,6 +25,7 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepMo
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
+        if (GeyserEntry.isPlayerOnBedrock(packetContext.getPlayer())) return this;
         return this.vanillaItem;
     }
 
@@ -31,6 +34,7 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepMo
         return this.id;
     }
 
+    @Override
     public Identifier getIdentifier() {
         return this.id;
     }

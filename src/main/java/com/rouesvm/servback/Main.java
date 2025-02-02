@@ -1,7 +1,7 @@
 package com.rouesvm.servback;
 
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
-import com.rouesvm.servback.items.ItemList;
+import com.rouesvm.servback.items.ItemRegistry;
 import com.rouesvm.servback.items.ModItemGroup;
 import com.rouesvm.servback.state.StateSaverAndLoader;
 import com.rouesvm.servback.utils.BackpackManager;
@@ -29,7 +29,7 @@ public class Main implements ModInitializer {
 
 		BackpacksDataComponentTypes.initialize();
 
-		ItemList.initialize();
+		ItemRegistry.initialize();
 		ModItemGroup.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server -> {

@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "serverbackpacks:item/medium"
+    "layer0": "serverbackpacks:item/lime_large"
   }
 }

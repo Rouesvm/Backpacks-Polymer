@@ -1,7 +1,7 @@
 package com.rouesvm.servback;
 
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
-import com.rouesvm.servback.items.ItemList;
+import com.rouesvm.servback.items.ItemRegistry;
 import com.rouesvm.servback.items.ModItemGroup;
 import com.rouesvm.servback.state.StateSaverAndLoader;
 import com.rouesvm.servback.utils.BackpackManager;
@@ -14,6 +14,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class Main implements ModInitializer {
@@ -31,9 +32,11 @@ public class Main implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
+		if (hasGeyserLoaded) GeyserEntry.initialize();
+
 		BackpacksDataComponentTypes.initialize();
 
-		ItemList.initialize();
+		ItemRegistry.initialize();
 		ModItemGroup.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
@@ -47,11 +50,13 @@ public class Main implements ModInitializer {
 			serverState.globalInventory = backpackManager.globalInventory;
 			serverState.storedInventories = backpackManager.save();
 		}));
-
-		if (hasGeyserLoaded) GeyserEntry.initialize();
 	}
 
 	public static BaseInventory getInventory() {
 		return backpackManager.globalInventory;
+	}
+
+	public static boolean isBedrock(ServerPlayerEntity player) {
+		return player != null && hasGeyserLoaded && GeyserEntry.isPlayerOnBedrock(player);
 	}
 }

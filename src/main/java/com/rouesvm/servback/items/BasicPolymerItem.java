@@ -2,7 +2,6 @@ package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.utils.bedrock.BedrockItem;
-import com.rouesvm.servback.utils.bedrock.GeyserEntry;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.item.Item;
@@ -25,7 +24,7 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepMo
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
-        if (GeyserEntry.isPlayerOnBedrock(packetContext.getPlayer())) return this;
+        if (Main.isBedrock(packetContext.getPlayer())) return this;
         return this.vanillaItem;
     }
 

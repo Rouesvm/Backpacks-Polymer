@@ -15,6 +15,9 @@
 
   "environment": "*",
   "entrypoints": {
+    "fabric-datagen": [
+      "com.rouesvm.servback.datagen.BackpacksDataGenerator"
+    ],
     "main": [
       "com.rouesvm.servback.Main"
     ]

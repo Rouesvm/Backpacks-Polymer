@@ -8,7 +8,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-import static com.rouesvm.servback.Main.*;
+import static com.rouesvm.servback.Main.MOD_ID;
 
 public class BackpacksDataComponentTypes {
     public static final ComponentType<Boolean> BOOLEAN_TYPE = register(
@@ -27,6 +27,5 @@ public class BackpacksDataComponentTypes {
         return registry;
     }
 
-    public static void initialize() {
-    }
+    public static void initialize() {}
 }

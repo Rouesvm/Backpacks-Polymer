@@ -32,7 +32,7 @@ GlobalPack
 ## Geyser Support:
 ### If using version 1.21.4 or higher.
 1. Download the bedrock resource pack from modrinth.
-2. Copy the bedrock resource to config/Geyser-Fabric/packs
+2. Copy the bedrock resource pack to config/Geyser-Fabric/packs
 3. Optionally add the [language files](https://github.com/Rouesvm/Backpacks-Polymer/tree/1.21.4/src/main/resources/data/serverbackpacks/lang) to Geyser for localization, follow the guides [here](https://geysermc.org/wiki/geyser/translations#modifyingadding-minecraft-java-translations).
 4. That's it!
 

@@ -38,7 +38,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     private void itemRecipes(RegistryWrapper.WrapperLookup wrapperLookup, RecipeExporter exporter) {
         var itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 
-        for (int i = 1; i < 3; i++) {
+        for (int i = 1; i <= 3; i++) {
             ContainerItem backpack = (ContainerItem) ContainerItem.getDefaultBackpack(i);
             String backpackName = backpack.getIdentifier().getPath();
 
@@ -51,6 +51,8 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 Item dyeColor = DyeItem.byColor(color);
 
                 createTransmuteRecipe(exporter, backpack, dyeColor, ContainerItem.getColoredBackpack(color, i), name);
+
+                if (i+1 == 4) continue;
                 createUpgradeRecipe(itemWrap, exporter, ContainerItem.getColoredBackpack(color, i), backpackUpATier, slots, name, tierUpBackpackName);
             }
         }

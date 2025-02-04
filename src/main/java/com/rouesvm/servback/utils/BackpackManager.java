@@ -73,7 +73,7 @@ public class BackpackManager {
 
     public void saveBackpack(BackpackInstance instance) {
         if (instance.uuid != null && instance.backpackInventory != null) {
-            this.storedInstances.putIfAbsent(instance.uuid, instance);
+            this.storedInstances.put(instance.uuid, instance);
         }
     }
 

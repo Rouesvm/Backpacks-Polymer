@@ -29,7 +29,6 @@
   "depends": {
     "fabricloader": "*",
     "minecraft": "1.21.1",
-    "polymer-bundled": ">=0.9.18",
     "java": ">=21"
   }
 }

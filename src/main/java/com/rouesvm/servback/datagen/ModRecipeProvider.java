@@ -1,6 +1,7 @@
 package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.items.ItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
@@ -28,6 +29,38 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     private void itemRecipes(RecipeExporter exporter) {
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+                .pattern("#i#")
+                .pattern("SES")
+                .pattern(" N ")
+                .input('#', Items.LEATHER).input('S', Items.STRING)
+                .input('i', Items.IRON_INGOT).input('E', ModItemTags.LARGE_BACKPACKS)
+                .input('N', Items.ENDER_EYE)
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
+                .offerTo(exporter, "enderpack");
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+                .pattern("#i#")
+                .pattern("SES")
+                .pattern(" N ")
+                .input('#', Items.ENDER_EYE).input('S', Items.STRING)
+                .input('i', Items.IRON_INGOT).input('E', ItemRegistry.ENDER_BACKPACK)
+                .input('N', Items.NETHER_STAR)
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
+                .offerTo(exporter, "globalpack");
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+                .pattern("#S#")
+                .pattern("SCS")
+                .pattern(" # ")
+                .input('#', Items.LEATHER).input('S', Items.STRING).input('C', Items.CHEST)
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
+                .offerTo(exporter, "smallpack");
+
+        dyedBackpackRecipes(exporter);
+    }
+
+    private void dyedBackpackRecipes(RecipeExporter exporter) {
         for (int i = 1; i <= 3; i++) {
             ContainerItem backpack = (ContainerItem) ContainerItem.getDefaultBackpack(i);
             String backpackName = backpack.getIdentifier().getPath();
@@ -53,7 +86,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input(backpack)
                 .input(dyeColor)
                 .group(name)
-                .criterion(name, InventoryChangedCriterion.Conditions.items(dyeColor))
+                .criterion(name, InventoryChangedCriterion.Conditions.items(ItemRegistry.SMALL_BACKPACK))
                 .offerTo(exporter, name);
     }
 
@@ -64,24 +97,21 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                                      String tierUpBackpackName) {
         ShapedRecipeJsonBuilder builder = ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, backpackUpATier)
                 .group(name)
-                .criterion(name + tierUpBackpackName, InventoryChangedCriterion.Conditions.items(Items.LEATHER));
+                .criterion(name + tierUpBackpackName, InventoryChangedCriterion.Conditions.items(backpack));
 
         switch (slots) {
             case 2 -> builder
                     .pattern("iLi")
                     .pattern("SES")
                     .pattern(" O ")
-                    .input('S', Items.STRING)
-                    .input('i', Items.IRON_INGOT)
-                    .input('L', Items.LEATHER)
+                    .input('L', Items.LEATHER).input('S', Items.STRING)
+                    .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
                     .input('E', backpack)
-                    .input('O', ItemTags.PLANKS)
                     .offerTo(exporter, name + tierUpBackpackName);
             case 3 -> builder
                     .pattern("ZiZ")
                     .pattern("SLS")
-                    .input('Z', Items.STRING)
-                    .input('i', Items.IRON_INGOT)
+                    .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
                     .input('S', Items.SHULKER_SHELL)
                     .input('L', backpack)
                     .offerTo(exporter, name + tierUpBackpackName);

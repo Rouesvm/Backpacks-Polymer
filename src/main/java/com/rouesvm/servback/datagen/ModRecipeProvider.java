@@ -8,17 +8,22 @@ import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.data.recipe.RecipeExporter;
 import net.minecraft.data.recipe.RecipeGenerator;
 import net.minecraft.data.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.data.recipe.ShapelessRecipeJsonBuilder;
+import net.minecraft.data.recipe.TransmuteRecipeJsonBuilder;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
+
+import static com.rouesvm.servback.Main.MOD_ID;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public ModRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
@@ -38,25 +43,25 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     private void itemRecipes(RegistryWrapper.WrapperLookup wrapperLookup, RecipeExporter exporter) {
         RegistryWrapper.Impl<Item> itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.ENDER_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")
                 .input('#', Items.LEATHER).input('S', Items.STRING)
                 .input('i', Items.IRON_INGOT).input('E', ModItemTags.LARGE_BACKPACKS)
                 .input('N', Items.ENDER_EYE)
-                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
-                .offerTo(exporter, "enderpack");
+                .criterion("get_obsidian", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
+                .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.GLOBAL_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")
                 .input('#', Items.ENDER_EYE).input('S', Items.STRING)
                 .input('i', Items.IRON_INGOT).input('E', ItemRegistry.ENDER_BACKPACK)
                 .input('N', Items.NETHER_STAR)
-                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
-                .offerTo(exporter, "globalpack");
+                .criterion("get_eye", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
+                .offerTo(exporter);
 
         ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
                 .pattern("#S#")
@@ -64,7 +69,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .pattern(" # ")
                 .input('#', Items.LEATHER).input('S', Items.STRING).input('C', Items.CHEST)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
-                .offerTo(exporter, "smallpack");
+                .offerTo(exporter);
 
         dyedBackpackRecipes(itemWrap, exporter);
     }
@@ -75,38 +80,37 @@ public class ModRecipeProvider extends FabricRecipeProvider {
             String backpackName = backpack.getIdentifier().getPath();
 
             for (DyeColor color : DyeColor.values()) {
-                ContainerItem backpackUpATier = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
-                int slots = backpackUpATier.getSize();
-                String tierUpBackpackName = "_" + backpackUpATier.getIdentifier().getPath();
-
+                ContainerItem regular_dyed_backpack = (ContainerItem) ContainerItem.getColoredBackpack(color, i);
                 String name = color.getName().toLowerCase() + "_" + backpackName;
                 Item dyeColor = DyeItem.byColor(color);
 
-                createTransmuteRecipe(itemWrap, exporter, backpack, dyeColor, ContainerItem.getColoredBackpack(color, i), name);
+                createTransmuteRecipe(exporter, backpack, dyeColor, regular_dyed_backpack, i, name);
 
                 if (i+1 == 4) continue;
-                createUpgradeRecipe(itemWrap, exporter, ContainerItem.getColoredBackpack(color, i), backpackUpATier, slots, name, tierUpBackpackName);
+                ContainerItem backpackUpATier = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
+                createUpgradeRecipe(itemWrap, exporter,
+                        regular_dyed_backpack, backpackUpATier,
+                        backpackUpATier.getSize(),
+                        name + "_" + backpackUpATier.getIdentifier().getPath()
+                );
             }
         }
     }
 
-    private void createTransmuteRecipe(RegistryWrapper.Impl<Item> itemWrap, RecipeExporter exporter, Item backpack, Item dyeColor, Item result, String name) {
-        ShapelessRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, result)
-                .input(backpack)
-                .input(dyeColor)
-                .group(name)
-                .criterion(name, InventoryChangedCriterion.Conditions.items(ItemRegistry.SMALL_BACKPACK))
-                .offerTo(exporter, name);
+    private void createTransmuteRecipe(RecipeExporter exporter, Item backpack, Item dyeColor, Item result, int slots, String name) {
+        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.ofItem(backpack), Ingredient.ofItem(dyeColor), result)
+                .group(slots + "_dyedbackpacks")
+                .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(backpack))
+                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
     }
 
     private void createUpgradeRecipe(RegistryWrapper.Impl<Item> itemWrap, RecipeExporter exporter,
                                      Item backpack, Item backpackUpATier,
                                      int slots,
-                                     String name,
-                                     String tierUpBackpackName) {
+                                     String name) {
         ShapedRecipeJsonBuilder builder = ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, backpackUpATier)
-                .group(name)
-                .criterion(name + tierUpBackpackName, InventoryChangedCriterion.Conditions.items(backpack));
+                .group(slots + "_upgraded")
+                .criterion(name, InventoryChangedCriterion.Conditions.items(backpack));
 
         switch (slots) {
             case 2 -> builder
@@ -116,14 +120,14 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                     .input('L', Items.LEATHER).input('S', Items.STRING)
                     .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
                     .input('E', backpack)
-                    .offerTo(exporter, name + tierUpBackpackName);
+                    .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
             case 3 -> builder
                     .pattern("ZiZ")
                     .pattern("SLS")
                     .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
                     .input('S', Items.SHULKER_SHELL)
                     .input('L', backpack)
-                    .offerTo(exporter, name + tierUpBackpackName);
+                    .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
         }
     }
 

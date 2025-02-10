@@ -8,5 +8,6 @@ public class BackpacksDataGenerator implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
         FabricDataGenerator.Pack pack = generator.createPack();
         pack.addProvider(ModRecipeProvider::new);
+        pack.addProvider(ModItemTags::new);
     }
 }

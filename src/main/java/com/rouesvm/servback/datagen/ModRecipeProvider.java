@@ -14,8 +14,11 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
+
+import static com.rouesvm.servback.Main.MOD_ID;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public ModRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
@@ -65,17 +68,16 @@ public class ModRecipeProvider extends FabricRecipeProvider {
             String backpackName = backpack.getIdentifier().getPath();
 
             for (DyeColor color : DyeColor.values()) {
-                ContainerItem backpackUpATier = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
-                int slots = backpackUpATier.getSize();
-                String tierUpBackpackName = "_" + backpackUpATier.getIdentifier().getPath();
+                ContainerItem coloredBackpack = (ContainerItem) ContainerItem.getColoredBackpack(color, i);
 
                 String name = color.getName().toLowerCase() + "_" + backpackName;
                 Item dyeColor = DyeItem.byColor(color);
 
-                createTransmuteRecipe(exporter, backpack, dyeColor, ContainerItem.getColoredBackpack(color, i), name, i);
+                createTransmuteRecipe(exporter, backpack, dyeColor, coloredBackpack, name, i);
 
                 if (i + 1 == 4) continue;
-                createUpgradeRecipe(exporter, ContainerItem.getColoredBackpack(color, i), backpackUpATier, slots, name, tierUpBackpackName);
+                ContainerItem backpackUpATier = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
+                createUpgradeRecipe(exporter, coloredBackpack, backpackUpATier, backpackUpATier.getSize(), name + "_" + backpackUpATier.getIdentifier().getPath());
             }
         }
     }
@@ -86,14 +88,13 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input(dyeColor)
                 .group(size + "_dyedBackpacks")
                 .criterion(FabricRecipeProvider.hasItem(backpack), FabricRecipeProvider.conditionsFromItem(backpack))
-                .offerTo(exporter, name);
+                .offerTo(exporter, Identifier.of(MOD_ID, name));
     }
 
     private void createUpgradeRecipe(RecipeExporter exporter,
                                      Item backpack, Item backpackUpATier,
                                      int slots,
-                                     String name,
-                                     String tierUpBackpackName) {
+                                     String name) {
         ShapedRecipeJsonBuilder builder = ShapedRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, backpackUpATier)
                 .group(slots + "_upgraded")
                 .criterion(FabricRecipeProvider.hasItem(backpack), FabricRecipeProvider.conditionsFromItem(backpack));
@@ -106,14 +107,14 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                     .input('L', Items.LEATHER).input('S', Items.STRING)
                     .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
                     .input('E', backpack)
-                    .offerTo(exporter, name + tierUpBackpackName);
+                    .offerTo(exporter, Identifier.of(MOD_ID, name));
             case 3 -> builder
                     .pattern("ZiZ")
                     .pattern("SLS")
                     .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
                     .input('S', Items.SHULKER_SHELL)
                     .input('L', backpack)
-                    .offerTo(exporter, name + tierUpBackpackName);
+                    .offerTo(exporter, Identifier.of(MOD_ID, name));
         }
     }
 

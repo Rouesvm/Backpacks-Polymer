@@ -7,11 +7,9 @@ import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.data.recipe.RecipeExporter;
 import net.minecraft.data.recipe.RecipeGenerator;
 import net.minecraft.data.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.data.recipe.TransmuteRecipeJsonBuilder;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -36,8 +34,40 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     private void itemRecipes(RegistryWrapper.WrapperLookup wrapperLookup, RecipeExporter exporter) {
-        var itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
+        RegistryWrapper.Impl<Item> itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+                .pattern("#i#")
+                .pattern("SES")
+                .pattern(" N ")
+                .input('#', Items.LEATHER).input('S', Items.STRING)
+                .input('i', Items.IRON_INGOT).input('E', ModItemTags.LARGE_BACKPACKS)
+                .input('N', Items.ENDER_EYE)
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
+                .offerTo(exporter, "enderpack");
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+                .pattern("#i#")
+                .pattern("SES")
+                .pattern(" N ")
+                .input('#', Items.ENDER_EYE).input('S', Items.STRING)
+                .input('i', Items.IRON_INGOT).input('E', ItemRegistry.ENDER_BACKPACK)
+                .input('N', Items.NETHER_STAR)
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
+                .offerTo(exporter, "globalpack");
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+                .pattern("#S#")
+                .pattern("SCS")
+                .pattern(" # ")
+                .input('#', Items.LEATHER).input('S', Items.STRING).input('C', Items.CHEST)
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
+                .offerTo(exporter, "smallpack");
+
+        dyedBackpackRecipes(itemWrap, exporter);
+    }
+
+    private void dyedBackpackRecipes(RegistryWrapper.Impl<Item> itemWrap, RecipeExporter exporter) {
         for (int i = 1; i <= 3; i++) {
             ContainerItem backpack = (ContainerItem) ContainerItem.getDefaultBackpack(i);
             String backpackName = backpack.getIdentifier().getPath();
@@ -59,9 +89,11 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     private void createTransmuteRecipe(RecipeExporter exporter, Item backpack, Item dyeColor, Item result, String name) {
-        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.ofItem(backpack), Ingredient.ofItem(dyeColor), result)
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, result)
+                .input(backpack)
+                .input(dyeColor)
                 .group(name)
-                .criterion(name, InventoryChangedCriterion.Conditions.items(dyeColor))
+                .criterion(name, InventoryChangedCriterion.Conditions.items(ItemRegistry.SMALL_BACKPACK))
                 .offerTo(exporter, name);
     }
 
@@ -72,24 +104,21 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                                      String tierUpBackpackName) {
         ShapedRecipeJsonBuilder builder = ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, backpackUpATier)
                 .group(name)
-                .criterion(name + tierUpBackpackName, InventoryChangedCriterion.Conditions.items(Items.LEATHER));
+                .criterion(name + tierUpBackpackName, InventoryChangedCriterion.Conditions.items(backpack));
 
         switch (slots) {
             case 2 -> builder
                     .pattern("iLi")
                     .pattern("SES")
                     .pattern(" O ")
-                    .input('S', Items.STRING)
-                    .input('i', Items.IRON_INGOT)
-                    .input('L', Items.LEATHER)
+                    .input('L', Items.LEATHER).input('S', Items.STRING)
+                    .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
                     .input('E', backpack)
-                    .input('O', ItemTags.PLANKS)
                     .offerTo(exporter, name + tierUpBackpackName);
             case 3 -> builder
                     .pattern("ZiZ")
                     .pattern("SLS")
-                    .input('Z', Items.STRING)
-                    .input('i', Items.IRON_INGOT)
+                    .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
                     .input('S', Items.SHULKER_SHELL)
                     .input('L', backpack)
                     .offerTo(exporter, name + tierUpBackpackName);

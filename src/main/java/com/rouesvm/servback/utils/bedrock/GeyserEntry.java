@@ -36,14 +36,15 @@ public class GeyserEntry implements EventRegistrar {
                 Identifier identifier = entry.getKey().getValue();
 
                 NonVanillaCustomItemData customItemData = NonVanillaCustomItemData.builder()
+                        .displayName(Text.translatable(item.getTranslationKey()).getString())
                         .name(Text.translatable(item.getTranslationKey()).getString())
                         .javaId(id)
+                        .stackSize(1)
                         .identifier(identifier.toString())
                         .translationString(item.getTranslationKey())
                         .allowOffhand(true)
                         .displayHandheld(true)
                         .icon(identifier.toString())
-                        .creativeCategory(3)
                         .build();
                 event.register(customItemData);
             }

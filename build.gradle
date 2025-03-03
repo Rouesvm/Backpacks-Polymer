@@ -44,7 +44,7 @@ dependencies {
     modImplementation include("eu.pb4:sgui:${project.sgui}")
     modImplementation include("xyz.nucleoid:server-translations-api:2.4.0+1.21.2-rc1")
 
-    compileOnly('org.geysermc.geyser:api:2.4.2-SNAPSHOT')
+    compileOnly('org.geysermc.geyser:api:2.6.1-SNAPSHOT')
 }
 
 processResources {

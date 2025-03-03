@@ -45,6 +45,7 @@ public class GeyserEntry implements EventRegistrar {
                         .allowOffhand(true)
                         .displayHandheld(true)
                         .icon(identifier.toString())
+                        .creativeCategory(3)
                         .build();
                 event.register(customItemData);
             }

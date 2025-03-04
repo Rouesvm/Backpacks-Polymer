@@ -3,6 +3,7 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.utils.bedrock.BedrockItem;
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
@@ -15,7 +16,7 @@ import net.minecraft.util.Rarity;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class BasicPolymerItem extends Item implements PolymerItem, PolymerKeepModel, BedrockItem {
+public class BasicPolymerItem extends Item implements PolymerItem, PolymerClientDecoded, PolymerKeepModel, BedrockItem {
     private final Identifier id;
     private final Item vanillaItem;
 

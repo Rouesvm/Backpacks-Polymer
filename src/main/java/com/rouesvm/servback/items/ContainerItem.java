@@ -3,7 +3,6 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackInventory;
-import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.NbtComponent;
@@ -61,11 +60,6 @@ public class ContainerItem extends GuiItem {
         if (capacityAmount - capacityMaxShow > 0) {
             tooltip.add(Text.translatable("container.shulkerBox.more", capacityAmount - capacityMaxShow).formatted(Formatting.ITALIC).formatted(Formatting.GOLD));
         }
-    }
-
-    @Override
-    public boolean canBeEnchantedWith(ItemStack stack, RegistryEntry<Enchantment> enchantment, EnchantingContext context) {
-        return slots != 9;
     }
 
     @Override

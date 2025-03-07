@@ -36,6 +36,11 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
+    public boolean canBeNested() {
+        return false;
+    }
+
+    @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, @Nullable ServerPlayerEntity player) {
         BackpackInventory itemList = this.getItemList(polymerStack);
         if (itemList == null) return;

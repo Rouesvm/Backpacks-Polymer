@@ -1,5 +1,6 @@
 package com.rouesvm.servback.ui;
 
+import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.inventory.Inventory;
@@ -22,6 +23,16 @@ public class EnderBackpackGui extends SimpleGui {
         this.fillChest();
 
         this.open();
+
+        final int slots = 9*3;
+        for(int j = 0; j <= 3; ++j) {
+            for(int k = 0; k < 9; ++k) {
+                final int index;
+                if (j == 0) index = k + (9 * 4 + slots) - 9;
+                else index = slots + (k + j * 9) - 9;
+                this.screenHandler.setSlot(index, new DisabledSlot(stack, player.getInventory(), k + j * 9, k + j * 9, 0));
+            }
+        }
     }
 
     @Override

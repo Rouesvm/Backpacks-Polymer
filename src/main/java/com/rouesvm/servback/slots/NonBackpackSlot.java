@@ -13,6 +13,6 @@ public class NonBackpackSlot extends Slot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return (!(stack.getItem() instanceof GuiItem) || (stack.getItem() instanceof ContainerItem));
+        return !(stack.getItem() instanceof GuiItem) || (stack.getItem() instanceof ContainerItem);
     }
 }

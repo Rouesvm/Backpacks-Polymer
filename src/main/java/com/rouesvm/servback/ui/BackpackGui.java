@@ -46,6 +46,7 @@ public class BackpackGui extends SimpleGui {
         }
 
         this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
+
         this.fillChest();
 
         this.open();

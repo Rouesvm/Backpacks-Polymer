@@ -1,6 +1,5 @@
 package com.rouesvm.servback.slots;
 
-import com.rouesvm.servback.items.ContainerItem;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -12,6 +11,6 @@ public class BackpackSlot extends Slot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return !(stack.getItem() instanceof ContainerItem);
+        return stack.getItem().canBeNested();
     }
 }

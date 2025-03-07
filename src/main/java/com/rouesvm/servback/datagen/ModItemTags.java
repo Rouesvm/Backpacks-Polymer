@@ -25,6 +25,7 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
+
         for (int i = 1; i <= 3; i++) {
             for (DyeColor color : DyeColor.values()) {
                 ContainerItem item = (ContainerItem) ContainerItem.getColoredBackpack(color, i);

@@ -12,6 +12,8 @@ import net.minecraft.world.PersistentStateType;
 
 import java.util.List;
 
+import static com.rouesvm.servback.Main.MOD_ID;
+
 public class GlobalBackpackState extends PersistentState {
     public DefaultedList<ItemStack> inventory;
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
@@ -34,7 +36,7 @@ public class GlobalBackpackState extends PersistentState {
     }
 
     private static PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
-            "global-backpack",
+            MOD_ID + "-global-backpack",
             GlobalBackpackState::new,
             CODEC,
             null

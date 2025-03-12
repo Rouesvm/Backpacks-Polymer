@@ -1,8 +1,10 @@
 package com.rouesvm.servback.utils;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Uuids;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -47,6 +49,10 @@ public class BackpackInstance {
 
     public BackpackInventory getBackpackInventory() {
         return backpackInventory;
+    }
+
+    public DefaultedList<ItemStack> getHeldInventory() {
+        return backpackInventory.getHeldStacks();
     }
 
     @Override

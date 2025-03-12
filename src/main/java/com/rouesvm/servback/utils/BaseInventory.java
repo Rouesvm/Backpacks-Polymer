@@ -216,7 +216,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         this.clear();
 
         for(int i = 0; i < list.size(); ++i) {
-            ItemStack.fromNbt(registries, list.getCompound(i)).ifPresent(this::addStack);
+            ItemStack.fromNbt(registries, list.getCompoundOrEmpty(i)).ifPresent(this::addStack);
         }
 
     }

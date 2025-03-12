@@ -82,7 +82,7 @@ public class BackpackManager {
     }
 
     public static void loadNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        nbt.getList("backpackContents", NbtCompound.COMPOUND_TYPE).forEach(element ->
+        nbt.getListOrEmpty("backpackContents").forEach(element ->
                 instances.add(BackpackInstance.load((NbtCompound) element, registryLookup)));
     }
 

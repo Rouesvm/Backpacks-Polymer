@@ -2,6 +2,7 @@ package com.rouesvm.servback.utils;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.Uuids;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -25,7 +26,8 @@ public class BackpackInstance {
 
     public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {
         NbtCompound contents = new NbtCompound();
-        contents.putUuid("uuid", this.uuid);
+        contents.put("uuid", Uuids.CODEC, this.uuid);
+
         contents.put("contents", this.backpackInventory.save(registryLookup));
         contents.putLong("lastAccessed", lastAccessed);
         return contents;
@@ -33,10 +35,18 @@ public class BackpackInstance {
 
     public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
         BackpackInstance backpackInstance = new BackpackInstance();
-        backpackInstance.uuid = compound.getUuid("uuid");
-        backpackInstance.backpackInventory = BackpackInventory.load(compound.getCompound("contents"), registryLookup);
-        backpackInstance.lastAccessed = compound.getLong("lastAccessed");
+        backpackInstance.uuid = compound.get("uuid", Uuids.CODEC).get();
+        backpackInstance.backpackInventory = BackpackInventory.load(compound.getCompoundOrEmpty("contents"), registryLookup);
+        backpackInstance.lastAccessed = compound.getLong("lastAccessed", 0);
         return backpackInstance;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public BackpackInventory getBackpackInventory() {
+        return backpackInventory;
     }
 
     @Override

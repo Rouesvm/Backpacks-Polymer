@@ -3,7 +3,7 @@ package com.rouesvm.servback;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ItemRegistry;
 import com.rouesvm.servback.items.ModItemGroup;
-import com.rouesvm.servback.state.StateSaverAndLoader;
+import com.rouesvm.servback.state.GlobalBackpackState;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BaseInventory;
 import com.rouesvm.servback.utils.bedrock.GeyserEntry;
@@ -40,15 +40,17 @@ public class Main implements ModInitializer {
 		ModItemGroup.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
-			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
+			GlobalBackpackState serverState = GlobalBackpackState.getServerState(server);
 			backpackManager.globalInventory = serverState.globalInventory;
-			backpackManager.load(serverState.storedInventories);
+			//StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
+			//backpackManager.load(serverState.storedInventories);
 		}));
 
 		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
-			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
-			serverState.globalInventory = backpackManager.globalInventory;
-			serverState.storedInventories = backpackManager.save();
+			GlobalBackpackState serverState = GlobalBackpackState.getServerState(server);
+			serverState.inventory = backpackManager.globalInventory.heldStacks;
+			//StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
+			//serverState.storedInventories = backpackManager.save();
 		}));
 	}
 

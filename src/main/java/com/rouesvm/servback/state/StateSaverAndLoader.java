@@ -8,18 +8,13 @@ import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Uuids;
 import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.PersistentStateType;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import static com.rouesvm.servback.Main.MOD_ID;
 
 public class StateSaverAndLoader extends PersistentState {
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
@@ -33,28 +28,21 @@ public class StateSaverAndLoader extends PersistentState {
         return nbt;
     }
 
-    public static StateSaverAndLoader createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public static StateSaverAndLoader createFromNbt() {
         StateSaverAndLoader state = new StateSaverAndLoader();
-        state.globalInventory = BackpackInventory.load(tag, registryLookup);
-        BackpackManager.loadNbt(state.storedInventories, tag, registryLookup);
+       // state.globalInventory = BackpackInventory.load(tag, registryLookup);
+       // BackpackManager.loadNbt(state.storedInventories, tag, registryLookup);
         return state;
     }
 
-    private static PersistentStateType<StateSaverAndLoader> type = new PersistentStateType<>(
-            MOD_ID,
-            StateSaverAndLoader::createFromNbt,
-            SAVE_CODEC,
-            null
-    );
+    //public static StateSaverAndLoader getServerState(MinecraftServer server) {
+    //    PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();
 
-    public static StateSaverAndLoader getServerState(MinecraftServer server) {
-        PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();
+        //StateSaverAndLoader state = persistentStateManager.getOrCreate(type);
+        //state.markDirty();
 
-        StateSaverAndLoader state = persistentStateManager.getOrCreate(type);
-        state.markDirty();
-
-        return state;
-    }
+       // return state;
+   // }
 
     public record BackpackData(UUID uuid, List<ItemStack> inventory) {
         public static final Codec<BackpackData> CODEC = RecordCodecBuilder.create(instance -> instance.group(

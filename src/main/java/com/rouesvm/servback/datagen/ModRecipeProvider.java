@@ -81,7 +81,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
             for (DyeColor color : DyeColor.values()) {
                 ContainerItem regular_dyed_backpack = (ContainerItem) ContainerItem.getColoredBackpack(color, i);
-                String name = color.getName().toLowerCase() + "_" + backpackName;
+                String name = color.name().toLowerCase() + "_" + backpackName;
                 Item dyeColor = DyeItem.byColor(color);
 
                 createTransmuteRecipe(exporter, backpack, dyeColor, regular_dyed_backpack, i, name);

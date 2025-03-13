@@ -15,7 +15,6 @@ import java.util.List;
 import static com.rouesvm.servback.Main.MOD_ID;
 
 public class GlobalBackpackState extends PersistentState {
-    public DefaultedList<ItemStack> inventory;
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
 
     public static final Codec<GlobalBackpackState> CODEC = RecordCodecBuilder.create(
@@ -25,10 +24,10 @@ public class GlobalBackpackState extends PersistentState {
                     ).apply(instance, GlobalBackpackState::new));;
 
     private GlobalBackpackState(List<ItemStack> data) {
-        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9*3, ItemStack.EMPTY);
-        for (int i=0; i < 9 * 3; i++) stacks.set(i, data.get(i));
-        this.inventory = stacks;
-        this.globalInventory.heldStacks = stacks;
+        for(int i = 0; i < 9 * 3; ++i) {
+            ItemStack itemStack = i < data.size() ? data.get(i) : ItemStack.EMPTY;
+            this.globalInventory.setStack(i, itemStack.copy());
+        }
     }
 
     private GlobalBackpackState() {
@@ -44,14 +43,12 @@ public class GlobalBackpackState extends PersistentState {
 
     public static GlobalBackpackState getServerState(MinecraftServer server) {
         PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();
-
         GlobalBackpackState state = persistentStateManager.getOrCreate(type);
         state.markDirty();
-
         return state;
     }
 
     public List<ItemStack> getInventory() {
-        return inventory;
+        return this.globalInventory.getHeldStacks();
     }
 }

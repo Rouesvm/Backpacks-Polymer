@@ -112,14 +112,10 @@ public class BackpackManager {
         }
     }
 
-    public void load(Set<BackpackInstance> instances) {
-        instances.forEach(this::saveBackpack);
-    }
-
     public void load(MinecraftServer server) {
         StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
         this.globalInventory = serverState.globalInventory;
-        this.load(serverState.storedInventories);
+        serverState.storedInventories.forEach(this::saveBackpack);
     }
 
     public Set<BackpackInstance> save() {
@@ -134,7 +130,11 @@ public class BackpackManager {
         serverState.storedInventories = this.save();
     }
 
-    public void setGlobalInventory(DefaultedList<ItemStack> stacks) {
-        this.globalInventory.setInventoryDirectly(stacks);
+    public static void setGlobalInventory(DefaultedList<ItemStack> stacks) {
+        manager.globalInventory.setInventoryDirectly(stacks);
+    }
+
+    public static BackpackInventory getGlobalInventory() {
+        return manager.globalInventory;
     }
 }

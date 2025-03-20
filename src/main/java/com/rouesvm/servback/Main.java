@@ -39,7 +39,7 @@ public class Main implements ModInitializer {
 	}
 
 	public static BaseInventory getInventory() {
-		return BackpackManager.getManager().globalInventory;
+		return BackpackManager.getGlobalInventory();
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

@@ -19,11 +19,9 @@ import net.minecraft.util.collection.DefaultedList;
 import java.util.UUID;
 
 public class BackpackGui extends SimpleGui {
-    protected final ItemStack stack;
-
-    protected final BackpackInstance backpackInstance;
-
     protected final UUID uuid;
+    protected final ItemStack stack;
+    protected final BackpackInstance backpackInstance;
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
         super(getHandler(slots), player, false);

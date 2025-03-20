@@ -11,7 +11,7 @@ import net.minecraft.text.Text;
 
 public class EnderBackpackGui extends SimpleGui {
     protected final ItemStack stack;
-    protected Inventory inventory;
+    protected final Inventory inventory;
 
     public EnderBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);

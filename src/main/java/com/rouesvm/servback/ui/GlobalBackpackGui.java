@@ -44,7 +44,7 @@ public class GlobalBackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                BackpackManager.getManager().setGlobalInventory(inventory.heldStacks);
+                BackpackManager.setGlobalInventory(inventory.heldStacks);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {

@@ -3,7 +3,6 @@ package com.rouesvm.servback;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ItemRegistry;
 import com.rouesvm.servback.items.ModItemGroup;
-import com.rouesvm.servback.state.StateSaverAndLoader;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BaseInventory;
 import com.rouesvm.servback.utils.bedrock.GeyserEntry;
@@ -23,12 +22,8 @@ public class Main implements ModInitializer {
 
 	public static final boolean hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
 
-	public static BackpackManager backpackManager;
-
 	@Override
 	public void onInitialize() {
-		backpackManager = new BackpackManager();
-
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
@@ -39,21 +34,12 @@ public class Main implements ModInitializer {
 		ItemRegistry.initialize();
 		ModItemGroup.initialize();
 
-		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
-			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
-			backpackManager.globalInventory = serverState.globalInventory;
-			backpackManager.load(serverState.storedInventories);
-		}));
-
-		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
-			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
-			serverState.globalInventory = backpackManager.globalInventory;
-			serverState.storedInventories = backpackManager.save();
-		}));
+		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
+		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 	}
 
 	public static BaseInventory getInventory() {
-		return backpackManager.globalInventory;
+		return BackpackManager.getManager().globalInventory;
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

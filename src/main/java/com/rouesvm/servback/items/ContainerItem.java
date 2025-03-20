@@ -3,6 +3,7 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackInventory;
+import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.NbtComponent;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.rouesvm.servback.Main.CAPACITY;
-import static com.rouesvm.servback.Main.backpackManager;
 
 public class ContainerItem extends GuiItem {
     private final int slots;
@@ -69,7 +69,7 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        backpackManager.createNewUUID(stack);
+        BackpackManager.createNewUUID(stack);
 
         checkEnchantments(stack, player);
         player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
@@ -86,8 +86,8 @@ public class ContainerItem extends GuiItem {
 
     private BackpackInventory getItemList(ItemStack stack) {
         if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null) return null;
-        UUID uuid = backpackManager.getStackUUID(stack);
-        return backpackManager.getInventory(uuid, getExtendedSlots(stack) + this.slots);
+        UUID uuid = BackpackManager.getStackUUID(stack);
+        return BackpackManager.getInventory(uuid, getExtendedSlots(stack) + this.slots);
     }
 
     private int getExtendedSlots(ItemStack stack) {
@@ -127,8 +127,8 @@ public class ContainerItem extends GuiItem {
     private void resizeAndSaveInventory(ItemStack stack, BackpackInventory inventory, int newSize) {
         BackpackInventory newInventory = new BackpackInventory(newSize);
         inventory.copyTo(newInventory);
-        UUID backpackUUID = backpackManager.getStackUUID(stack);
-        backpackManager.saveBackpack(backpackUUID, newInventory);
+        UUID backpackUUID = BackpackManager.getStackUUID(stack);
+        BackpackManager.getManager().saveBackpack(backpackUUID, newInventory);
     }
 
     private void dropExcessItems(BackpackInventory inventory, int maxSlots, ServerPlayerEntity player) {

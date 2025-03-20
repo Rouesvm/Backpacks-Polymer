@@ -1,11 +1,11 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.Main;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
 import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
+import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -30,17 +30,17 @@ public class BackpackGui extends SimpleGui {
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
 
-        this.uuid = Main.backpackManager.getStackUUID(stack);
+        this.uuid = BackpackManager.getStackUUID(stack);
         this.stack = stack;
 
-        this.backpackInstance = Main.backpackManager.getInstance(uuid, slots);
+        this.backpackInstance = BackpackManager.getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
 
         if (this.backpackInstance.backpackInventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (backpackInstance.backpackInventory.insertItems(itemStacks)) {
                 backpackInstance.backpackInventory.setInventoryDirectly(backpackInstance.backpackInventory.getHeldStacks());
-                Main.backpackManager.saveBackpack(uuid, backpackInstance.backpackInventory);
+                BackpackManager.getManager().saveBackpack(uuid, backpackInstance.backpackInventory);
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
@@ -67,7 +67,7 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                Main.backpackManager.saveBackpack(backpackInstance);
+                BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
@@ -80,6 +80,11 @@ public class BackpackGui extends SimpleGui {
     public ItemStack quickMove(int index) {
         if (this.screenHandler.getSlot(index).getStack() == stack) return ItemStack.EMPTY;
         return super.quickMove(index);
+    }
+
+    @Override
+    public void onClose() {
+        BackpackManager.getManager().save(this.getPlayer().getServer());
     }
 
     @Override

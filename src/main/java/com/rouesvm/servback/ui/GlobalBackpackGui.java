@@ -3,6 +3,7 @@ package com.rouesvm.servback.ui;
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.slots.NonBackpackSlot;
+import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BaseInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.ItemStack;
@@ -43,7 +44,7 @@ public class GlobalBackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                Main.backpackManager.setGlobalInventory(inventory.heldStacks);
+                BackpackManager.getManager().setGlobalInventory(inventory.heldStacks);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {

@@ -3,8 +3,6 @@ package com.rouesvm.servback;
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ItemRegistry;
 import com.rouesvm.servback.items.ModItemGroup;
-import com.rouesvm.servback.state.BackpackState;
-import com.rouesvm.servback.state.GlobalBackpackState;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BaseInventory;
 import com.rouesvm.servback.utils.bedrock.GeyserEntry;
@@ -24,12 +22,8 @@ public class Main implements ModInitializer {
 
 	public static final boolean hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
 
-	public static BackpackManager backpackManager;
-
 	@Override
 	public void onInitialize() {
-		backpackManager = new BackpackManager();
-
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
@@ -40,23 +34,12 @@ public class Main implements ModInitializer {
 		ItemRegistry.initialize();
 		ModItemGroup.initialize();
 
-		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
-			BackpackState backpackState = BackpackState.getServerState(server);
-			GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
-			backpackManager.globalInventory = globalBackpackState.globalInventory;
-			backpackManager.load(backpackState.storedInventories);
-		}));
-
-		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
-			BackpackState backpackState = BackpackState.getServerState(server);
-			GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
-			globalBackpackState.globalInventory = backpackManager.globalInventory;
-			backpackState.storedInventories = backpackManager.save();
-		}));
+		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
+		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 	}
 
 	public static BaseInventory getInventory() {
-		return backpackManager.globalInventory;
+		return BackpackManager.getManager().globalInventory;
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

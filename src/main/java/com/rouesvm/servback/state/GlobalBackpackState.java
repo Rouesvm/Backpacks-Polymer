@@ -34,7 +34,7 @@ public class GlobalBackpackState extends PersistentState {
         this(DefaultedList.ofSize(9*3, ItemStack.EMPTY));
     }
 
-    private static PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
+    private static final PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
             MOD_ID + "-global-backpack",
             GlobalBackpackState::new,
             CODEC,

@@ -4,9 +4,6 @@ import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.state.BackpackState;
 import com.rouesvm.servback.state.GlobalBackpackState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -56,61 +53,33 @@ public class BackpackManager {
     public static BackpackInstance getInstance(UUID uuid, int slots) {
         if (manager.storedInstances.containsKey(uuid)) {
             BackpackInstance backpack = manager.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.backpackInventory;
-            if (backpackInventory.size() != slots) {
-                BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
-
-                backpack.backpackInventory = newInventory;
-                manager.saveBackpack(backpack);
-            }
-
-            if (!backpackInventory.getHeldStacks().isEmpty())
-                return backpack;
+            BackpackInventory inventory = backpack.getInventory();
+            if (inventory.size() != slots)
+                resizeAndSaveInventory(uuid, inventory, slots);
+            return manager.storedInstances.get(uuid);
         }
         return new BackpackInstance(uuid, new BackpackInventory(slots));
     }
 
     public static BackpackInventory getInventory(UUID uuid, int slots) {
-        if (manager.storedInstances.containsKey(uuid)) {
-            BackpackInstance backpack = manager.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.backpackInventory;
-            if (backpackInventory.size() != slots) {
-                BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
+        BackpackInstance backpack = getInstance(uuid, slots);
+        return backpack.getInventory();
+    }
 
-                backpackInventory = newInventory;
-                manager.saveBackpack(uuid, backpackInventory);
-            }
-
-            if (!backpackInventory.getHeldStacks().isEmpty())
-                return backpackInventory;
-        }
-
-        return new BackpackInventory(slots);
+    public static void resizeAndSaveInventory(UUID uuid, BackpackInventory inventory, int newSize) {
+        BackpackInventory newInventory = new BackpackInventory(newSize);
+        inventory.copyTo(newInventory);
+        manager.saveBackpack(uuid, newInventory);
     }
 
     public void saveBackpack(BackpackInstance instance) {
-        if (instance.uuid != null && instance.backpackInventory != null) {
-            manager.storedInstances.put(instance.uuid, instance);
+        if (instance.getUuid() != null && instance.getInventory() != null) {
+            this.storedInstances.put(instance.getUuid(), instance);
         }
     }
 
     public void saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
         saveBackpack(new BackpackInstance(uuid, backpackInventory));
-    }
-
-    public static void loadNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        nbt.getListOrEmpty("backpackContents").forEach(element ->
-                instances.add(BackpackInstance.load((NbtCompound) element, registryLookup)));
-    }
-
-    public static void saveNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        if (!instances.isEmpty()) {
-            NbtList nbtList = new NbtList();
-            instances.forEach(instance -> nbtList.add(instance.save(registryLookup)));
-            nbt.put("backpackContents", nbtList);
-        }
     }
 
     public void load(Set<BackpackInstance> instances) {
@@ -119,9 +88,10 @@ public class BackpackManager {
 
     public void load(MinecraftServer server) {
         BackpackState backpackState = BackpackState.getServerState(server);
+        this.load(backpackState.getBackpackInstances());
+
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         this.globalInventory = globalBackpackState.globalInventory;
-        this.load(backpackState.storedInventories);
     }
 
     public Set<BackpackInstance> save() {
@@ -132,9 +102,10 @@ public class BackpackManager {
 
     public void save(MinecraftServer server) {
         BackpackState backpackState = BackpackState.getServerState(server);
+        backpackState.setStoredInventories(this.save());
+
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         globalBackpackState.globalInventory = this.globalInventory;
-        backpackState.storedInventories = this.save();
     }
 
     public void setGlobalInventory(DefaultedList<ItemStack> stacks) {

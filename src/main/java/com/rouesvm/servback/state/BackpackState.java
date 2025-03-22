@@ -17,7 +17,7 @@ import java.util.Set;
 import static com.rouesvm.servback.Main.MOD_ID;
 
 public class BackpackState extends PersistentState {
-    public Set<BackpackInstance> storedInventories;
+    public List<BackpackData> storedInventories;
 
     private static final Codec<BackpackState> SAVE_CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
@@ -25,19 +25,14 @@ public class BackpackState extends PersistentState {
                     ).apply(instance, BackpackState::new));
 
     public BackpackState(List<BackpackData> data) {
-        this.storedInventories = new HashSet<>();
-        data.forEach(backpackData -> {
-            BackpackInventory backpackInventory = new BackpackInventory(backpackData.getItemStacks().size());
-            backpackInventory.setInventoryDirectly(backpackData.getHeldStacks());
-            storedInventories.add(new BackpackInstance(backpackData.getUuid(), backpackInventory));
-        });
+        this.storedInventories = new ArrayList<>();
     }
 
     public BackpackState() {
         this(new ArrayList<>());
     }
 
-    private static PersistentStateType<BackpackState> type = new PersistentStateType<>(
+    private static final PersistentStateType<BackpackState> type = new PersistentStateType<>(
             MOD_ID,
             BackpackState::new,
             SAVE_CODEC,
@@ -48,14 +43,25 @@ public class BackpackState extends PersistentState {
         PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();
         BackpackState state = persistentStateManager.getOrCreate(type);
         state.markDirty();
-       return state;
+        return state;
    }
 
     public List<BackpackData> getStoredInventories() {
-        List<BackpackData> list = new ArrayList<>();
-        storedInventories.forEach(backpackInstance ->
-                list.add(new BackpackData(backpackInstance.uuid, backpackInstance.getHeldInventory()))
-        );
-        return list;
+        return this.storedInventories;
+    }
+
+    public Set<BackpackInstance> getBackpackInstances() {
+        Set<BackpackInstance> backpackInstances = new HashSet<>();
+        this.storedInventories.forEach(data ->
+                backpackInstances.add(
+                        new BackpackInstance(data.getUuid(),
+                        new BackpackInventory(data.getHeldStacks()))
+                ));
+        return backpackInstances;
+    }
+
+    public void setStoredInventories(Set<BackpackInstance> backpackInstances) {
+        backpackInstances.forEach(instance ->
+                this.storedInventories.add(new BackpackData(instance.getUuid(), instance.getHeldInventory())));
     }
 }

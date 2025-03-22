@@ -1,58 +1,39 @@
 package com.rouesvm.servback.utils;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Uuids;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class BackpackInstance {
-    public UUID uuid;
-    public BackpackInventory backpackInventory;
+    private final UUID uuid;
+    private BackpackInventory inventory;
     public long lastAccessed;
 
     public BackpackInstance(UUID uuid, BackpackInventory inventory) {
         this.uuid = uuid;
-        this.backpackInventory = inventory;
+        this.inventory = inventory;
     }
 
-    public BackpackInstance() {
+    public void setInventory(BackpackInventory inventory) {
+        this.inventory = inventory;
     }
 
     public void setLastAccessed() {
         this.lastAccessed = System.currentTimeMillis();
     }
 
-    public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {
-        NbtCompound contents = new NbtCompound();
-        contents.put("uuid", Uuids.CODEC, this.uuid);
-
-        contents.put("contents", this.backpackInventory.save(registryLookup));
-        contents.putLong("lastAccessed", lastAccessed);
-        return contents;
-    }
-
-    public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
-        BackpackInstance backpackInstance = new BackpackInstance();
-        backpackInstance.uuid = compound.get("uuid", Uuids.CODEC).get();
-        backpackInstance.backpackInventory = BackpackInventory.load(compound.getCompoundOrEmpty("contents"), registryLookup);
-        backpackInstance.lastAccessed = compound.getLong("lastAccessed", 0);
-        return backpackInstance;
-    }
-
     public UUID getUuid() {
         return uuid;
     }
 
-    public BackpackInventory getBackpackInventory() {
-        return backpackInventory;
+    public BackpackInventory getInventory() {
+        return inventory;
     }
 
     public DefaultedList<ItemStack> getHeldInventory() {
-        return backpackInventory.getHeldStacks();
+        return inventory.getHeldStacks();
     }
 
     @Override

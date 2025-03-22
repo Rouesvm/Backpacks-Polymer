@@ -36,11 +36,11 @@ public class BackpackGui extends SimpleGui {
         this.backpackInstance = BackpackManager.getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
 
-        if (this.backpackInstance.backpackInventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+        if (this.backpackInstance.inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            if (backpackInstance.backpackInventory.insertItems(itemStacks)) {
-                backpackInstance.backpackInventory.setInventoryDirectly(backpackInstance.backpackInventory.getHeldStacks());
-                BackpackManager.getManager().saveBackpack(uuid, backpackInstance.backpackInventory);
+            if (backpackInstance.inventory.insertItems(itemStacks)) {
+                backpackInstance.inventory.setInventoryDirectly(backpackInstance.inventory.getHeldStacks());
+                BackpackManager.getManager().saveBackpack(uuid, backpackInstance.inventory);
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
@@ -54,7 +54,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void afterOpened() {
-        final int slots = backpackInstance.backpackInventory.size();
+        final int slots = backpackInstance.inventory.size();
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
                 final int index;
@@ -106,7 +106,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int j = 0; j < this.backpackInstance.backpackInventory.size(); ++j)
-            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.backpackInventory, j, j,0));
+        for (int j = 0; j < this.backpackInstance.inventory.size(); ++j)
+            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.inventory, j, j,0));
     }
 }

@@ -35,7 +35,7 @@ public class Main implements ModInitializer {
 		ModItemGroup.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
-		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
+		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
 	}
 
 	public static BaseInventory getInventory() {

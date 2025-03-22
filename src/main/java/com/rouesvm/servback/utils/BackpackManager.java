@@ -13,7 +13,7 @@ import java.util.*;
 
 public class BackpackManager {
     private static BackpackManager manager = null;
-    
+
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
@@ -55,12 +55,12 @@ public class BackpackManager {
     public static BackpackInstance getInstance(UUID uuid, int slots) {
         if (manager.storedInstances.containsKey(uuid)) {
             BackpackInstance backpack = manager.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.backpackInventory;
+            BackpackInventory backpackInventory = backpack.inventory;
             if (backpackInventory.size() != slots) {
                 BackpackInventory newInventory = new BackpackInventory(slots);
                 newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
 
-                backpack.backpackInventory = newInventory;
+                backpack.inventory = newInventory;
                 manager.saveBackpack(backpack);
             }
 
@@ -73,7 +73,7 @@ public class BackpackManager {
     public static BackpackInventory getInventory(UUID uuid, int slots) {
         if (manager.storedInstances.containsKey(uuid)) {
             BackpackInstance backpack = manager.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.backpackInventory;
+            BackpackInventory backpackInventory = backpack.inventory;
             if (backpackInventory.size() != slots) {
                 BackpackInventory newInventory = new BackpackInventory(slots);
                 newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
@@ -90,8 +90,8 @@ public class BackpackManager {
     }
 
     public void saveBackpack(BackpackInstance instance) {
-        if (instance.uuid != null && instance.backpackInventory != null) {
-            manager.storedInstances.put(instance.uuid, instance);
+        if (instance.uuid != null && instance.inventory != null) {
+            this.storedInstances.put(instance.uuid, instance);
         }
     }
 

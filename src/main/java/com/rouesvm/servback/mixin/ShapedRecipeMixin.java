@@ -2,6 +2,7 @@ package com.rouesvm.servback.mixin;
 
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.input.CraftingRecipeInput;
@@ -27,6 +28,7 @@ public abstract class ShapedRecipeMixin {
             for (int i = 0; i < inventory.size(); i++) {
                 ItemStack stack = inventory.getStackInSlot(i);
                 if (stack.getItem() instanceof ContainerItem) {
+                    resultStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
                     resultStack.set(BackpacksDataComponentTypes.UUID_TYPE, stack.get(BackpacksDataComponentTypes.UUID_TYPE));
                     callBack.setReturnValue(resultStack);
                     break;

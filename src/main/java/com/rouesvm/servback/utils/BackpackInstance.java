@@ -8,12 +8,12 @@ import java.util.UUID;
 
 public class BackpackInstance {
     public UUID uuid;
-    public BackpackInventory backpackInventory;
+    public BackpackInventory inventory;
     public long lastAccessed;
 
     public BackpackInstance(UUID uuid, BackpackInventory inventory) {
         this.uuid = uuid;
-        this.backpackInventory = inventory;
+        this.inventory = inventory;
     }
 
     public BackpackInstance() {
@@ -26,7 +26,7 @@ public class BackpackInstance {
     public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {
         NbtCompound contents = new NbtCompound();
         contents.putUuid("uuid", this.uuid);
-        contents.put("contents", this.backpackInventory.save(registryLookup));
+        contents.put("contents", this.inventory.save(registryLookup));
         contents.putLong("lastAccessed", lastAccessed);
         return contents;
     }
@@ -34,7 +34,7 @@ public class BackpackInstance {
     public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
         BackpackInstance backpackInstance = new BackpackInstance();
         backpackInstance.uuid = compound.getUuid("uuid");
-        backpackInstance.backpackInventory = BackpackInventory.load(compound.getCompound("contents"), registryLookup);
+        backpackInstance.inventory = BackpackInventory.load(compound.getCompound("contents"), registryLookup);
         backpackInstance.lastAccessed = compound.getLong("lastAccessed");
         return backpackInstance;
     }

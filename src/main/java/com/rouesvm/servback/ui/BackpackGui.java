@@ -5,6 +5,7 @@ import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.slots.BackpackSlot;
 import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
+import com.rouesvm.servback.utils.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
@@ -36,11 +37,12 @@ public class BackpackGui extends SimpleGui {
         this.backpackInstance = BackpackManager.getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
 
-        if (this.backpackInstance.inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+        BackpackInventory inventory = this.backpackInstance.getInventory();
+        if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            if (backpackInstance.inventory.insertItems(itemStacks)) {
-                backpackInstance.inventory.setInventoryDirectly(backpackInstance.inventory.getHeldStacks());
-                BackpackManager.getManager().saveBackpack(uuid, backpackInstance.inventory);
+            if (inventory.insertItems(itemStacks)) {
+                this.backpackInstance.setInventory(inventory);
+                BackpackManager.getManager().saveBackpack(this.backpackInstance);
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
@@ -54,7 +56,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void afterOpened() {
-        final int slots = backpackInstance.inventory.size();
+        final int slots = backpackInstance.getInventory().size();
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
                 final int index;
@@ -106,7 +108,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int j = 0; j < this.backpackInstance.inventory.size(); ++j)
-            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.inventory, j, j,0));
+        for (int j = 0; j < this.backpackInstance.getInventory().size(); ++j)
+            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.getInventory(), j, j,0));
     }
 }

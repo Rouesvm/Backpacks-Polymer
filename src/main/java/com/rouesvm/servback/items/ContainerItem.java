@@ -125,13 +125,13 @@ public class ContainerItem extends GuiItem {
         if (currentSize > 0) {
             int totalSlots = currentSize + this.slots;
             if (inventory.size() != totalSlots)
-                BackpackManager.resizeAndSaveInventory(uuid, inventory, totalSlots);
+                BackpackManager.resizeInventory(uuid, inventory, totalSlots);
             return;
         }
 
         if (inventory.size() > this.slots)
             dropExcessItems(inventory, this.slots, player);
-        BackpackManager.resizeAndSaveInventory(uuid, inventory, this.slots);
+        BackpackManager.resizeInventory(uuid, inventory, this.slots);
     }
 
     private void dropExcessItems(BackpackInventory inventory, int maxSlots, ServerPlayerEntity player) {

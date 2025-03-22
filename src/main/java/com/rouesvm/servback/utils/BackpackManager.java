@@ -15,6 +15,8 @@ public class BackpackManager {
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
+    private BackpackManager() {}
+
     public static BackpackManager getManager() {
         return manager;
     }
@@ -39,23 +41,33 @@ public class BackpackManager {
     public static UUID createNewUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
-            UUID uuid = UUID.randomUUID();
-            if (manager.storedInstances.containsKey(uuid))
-                uuid = UUID.randomUUID();
-
-            uuidString = uuid.toString();
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuidString);
+            UUID uuid = generateUniqueUUID();
+            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuid.toString());
             return uuid;
         }
         return UUID.fromString(uuidString);
     }
 
+    private static UUID generateUniqueUUID() {
+        UUID uuid = UUID.randomUUID();
+        if (manager != null) {
+            while (manager.storedInstances.containsKey(uuid)) {
+                uuid = UUID.randomUUID();
+            }
+        }
+        return uuid;
+    }
+
     public static BackpackInstance getInstance(UUID uuid, int slots) {
+        BackpackManager manager = getManager();
         if (manager.storedInstances.containsKey(uuid)) {
             BackpackInstance backpack = manager.storedInstances.get(uuid);
             BackpackInventory inventory = backpack.getInventory();
-            if (inventory.size() != slots)
-                resizeAndSaveInventory(uuid, inventory, slots);
+            if (inventory.size() != slots) {
+                inventory = resizeInventory(inventory, slots);
+                backpack.setInventory(inventory);
+                manager.saveBackpack(backpack);
+            }
             return backpack;
         }
         return new BackpackInstance(uuid, new BackpackInventory(slots));
@@ -66,10 +78,16 @@ public class BackpackManager {
         return backpack.getInventory();
     }
 
-    public static void resizeAndSaveInventory(UUID uuid, BackpackInventory inventory, int newSize) {
+    public static BackpackInventory resizeInventory(BackpackInventory inventory, int newSize) {
         BackpackInventory newInventory = new BackpackInventory(newSize);
         inventory.copyTo(newInventory);
-        manager.saveBackpack(uuid, newInventory);
+        return newInventory;
+    }
+
+    public static void resizeInventory(UUID uuid, BackpackInventory inventory, int newSize) {
+        BackpackInventory newInventory = new BackpackInventory(newSize);
+        inventory.copyTo(newInventory);
+        manager.saveBackpack(uuid, inventory);
     }
 
     public void saveBackpack(BackpackInstance instance) {

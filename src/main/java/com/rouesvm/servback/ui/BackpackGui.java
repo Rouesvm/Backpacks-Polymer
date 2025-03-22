@@ -34,11 +34,11 @@ public class BackpackGui extends SimpleGui {
         this.backpackInstance = BackpackManager.getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
 
-        if (this.backpackInstance.inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+        if (this.backpackInstance.getInventory().isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            if (backpackInstance.inventory.insertItems(itemStacks)) {
-                backpackInstance.inventory.setInventoryDirectly(backpackInstance.inventory.getHeldStacks());
-                BackpackManager.getManager().saveBackpack(uuid, backpackInstance.inventory);
+            if (backpackInstance.getInventory().insertItems(itemStacks)) {
+                backpackInstance.getInventory().setInventoryDirectly(backpackInstance.getInventory().getHeldStacks());
+                BackpackManager.getManager().saveBackpack(uuid, backpackInstance.getInventory());
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
@@ -52,7 +52,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void afterOpened() {
-        final int slots = backpackInstance.inventory.size();
+        final int slots = backpackInstance.getInventory().size();
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
                 final int index;
@@ -104,7 +104,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int j = 0; j < this.backpackInstance.inventory.size(); ++j)
-            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.inventory, j, j,0));
+        for (int j = 0; j < this.backpackInstance.getInventory().size(); ++j)
+            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.getInventory(), j, j,0));
     }
 }

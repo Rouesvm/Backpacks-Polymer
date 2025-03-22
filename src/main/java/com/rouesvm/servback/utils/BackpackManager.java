@@ -21,6 +21,8 @@ public class BackpackManager {
         return manager;
     }
 
+    private BackpackManager() {}
+
     public static void setup(MinecraftServer server) {
         manager = new BackpackManager();
         manager.load(server);
@@ -41,62 +43,56 @@ public class BackpackManager {
     public static UUID createNewUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
-            UUID uuid = UUID.randomUUID();
-            if (manager.storedInstances.containsKey(uuid))
-                uuid = UUID.randomUUID();
-
-            uuidString = uuid.toString();
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuidString);
+            UUID uuid = generateUniqueUUID();
+            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuid.toString());
             return uuid;
         }
         return UUID.fromString(uuidString);
     }
 
+    private static UUID generateUniqueUUID() {
+        UUID uuid = UUID.randomUUID();
+        if (manager != null) {
+            while (manager.storedInstances.containsKey(uuid)) {
+                uuid = UUID.randomUUID();
+            }
+        }
+        return uuid;
+    }
+
     public static BackpackInstance getInstance(UUID uuid, int slots) {
         if (manager.storedInstances.containsKey(uuid)) {
             BackpackInstance backpack = manager.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.inventory;
-            if (backpackInventory.size() != slots) {
-                BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
-
-                backpack.inventory = newInventory;
+            BackpackInventory inventory = backpack.getInventory();
+            if (inventory.size() != slots) {
+                inventory = resizeInventory(inventory, slots);
+                backpack.setInventory(inventory);
                 manager.saveBackpack(backpack);
             }
-
-            if (!backpackInventory.getHeldStacks().isEmpty())
-                return backpack;
+            return backpack;
         }
         return new BackpackInstance(uuid, new BackpackInventory(slots));
     }
 
     public static BackpackInventory getInventory(UUID uuid, int slots) {
-        if (manager.storedInstances.containsKey(uuid)) {
-            BackpackInstance backpack = manager.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.inventory;
-            if (backpackInventory.size() != slots) {
-                BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
-
-                backpackInventory = newInventory;
-                manager.saveBackpack(uuid, backpackInventory);
-            }
-
-            if (!backpackInventory.getHeldStacks().isEmpty())
-                return backpackInventory;
-        }
-
-        return new BackpackInventory(slots);
+        BackpackInstance backpack = BackpackManager.getInstance(uuid, slots);
+        return backpack.getInventory();
     }
 
     public void saveBackpack(BackpackInstance instance) {
-        if (instance.uuid != null && instance.inventory != null) {
-            this.storedInstances.put(instance.uuid, instance);
+        if (instance.getUuid() != null && instance.getInventory() != null) {
+            this.storedInstances.put(instance.getUuid(), instance);
         }
     }
 
     public void saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
         saveBackpack(new BackpackInstance(uuid, backpackInventory));
+    }
+
+    public static BackpackInventory resizeInventory(BackpackInventory inventory, int newSize) {
+        BackpackInventory newInventory = new BackpackInventory(newSize);
+        inventory.copyTo(newInventory);
+        return newInventory;
     }
 
     public static void loadNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {

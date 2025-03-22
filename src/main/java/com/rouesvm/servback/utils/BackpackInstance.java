@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class BackpackInstance {
-    public UUID uuid;
-    public BackpackInventory inventory;
+    private UUID uuid;
+    private BackpackInventory inventory;
     public long lastAccessed;
 
     public BackpackInstance(UUID uuid, BackpackInventory inventory) {
@@ -16,11 +16,22 @@ public class BackpackInstance {
         this.inventory = inventory;
     }
 
-    public BackpackInstance() {
+    public BackpackInstance() {}
+
+    public void setInventory(BackpackInventory inventory) {
+        this.inventory = inventory;
     }
 
     public void setLastAccessed() {
         this.lastAccessed = System.currentTimeMillis();
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public BackpackInventory getInventory() {
+        return inventory;
     }
 
     public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {

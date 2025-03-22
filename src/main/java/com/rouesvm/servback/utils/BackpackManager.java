@@ -56,7 +56,7 @@ public class BackpackManager {
             BackpackInventory inventory = backpack.getInventory();
             if (inventory.size() != slots)
                 resizeAndSaveInventory(uuid, inventory, slots);
-            return manager.storedInstances.get(uuid);
+            return backpack;
         }
         return new BackpackInstance(uuid, new BackpackInventory(slots));
     }

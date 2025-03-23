@@ -4,13 +4,10 @@ import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.Trinket;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -24,7 +21,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.Direction;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
@@ -33,26 +29,12 @@ import java.util.UUID;
 
 import static com.rouesvm.servback.Main.CAPACITY;
 
-public class ContainerItem extends GuiItem implements Trinket {
+public class ContainerItem extends GuiItem {
     private final int slots;
 
     public ContainerItem(String name, int slots) {
         super(name);
         this.slots = slots;
-    }
-
-    @Override
-    public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (entity instanceof ServerPlayerEntity player) {
-            Direction yaw = player.getFacing();
-            if (yaw == Direction.DOWN
-                    && player.isSneaking()
-                    && player.isOnGround()
-                    && !stack.getOrDefault(BackpacksDataComponentTypes.BOOLEAN_TYPE, false)
-            ) {
-                openGui(player, stack);
-            }
-        }
     }
 
     @Override

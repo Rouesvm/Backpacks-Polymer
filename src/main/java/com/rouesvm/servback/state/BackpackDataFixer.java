@@ -50,16 +50,10 @@ public class BackpackDataFixer {
     }
 
     public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
-        DefaultedList<ItemStack> stacks = DefaultedList.of();
-        Inventories.readNbt(compound.getCompound("contents").get(), stacks, registryLookup);
-
-        BackpackInstance backpackInstance = new BackpackInstance(
+        return new BackpackInstance(
                 Uuids.toUuid(compound.getIntArray("uuid").get()),
-                new BackpackInventory(stacks)
+                loadInventory(compound.getCompound("contents").get(), registryLookup)
         );
-        backpackInstance.lastAccessed = compound.getLong("lastAccessed").get();
-
-        return backpackInstance;
     }
 
     public static Set<BackpackInstance> convertToV2Format(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
@@ -74,5 +68,12 @@ public class BackpackDataFixer {
         }
 
         return instances;
+    }
+
+    public static BackpackInventory loadInventory(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
+        DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
+        Inventories.readNbt(nbtCompound, itemStacks, registryLookup);
+
+        return new BackpackInventory(itemStacks);
     }
 }

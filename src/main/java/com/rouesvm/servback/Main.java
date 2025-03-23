@@ -20,6 +20,7 @@ public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
 
+	public static final boolean hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 	public static final boolean hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
 
 	@Override

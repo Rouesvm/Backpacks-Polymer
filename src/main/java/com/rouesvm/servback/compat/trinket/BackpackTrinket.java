@@ -22,8 +22,8 @@ public class BackpackTrinket implements Trinket {
     public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
         if (entity instanceof ServerPlayerEntity player) {
             ContainerItem item = (ContainerItem) stack.getItem();
-            Direction yaw = player.getFacing();
-            if (yaw == Direction.DOWN
+            Direction facing = player.getFacing();
+            if (facing == Direction.UP
                     && player.isSneaking()
                     && player.isOnGround()
                     && !stack.getOrDefault(DataComponentRegistry.BOOLEAN_TYPE, false)

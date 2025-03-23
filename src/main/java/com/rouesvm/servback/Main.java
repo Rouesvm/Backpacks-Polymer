@@ -32,13 +32,13 @@ public class Main implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
-		if (hasGeyserLoaded) BackpackGeyser.initialize();
-		if (hasTrinketLoaded) BackpackTrinket.initialize();
-
 		DataComponentRegistry.initialize();
 
 		ItemRegistry.initialize();
 		ModItemGroup.initialize();
+
+		if (hasGeyserLoaded) BackpackGeyser.initialize();
+		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);

@@ -11,7 +11,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class ItemRegistry {
+public class BackpackItemRegistry {
     public static final Item SMALL_BACKPACK = register(new ContainerItem("small", 9));
     public static final Item BLACK_SMALL_BACKPACK = register(new ContainerItem("black_small", 9));
     public static final Item BLUE_SMALL_BACKPACK = register(new ContainerItem("blue_small", 9));

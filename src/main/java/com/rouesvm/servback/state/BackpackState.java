@@ -2,7 +2,7 @@ package com.rouesvm.servback.state;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.utils.BackpackInstance;
-import com.rouesvm.servback.utils.BackpackInventory;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;

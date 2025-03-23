@@ -1,9 +1,9 @@
 package com.rouesvm.servback.items;
 
-import com.rouesvm.servback.registry.DataComponentRegistry;
-import com.rouesvm.servback.registry.ItemRegistry;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackItemRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
-import com.rouesvm.servback.utils.BackpackInventory;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
@@ -85,7 +85,7 @@ public class ContainerItem extends GuiItem {
     }
 
     private BackpackInventory getItemList(ItemStack stack) {
-        if (stack.get(DataComponentRegistry.UUID_TYPE) == null) return null;
+        if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = BackpackManager.getStackUUID(stack);
         return BackpackManager.getInventory(uuid, getExtendedSlots(stack) + this.slots);
     }
@@ -141,65 +141,65 @@ public class ContainerItem extends GuiItem {
 
     public static Map<String, Item> getBackpackMap() {
         return Map.ofEntries(
-                Map.entry("WHITE_1", ItemRegistry.WHITE_SMALL_BACKPACK),
-                Map.entry("WHITE_2", ItemRegistry.WHITE_MEDIUM_BACKPACK),
-                Map.entry("WHITE_3", ItemRegistry.WHITE_LARGE_BACKPACK),
+                Map.entry("WHITE_1", BackpackItemRegistry.WHITE_SMALL_BACKPACK),
+                Map.entry("WHITE_2", BackpackItemRegistry.WHITE_MEDIUM_BACKPACK),
+                Map.entry("WHITE_3", BackpackItemRegistry.WHITE_LARGE_BACKPACK),
 
-                Map.entry("ORANGE_1", ItemRegistry.ORANGE_SMALL_BACKPACK),
-                Map.entry("ORANGE_2", ItemRegistry.ORANGE_MEDIUM_BACKPACK),
-                Map.entry("ORANGE_3", ItemRegistry.ORANGE_LARGE_BACKPACK),
+                Map.entry("ORANGE_1", BackpackItemRegistry.ORANGE_SMALL_BACKPACK),
+                Map.entry("ORANGE_2", BackpackItemRegistry.ORANGE_MEDIUM_BACKPACK),
+                Map.entry("ORANGE_3", BackpackItemRegistry.ORANGE_LARGE_BACKPACK),
 
-                Map.entry("MAGENTA_1", ItemRegistry.MAGENTA_SMALL_BACKPACK),
-                Map.entry("MAGENTA_2", ItemRegistry.MAGENTA_MEDIUM_BACKPACK),
-                Map.entry("MAGENTA_3", ItemRegistry.MAGENTA_LARGE_BACKPACK),
+                Map.entry("MAGENTA_1", BackpackItemRegistry.MAGENTA_SMALL_BACKPACK),
+                Map.entry("MAGENTA_2", BackpackItemRegistry.MAGENTA_MEDIUM_BACKPACK),
+                Map.entry("MAGENTA_3", BackpackItemRegistry.MAGENTA_LARGE_BACKPACK),
 
-                Map.entry("LIGHT_BLUE_1", ItemRegistry.LIGHT_BLUE_SMALL_BACKPACK),
-                Map.entry("LIGHT_BLUE_2", ItemRegistry.LIGHT_BLUE_MEDIUM_BACKPACK),
-                Map.entry("LIGHT_BLUE_3", ItemRegistry.LIGHT_BLUE_LARGE_BACKPACK),
+                Map.entry("LIGHT_BLUE_1", BackpackItemRegistry.LIGHT_BLUE_SMALL_BACKPACK),
+                Map.entry("LIGHT_BLUE_2", BackpackItemRegistry.LIGHT_BLUE_MEDIUM_BACKPACK),
+                Map.entry("LIGHT_BLUE_3", BackpackItemRegistry.LIGHT_BLUE_LARGE_BACKPACK),
 
-                Map.entry("YELLOW_1", ItemRegistry.YELLOW_SMALL_BACKPACK),
-                Map.entry("YELLOW_2", ItemRegistry.YELLOW_MEDIUM_BACKPACK),
-                Map.entry("YELLOW_3", ItemRegistry.YELLOW_LARGE_BACKPACK),
+                Map.entry("YELLOW_1", BackpackItemRegistry.YELLOW_SMALL_BACKPACK),
+                Map.entry("YELLOW_2", BackpackItemRegistry.YELLOW_MEDIUM_BACKPACK),
+                Map.entry("YELLOW_3", BackpackItemRegistry.YELLOW_LARGE_BACKPACK),
 
-                Map.entry("LIME_1", ItemRegistry.LIME_SMALL_BACKPACK),
-                Map.entry("LIME_2", ItemRegistry.LIME_MEDIUM_BACKPACK),
-                Map.entry("LIME_3", ItemRegistry.LIME_LARGE_BACKPACK),
+                Map.entry("LIME_1", BackpackItemRegistry.LIME_SMALL_BACKPACK),
+                Map.entry("LIME_2", BackpackItemRegistry.LIME_MEDIUM_BACKPACK),
+                Map.entry("LIME_3", BackpackItemRegistry.LIME_LARGE_BACKPACK),
 
-                Map.entry("PINK_1", ItemRegistry.PINK_SMALL_BACKPACK),
-                Map.entry("PINK_2", ItemRegistry.PINK_MEDIUM_BACKPACK),
-                Map.entry("PINK_3", ItemRegistry.PINK_LARGE_BACKPACK),
+                Map.entry("PINK_1", BackpackItemRegistry.PINK_SMALL_BACKPACK),
+                Map.entry("PINK_2", BackpackItemRegistry.PINK_MEDIUM_BACKPACK),
+                Map.entry("PINK_3", BackpackItemRegistry.PINK_LARGE_BACKPACK),
 
-                Map.entry("GRAY_1", ItemRegistry.LIGHT_GRAY_SMALL_BACKPACK),
-                Map.entry("GRAY_2", ItemRegistry.LIGHT_GRAY_MEDIUM_BACKPACK),
-                Map.entry("GRAY_3", ItemRegistry.LIGHT_GRAY_LARGE_BACKPACK),
+                Map.entry("GRAY_1", BackpackItemRegistry.LIGHT_GRAY_SMALL_BACKPACK),
+                Map.entry("GRAY_2", BackpackItemRegistry.LIGHT_GRAY_MEDIUM_BACKPACK),
+                Map.entry("GRAY_3", BackpackItemRegistry.LIGHT_GRAY_LARGE_BACKPACK),
 
-                Map.entry("LIGHT_GRAY_1", ItemRegistry.LIGHT_GRAY_SMALL_BACKPACK),
-                Map.entry("LIGHT_GRAY_2", ItemRegistry.LIGHT_GRAY_MEDIUM_BACKPACK),
-                Map.entry("LIGHT_GRAY_3", ItemRegistry.LIGHT_GRAY_LARGE_BACKPACK),
+                Map.entry("LIGHT_GRAY_1", BackpackItemRegistry.LIGHT_GRAY_SMALL_BACKPACK),
+                Map.entry("LIGHT_GRAY_2", BackpackItemRegistry.LIGHT_GRAY_MEDIUM_BACKPACK),
+                Map.entry("LIGHT_GRAY_3", BackpackItemRegistry.LIGHT_GRAY_LARGE_BACKPACK),
 
-                Map.entry("CYAN_1", ItemRegistry.CYAN_SMALL_BACKPACK),
-                Map.entry("CYAN_2", ItemRegistry.CYAN_MEDIUM_BACKPACK),
-                Map.entry("CYAN_3", ItemRegistry.CYAN_LARGE_BACKPACK),
+                Map.entry("CYAN_1", BackpackItemRegistry.CYAN_SMALL_BACKPACK),
+                Map.entry("CYAN_2", BackpackItemRegistry.CYAN_MEDIUM_BACKPACK),
+                Map.entry("CYAN_3", BackpackItemRegistry.CYAN_LARGE_BACKPACK),
 
-                Map.entry("BLUE_1", ItemRegistry.BLUE_SMALL_BACKPACK),
-                Map.entry("BLUE_2", ItemRegistry.BLUE_MEDIUM_BACKPACK),
-                Map.entry("BLUE_3", ItemRegistry.BLUE_LARGE_BACKPACK),
+                Map.entry("BLUE_1", BackpackItemRegistry.BLUE_SMALL_BACKPACK),
+                Map.entry("BLUE_2", BackpackItemRegistry.BLUE_MEDIUM_BACKPACK),
+                Map.entry("BLUE_3", BackpackItemRegistry.BLUE_LARGE_BACKPACK),
 
-                Map.entry("GREEN_1", ItemRegistry.GREEN_SMALL_BACKPACK),
-                Map.entry("GREEN_2", ItemRegistry.GREEN_MEDIUM_BACKPACK),
-                Map.entry("GREEN_3", ItemRegistry.GREEN_LARGE_BACKPACK),
+                Map.entry("GREEN_1", BackpackItemRegistry.GREEN_SMALL_BACKPACK),
+                Map.entry("GREEN_2", BackpackItemRegistry.GREEN_MEDIUM_BACKPACK),
+                Map.entry("GREEN_3", BackpackItemRegistry.GREEN_LARGE_BACKPACK),
 
-                Map.entry("RED_1", ItemRegistry.RED_SMALL_BACKPACK),
-                Map.entry("RED_2", ItemRegistry.RED_MEDIUM_BACKPACK),
-                Map.entry("RED_3", ItemRegistry.RED_LARGE_BACKPACK),
+                Map.entry("RED_1", BackpackItemRegistry.RED_SMALL_BACKPACK),
+                Map.entry("RED_2", BackpackItemRegistry.RED_MEDIUM_BACKPACK),
+                Map.entry("RED_3", BackpackItemRegistry.RED_LARGE_BACKPACK),
 
-                Map.entry("BLACK_1", ItemRegistry.BLACK_SMALL_BACKPACK),
-                Map.entry("BLACK_2", ItemRegistry.BLACK_MEDIUM_BACKPACK),
-                Map.entry("BLACK_3", ItemRegistry.BLACK_LARGE_BACKPACK),
+                Map.entry("BLACK_1", BackpackItemRegistry.BLACK_SMALL_BACKPACK),
+                Map.entry("BLACK_2", BackpackItemRegistry.BLACK_MEDIUM_BACKPACK),
+                Map.entry("BLACK_3", BackpackItemRegistry.BLACK_LARGE_BACKPACK),
 
-                Map.entry("PURPLE_1", ItemRegistry.PURPLE_SMALL_BACKPACK),
-                Map.entry("PURPLE_2", ItemRegistry.PURPLE_MEDIUM_BACKPACK),
-                Map.entry("PURPLE_3", ItemRegistry.PURPLE_LARGE_BACKPACK)
+                Map.entry("PURPLE_1", BackpackItemRegistry.PURPLE_SMALL_BACKPACK),
+                Map.entry("PURPLE_2", BackpackItemRegistry.PURPLE_MEDIUM_BACKPACK),
+                Map.entry("PURPLE_3", BackpackItemRegistry.PURPLE_LARGE_BACKPACK)
         );
     }
 
@@ -217,9 +217,9 @@ public class ContainerItem extends GuiItem {
 
     public static Item getDefaultBackpack(int size) {
         return switch (size) {
-            case 1 -> ItemRegistry.SMALL_BACKPACK;
-            case 2 -> ItemRegistry.MEDIUM_BACKPACK;
-            default -> ItemRegistry.LARGE_BACKPACK;
+            case 1 -> BackpackItemRegistry.SMALL_BACKPACK;
+            case 2 -> BackpackItemRegistry.MEDIUM_BACKPACK;
+            default -> BackpackItemRegistry.LARGE_BACKPACK;
         };
     }
 }

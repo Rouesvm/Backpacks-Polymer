@@ -1,5 +1,6 @@
 package com.rouesvm.servback.utils;
 
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 

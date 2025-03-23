@@ -1,7 +1,8 @@
 package com.rouesvm.servback.utils;
 
-import com.rouesvm.servback.registry.DataComponentRegistry;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.state.BackpackState;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -34,17 +35,17 @@ public class BackpackManager {
     }
 
     public static UUID getStackUUID(ItemStack stack) {
-        String uuidString = stack.get(DataComponentRegistry.UUID_TYPE);
+        String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
         if (uuidString == null)
             uuidString = String.valueOf(createNewUUID(stack));
         return UUID.fromString(uuidString);
     }
 
     public static UUID createNewUUID(ItemStack stack) {
-        String uuidString = stack.get(DataComponentRegistry.UUID_TYPE);
+        String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
             UUID uuid = generateUniqueUUID();
-            stack.set(DataComponentRegistry.UUID_TYPE, uuid.toString());
+            stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
             return uuid;
         }
         return UUID.fromString(uuidString);

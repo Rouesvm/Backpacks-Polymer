@@ -1,7 +1,7 @@
 package com.rouesvm.servback.compat.trinket;
 
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.registry.DataComponentRegistry;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import dev.emi.trinkets.api.TrinketsApi;
@@ -26,7 +26,7 @@ public class BackpackTrinket implements Trinket {
             if (facing == Direction.UP
                     && player.isSneaking()
                     && player.isOnGround()
-                    && !stack.getOrDefault(DataComponentRegistry.BOOLEAN_TYPE, false)
+                    && !stack.getOrDefault(BackpackDataComponentTypes.BOOLEAN_TYPE, false)
             ) {
                 item.openGui(player, stack);
             }

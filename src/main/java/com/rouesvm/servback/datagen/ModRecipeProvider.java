@@ -1,7 +1,7 @@
 package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.registry.ItemRegistry;
+import com.rouesvm.servback.registry.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
@@ -43,7 +43,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     private void itemRecipes(RegistryWrapper.WrapperLookup wrapperLookup, RecipeExporter exporter) {
         RegistryWrapper.Impl<Item> itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.ENDER_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.ENDER_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")
@@ -53,17 +53,17 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_obsidian", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.GLOBAL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")
                 .input('#', Items.ENDER_EYE).input('S', Items.STRING)
-                .input('i', Items.IRON_INGOT).input('E', ItemRegistry.ENDER_BACKPACK)
+                .input('i', Items.IRON_INGOT).input('E', BackpackItemRegistry.ENDER_BACKPACK)
                 .input('N', Items.NETHER_STAR)
                 .criterion("get_eye", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.SMALL_BACKPACK, 1)
                 .pattern("#S#")
                 .pattern("SCS")
                 .pattern(" # ")

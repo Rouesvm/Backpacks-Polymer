@@ -3,7 +3,7 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
 import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
 import com.rouesvm.servback.ui.BackpackGui;
-import com.rouesvm.servback.utils.BackpackInventory;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;

@@ -1,10 +1,10 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.Main;
-import com.rouesvm.servback.slots.DisabledSlot;
-import com.rouesvm.servback.slots.NonBackpackSlot;
+import com.rouesvm.servback.ui.inventory.BaseInventory;
+import com.rouesvm.servback.ui.slots.DisabledSlot;
+import com.rouesvm.servback.ui.slots.NonBackpackSlot;
 import com.rouesvm.servback.utils.BackpackManager;
-import com.rouesvm.servback.utils.BaseInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;

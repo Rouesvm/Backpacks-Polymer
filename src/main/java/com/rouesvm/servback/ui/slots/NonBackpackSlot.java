@@ -1,4 +1,4 @@
-package com.rouesvm.servback.slots;
+package com.rouesvm.servback.ui.slots;
 
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.items.GuiItem;

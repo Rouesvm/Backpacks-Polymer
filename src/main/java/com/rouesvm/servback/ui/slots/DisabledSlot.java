@@ -1,4 +1,4 @@
-package com.rouesvm.servback.slots;
+package com.rouesvm.servback.ui.slots;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;

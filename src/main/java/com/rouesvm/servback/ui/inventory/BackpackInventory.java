@@ -1,4 +1,4 @@
-package com.rouesvm.servback.utils;
+package com.rouesvm.servback.ui.inventory;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;

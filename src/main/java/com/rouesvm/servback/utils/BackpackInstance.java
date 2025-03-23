@@ -1,5 +1,6 @@
 package com.rouesvm.servback.utils;
 
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 

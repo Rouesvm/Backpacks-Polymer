@@ -4,6 +4,7 @@ import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
 import com.rouesvm.servback.state.BackpackDataFixer;
 import com.rouesvm.servback.state.BackpackState;
 import com.rouesvm.servback.state.GlobalBackpackState;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;

@@ -3,7 +3,7 @@ package com.rouesvm.servback.state;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.state.codecs.SlotData;
-import com.rouesvm.servback.utils.BackpackInventory;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;

@@ -23,9 +23,8 @@ public class InventoryData {
     }
 
     public static DefaultedList<ItemStack> getHeldStacks(List<SlotData> data) {
-        DefaultedList<ItemStack> stacks = DefaultedList.of();
-        data.forEach(
-                slotData -> stacks.add(slotData.getSlot(), slotData.getStack()));
+        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
+        if (!data.isEmpty()) data.forEach(slotData -> stacks.set(slotData.getSlot(), slotData.getStack()));
         return stacks;
     }
 }

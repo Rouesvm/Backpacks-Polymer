@@ -1,7 +1,7 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.registry.DataComponentRegistry;
 import com.rouesvm.servback.slots.BackpackSlot;
 import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
@@ -26,7 +26,7 @@ public class BackpackGui extends SimpleGui {
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
         super(getHandler(slots), player, false);
 
-        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
+        stack.set(DataComponentRegistry.BOOLEAN_TYPE, true);
 
         this.uuid = BackpackManager.getStackUUID(stack);
         this.stack = stack;
@@ -83,7 +83,7 @@ public class BackpackGui extends SimpleGui {
     @Override
     public void onClose() {
         BackpackManager.getManager().save(this.getPlayer().getServer());
-        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
+        stack.set(DataComponentRegistry.BOOLEAN_TYPE, false);
     }
 
     @Override

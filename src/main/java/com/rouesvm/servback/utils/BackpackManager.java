@@ -1,7 +1,7 @@
 package com.rouesvm.servback.utils;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
-import com.rouesvm.servback.state.StateSaverAndLoader;
+import com.rouesvm.servback.registry.DataComponentRegistry;
+import com.rouesvm.servback.state.BackpackState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -34,17 +34,17 @@ public class BackpackManager {
     }
 
     public static UUID getStackUUID(ItemStack stack) {
-        String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
+        String uuidString = stack.get(DataComponentRegistry.UUID_TYPE);
         if (uuidString == null)
             uuidString = String.valueOf(createNewUUID(stack));
         return UUID.fromString(uuidString);
     }
 
     public static UUID createNewUUID(ItemStack stack) {
-        String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
+        String uuidString = stack.get(DataComponentRegistry.UUID_TYPE);
         if (uuidString == null) {
             UUID uuid = generateUniqueUUID();
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuid.toString());
+            stack.set(DataComponentRegistry.UUID_TYPE, uuid.toString());
             return uuid;
         }
         return UUID.fromString(uuidString);
@@ -109,7 +109,7 @@ public class BackpackManager {
     }
 
     public void load(MinecraftServer server) {
-        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
+        BackpackState serverState = BackpackState.getServerState(server);
         this.globalInventory = serverState.globalInventory;
         serverState.storedInventories.forEach(this::saveBackpack);
     }
@@ -121,7 +121,7 @@ public class BackpackManager {
     }
 
     public void save(MinecraftServer server) {
-        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
+        BackpackState serverState = BackpackState.getServerState(server);
         serverState.globalInventory = this.globalInventory;
         serverState.storedInventories = this.save();
     }

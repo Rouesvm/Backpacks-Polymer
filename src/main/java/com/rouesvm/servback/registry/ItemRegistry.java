@@ -1,9 +1,10 @@
-package com.rouesvm.servback.items;
+package com.rouesvm.servback.registry;
 
-import com.rouesvm.servback.Main;
+import com.rouesvm.servback.items.BasicPolymerItem;
+import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.items.GuiItem;
 import com.rouesvm.servback.ui.EnderBackpackGui;
 import com.rouesvm.servback.ui.GlobalBackpackGui;
-import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -73,11 +74,6 @@ public class ItemRegistry {
     });
 
     public static Item register(BasicPolymerItem item) {
-        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
-    }
-
-    public static Item register(ContainerItem item) {
-        if (Main.hasTrinketLoaded) TrinketsApi.registerTrinket(item, item);
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 

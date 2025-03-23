@@ -15,6 +15,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
+
 public class BasicPolymerItem extends Item implements PolymerItem, PolymerClientDecoded, PolymerKeepModel, BedrockItem {
     private final Identifier id;
     private final Item vanillaItem;
@@ -46,7 +47,6 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerClient
         return this.id;
     }
 
-    @Override
     public Identifier getIdentifier() {
         return this.id;
     }

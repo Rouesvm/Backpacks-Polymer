@@ -13,7 +13,7 @@ import net.minecraft.world.PersistentStateManager;
 import java.util.HashSet;
 import java.util.Set;
 
-public class StateSaverAndLoader extends PersistentState {
+public class BackpackState extends PersistentState {
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public Set<BackpackInstance> storedInventories = new HashSet<>();
 
@@ -24,23 +24,23 @@ public class StateSaverAndLoader extends PersistentState {
         return nbt;
     }
 
-    public static StateSaverAndLoader createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        StateSaverAndLoader state = new StateSaverAndLoader();
+    public static BackpackState createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        BackpackState state = new BackpackState();
         state.globalInventory = BackpackInventory.load(tag, registryLookup);
         BackpackManager.loadNbt(state.storedInventories, tag, registryLookup);
         return state;
     }
 
-    private static final Type<StateSaverAndLoader> type = new Type<>(
-            StateSaverAndLoader::new,
-            StateSaverAndLoader::createFromNbt,
+    private static final Type<BackpackState> type = new Type<>(
+            BackpackState::new,
+            BackpackState::createFromNbt,
             null
     );
 
-    public static StateSaverAndLoader getServerState(MinecraftServer server) {
+    public static BackpackState getServerState(MinecraftServer server) {
         PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();
 
-        StateSaverAndLoader state = persistentStateManager.getOrCreate(type, Main.MOD_ID);
+        BackpackState state = persistentStateManager.getOrCreate(type, Main.MOD_ID);
         state.markDirty();
 
         return state;

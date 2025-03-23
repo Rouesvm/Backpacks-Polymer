@@ -1,7 +1,7 @@
 package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.items.ItemRegistry;
+import com.rouesvm.servback.registry.ItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;

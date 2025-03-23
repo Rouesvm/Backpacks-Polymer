@@ -2,6 +2,7 @@ package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.ui.EnderBackpackGui;
 import com.rouesvm.servback.ui.GlobalBackpackGui;
+import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -71,7 +72,12 @@ public class ItemRegistry {
     });
 
     public static Item register(BasicPolymerItem item) {
-       return Registry.register(Registries.ITEM, item.getIdentifier(), item);
+        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
+    }
+
+    public static Item register(ContainerItem item) {
+        TrinketsApi.registerTrinket(item, item);
+        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 
     public static void initialize() {}

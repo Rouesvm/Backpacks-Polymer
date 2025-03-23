@@ -12,7 +12,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
 
-public class GuiItem extends BasicPolymerItem {
+public class GuiItem extends BasicPolymerItem  {
     public GuiItem(String name) {
         super(name, Items.LEATHER);
     }

@@ -11,12 +11,10 @@ base {
 }
 
 repositories {
-    maven { url 'https://maven.nucleoid.xyz' }
-
-    maven {
-        url = uri("https://repo.opencollab.dev/main/")
-    }
-}
+    maven { url = uri("https://repo.opencollab.dev/main/") }
+    maven { url = 'https://maven.nucleoid.xyz' }
+    maven { url = "https://maven.terraformersmc.com/" }
+    maven { url = "https://maven.ladysnake.org/releases" }}
 
 loom {
     splitEnvironmentSourceSets()
@@ -44,6 +42,7 @@ dependencies {
     modImplementation include("eu.pb4:sgui:${project.sgui}")
     modImplementation include("xyz.nucleoid:server-translations-api:2.4.0+1.21.2-rc1")
 
+    modImplementation "eu.pb4.polyport:trinkets:${trinkets_version}"
     compileOnly('org.geysermc.geyser:api:2.6.1-SNAPSHOT')
 }
 

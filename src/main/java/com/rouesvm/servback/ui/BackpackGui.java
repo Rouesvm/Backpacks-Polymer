@@ -83,6 +83,7 @@ public class BackpackGui extends SimpleGui {
     @Override
     public void onClose() {
         BackpackManager.getManager().save(this.getPlayer().getServer());
+        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
     }
 
     @Override

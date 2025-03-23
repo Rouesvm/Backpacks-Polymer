@@ -23,6 +23,14 @@ public class GlobalBackpackState extends PersistentState {
                             SlotData.CODEC.listOf().fieldOf("itemStacks").forGetter(GlobalBackpackState::getInventory)
                     ).apply(instance, GlobalBackpackState::new));;
 
+
+    private static final PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
+            MOD_ID + "-v2-global",
+            GlobalBackpackState::new,
+            CODEC,
+            null
+    );
+
     private GlobalBackpackState(List<SlotData> data) {
         this.globalInventory = new BackpackInventory(9 * 3);
 
@@ -34,13 +42,6 @@ public class GlobalBackpackState extends PersistentState {
     private GlobalBackpackState() {
         this(new ArrayList<>());
     }
-
-    private static final PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
-            MOD_ID + "-v2-global",
-            GlobalBackpackState::new,
-            CODEC,
-            null
-    );
 
     public static GlobalBackpackState getServerState(MinecraftServer server) {
         PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();

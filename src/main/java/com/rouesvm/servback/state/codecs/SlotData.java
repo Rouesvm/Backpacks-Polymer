@@ -19,7 +19,7 @@ public class SlotData {
     }
 
     public static final Codec<SlotData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codecs.NON_NEGATIVE_INT.fieldOf("slot").forGetter(SlotData::getSlot),
+            Codecs.UNSIGNED_BYTE.fieldOf("slot").forGetter(SlotData::getSlot),
             ItemStack.CODEC.fieldOf("itemStacks").forGetter(SlotData::getStack)
     ).apply(instance, SlotData::new));
 

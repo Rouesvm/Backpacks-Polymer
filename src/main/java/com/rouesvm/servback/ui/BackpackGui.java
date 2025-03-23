@@ -1,7 +1,7 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
 import com.rouesvm.servback.slots.BackpackSlot;
 import com.rouesvm.servback.slots.DisabledSlot;
 import com.rouesvm.servback.utils.BackpackInstance;

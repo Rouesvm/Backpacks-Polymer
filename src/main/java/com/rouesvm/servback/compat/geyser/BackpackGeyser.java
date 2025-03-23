@@ -1,5 +1,6 @@
-package com.rouesvm.servback.utils.bedrock;
+package com.rouesvm.servback.compat.geyser;
 
+import com.rouesvm.servback.utils.bedrock.BedrockItem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 import static com.rouesvm.servback.Main.MOD_ID;
 
-public class GeyserEntry implements EventRegistrar {
+public class BackpackGeyser implements EventRegistrar {
     public static Path PACKS_FOLDER;
     public static Path GEYSER_PACK;
 
@@ -33,7 +34,7 @@ public class GeyserEntry implements EventRegistrar {
         ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
             geyser = GeyserApi.api();
 
-            EventRegistrar registrar = new GeyserEntry();
+            EventRegistrar registrar = new BackpackGeyser();
             geyser.eventBus().register(registrar, registrar);
         });
     }

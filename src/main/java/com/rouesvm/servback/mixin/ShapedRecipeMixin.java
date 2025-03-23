@@ -1,7 +1,7 @@
 package com.rouesvm.servback.mixin;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.input.CraftingRecipeInput;

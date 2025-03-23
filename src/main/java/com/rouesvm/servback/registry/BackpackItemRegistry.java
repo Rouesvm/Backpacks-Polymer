@@ -1,5 +1,8 @@
-package com.rouesvm.servback.items;
+package com.rouesvm.servback.registry;
 
+import com.rouesvm.servback.items.BasicPolymerItem;
+import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.items.GuiItem;
 import com.rouesvm.servback.ui.EnderBackpackGui;
 import com.rouesvm.servback.ui.GlobalBackpackGui;
 import net.minecraft.item.Item;
@@ -8,7 +11,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class ItemRegistry {
+public class BackpackItemRegistry {
     public static Item SMALL_BACKPACK = register(new ContainerItem("small", 9));
     public static Item BLACK_SMALL_BACKPACK = register(new ContainerItem("black_small", 9));
     public static Item BLUE_SMALL_BACKPACK = register(new ContainerItem("blue_small", 9));

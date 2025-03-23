@@ -1,11 +1,11 @@
 package com.rouesvm.servback;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
-import com.rouesvm.servback.items.ItemRegistry;
-import com.rouesvm.servback.items.ModItemGroup;
+import com.rouesvm.servback.compat.geyser.BackpackGeyser;
+import com.rouesvm.servback.registry.BackpackItemGroup;
+import com.rouesvm.servback.registry.BackpackItemRegistry;
+import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BaseInventory;
-import com.rouesvm.servback.utils.bedrock.GeyserEntry;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -27,12 +27,12 @@ public class Main implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
-		if (hasGeyserLoaded) GeyserEntry.initialize();
-
 		BackpacksDataComponentTypes.initialize();
 
-		ItemRegistry.initialize();
-		ModItemGroup.initialize();
+		BackpackItemRegistry.initialize();
+		BackpackItemGroup.initialize();
+
+		if (hasGeyserLoaded) BackpackGeyser.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
@@ -43,6 +43,6 @@ public class Main implements ModInitializer {
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {
-		return player != null && hasGeyserLoaded && GeyserEntry.isPlayerOnBedrock(player);
+		return player != null && hasGeyserLoaded && BackpackGeyser.isPlayerOnBedrock(player);
 	}
 }

@@ -2,6 +2,9 @@ package com.rouesvm.servback.state;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.rouesvm.servback.state.codecs.BackpackData;
+import com.rouesvm.servback.state.codecs.InventoryData;
+import com.rouesvm.servback.state.codecs.SlotData;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
@@ -17,15 +20,16 @@ import java.util.Set;
 import static com.rouesvm.servback.Main.MOD_ID;
 
 public class BackpackState extends PersistentState {
-    public List<BackpackData> storedInventories;
+    public Set<BackpackData> storedInventories;
 
     private static final Codec<BackpackState> SAVE_CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
-                      BackpackData.CODEC.listOf().fieldOf("inventories").forGetter(BackpackState::getStoredInventories)
+                      BackpackData.CODEC.listOf().fieldOf("backpackContents").forGetter(BackpackState::getStoredInventories)
                     ).apply(instance, BackpackState::new));
 
     public BackpackState(List<BackpackData> data) {
-        this.storedInventories = new ArrayList<>();
+        this.storedInventories = new HashSet<>();
+        this.storedInventories.addAll(data);
     }
 
     public BackpackState() {
@@ -33,7 +37,7 @@ public class BackpackState extends PersistentState {
     }
 
     private static final PersistentStateType<BackpackState> type = new PersistentStateType<>(
-            MOD_ID,
+            MOD_ID + "-v2",
             BackpackState::new,
             SAVE_CODEC,
             null
@@ -47,7 +51,7 @@ public class BackpackState extends PersistentState {
    }
 
     public List<BackpackData> getStoredInventories() {
-        return this.storedInventories;
+        return this.storedInventories.stream().toList();
     }
 
     public Set<BackpackInstance> getBackpackInstances() {
@@ -55,13 +59,14 @@ public class BackpackState extends PersistentState {
         this.storedInventories.forEach(data ->
                 backpackInstances.add(
                         new BackpackInstance(data.getUuid(),
-                        new BackpackInventory(data.getHeldStacks()))
+                        new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().getItemStacks())))
                 ));
         return backpackInstances;
     }
 
     public void setStoredInventories(Set<BackpackInstance> backpackInstances) {
+        this.storedInventories = new HashSet<>();
         backpackInstances.forEach(instance ->
-                this.storedInventories.add(new BackpackData(instance.getUuid(), instance.getHeldInventory())));
+                this.storedInventories.add(new BackpackData(instance.getUuid(), new InventoryData(SlotData.writeToCodec(instance.getHeldInventory())))));
     }
 }

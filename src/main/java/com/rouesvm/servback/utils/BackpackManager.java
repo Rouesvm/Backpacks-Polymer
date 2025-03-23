@@ -1,6 +1,7 @@
 package com.rouesvm.servback.utils;
 
 import com.rouesvm.servback.components.BackpacksDataComponentTypes;
+import com.rouesvm.servback.state.BackpackDataFixer;
 import com.rouesvm.servback.state.BackpackState;
 import com.rouesvm.servback.state.GlobalBackpackState;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,7 @@ public class BackpackManager {
     public static void setup(MinecraftServer server) {
         manager = new BackpackManager();
         manager.load(server);
+        BackpackDataFixer.onWorldLoading(server);
     }
 
     public static void destroy(MinecraftServer server) {

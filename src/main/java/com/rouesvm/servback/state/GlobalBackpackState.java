@@ -2,40 +2,41 @@ package com.rouesvm.servback.state;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.rouesvm.servback.state.codecs.SlotData;
 import com.rouesvm.servback.utils.BackpackInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.PersistentStateType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.rouesvm.servback.Main.MOD_ID;
 
 public class GlobalBackpackState extends PersistentState {
-    public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
+    public BackpackInventory globalInventory;
 
     public static final Codec<GlobalBackpackState> CODEC = RecordCodecBuilder.create(
             (instance) ->
                     instance.group(
-                            ItemStack.CODEC.listOf().fieldOf("itemStacks").forGetter(GlobalBackpackState::getInventory)
+                            SlotData.CODEC.listOf().fieldOf("itemStacks").forGetter(GlobalBackpackState::getInventory)
                     ).apply(instance, GlobalBackpackState::new));;
 
-    private GlobalBackpackState(List<ItemStack> data) {
-        for(int i = 0; i < 9 * 3; ++i) {
-            ItemStack itemStack = i < data.size() ? data.get(i) : ItemStack.EMPTY;
-            this.globalInventory.setStack(i, itemStack.copy());
+    private GlobalBackpackState(List<SlotData> data) {
+        this.globalInventory = new BackpackInventory(9 * 3);
+
+        if (!data.isEmpty()) {
+            this.globalInventory.setInventoryDirectly(SlotData.readFromCodec(data, 9 * 3));
         }
     }
 
     private GlobalBackpackState() {
-        this(DefaultedList.ofSize(9*3, ItemStack.EMPTY));
+        this(new ArrayList<>());
     }
 
     private static final PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
-            MOD_ID + "-global-backpack",
+            MOD_ID + "-v2-global",
             GlobalBackpackState::new,
             CODEC,
             null
@@ -48,7 +49,7 @@ public class GlobalBackpackState extends PersistentState {
         return state;
     }
 
-    public List<ItemStack> getInventory() {
-        return this.globalInventory.getHeldStacks();
+    public List<SlotData> getInventory() {
+        return SlotData.writeToCodec(this.globalInventory.getHeldStacks());
     }
 }

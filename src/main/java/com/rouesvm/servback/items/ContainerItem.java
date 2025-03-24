@@ -73,7 +73,7 @@ public class ContainerItem extends GuiItem {
         BackpackManager.createNewUUID(stack);
 
         checkEnchantments(stack, player);
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+        playInsertSound(player);
 
         new BackpackGui(player, stack, getExtendedSlots(stack) + this.slots);
     }
@@ -84,7 +84,7 @@ public class ContainerItem extends GuiItem {
         return list;
     }
 
-    private BackpackInventory getItemList(ItemStack stack) {
+    public BackpackInventory getItemList(ItemStack stack) {
         if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = BackpackManager.getStackUUID(stack);
         return BackpackManager.getInventory(uuid, getExtendedSlots(stack) + this.slots);
@@ -136,7 +136,7 @@ public class ContainerItem extends GuiItem {
             ItemStack excessItem = inventory.getHeldStacks().get(i - 1);
             player.dropItem(excessItem, true);
         }
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+        playDropContentsSound(player);
     }
 
     public static Map<String, Item> getBackpackMap() {
@@ -222,5 +222,22 @@ public class ContainerItem extends GuiItem {
             default -> BackpackItemRegistry.LARGE_BACKPACK;
         };
     }
+
+    public static void playInsertSound(ServerPlayerEntity player) {
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+    }
+
+    public static void playDropContentsSound(ServerPlayerEntity player) {
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+    }
+
+    public static void playRemoveOneSound(ServerPlayerEntity player) {
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_REMOVE_ONE, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+    }
+
+    public static void playInsertFailSound(ServerPlayerEntity player) {
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT_FAIL, SoundCategory.PLAYERS, 1.0F, 1.0F);
+    }
+
 }
 

@@ -1,6 +1,7 @@
 package com.rouesvm.servback;
 
 import com.rouesvm.servback.compat.geyser.BackpackGeyser;
+import com.rouesvm.servback.compat.trinket.BackpackTrinket;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackItemGroup;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
@@ -37,7 +38,7 @@ public class Main implements ModInitializer {
 		BackpackItemGroup.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
-		//if (hasTrinketLoaded) BackpackTrinket.initialize();
+		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);

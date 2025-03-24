@@ -20,10 +20,14 @@ public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
 
-	public static final boolean hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
+	public static boolean hasTrinketLoaded;
+	public static boolean hasGeyserLoaded;
 
 	@Override
 	public void onInitialize() {
+		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
+		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
+
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
@@ -33,9 +37,10 @@ public class Main implements ModInitializer {
 		BackpackItemGroup.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
+		//if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
-		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
+		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
 	}
 
 	public static BaseInventory getInventory() {

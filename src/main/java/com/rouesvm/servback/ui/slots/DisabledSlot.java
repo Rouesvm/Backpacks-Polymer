@@ -7,10 +7,12 @@ import net.minecraft.screen.slot.Slot;
 
 public class DisabledSlot extends Slot {
     private final ItemStack stack;
+    private final boolean isStack;
 
     public DisabledSlot(ItemStack root, Inventory inventory, int index, int x, int y) {
         super(inventory, index, x, y);
         this.stack = root;
+        this.isStack = this.getStack() != this.stack;
     }
 
     @Override
@@ -20,6 +22,6 @@ public class DisabledSlot extends Slot {
 
     @Override
     public boolean canTakeItems(PlayerEntity playerEntity) {
-        return !this.getStack().equals(this.stack);
+        return isStack;
     }
 }

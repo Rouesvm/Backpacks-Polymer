@@ -30,6 +30,8 @@ public class BundleContainerItem extends ContainerItem {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             ItemStack itemStack = slot.getStack();
 
+            if (!itemStack.getItem().canBeNested()) return false;
+
             if (clickType == ClickType.LEFT && !itemStack.isEmpty()) {
                 if (inventory.canInsert(itemStack)) {
                     itemStack = inventory.addStack(itemStack);
@@ -52,17 +54,15 @@ public class BundleContainerItem extends ContainerItem {
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
         if (clickType == ClickType.LEFT && otherStack.isEmpty()) {
             setSelectedStackIndex(stack, -1);
-            return false;
         } else {
             UUID uuid = BackpackManager.getStackUUID(stack);
             BackpackInventory inventory = this.getItemList(stack);
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-            if (inventory == null) {
-                return false;
-            } else {
-                if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
+            if (!otherStack.getItem().canBeNested()) return false;
 
+            if (inventory != null) {
+                if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
                     if (inventory.canInsert(otherStack)) {
                         otherStack = inventory.addStack(otherStack);
                         playInsertSound(serverPlayer);
@@ -71,16 +71,15 @@ public class BundleContainerItem extends ContainerItem {
                     }
 
                     cursorStackReference.set(otherStack);
-
                     BackpackManager.getManager().saveBackpack(uuid, inventory);
                     this.onContentChanged(serverPlayer);
                     return true;
                 } else {
                     setSelectedStackIndex(stack, -1);
-                    return false;
                 }
             }
         }
+        return false;
     }
 
     private void onContentChanged(PlayerEntity user) {
@@ -88,6 +87,5 @@ public class BundleContainerItem extends ContainerItem {
         if (screenHandler != null) {
             screenHandler.onContentChanged(user.getInventory());
         }
-
     }
 }

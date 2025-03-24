@@ -25,6 +25,8 @@ public class BackpackGui extends SimpleGui {
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
+    private boolean inInventory = false;
+
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
         super(getHandler(slots), player, false);
 
@@ -35,6 +37,29 @@ public class BackpackGui extends SimpleGui {
 
         this.backpackInstance = BackpackManager.getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
+
+        convertComponentToBackpackData();
+
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
+
+        this.fillChest();
+
+        this.open();
+        this.afterOpened();
+    }
+
+    public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots, boolean inInventory) {
+        super(getHandler(slots), player, false);
+
+        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
+
+        this.uuid = BackpackManager.getStackUUID(stack);
+        this.stack = stack;
+
+        this.backpackInstance = BackpackManager.getInstance(uuid, slots);
+        this.backpackInstance.setLastAccessed();
+
+        this.inInventory = inInventory;
 
         convertComponentToBackpackData();
 
@@ -70,7 +95,7 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                if (!inInventory && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
                 BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override

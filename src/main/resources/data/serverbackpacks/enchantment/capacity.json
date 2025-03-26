@@ -1,9 +1,6 @@
 {
   "description": "Capacity",
-  "supported_items": [
-    "serverbackpacks:large",
-    "serverbackpacks:medium"
-  ],
+  "supported_items": "serverbackpacks:supported_backpacks",
   "weight": 4,
   "max_level": 3,
   "min_cost": {

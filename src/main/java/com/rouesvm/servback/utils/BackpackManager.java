@@ -1,78 +1,93 @@
 package com.rouesvm.servback.utils;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
+import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
+import com.rouesvm.servback.state.BackpackState;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.*;
 
 public class BackpackManager {
+    private static BackpackManager manager = null;
+
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
-    public UUID getStackUUID(ItemStack stack) {
+    public static BackpackManager getManager() {
+        return manager;
+    }
+
+    private BackpackManager() {}
+
+    public static void setup(MinecraftServer server) {
+        manager = new BackpackManager();
+        manager.load(server);
+    }
+
+    public static void destroy(MinecraftServer server) {
+        manager.save(server);
+        manager = null;
+    }
+
+    public static UUID getStackUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
         if (uuidString == null)
             uuidString = String.valueOf(createNewUUID(stack));
         return UUID.fromString(uuidString);
     }
 
-    public UUID createNewUUID(ItemStack stack) {
+    public static UUID createNewUUID(ItemStack stack) {
         String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
-            UUID uuid = UUID.randomUUID();
-            if (storedInstances.containsKey(uuid))
-                uuid = UUID.randomUUID();
-
-            uuidString = uuid.toString();
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuidString);
+            UUID uuid = generateUniqueUUID();
+            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuid.toString());
             return uuid;
         }
         return UUID.fromString(uuidString);
     }
 
-    public BackpackInstance getInstance(UUID uuid, int slots) {
-        if (this.storedInstances.containsKey(uuid)) {
-            BackpackInstance backpack = this.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.backpackInventory;
-            if (backpackInventory.size() != slots) {
-                BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
-
-                backpack.backpackInventory = newInventory;
-                saveBackpack(backpack);
+    private static UUID generateUniqueUUID() {
+        UUID uuid = UUID.randomUUID();
+        if (manager != null) {
+            while (manager.storedInstances.containsKey(uuid)) {
+                uuid = UUID.randomUUID();
             }
+        }
+        return uuid;
+    }
 
-            if (!backpackInventory.getHeldStacks().isEmpty())
-                return backpack;
+    public static BackpackInstance getInstance(UUID uuid, int slots) {
+        if (manager.storedInstances.containsKey(uuid)) {
+            BackpackInstance backpack = manager.storedInstances.get(uuid);
+            BackpackInventory inventory = backpack.inventory;
+            if (inventory.size() != slots) {
+                inventory = resizeInventory(inventory, slots);
+                backpack.setInventory(inventory);
+                manager.saveBackpack(backpack);
+            }
+            return backpack;
         }
         return new BackpackInstance(uuid, new BackpackInventory(slots));
     }
 
-    public BackpackInventory getInventory(UUID uuid, int slots) {
-        if (this.storedInstances.containsKey(uuid)) {
-            BackpackInstance backpack = this.storedInstances.get(uuid);
-            BackpackInventory backpackInventory = backpack.backpackInventory;
-            if (backpackInventory.size() != slots) {
-                BackpackInventory newInventory = new BackpackInventory(slots);
-                newInventory.setInventoryDirectly(backpackInventory.getHeldStacks());
+    public static BackpackInventory getInventory(UUID uuid, int slots) {
+        BackpackInstance backpack = BackpackManager.getInstance(uuid, slots);
+        return backpack.inventory;
+    }
 
-                backpackInventory = newInventory;
-                saveBackpack(uuid, backpackInventory);
-            }
-
-            if (!backpackInventory.getHeldStacks().isEmpty())
-                return backpackInventory;
-        }
-
-        return new BackpackInventory(slots);
+    public static BackpackInventory resizeInventory(BackpackInventory inventory, int newSize) {
+        BackpackInventory newInventory = new BackpackInventory(newSize);
+        inventory.copyTo(newInventory);
+        return newInventory;
     }
 
     public void saveBackpack(BackpackInstance instance) {
-        if (instance.uuid != null && instance.backpackInventory != null) {
+        if (instance.uuid != null && instance.inventory != null) {
             this.storedInstances.put(instance.uuid, instance);
         }
     }
@@ -94,8 +109,16 @@ public class BackpackManager {
         }
     }
 
-    public void load(Set<BackpackInstance> instances) {
-        instances.forEach(this::saveBackpack);
+    public void load(MinecraftServer server) {
+        BackpackState serverState = BackpackState.getServerState(server);
+        this.globalInventory = serverState.globalInventory;
+        serverState.storedInventories.forEach(this::saveBackpack);
+    }
+
+    public void save(MinecraftServer server) {
+        BackpackState serverState = BackpackState.getServerState(server);
+        serverState.globalInventory = this.globalInventory;
+        serverState.storedInventories = this.save();
     }
 
     public Set<BackpackInstance> save() {

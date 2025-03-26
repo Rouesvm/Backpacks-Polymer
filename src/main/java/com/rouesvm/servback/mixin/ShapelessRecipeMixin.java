@@ -1,7 +1,8 @@
 package com.rouesvm.servback.mixin;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.input.CraftingRecipeInput;
@@ -28,6 +29,7 @@ public abstract class ShapelessRecipeMixin {
                 ItemStack stack = inventory.getStackInSlot(i);
                 if (stack.getItem() instanceof ContainerItem) {
                     resultStack.set(BackpacksDataComponentTypes.UUID_TYPE, stack.get(BackpacksDataComponentTypes.UUID_TYPE));
+                    resultStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
                     callBack.setReturnValue(resultStack);
                     break;
                 }

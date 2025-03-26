@@ -1,4 +1,4 @@
-package com.rouesvm.servback.utils;
+package com.rouesvm.servback.ui.inventory;
 
 import com.google.common.collect.Lists;
 import net.minecraft.entity.player.PlayerEntity;

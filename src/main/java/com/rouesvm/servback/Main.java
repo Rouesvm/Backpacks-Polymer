@@ -1,11 +1,10 @@
 package com.rouesvm.servback;
 
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
-import com.rouesvm.servback.items.ItemRegistry;
-import com.rouesvm.servback.items.ModItemGroup;
-import com.rouesvm.servback.state.StateSaverAndLoader;
+import com.rouesvm.servback.registry.BackpackItemRegistry;
+import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
+import com.rouesvm.servback.registry.BackpacksItemGroup;
+import com.rouesvm.servback.ui.inventory.BaseInventory;
 import com.rouesvm.servback.utils.BackpackManager;
-import com.rouesvm.servback.utils.BaseInventory;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -18,34 +17,21 @@ public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
 
-	public static BackpackManager backpackManager;
-
 	@Override
 	public void onInitialize() {
-		backpackManager = new BackpackManager();
-
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
 		BackpacksDataComponentTypes.initialize();
 
-		ItemRegistry.initialize();
-		ModItemGroup.initialize();
+		BackpackItemRegistry.initialize();
+		BackpacksItemGroup.initialize();
 
-		ServerLifecycleEvents.SERVER_STARTED.register((server -> {
-			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
-			backpackManager.globalInventory = serverState.globalInventory;
-			backpackManager.load(serverState.storedInventories);
-		}));
-
-		ServerLifecycleEvents.SERVER_STOPPING.register((server -> {
-			StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(server);
-			serverState.globalInventory = backpackManager.globalInventory;
-			serverState.storedInventories = backpackManager.save();
-		}));
+		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
+		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
 	}
 
 	public static BaseInventory getInventory() {
-		return backpackManager.globalInventory;
+		return BackpackManager.getManager().globalInventory;
 	}
 }

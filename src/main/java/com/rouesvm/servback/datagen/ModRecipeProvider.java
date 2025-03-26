@@ -1,7 +1,7 @@
 package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.items.ItemRegistry;
+import com.rouesvm.servback.registry.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.data.server.recipe.RecipeExporter;
@@ -31,7 +31,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     private void itemRecipes(RecipeExporter exporter) {
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.ENDER_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, BackpackItemRegistry.ENDER_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")
@@ -41,17 +41,17 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(FabricRecipeProvider.hasItem(Items.OBSIDIAN), FabricRecipeProvider.conditionsFromItem(Items.OBSIDIAN))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.GLOBAL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")
                 .input('#', Items.ENDER_EYE).input('S', Items.STRING)
-                .input('i', Items.IRON_INGOT).input('E', ItemRegistry.ENDER_BACKPACK)
+                .input('i', Items.IRON_INGOT).input('E', BackpackItemRegistry.ENDER_BACKPACK)
                 .input('N', Items.NETHER_STAR)
                 .criterion(FabricRecipeProvider.hasItem(Items.ENDER_EYE), FabricRecipeProvider.conditionsFromItem(Items.ENDER_EYE))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ItemRegistry.SMALL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, BackpackItemRegistry.SMALL_BACKPACK, 1)
                 .pattern("#S#")
                 .pattern("SCS")
                 .pattern(" # ")

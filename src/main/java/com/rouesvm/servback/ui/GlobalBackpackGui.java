@@ -1,9 +1,9 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.Main;
-import com.rouesvm.servback.slots.DisabledSlot;
-import com.rouesvm.servback.slots.NonBackpackSlot;
-import com.rouesvm.servback.utils.BaseInventory;
+import com.rouesvm.servback.ui.inventory.BaseInventory;
+import com.rouesvm.servback.ui.slots.NonBackpackSlot;
+import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -15,6 +15,9 @@ import net.minecraft.text.Text;
 public class GlobalBackpackGui extends SimpleGui {
     protected final ItemStack stack;
     protected final BaseInventory inventory;
+
+    protected int stackIndex;
+    protected boolean outOfSlot = false;
 
     public GlobalBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
@@ -30,20 +33,19 @@ public class GlobalBackpackGui extends SimpleGui {
     }
 
     public void afterOpened() {
-        final int slots = 9*3;
-        for(int j = 0; j <= 3; ++j) {
-            for(int k = 0; k < 9; ++k) {
-                final int index;
-                if (j == 0) index = k + (9 * 4 + slots) - 9;
-                else index = slots + (k + j * 9) - 9;
-                this.screenHandler.setSlot(index, new DisabledSlot(stack, player.getInventory(), k + j * 9, k + j * 9, 0));
+        for (int k = 0; k < 9; ++k) {
+            int index = k + (9 * 4 + 9*3) - 9;
+            if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
+                this.stackIndex = index;
+                break;
             }
         }
 
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                Main.backpackManager.setGlobalInventory(inventory.heldStacks);
+                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                BackpackManager.getManager().setGlobalInventory(inventory.heldStacks);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
@@ -54,8 +56,7 @@ public class GlobalBackpackGui extends SimpleGui {
 
     @Override
     public void onTick() {
-        if (this.stack.isEmpty())
-            this.close();
+        if (outOfSlot) this.close();
     }
 
     public void fillChest() {

@@ -1,11 +1,11 @@
 package com.rouesvm.servback.ui;
 
-import com.rouesvm.servback.Main;
-import com.rouesvm.servback.components.BackpacksDataComponentTypes;
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.slots.BackpackSlot;
-import com.rouesvm.servback.slots.DisabledSlot;
+import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
+import com.rouesvm.servback.ui.slots.BackpackSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
+import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -18,55 +18,64 @@ import net.minecraft.util.collection.DefaultedList;
 
 import java.util.UUID;
 
-public class BackpackGui extends SimpleGui {
-    protected final ItemStack stack;
+import static com.rouesvm.servback.utils.BackpackManager.getInstance;
+import static com.rouesvm.servback.utils.BackpackManager.getStackUUID;
 
+public class BackpackGui extends SimpleGui {
+    protected final UUID uuid;
+    protected final ItemStack stack;
     protected final BackpackInstance backpackInstance;
 
-    protected final UUID uuid;
+    protected int stackIndex;
+    protected boolean outOfSlot = false;
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
         super(getHandler(slots), player, false);
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
 
-        this.uuid = Main.backpackManager.getStackUUID(stack);
+        this.uuid = getStackUUID(stack);
         this.stack = stack;
 
-        this.backpackInstance = Main.backpackManager.getInstance(uuid, slots);
+        this.backpackInstance = getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
-
-        if (this.backpackInstance.backpackInventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
-            DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            if (backpackInstance.backpackInventory.insertItems(itemStacks)) {
-                backpackInstance.backpackInventory.setInventoryDirectly(backpackInstance.backpackInventory.getHeldStacks());
-                Main.backpackManager.saveBackpack(uuid, backpackInstance.backpackInventory);
-            }
-            stack.set(DataComponentTypes.CONTAINER, null);
-        }
 
         this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         this.fillChest();
+
+        convertComponentToBackpackData();
 
         this.open();
         this.afterOpened();
     }
 
+    private void convertComponentToBackpackData() {
+        BackpackInventory inventory = this.backpackInstance.inventory;
+        if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+            DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
+            if (inventory.insertItems(itemStacks)) {
+                backpackInstance.inventory.setInventoryDirectly(inventory.getHeldStacks());
+                BackpackManager.getManager().saveBackpack(uuid, inventory);
+            }
+            stack.set(DataComponentTypes.CONTAINER, null);
+        }
+    }
+
     public void afterOpened() {
-        final int slots = backpackInstance.backpackInventory.size();
-        for(int j = 0; j <= 3; ++j) {
-            for(int k = 0; k < 9; ++k) {
-                final int index;
-                if (j == 0) index = k + (9 * 4 + slots) - 9;
-                else index = slots + (k + j * 9) - 9;
-                this.screenHandler.setSlot(index, new DisabledSlot(stack, player.getInventory(), k + j * 9, k + j * 9, 0));
+        final int slots = backpackInstance.inventory.size();
+        for (int k = 0; k < 9; ++k) {
+            int index = k + (9 * 4 + slots) - 9;
+            if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
+                this.stackIndex = index;
+                break;
             }
         }
 
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                Main.backpackManager.saveBackpack(backpackInstance);
+                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
@@ -83,8 +92,7 @@ public class BackpackGui extends SimpleGui {
 
     @Override
     public void onTick() {
-        if (this.stack.isEmpty())
-            this.close();
+        if (outOfSlot) this.close();
     }
 
     public static ScreenHandlerType<?> getHandler(int slots) {
@@ -100,7 +108,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int j = 0; j < this.backpackInstance.backpackInventory.size(); ++j)
-            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.backpackInventory, j, j,0));
+        for (int j = 0; j < this.backpackInstance.inventory.size(); ++j)
+            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.inventory, j, j,0));
     }
 }

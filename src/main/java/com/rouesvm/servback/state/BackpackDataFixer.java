@@ -66,8 +66,11 @@ public class BackpackDataFixer {
             list.ifPresent(nbtElements -> nbtElements.forEach(element ->
                     instances.add(load((NbtCompound) element, registryLookup))));
 
-            BackpackInventory globalInventory = loadInventory(compound, registryLookup);
-            System.out.println("this is global's inventory " + globalInventory);
+            Optional<NbtCompound> globalNbt = compound.getCompound("global");
+            if (globalNbt.isPresent()) {
+                BackpackInventory globalInventory = loadInventory(globalNbt.get(), registryLookup);
+                BackpackManager.getManager().setGlobalInventory(globalInventory.getHeldStacks());
+            }
         }
 
         return instances;

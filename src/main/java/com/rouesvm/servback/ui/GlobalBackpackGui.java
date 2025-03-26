@@ -55,6 +55,11 @@ public class GlobalBackpackGui extends SimpleGui {
     }
 
     @Override
+    public void onClose() {
+        BackpackManager.getManager().save(this.getPlayer().getServer());
+    }
+
+    @Override
     public void onTick() {
         if (outOfSlot) this.close();
     }

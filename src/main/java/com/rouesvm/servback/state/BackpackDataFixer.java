@@ -27,6 +27,8 @@ import java.util.zip.GZIPInputStream;
 public class BackpackDataFixer {
     public static void onWorldLoading(MinecraftServer server) {
         Path path = server.getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
+        if (!path.toFile().exists()) return;
+
         NbtCompound oldData = null;
 
         try (DataInputStream dataInputStream = new DataInputStream(

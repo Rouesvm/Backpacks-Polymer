@@ -3,7 +3,6 @@
   "package": "com.rouesvm.servback.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ServerPlayerNetworkHandlerMixin",
     "ShapedRecipeMixin"
   ],
   "injectors": {

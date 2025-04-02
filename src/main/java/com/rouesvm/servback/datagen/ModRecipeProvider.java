@@ -17,6 +17,7 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
@@ -24,6 +25,7 @@ import net.minecraft.util.Identifier;
 import java.util.concurrent.CompletableFuture;
 
 import static com.rouesvm.servback.Main.MOD_ID;
+import static com.rouesvm.servback.datagen.ModItemTags.*;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public ModRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
@@ -84,7 +86,11 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 String name = color.getName().toLowerCase() + "_" + backpackName;
                 Item dyeColor = DyeItem.byColor(color);
 
-                createTransmuteRecipe(exporter, backpack, dyeColor, regular_dyed_backpack, i, name);
+                switch (i) {
+                    case 1 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(SMALL_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                    case 2 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(MEDIUM_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                    case 3 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(LARGE_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                }
 
                 if (i+1 == 4) continue;
                 ContainerItem backpackUpATier = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
@@ -97,10 +103,10 @@ public class ModRecipeProvider extends FabricRecipeProvider {
         }
     }
 
-    private void createTransmuteRecipe(RecipeExporter exporter, Item backpack, Item dyeColor, Item result, int slots, String name) {
-        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.ofItem(backpack), Ingredient.ofItem(dyeColor), result)
+    private void createTransmuteRecipe(RecipeExporter exporter, RegistryEntryList<Item> backpack, Item dyeColor, Item result, int slots, String name) {
+        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.fromTag(backpack), Ingredient.ofItem(dyeColor), result)
                 .group(slots + "_dyedbackpacks")
-                .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(backpack))
+                .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(ContainerItem.getDefaultBackpack(slots)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
     }
 

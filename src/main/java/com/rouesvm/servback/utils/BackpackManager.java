@@ -18,6 +18,8 @@ public class BackpackManager {
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
+    public Map<UUID, List<UUID>> lastAccessedUUID = new HashMap<>();
+
     public static BackpackManager getManager() {
         return manager;
     }
@@ -27,6 +29,7 @@ public class BackpackManager {
     public static void setup(MinecraftServer server) {
         manager = new BackpackManager();
         manager.load(server);
+
     }
 
     public static void destroy(MinecraftServer server) {

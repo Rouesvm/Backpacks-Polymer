@@ -19,13 +19,11 @@ import java.util.UUID;
 
 public class BackpackGui extends SimpleGui {
     protected final UUID uuid;
-    protected final ItemStack stack;
     protected final BackpackInstance backpackInstance;
 
+    protected ItemStack stack;
     protected int stackIndex;
     protected boolean outOfSlot = false;
-
-    private boolean inInventory = false;
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
         super(getHandler(slots), player, false);
@@ -45,21 +43,17 @@ public class BackpackGui extends SimpleGui {
         this.fillChest();
 
         this.open();
+        this.lockSlot();
         this.afterOpened();
     }
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots, boolean inInventory) {
+    public BackpackGui(ServerPlayerEntity player, UUID uuid, int slots) {
         super(getHandler(slots), player, false);
 
-        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
-
-        this.uuid = BackpackManager.getStackUUID(stack);
-        this.stack = stack;
+        this.uuid = uuid;
 
         this.backpackInstance = BackpackManager.getInstance(uuid, slots);
         this.backpackInstance.setLastAccessed();
-
-        this.inInventory = inInventory;
 
         convertComponentToBackpackData();
 
@@ -82,7 +76,7 @@ public class BackpackGui extends SimpleGui {
         }
     }
 
-    public void afterOpened() {
+    private void lockSlot() {
         final int slots = backpackInstance.getInventory().size();
         for (int k = 0; k < 9; ++k) {
             int index = k + (9 * 4 + slots) - 9;
@@ -91,11 +85,13 @@ public class BackpackGui extends SimpleGui {
                 break;
             }
         }
+    }
 
+    private void afterOpened() {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (!inInventory && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
                 BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override

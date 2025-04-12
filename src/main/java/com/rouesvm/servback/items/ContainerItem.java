@@ -31,7 +31,7 @@ import java.util.UUID;
 import static com.rouesvm.servback.Main.CAPACITY;
 
 public class ContainerItem extends GuiItem {
-    private final int slots;
+    final int slots;
 
     public ContainerItem(String name, int slots) {
         super(name);
@@ -90,7 +90,7 @@ public class ContainerItem extends GuiItem {
         return BackpackManager.getInventory(uuid, getExtendedSlots(stack) + this.slots);
     }
 
-    private int getExtendedSlots(ItemStack stack) {
+    int getExtendedSlots(ItemStack stack) {
         NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
         NbtCompound compound = component.copyNbt();
         if (compound.contains("level"))
@@ -98,7 +98,7 @@ public class ContainerItem extends GuiItem {
         else return 0;
     }
 
-    private void checkEnchantments(ItemStack stack, ServerPlayerEntity player) {
+    void checkEnchantments(ItemStack stack, ServerPlayerEntity player) {
         BackpackInventory inventory = getItemList(stack);
         if (inventory == null) return;
 

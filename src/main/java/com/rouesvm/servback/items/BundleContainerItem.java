@@ -1,5 +1,6 @@
 package com.rouesvm.servback.items;
 
+import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -75,8 +76,7 @@ public class BundleContainerItem extends ContainerItem {
                     this.onContentChanged(serverPlayer);
                     return true;
                 } else if (clickType == ClickType.RIGHT) {
-                    ContainerItem item = (ContainerItem) stack.getItem();
-                    item.openGui(serverPlayer, stack);
+                    openInUIGui(serverPlayer, stack);
                     return true;
                 } else {
                     setSelectedStackIndex(stack, -1);
@@ -84,6 +84,15 @@ public class BundleContainerItem extends ContainerItem {
             }
         }
         return false;
+    }
+
+    public void openInUIGui(ServerPlayerEntity player, ItemStack stack) {
+        BackpackManager.createNewUUID(stack);
+
+        checkEnchantments(stack, player);
+        playInsertSound(player);
+
+        new BackpackGui(player, BackpackManager.getStackUUID(stack), getExtendedSlots(stack) + this.slots);
     }
 
     private void onContentChanged(PlayerEntity user) {

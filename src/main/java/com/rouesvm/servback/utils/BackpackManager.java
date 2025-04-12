@@ -29,12 +29,37 @@ public class BackpackManager {
     public static void setup(MinecraftServer server) {
         manager = new BackpackManager();
         manager.load(server);
-
     }
 
     public static void destroy(MinecraftServer server) {
         manager.save(server);
         manager = null;
+    }
+
+    public List<UUID> getAccessedUUID(UUID player) {
+        return this.lastAccessedUUID.computeIfAbsent(player, k -> new ArrayList<>());
+    }
+
+    public void putAccessedUUID(UUID player, UUID backpack) {
+        List<UUID> uuids = getAccessedUUID(player);
+        if (!uuids.contains(backpack)) {
+            uuids.add(backpack);
+        }
+    }
+
+    public void removeAccessedUUID(UUID player, UUID backpack) {
+        List<UUID> uuids = getAccessedUUID(player);
+        if (!uuids.contains(backpack)) {
+            uuids.remove(backpack);
+            this.lastAccessedUUID.replace(player, uuids);
+        }
+    }
+
+    public UUID getLastAccessedUUID(UUID player) {
+        List<UUID> uuids = getAccessedUUID(player);
+        if (!uuids.isEmpty())
+            return uuids.getLast();
+        else return null;
     }
 
     public static UUID getStackUUID(ItemStack stack) {

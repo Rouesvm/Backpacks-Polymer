@@ -112,7 +112,8 @@ public class BackpackGui extends SimpleGui {
             UUID playerUUID = this.getPlayer().getUuid();
             UUID lastAccessedUUID = BackpackManager.getManager().getLastAccessedUUID(playerUUID);
 
-            if (lastAccessedUUID != null) {
+            if (lastAccessedUUID != null && !lastAccessedUUID.equals(this.uuid)) {
+                player.closeHandledScreen();
                 new BackpackGui(this.player, lastAccessedUUID, this.size);
                 BackpackManager.getManager().removeAccessedUUID(playerUUID, lastAccessedUUID);
             } else if (!BackpackManager.getManager().lastAccessedUUID
@@ -121,6 +122,11 @@ public class BackpackGui extends SimpleGui {
                 BackpackManager.getManager().putAccessedUUID(playerUUID, this.uuid);
             }
         }
+    }
+
+    @Override
+    public void close() {
+        super.close();
     }
 
     @Override

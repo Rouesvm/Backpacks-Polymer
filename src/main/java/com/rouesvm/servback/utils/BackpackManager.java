@@ -96,8 +96,8 @@ public class BackpackManager {
     }
 
     public void saveBackpack(BackpackInstance instance) {
-        if (instance.uuid != null && instance.backpackInventory != null) {
-            this.storedInstances.put(instance.uuid, instance);
+        if (instance.getUuid() != null && instance.getInventory() != null) {
+            this.storedInstances.put(instance.getUuid(), instance);
         }
     }
 

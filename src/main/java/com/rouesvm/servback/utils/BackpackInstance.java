@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class BackpackInstance {
-    private final UUID uuid;
+    private UUID uuid;
     private BackpackInventory inventory;
     public long lastAccessed;
 

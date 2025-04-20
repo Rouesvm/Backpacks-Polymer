@@ -15,13 +15,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
-import java.util.List;
-import java.util.UUID;
-
 public class BackpackGui extends SimpleGui {
     protected final BackpackInstance backpackInstance;
+    protected final ItemStack stack;
 
-    protected ItemStack stack;
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
@@ -40,22 +37,7 @@ public class BackpackGui extends SimpleGui {
         this.size = this.backpackInstance.getInventory().size();
         if (this.size > (9*6)) this.size = 9 * 6;
 
-        convertComponentToBackpackData();
-
-        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
-
-        this.fillChest();
-
-        this.open();
-        this.lockSlot();
-        this.afterOpened();
-    }
-
-    public BackpackGui(ServerPlayerEntity player, UUID uuid, int slots) {
-        super(getHandler(slots), player, false);
-
-        this.backpackInstance = BackpackManager.getInstance(uuid, slots);
-        this.backpackInstance.setLastAccessed();
+        System.out.println(instance.getUuid());
 
         convertComponentToBackpackData();
 
@@ -107,21 +89,7 @@ public class BackpackGui extends SimpleGui {
     @Override
     public void onClose() {
         BackpackManager.getManager().save(this.getPlayer().getServer());
-        if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
-        else {
-            UUID playerUUID = this.getPlayer().getUuid();
-            UUID lastAccessedUUID = BackpackManager.getManager().getLastAccessedUUID(playerUUID);
-
-            if (lastAccessedUUID != null && !lastAccessedUUID.equals(backpackInstance.getUuid())) {
-                player.closeHandledScreen();
-                new BackpackGui(this.getPlayer(), lastAccessedUUID, backpackInstance.getInventory().size());
-                BackpackManager.getManager().removeAccessedUUID(playerUUID, lastAccessedUUID);
-            } else if (!BackpackManager.getManager().lastAccessedUUID
-                    .getOrDefault(playerUUID, List.of())
-                    .contains(backpackInstance.getUuid())) {
-                BackpackManager.getManager().putAccessedUUID(playerUUID, backpackInstance.getUuid());
-            }
-        }
+        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
     }
 
     @Override

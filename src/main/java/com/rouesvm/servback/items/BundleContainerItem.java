@@ -1,6 +1,5 @@
 package com.rouesvm.servback.items;
 
-import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
@@ -76,21 +75,12 @@ public class BundleContainerItem extends ContainerItem {
                     BackpackManager.getManager().saveBackpack(uuid, inventory);
                     this.onContentChanged(serverPlayer);
                     return true;
-                } else if (clickType == ClickType.RIGHT) {
-                    serverPlayer.closeHandledScreen();
-                    openInUIGui(serverPlayer, stack);
-                    return true;
                 } else {
                     setSelectedStackIndex(stack, -1);
                 }
             }
         }
         return false;
-    }
-
-    public void openInUIGui(ServerPlayerEntity player, ItemStack stack) {
-        onOpen(player, stack);
-        new BackpackGui(player, BackpackManager.getStackUUID(stack), BackpackUtils.getExtendedSlots(stack) + this.slots);
     }
 
     private void onContentChanged(PlayerEntity user) {

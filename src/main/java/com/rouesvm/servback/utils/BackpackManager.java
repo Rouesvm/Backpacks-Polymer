@@ -44,15 +44,16 @@ public class BackpackManager {
     public static UUID createNewUUID(ItemStack stack) {
         String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
-            UUID uuid = generateUniqueUUID();
+            UUID uuid = createNewUUID();
             stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
             return uuid;
         }
         return UUID.fromString(uuidString);
     }
 
-    private static UUID generateUniqueUUID() {
+    public static UUID createNewUUID() {
         UUID uuid = UUID.randomUUID();
+        // bad idea
         if (manager != null) {
             while (manager.storedInstances.containsKey(uuid)) {
                 uuid = UUID.randomUUID();

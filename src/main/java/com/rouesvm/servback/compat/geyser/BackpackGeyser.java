@@ -50,9 +50,7 @@ public class BackpackGeyser implements EventRegistrar {
 
                 GEYSER_PACK = PACKS_FOLDER.resolve("backpack.zip");
             }
-        } catch (Exception e) {
-            throw new RuntimeException("PACK doesn't exist!");
-        }
+        } catch (Exception ignored) {}
     }
 
     @Subscribe

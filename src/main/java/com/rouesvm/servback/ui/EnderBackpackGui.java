@@ -17,9 +17,6 @@ public class EnderBackpackGui extends SimpleGui {
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
-    protected int stackIndex;
-    protected boolean outOfSlot = false;
-
     public EnderBackpackGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
 

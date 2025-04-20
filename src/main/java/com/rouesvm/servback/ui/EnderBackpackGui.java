@@ -12,7 +12,10 @@ import net.minecraft.text.Text;
 
 public class EnderBackpackGui extends SimpleGui {
     protected final ItemStack stack;
-    protected Inventory inventory;
+    protected final Inventory inventory;
+
+    protected int stackIndex;
+    protected boolean outOfSlot = false;
 
     protected int stackIndex;
     protected boolean outOfSlot = false;

@@ -47,7 +47,6 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerClient
         return this.id;
     }
 
-    @Override
     public Identifier getIdentifier() {
         return this.id;
     }

@@ -1,8 +1,7 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
-import com.rouesvm.servback.ui.inventory.BackpackInventory;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.ui.slots.BackpackSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
@@ -16,26 +15,27 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
-import java.util.UUID;
-
 public class BackpackGui extends SimpleGui {
-    protected final UUID uuid;
     protected final ItemStack stack;
     protected final BackpackInstance backpackInstance;
 
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
-        super(getHandler(slots), player, false);
+    private int size;
 
-        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
+    public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
+        super(getHandler(instance.getInventory().size()), player, false);
 
-        this.uuid = BackpackManager.getStackUUID(stack);
+        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
+
         this.stack = stack;
 
-        this.backpackInstance = BackpackManager.getInstance(uuid, slots);
+        this.backpackInstance = instance;
         this.backpackInstance.setLastAccessed();
+
+        this.size = this.backpackInstance.getInventory().size();
+        if (this.size > (9*6)) this.size = 9 * 6;
 
         convertComponentToBackpackData();
 
@@ -52,17 +52,16 @@ public class BackpackGui extends SimpleGui {
         if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (inventory.insertItems(itemStacks)) {
-                this.backpackInstance.setInventory(inventory);
-                BackpackManager.getManager().saveBackpack(this.backpackInstance);
+                backpackInstance.setInventory(inventory);
+                BackpackManager.getManager().saveBackpack(backpackInstance.getUuid(), backpackInstance.getInventory());
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
     }
 
     public void afterOpened() {
-        final int slots = backpackInstance.getInventory().size();
         for (int k = 0; k < 9; ++k) {
-            int index = k + (9 * 4 + slots) - 9;
+            int index = k + (9 * 4 + this.size) - 9;
             if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
                 this.stackIndex = index;
                 break;
@@ -85,7 +84,7 @@ public class BackpackGui extends SimpleGui {
     @Override
     public void onClose() {
         BackpackManager.getManager().save(this.getPlayer().getServer());
-        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
+        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
     }
 
     @Override
@@ -105,7 +104,7 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void fillChest() {
-        for (int j = 0; j < this.backpackInstance.getInventory().size(); ++j)
-            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.getInventory(), j, j,0));
+        for (int j = 0; j < size; ++j)
+            this.setSlotRedirect(j, new BackpackSlot(backpackInstance.getInventory(), j, j,0));
     }
 }

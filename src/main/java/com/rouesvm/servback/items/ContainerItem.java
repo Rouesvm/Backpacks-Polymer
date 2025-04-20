@@ -1,21 +1,15 @@
 package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.registry.BackpackItemRegistry;
-import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
+import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.utils.BackpackUtils;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipData;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -27,10 +21,6 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import static com.rouesvm.servback.Main.CAPACITY;
 
 public class ContainerItem extends GuiItem {
     private final int slots;
@@ -46,13 +36,8 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
-    public Optional<TooltipData> getTooltipData(ItemStack stack) {
-        return super.getTooltipData(stack);
-    }
-
-    @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
-        BackpackInventory itemList = this.getItemList(polymerStack);
+        BackpackInventory itemList = BackpackUtils.getItemList(polymerStack, this.slots);
 
         if (itemList == null) return;
         if (itemList.getHeldStacks().isEmpty()) return;
@@ -78,69 +63,30 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        BackpackManager.createNewUUID(stack);
+        onOpen(player, stack);
 
-        checkEnchantments(stack, player);
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+        BackpackInstance instance = BackpackManager.getInstance(
+                BackpackManager.getStackUUID(stack),
+                BackpackUtils.getExtendedSlots(stack) + this.slots
+        );
 
-        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, false);
-        new BackpackGui(player, stack, getExtendedSlots(stack) + this.slots);
+        new BackpackGui(player, stack, instance);
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
-        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots + getExtendedSlots(stack), ItemStack.EMPTY);
+        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots + BackpackUtils.getExtendedSlots(stack), ItemStack.EMPTY);
         stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
         return list;
     }
 
-    private BackpackInventory getItemList(ItemStack stack) {
-        if (stack.get(BackpacksDataComponentTypes.UUID_TYPE) == null) return null;
-        UUID uuid = BackpackManager.getStackUUID(stack);
-        return BackpackManager.getInventory(uuid, getExtendedSlots(stack) + this.slots);
+    private void onOpen(ServerPlayerEntity player, ItemStack stack) {
+        BackpackManager.createNewUUID(stack);
+        BackpackUtils.checkEnchantments(stack, player, this.slots);
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
-    private int getExtendedSlots(ItemStack stack) {
-        NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
-        NbtCompound compound = component.copyNbt();
-        if (compound.contains("level"))
-            return 9 * compound.getInt("level", 0);
-        else return 0;
-    }
-
-    private void checkEnchantments(ItemStack stack, ServerPlayerEntity player) {
-        BackpackInventory inventory = getItemList(stack);
-        if (inventory == null) return;
-
-        DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
-
-        int level = stack.getEnchantments().getLevel(capacity);
-        int currentSize = 9 * level;
-
-        NbtCompound compound = new NbtCompound();
-        compound.putInt("level", level);
-        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
-
-        UUID uuid = BackpackManager.getStackUUID(stack);
-
-        if (currentSize > 0) {
-            int totalSlots = currentSize + this.slots;
-            if (inventory.size() != totalSlots)
-                BackpackManager.resizeInventory(uuid, inventory, totalSlots);
-            return;
-        }
-
-        if (inventory.size() > this.slots)
-            dropExcessItems(inventory, this.slots, player);
-        BackpackManager.resizeInventory(uuid, inventory, this.slots);
-    }
-
-    private void dropExcessItems(BackpackInventory inventory, int maxSlots, ServerPlayerEntity player) {
-        for (int i = inventory.size(); i > maxSlots; --i) {
-            ItemStack excessItem = inventory.getHeldStacks().get(i - 1);
-            player.dropItem(excessItem, true);
-        }
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+    public int getSize() {
+        return slots / 9;
     }
 
     public static Map<String, Item> getBackpackMap() {
@@ -205,10 +151,6 @@ public class ContainerItem extends GuiItem {
                 Map.entry("PURPLE_2", BackpackItemRegistry.PURPLE_MEDIUM_BACKPACK),
                 Map.entry("PURPLE_3", BackpackItemRegistry.PURPLE_LARGE_BACKPACK)
         );
-    }
-
-    public int getSize() {
-        return slots / 9;
     }
 
     public static Item getColoredBackpack(DyeColor color, int size) {

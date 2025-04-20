@@ -11,11 +11,10 @@ base {
 }
 
 repositories {
-    maven { url 'https://maven.nucleoid.xyz' }
-
-    maven {
-        url = uri("https://repo.opencollab.dev/main/")
-    }
+    maven { url = uri("https://repo.opencollab.dev/main/") }
+    maven { url = 'https://maven.nucleoid.xyz' }
+    maven { url = "https://maven.terraformersmc.com/" }
+    maven { url = "https://maven.ladysnake.org/releases" }
 }
 
 loom {

@@ -1,6 +1,6 @@
 package com.rouesvm.servback.utils;
 
-import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.state.BackpackDataFixer;
 import com.rouesvm.servback.state.BackpackState;
 import com.rouesvm.servback.state.GlobalBackpackState;
@@ -13,7 +13,7 @@ import java.util.*;
 
 public class BackpackManager {
     private static BackpackManager manager = null;
-    
+
     public BackpackInventory globalInventory;
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
@@ -39,17 +39,17 @@ public class BackpackManager {
     }
 
     public static UUID getStackUUID(ItemStack stack) {
-        String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
+        String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
         if (uuidString == null)
             uuidString = String.valueOf(createNewUUID(stack));
         return UUID.fromString(uuidString);
     }
 
     public static UUID createNewUUID(ItemStack stack) {
-        String uuidString = stack.get(BackpacksDataComponentTypes.UUID_TYPE);
+        String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
         if (uuidString == null) {
             UUID uuid = generateUniqueUUID();
-            stack.set(BackpacksDataComponentTypes.UUID_TYPE, uuid.toString());
+            stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
             return uuid;
         }
         return UUID.fromString(uuidString);
@@ -96,8 +96,8 @@ public class BackpackManager {
     }
 
     public void saveBackpack(BackpackInstance instance) {
-        if (instance.getUuid() != null && instance.getInventory() != null) {
-            this.storedInstances.put(instance.getUuid(), instance);
+        if (instance.uuid != null && instance.backpackInventory != null) {
+            this.storedInstances.put(instance.uuid, instance);
         }
     }
 

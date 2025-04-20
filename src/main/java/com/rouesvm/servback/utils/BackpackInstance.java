@@ -17,6 +17,8 @@ public class BackpackInstance {
         this.inventory = inventory;
     }
 
+    public BackpackInstance() {}
+
     public void setInventory(BackpackInventory inventory) {
         this.inventory = inventory;
     }

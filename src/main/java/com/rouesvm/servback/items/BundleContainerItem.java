@@ -3,6 +3,7 @@ package com.rouesvm.servback.items;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.utils.BackpackUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
@@ -23,7 +24,7 @@ public class BundleContainerItem extends ContainerItem {
     @Override
     public boolean onStackClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player) {
         UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackInventory inventory = this.getItemList(stack);
+        BackpackInventory inventory = BackpackUtils.getItemList(stack, this.slots);
 
         if (inventory == null) {
             return false;
@@ -57,7 +58,7 @@ public class BundleContainerItem extends ContainerItem {
             setSelectedStackIndex(stack, -1);
         } else {
             UUID uuid = BackpackManager.getStackUUID(stack);
-            BackpackInventory inventory = this.getItemList(stack);
+            BackpackInventory inventory = BackpackUtils.getItemList(stack, this.slots);
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
             if (!otherStack.getItem().canBeNested()) return false;
@@ -88,12 +89,8 @@ public class BundleContainerItem extends ContainerItem {
     }
 
     public void openInUIGui(ServerPlayerEntity player, ItemStack stack) {
-        BackpackManager.createNewUUID(stack);
-
-        checkEnchantments(stack, player);
-        playInsertSound(player);
-
-        new BackpackGui(player, BackpackManager.getStackUUID(stack), getExtendedSlots(stack) + this.slots);
+        onOpen(player, stack);
+        new BackpackGui(player, BackpackManager.getStackUUID(stack), BackpackUtils.getExtendedSlots(stack) + this.slots);
     }
 
     private void onContentChanged(PlayerEntity user) {

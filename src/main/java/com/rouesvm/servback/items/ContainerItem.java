@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ContainerItem extends GuiItem {
-    private final int slots;
+    public final int slots;
 
     public ContainerItem(String name, int slots) {
         super(name);
@@ -78,7 +78,7 @@ public class ContainerItem extends GuiItem {
         return list;
     }
 
-    private void onOpen(ServerPlayerEntity player, ItemStack stack) {
+    public void onOpen(ServerPlayerEntity player, ItemStack stack) {
         BackpackManager.createNewUUID(stack);
         BackpackUtils.checkEnchantments(stack, player, this.slots);
         player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);

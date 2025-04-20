@@ -107,19 +107,19 @@ public class BackpackGui extends SimpleGui {
     @Override
     public void onClose() {
         BackpackManager.getManager().save(this.getPlayer().getServer());
-        if (this.stack != null) this.stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
+        if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
         else {
             UUID playerUUID = this.getPlayer().getUuid();
             UUID lastAccessedUUID = BackpackManager.getManager().getLastAccessedUUID(playerUUID);
 
-            if (lastAccessedUUID != null && !lastAccessedUUID.equals(this.uuid)) {
+            if (lastAccessedUUID != null && !lastAccessedUUID.equals(backpackInstance.getUuid())) {
                 player.closeHandledScreen();
-                new BackpackGui(this.player, lastAccessedUUID, backpackInstance.getInventory().size());
+                new BackpackGui(this.getPlayer(), lastAccessedUUID, backpackInstance.getInventory().size());
                 BackpackManager.getManager().removeAccessedUUID(playerUUID, lastAccessedUUID);
             } else if (!BackpackManager.getManager().lastAccessedUUID
                     .getOrDefault(playerUUID, List.of())
                     .contains(backpackInstance.getUuid())) {
-                BackpackManager.getManager().putAccessedUUID(playerUUID, this.uuid);
+                BackpackManager.getManager().putAccessedUUID(playerUUID, backpackInstance.getUuid());
             }
         }
     }

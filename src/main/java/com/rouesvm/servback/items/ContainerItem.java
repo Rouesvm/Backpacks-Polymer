@@ -82,7 +82,7 @@ public class ContainerItem extends GuiItem {
     public void onOpen(ServerPlayerEntity player, ItemStack stack) {
         BackpackManager.createNewUUID(stack);
         BackpackUtils.checkEnchantments(stack, player, this.slots);
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+        playInsertSound(player);
     }
 
     public int getSize() {

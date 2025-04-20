@@ -1,5 +1,6 @@
 package com.rouesvm.servback.items;
 
+import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
@@ -77,7 +78,14 @@ public class BundleContainerItem extends ContainerItem {
                     return true;
                 } else if (clickType == ClickType.RIGHT) {
                     serverPlayer.closeHandledScreen();
-                    openGui(serverPlayer, stack);
+                    new BackpackGui(
+                            serverPlayer,
+                            stack,
+                            BackpackManager.getInstance(
+                                    BackpackManager.getStackUUID(stack),
+                                    BackpackUtils.getExtendedSlots(stack) + this.slots
+                            )
+                    );
                     return true;
                 } else {
                     setSelectedStackIndex(stack, -1);

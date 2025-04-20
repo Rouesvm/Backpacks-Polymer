@@ -1,7 +1,7 @@
 package com.rouesvm.servback;
 
 import com.rouesvm.servback.compat.geyser.BackpackGeyser;
-import com.rouesvm.servback.compat.trinket.BackpackTrinket;
+import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackItemGroup;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
@@ -24,8 +24,15 @@ public class Main implements ModInitializer {
 	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
 
+	public static Configuration configuration;
+
 	@Override
 	public void onInitialize() {
+		configuration = new Configuration(MOD_ID + ".json");
+		configuration.load();
+
+		ServerLifecycleEvents.BEFORE_SAVE.register((s, a, b) -> configuration.save());
+
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
 
@@ -38,7 +45,7 @@ public class Main implements ModInitializer {
 		BackpackItemGroup.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
-		if (hasTrinketLoaded) BackpackTrinket.initialize();
+		//if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);

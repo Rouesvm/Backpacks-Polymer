@@ -29,7 +29,7 @@ public class BackpackUtils {
         NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
         NbtCompound compound = component.copyNbt();
         if (compound.contains("level"))
-            return 9 * compound.getInt("level").get();
+            return 9 * compound.getInt("level", 0);
         else return 0;
     }
 

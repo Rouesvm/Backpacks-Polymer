@@ -66,8 +66,8 @@ public class Configuration {
     }
 
     public static class Instance {
-        @SerializedName("//info")
-        public String description = "Cannot be more than 54 slots.";
+        @SerializedName("//comment_1")
+        public String comment_1 = "Cannot be more than 54 slots.";
 
         @SerializedName("small_backpack_size")
         public int small_backpack_size = 9;

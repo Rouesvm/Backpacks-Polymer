@@ -2,7 +2,7 @@ package com.rouesvm.servback.compat.trinkets;
 
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.utils.cosmetic.BackHolder;
-import com.rouesvm.servback.utils.cosmetic.StupidManager;
+import com.rouesvm.servback.utils.cosmetic.CosmeticManager;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import dev.emi.trinkets.api.TrinketsApi;
@@ -21,16 +21,16 @@ public class BackpackTrinket implements Trinket {
     @Override
     public void onEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
         if (entity instanceof ServerPlayerEntity player) {
-            StupidManager.getManager().getOrCreateInstance(player, stack);
+            CosmeticManager.getManager().getOrCreateInstance(player, stack);
         }
     }
 
     @Override
     public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
         if (entity instanceof ServerPlayerEntity player) {
-            BackHolder holder = StupidManager.getManager().getOrCreateInstance(player, stack);
+            BackHolder holder = CosmeticManager.getManager().getOrCreateInstance(player, stack);
             holder.destroy();
-            StupidManager.getManager().removeInstance(player);
+            CosmeticManager.getManager().removeInstance(player);
         }
     }
 }

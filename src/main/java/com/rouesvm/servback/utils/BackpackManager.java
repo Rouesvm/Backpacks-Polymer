@@ -1,11 +1,12 @@
 package com.rouesvm.servback.utils;
 
+import com.rouesvm.servback.Main;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.state.BackpackDataFixer;
 import com.rouesvm.servback.state.BackpackState;
 import com.rouesvm.servback.state.GlobalBackpackState;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
-import com.rouesvm.servback.utils.cosmetic.StupidManager;
+import com.rouesvm.servback.utils.cosmetic.CosmeticManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;
@@ -27,7 +28,7 @@ public class BackpackManager {
     }
 
     public static void setup(MinecraftServer server) {
-        StupidManager.setup(server);
+        if (Main.hasTrinketLoaded) CosmeticManager.setup();
         
         manager = new BackpackManager();
         manager.load(server);
@@ -35,7 +36,7 @@ public class BackpackManager {
     }
 
     public static void destroy(MinecraftServer server) {
-        StupidManager.destroy(server);
+        CosmeticManager.destroy();
 
         if (manager != null) {
             manager.save(server);

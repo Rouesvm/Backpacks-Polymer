@@ -1,28 +1,27 @@
 package com.rouesvm.servback.utils.cosmetic;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class StupidManager {
-    private static StupidManager manager = null;
+public class CosmeticManager {
+    private static CosmeticManager manager = null;
     public Map<UUID, BackHolder> storedInstances = new HashMap<>();
 
-    private StupidManager() {}
+    private CosmeticManager() {}
 
-    public static StupidManager getManager() {
+    public static CosmeticManager getManager() {
         return manager;
     }
 
-    public static void setup(MinecraftServer server) {
-        manager = new StupidManager();
+    public static void setup() {
+        manager = new CosmeticManager();
     }
 
-    public static void destroy(MinecraftServer server) {
+    public static void destroy() {
         if (manager != null) {
             manager.storedInstances.forEach((uuid, backHolder) -> backHolder.destroy());
             manager.storedInstances = new HashMap<>();

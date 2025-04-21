@@ -67,7 +67,7 @@ public class Configuration {
 
     public static class Instance {
         @SerializedName("//comment_1")
-        public String comment_1 = "Cannot be more than 54 slots.";
+        public String comment_1 = "Cannot be more than 54 slots";
 
         @SerializedName("small_backpack_size")
         public int small_backpack_size = 9;
@@ -77,5 +77,11 @@ public class Configuration {
 
         @SerializedName("large_backpack_size")
         public int large_backpack_size = 9 * 3;
+
+        @SerializedName("//comment_2")
+        public String comment_2 = "If enabled it will display the backpack on the back if you equipped it on the trinket back slot";
+
+        @SerializedName("display_back")
+        public boolean display_back = true;
     }
 }

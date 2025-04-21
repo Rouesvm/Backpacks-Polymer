@@ -1,0 +1,58 @@
+package com.rouesvm.servback.utils.cosmetic;
+
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class StupidManager {
+    private static StupidManager manager = null;
+    public Map<UUID, BackHolder> storedInstances = new HashMap<>();
+
+    private StupidManager() {}
+
+    public static StupidManager getManager() {
+        return manager;
+    }
+
+    public static void setup(MinecraftServer server) {
+        manager = new StupidManager();
+    }
+
+    public static void destroy(MinecraftServer server) {
+        if (manager != null) {
+            manager.storedInstances.forEach((uuid, backHolder) -> backHolder.destroy());
+            manager.storedInstances = new HashMap<>();
+            manager = null;
+        }
+    }
+
+    public BackHolder getInstance(ServerPlayerEntity player) {
+        return manager.storedInstances.getOrDefault(player.getUuid(), null);
+    }
+
+    public BackHolder getOrCreateInstance(ServerPlayerEntity player, ItemStack stack) {
+        UUID uuid = player.getUuid();
+        if (getInstance(player) != null)
+            return getInstance(player);
+
+        manager.storedInstances.put(uuid,
+                BackHolder.createDisplay(
+                        stack,
+                        player
+                )
+        );
+
+        return getInstance(player);
+    }
+
+    public void removeInstance(ServerPlayerEntity player) {
+        BackHolder holder = getInstance(player);
+        if (holder != null) {
+            manager.storedInstances.remove(player.getUuid());
+        }
+    }
+}

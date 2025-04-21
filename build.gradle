@@ -38,10 +38,11 @@ dependencies {
 
     modImplementation ("eu.pb4:polymer-core:${project.polymer}")
     modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
-
+    modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer}")
     modImplementation include("eu.pb4:sgui:${project.sgui}")
     modImplementation include("xyz.nucleoid:server-translations-api:2.4.0+1.21.2-rc1")
 
+    modCompileOnly("eu.pb4.polyport:trinkets:${trinkets}")
     compileOnly('org.geysermc.geyser:api:2.6.1-SNAPSHOT')
 }
 

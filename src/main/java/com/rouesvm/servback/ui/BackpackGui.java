@@ -37,11 +37,19 @@ public class BackpackGui extends SimpleGui {
         this.size = this.backpackInstance.getInventory().size();
         if (this.size > (9*6)) this.size = 9 * 6;
 
-        System.out.println(instance.getUuid());
-
         convertComponentToBackpackData();
 
-        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
+        if (stack.getCustomName() != null) {
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                    .append(" (")
+                    .append(stack.getCustomName())
+                    .append(")"));
+        } else {
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                    .append(" (")
+                    .append(stack.getItemName())
+                    .append(")"));
+        }
 
         this.fillChest();
 

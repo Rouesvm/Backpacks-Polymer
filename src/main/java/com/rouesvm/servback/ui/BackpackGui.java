@@ -98,8 +98,6 @@ public class BackpackGui extends SimpleGui {
 
     @Override
     public void onClose() {
-        System.out.println("closed " + outOfSlot);
-
         BackpackManager.getManager().save(this.getPlayer().getServer());
         stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
     }

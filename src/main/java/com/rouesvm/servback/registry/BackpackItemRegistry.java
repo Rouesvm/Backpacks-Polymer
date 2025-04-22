@@ -7,6 +7,7 @@ import com.rouesvm.servback.ui.EnderBackpackGui;
 import com.rouesvm.servback.ui.GlobalBackpackGui;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -75,6 +76,13 @@ public class BackpackItemRegistry {
             new GlobalBackpackGui(player, stack);
         }
     });
+
+    public static final Item ARROW_LEFT = register(new BasicPolymerItem("arrowleft", Items.POISONOUS_POTATO));
+    public static final Item ARROW_RIGHT = register(new BasicPolymerItem("arrowright", Items.POISONOUS_POTATO));
+    public static final Item SKIP_LEFT = register(new BasicPolymerItem("skipleft", Items.POISONOUS_POTATO));
+    public static final Item SKIP_RIGHT = register(new BasicPolymerItem("skipright", Items.POISONOUS_POTATO));
+    public static final Item SLOT = register(new BasicPolymerItem("slot", Items.POISONOUS_POTATO));
+    public static final Item SEARCH = register(new BasicPolymerItem("search", Items.POISONOUS_POTATO));
 
     public static Item register(BasicPolymerItem item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);

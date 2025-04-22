@@ -71,11 +71,13 @@ public class BackpackGui extends SimpleGui {
     }
 
     private void lockSlot() {
-        for (int k = 0; k < 9; ++k) {
-            int index = k + (9 * 4 + this.size) - 9;
-            if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
-                this.stackIndex = index;
-                break;
+        for(int j = 0; j <= 3; ++j) {
+            for(int k = 0; k < 9; ++k) {
+                final int index = j == 0 ? k + (9 * 4 + this.size) - 9 : this.size + (k + j * 9) - 9 ;
+                if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
+                    this.stackIndex = index;
+                    break;
+                }
             }
         }
     }
@@ -96,6 +98,8 @@ public class BackpackGui extends SimpleGui {
 
     @Override
     public void onClose() {
+        System.out.println("closed " + outOfSlot);
+
         BackpackManager.getManager().save(this.getPlayer().getServer());
         stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
     }

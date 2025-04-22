@@ -75,6 +75,10 @@ public class BundleContainerItem extends ContainerItem {
                     BackpackManager.getManager().saveBackpack(uuid, inventory);
                     this.onContentChanged(serverPlayer);
                     return true;
+                } else if (clickType == ClickType.RIGHT) {
+                    serverPlayer.closeHandledScreen();
+                    openGui(serverPlayer, stack);
+                    return true;
                 } else {
                     setSelectedStackIndex(stack, -1);
                 }

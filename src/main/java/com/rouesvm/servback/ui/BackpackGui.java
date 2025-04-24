@@ -15,12 +15,16 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
+import java.util.List;
+import java.util.UUID;
+
 public class BackpackGui extends SimpleGui {
     protected final BackpackInstance backpackInstance;
-    protected final ItemStack stack;
+    protected ItemStack stack;
 
     protected int stackIndex;
     protected boolean outOfSlot = false;
+    protected boolean isClosed = false;
 
     private int size;
 
@@ -58,6 +62,27 @@ public class BackpackGui extends SimpleGui {
         this.afterOpened();
     }
 
+    public BackpackGui(ServerPlayerEntity player, BackpackInstance instance) {
+        super(getHandler(instance.getInventory().size()), player, false);
+
+        this.isClosed = true;
+
+        this.backpackInstance = instance;
+        this.backpackInstance.setLastAccessed();
+
+        this.size = this.backpackInstance.getInventory().size();
+        if (this.size > (9*6)) this.size = 9 * 6;
+
+        convertComponentToBackpackData();
+
+        this.fillChest();
+
+        this.stackIndex = -1;
+
+        this.open();
+        this.afterOpened();
+    }
+
     private void convertComponentToBackpackData() {
         if (stack == null) return;
         if (backpackInstance.getInventory().isEmpty() && this.stack.get(DataComponentTypes.CONTAINER) != null && this.stack.getItem() instanceof ContainerItem item) {
@@ -83,10 +108,10 @@ public class BackpackGui extends SimpleGui {
     }
 
     private void afterOpened() {
-            this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
+        this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                if (stackIndex != -1 && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
                 BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override
@@ -99,7 +124,20 @@ public class BackpackGui extends SimpleGui {
     @Override
     public void onClose() {
         BackpackManager.getManager().save(this.getPlayer().getServer());
-        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
+        if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
+
+        UUID playerUUID = this.getPlayer().getUuid();
+        BackpackInstance lastAccessedUUID = BackpackManager.getManager().getLastAccessedUUID(playerUUID);
+
+        if (lastAccessedUUID != null && lastAccessedUUID.getUuid() != backpackInstance.getUuid()) {
+            player.closeHandledScreen();
+            new BackpackGui(this.getPlayer(), lastAccessedUUID);
+            BackpackManager.getManager().removeAccessedUUID(playerUUID, lastAccessedUUID);
+        } else if (!BackpackManager.getManager().lastAccessedInstances
+                .getOrDefault(playerUUID, List.of())
+                .contains(backpackInstance)) {
+            BackpackManager.getManager().putAccessedUUID(playerUUID, backpackInstance);
+        }
     }
 
     @Override

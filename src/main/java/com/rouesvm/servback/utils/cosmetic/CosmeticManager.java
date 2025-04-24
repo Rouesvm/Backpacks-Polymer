@@ -1,5 +1,6 @@
 package com.rouesvm.servback.utils.cosmetic;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 public class CosmeticManager {
     private static CosmeticManager manager = null;
-    public Map<UUID, BackHolder> storedInstances = new HashMap<>();
+    public Map<UUID, BackHolder> storedInstances = new Object2ObjectOpenHashMap<>();
 
     private CosmeticManager() {}
 

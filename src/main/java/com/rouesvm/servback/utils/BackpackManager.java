@@ -3,7 +3,6 @@ package com.rouesvm.servback.utils;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.state.BackpackState;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -19,8 +18,6 @@ public class BackpackManager {
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
-    public Map<UUID, List<BackpackInstance>> lastAccessedInstances = new Object2ObjectOpenHashMap<>();
-
     public static BackpackManager getManager() {
         return manager;
     }
@@ -35,32 +32,6 @@ public class BackpackManager {
     public static void destroy(MinecraftServer server) {
         manager.save(server);
         manager = null;
-    }
-
-    public List<BackpackInstance> getAccessedUUID(UUID player) {
-        return this.lastAccessedInstances.computeIfAbsent(player, k -> new ArrayList<>());
-    }
-
-    public void putAccessedUUID(UUID player, BackpackInstance backpack) {
-        List<BackpackInstance> uuids = getAccessedUUID(player);
-        if (!uuids.contains(backpack)) {
-            uuids.add(backpack);
-        }
-    }
-
-    public void removeAccessedUUID(UUID player, BackpackInstance backpack) {
-        List<BackpackInstance> uuids = getAccessedUUID(player);
-        if (uuids.contains(backpack)) {
-            uuids.remove(backpack);
-            this.lastAccessedInstances.replace(player, uuids);
-        }
-    }
-
-    public BackpackInstance getLastAccessedUUID(UUID player) {
-        List<BackpackInstance> uuids = getAccessedUUID(player);
-        if (!uuids.isEmpty())
-            return uuids.getLast();
-        else return null;
     }
 
     public static UUID getStackUUID(ItemStack stack) {

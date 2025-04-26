@@ -10,6 +10,7 @@ import java.util.UUID;
 public class BackpackInstance {
     private UUID uuid;
     private BackpackInventory inventory;
+
     public long lastAccessed;
 
     public BackpackInstance(UUID uuid, BackpackInventory inventory) {

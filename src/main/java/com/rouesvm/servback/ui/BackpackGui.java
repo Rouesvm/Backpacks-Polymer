@@ -40,7 +40,17 @@ public class BackpackGui extends SimpleGui {
 
         convertComponentToBackpackData();
 
-        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
+        if (stack.getCustomName() != null) {
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                    .append(" (")
+                    .append(stack.getCustomName())
+                    .append(")"));
+        } else {
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                    .append(" (")
+                    .append(stack.getItemName())
+                    .append(")"));
+        }
 
         this.fillChest();
 
@@ -84,8 +94,14 @@ public class BackpackGui extends SimpleGui {
 
     @Override
     public void onClose() {
-        BackpackManager.getManager().save(this.getPlayer().getServer());
+        BackpackManager manager = BackpackManager.getManager();
+        manager.save(this.getPlayer().getServer());
         stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
+    }
+
+    @Override
+    public void close() {
+        super.close();
     }
 
     @Override

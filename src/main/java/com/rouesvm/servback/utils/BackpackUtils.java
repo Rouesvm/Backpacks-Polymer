@@ -1,5 +1,6 @@
 package com.rouesvm.servback.utils;
 
+import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
@@ -11,8 +12,6 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 
 import java.util.UUID;
 
@@ -71,6 +70,6 @@ public class BackpackUtils {
             ItemStack excessItem = inventory.getHeldStacks().get(i - 1);
             player.dropItem(excessItem, true);
         }
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+        ContainerItem.playDropContentsSound(player);
     }
 }

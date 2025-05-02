@@ -14,8 +14,6 @@ import net.minecraft.util.ClickType;
 
 import java.util.UUID;
 
-import static net.minecraft.item.BundleItem.setSelectedStackIndex;
-
 public class BundleContainerItem extends ContainerItem {
     public BundleContainerItem(String name, int slots) {
         super(name, slots);
@@ -24,7 +22,7 @@ public class BundleContainerItem extends ContainerItem {
     @Override
     public boolean onStackClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player) {
         UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackInventory inventory = BackpackUtils.getItemList(stack, this.slots);
+        BackpackInventory inventory = BackpackUtils.getItemList(stack, this.slots + BackpackUtils.getExtendedSlots(stack));
 
         if (inventory == null) {
             return false;

@@ -1,7 +1,7 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.ui.slots.BackpackSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
@@ -28,7 +28,7 @@ public class BackpackGui extends SimpleGui {
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
         super(getHandler(instance.getInventory().size()), player, false);
 
-        stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
+        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
 
         this.stack = stack;
 
@@ -40,17 +40,10 @@ public class BackpackGui extends SimpleGui {
 
         convertComponentToBackpackData();
 
-        if (stack.getCustomName() != null) {
-            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
-                    .append(" (")
-                    .append(stack.getCustomName())
-                    .append(")"));
-        } else {
-            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
-                    .append(" (")
-                    .append(stack.getItemName())
-                    .append(")"));
-        }
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                .append(" (")
+                .append(stack.getName())
+                .append(")"));
 
         this.fillChest();
 

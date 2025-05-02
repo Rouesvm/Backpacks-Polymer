@@ -1,12 +1,13 @@
 package com.rouesvm.servback.mixin;
 
 import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.registry.BackpacksDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +28,7 @@ public abstract class ShapedRecipeMixin {
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack stack = inventory.getStackInSlot(i);
                 if (stack.getItem() instanceof ContainerItem) {
-                    resultStack.set(BackpacksDataComponentTypes.UUID_TYPE, stack.get(BackpacksDataComponentTypes.UUID_TYPE));
+                    resultStack.set(BackpackDataComponentTypes.UUID_TYPE, stack.get(BackpackDataComponentTypes.UUID_TYPE));
                     resultStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
                     callBack.setReturnValue(resultStack);
                     break;

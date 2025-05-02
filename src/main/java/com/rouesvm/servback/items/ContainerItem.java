@@ -4,11 +4,14 @@ import com.rouesvm.servback.registry.BackpackItemRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.utils.BackpackUtils;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
@@ -19,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ContainerItem extends GuiItem {
-    private final int slots;
+    public final int slots;
 
     public ContainerItem(String name, int slots) {
         super(name);
@@ -33,7 +36,7 @@ public class ContainerItem extends GuiItem {
 
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, @Nullable ServerPlayerEntity player) {
-        BackpackInventory itemList = this.getItemList(polymerStack);
+        BackpackInventory itemList = BackpackUtils.getItemList(polymerStack, this.slots + BackpackUtils.getExtendedSlots(polymerStack));
         if (itemList == null) return;
         if (itemList.getHeldStacks().isEmpty()) return;
 
@@ -65,9 +68,9 @@ public class ContainerItem extends GuiItem {
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         onOpen(player, stack);
 
-        onEnchanted(stack, player);
-
-        new BackpackGui(player, stack, instance);
+        int slots = this.slots + BackpackUtils.getExtendedSlots(stack);
+        BackpackUtils.checkEnchantments(stack, player, slots);
+        new BackpackGui(player, stack, BackpackManager.getInstance(BackpackManager.getStackUUID(stack), slots));
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
@@ -179,7 +182,7 @@ public class ContainerItem extends GuiItem {
     }
 
     public static void playInsertFailSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT_FAIL, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_REMOVE_ONE, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
 }

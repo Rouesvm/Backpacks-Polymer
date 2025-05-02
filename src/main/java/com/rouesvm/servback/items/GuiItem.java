@@ -9,6 +9,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
 
@@ -18,20 +19,20 @@ public class GuiItem extends BasicPolymerItem  {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
         var cast = player.raycast(5,0,false);
         if (!(player instanceof ServerPlayerEntity serverPlayer))
-            return ActionResult.PASS;
+            return TypedActionResult.pass(stack);
         if (player.isSneaking())
-            return ActionResult.PASS;
+            return TypedActionResult.pass(stack);
         if (cast.getType() == HitResult.Type.BLOCK)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return TypedActionResult.pass(stack);
 
         openGui(serverPlayer, stack);
         player.swingHand(hand, true);
-        return ActionResult.SUCCESS;
+        return TypedActionResult.success(stack);
     }
 
     @Override

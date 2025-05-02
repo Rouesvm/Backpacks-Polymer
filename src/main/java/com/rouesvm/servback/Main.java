@@ -3,6 +3,7 @@ package com.rouesvm.servback;
 import com.rouesvm.servback.compat.geyser.BackpackGeyser;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.config.Configuration;
+import com.rouesvm.servback.config.commands.BackpackCommands;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackItemGroup;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
@@ -10,6 +11,7 @@ import com.rouesvm.servback.ui.inventory.BaseInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
@@ -37,6 +39,7 @@ public class Main implements ModInitializer {
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
 
+
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
@@ -46,7 +49,10 @@ public class Main implements ModInitializer {
 		BackpackItemGroup.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
-		if (hasTrinketLoaded) BackpackTrinket.initialize();
+		if (hasTrinketLoaded) {
+			BackpackTrinket.initialize();
+			CommandRegistrationCallback.EVENT.register(BackpackCommands::init);
+		}
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);

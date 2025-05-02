@@ -1,0 +1,31 @@
+package com.rouesvm.servback.config.commands;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.rouesvm.servback.items.ContainerItem;
+import dev.emi.trinkets.api.TrinketComponent;
+import dev.emi.trinkets.api.TrinketsApi;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.Optional;
+
+import static net.minecraft.server.command.CommandManager.literal;
+
+public class BackpackCommands {
+    public static void init(CommandDispatcher<ServerCommandSource> dispatcher,
+                            CommandRegistryAccess registryAccess,
+                            CommandManager.RegistrationEnvironment registrationEnvironment) {
+        dispatcher.register(literal("open").executes(context -> {
+            ServerPlayerEntity player = context.getSource().getPlayer();
+            Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(player);
+            component.ifPresent(trinketComponent -> trinketComponent.forEach((slotReference, stack) -> {
+                if (stack.getItem() instanceof ContainerItem containerItem) {
+                    containerItem.openGui(player, stack);
+                }
+            }));
+            return 1;
+        }));
+    }
+}

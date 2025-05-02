@@ -13,6 +13,7 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
@@ -74,9 +75,9 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 Item dyeColor = DyeItem.byColor(color);
 
                 switch (i) {
-                    case 1 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(SMALL_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
-                    case 2 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(MEDIUM_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
-                    case 3 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(LARGE_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                    case 1 -> createTransmuteRecipe(exporter, SMALL_BACKPACKS, dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                    case 2 -> createTransmuteRecipe(exporter, MEDIUM_BACKPACKS, dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                    case 3 -> createTransmuteRecipe(exporter, LARGE_BACKPACKS, dyeColor, regular_dyed_backpack, i, name + "_" + i);
                 }
 
                 if (i+1 == 4) continue;
@@ -90,12 +91,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
         }
     }
 
-    private void createTransmuteRecipe(RecipeExporter exporter, Item backpack, Item dyeColor, Item result, String name, int size) {
+    private void createTransmuteRecipe(RecipeExporter exporter, TagKey<Item> backpack, Item dyeColor, Item result, int slots, String name) {
         ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, result)
                 .input(backpack)
                 .input(dyeColor)
-                .group(size + "_dyedBackpacks")
-                .criterion(FabricRecipeProvider.hasItem(backpack), FabricRecipeProvider.conditionsFromItem(backpack))
+                .group(slots + "_dyedBackpacks")
+                .criterion(FabricRecipeProvider.conditionsFromTag(backpack).toString(), FabricRecipeProvider.conditionsFromTag(backpack))
                 .offerTo(exporter, Identifier.of(MOD_ID, name));
     }
 

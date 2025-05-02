@@ -49,9 +49,10 @@ public class BackpackInstance {
     }
 
     public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
-        BackpackInstance backpackInstance = new BackpackInstance();
-        backpackInstance.uuid = compound.getUuid("uuid");
-        backpackInstance.inventory = BackpackInventory.load(compound.getCompound("contents"), registryLookup);
+        BackpackInstance backpackInstance = new BackpackInstance(
+                compound.getUuid("uuid"),
+                BackpackInventory.load(compound.getCompound("contents"), registryLookup)
+        );
         backpackInstance.lastAccessed = compound.getLong("lastAccessed");
         return backpackInstance;
     }

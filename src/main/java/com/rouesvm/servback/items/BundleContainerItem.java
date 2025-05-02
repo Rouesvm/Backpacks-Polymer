@@ -53,7 +53,6 @@ public class BundleContainerItem extends ContainerItem {
     @Override
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
         if (clickType == ClickType.LEFT && otherStack.isEmpty()) {
-            setSelectedStackIndex(stack, -1);
         } else {
             UUID uuid = BackpackManager.getStackUUID(stack);
             BackpackInventory inventory = BackpackUtils.getItemList(stack, this.slots);
@@ -85,8 +84,6 @@ public class BundleContainerItem extends ContainerItem {
                             )
                     );
                     return true;
-                } else {
-                    setSelectedStackIndex(stack, -1);
                 }
             }
         }

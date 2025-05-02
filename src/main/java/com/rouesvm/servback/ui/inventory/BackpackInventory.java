@@ -16,6 +16,11 @@ public class BackpackInventory extends BaseInventory {
         this.heldStacks = stacks;
     }
 
+    public BackpackInventory(int slots, DefaultedList<ItemStack> stacks) {
+        super(slots);
+        this.heldStacks = stacks;
+    }
+
     public boolean insertItems(DefaultedList<ItemStack> itemStacks) {
         if (itemStacks != null && !itemStacks.isEmpty()) {
             markDirty();

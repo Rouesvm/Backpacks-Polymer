@@ -19,6 +19,7 @@ import net.minecraft.util.Identifier;
 import java.util.concurrent.CompletableFuture;
 
 import static com.rouesvm.servback.Main.MOD_ID;
+import static com.rouesvm.servback.datagen.ModItemTags.*;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public ModRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
@@ -68,16 +69,23 @@ public class ModRecipeProvider extends FabricRecipeProvider {
             String backpackName = backpack.getIdentifier().getPath();
 
             for (DyeColor color : DyeColor.values()) {
-                ContainerItem coloredBackpack = (ContainerItem) ContainerItem.getColoredBackpack(color, i);
-
-                String name = color.getName().toLowerCase() + "_" + backpackName;
+                ContainerItem regular_dyed_backpack = (ContainerItem) ContainerItem.getColoredBackpack(color, i);
+                String name = color.name().toLowerCase() + "_" + backpackName;
                 Item dyeColor = DyeItem.byColor(color);
 
-                createTransmuteRecipe(exporter, backpack, dyeColor, coloredBackpack, name, i);
+                switch (i) {
+                    case 1 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(SMALL_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                    case 2 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(MEDIUM_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                    case 3 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(LARGE_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
+                }
 
-                if (i + 1 == 4) continue;
+                if (i+1 == 4) continue;
                 ContainerItem backpackUpATier = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
-                createUpgradeRecipe(exporter, coloredBackpack, backpackUpATier, backpackUpATier.getSize(), name + "_" + backpackUpATier.getIdentifier().getPath());
+                createUpgradeRecipe(exporter,
+                        regular_dyed_backpack, backpackUpATier,
+                        backpackUpATier.getSize(),
+                        name + "_" + backpackUpATier.getIdentifier().getPath()
+                );
             }
         }
     }

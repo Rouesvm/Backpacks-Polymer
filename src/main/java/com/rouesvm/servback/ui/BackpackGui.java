@@ -16,55 +16,63 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
-import java.util.UUID;
-
-import static com.rouesvm.servback.utils.BackpackManager.getInstance;
-import static com.rouesvm.servback.utils.BackpackManager.getStackUUID;
-
 public class BackpackGui extends SimpleGui {
-    protected final UUID uuid;
     protected final ItemStack stack;
     protected final BackpackInstance backpackInstance;
 
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, int slots) {
-        super(getHandler(slots), player, false);
+    private int size;
+
+    public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
+        super(getHandler(instance.getInventory().size()), player, false);
 
         stack.set(BackpacksDataComponentTypes.BOOLEAN_TYPE, true);
 
-        this.uuid = getStackUUID(stack);
         this.stack = stack;
 
-        this.backpackInstance = getInstance(uuid, slots);
+        this.backpackInstance = instance;
         this.backpackInstance.setLastAccessed();
 
-        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
-        this.fillChest();
+        this.size = this.backpackInstance.getInventory().size();
+        if (this.size > (9*6)) this.size = 9 * 6;
 
         convertComponentToBackpackData();
+
+        if (stack.getCustomName() != null) {
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                    .append(" (")
+                    .append(stack.getCustomName())
+                    .append(")"));
+        } else {
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                    .append(" (")
+                    .append(stack.getItemName())
+                    .append(")"));
+        }
+
+        this.fillChest();
 
         this.open();
         this.afterOpened();
     }
 
     private void convertComponentToBackpackData() {
-        BackpackInventory inventory = this.backpackInstance.inventory;
+        BackpackInventory inventory = this.backpackInstance.getInventory();
         if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (inventory.insertItems(itemStacks)) {
-                backpackInstance.inventory.setInventoryDirectly(inventory.getHeldStacks());
-                BackpackManager.getManager().saveBackpack(uuid, inventory);
+                backpackInstance.setInventory(inventory);
+                BackpackManager.getManager().saveBackpack(backpackInstance.getUuid(), backpackInstance.getInventory());
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
     }
 
     public void afterOpened() {
-        final int slots = backpackInstance.inventory.size();
         for (int k = 0; k < 9; ++k) {
-            int index = k + (9 * 4 + slots) - 9;
+            int index = k + (9 * 4 + this.size) - 9;
             if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
                 this.stackIndex = index;
                 break;
@@ -85,9 +93,15 @@ public class BackpackGui extends SimpleGui {
     }
 
     @Override
-    public ItemStack quickMove(int index) {
-        if (this.screenHandler.getSlot(index).getStack() == stack) return ItemStack.EMPTY;
-        return super.quickMove(index);
+    public void onClose() {
+        BackpackManager manager = BackpackManager.getManager();
+        manager.save(this.getPlayer().getServer());
+        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
+    }
+
+    @Override
+    public void close() {
+        super.close();
     }
 
     @Override
@@ -102,13 +116,12 @@ public class BackpackGui extends SimpleGui {
             case 3 -> ScreenHandlerType.GENERIC_9X3;
             case 4 -> ScreenHandlerType.GENERIC_9X4;
             case 5 -> ScreenHandlerType.GENERIC_9X5;
-            case 6 -> ScreenHandlerType.GENERIC_9X6;
-            default -> null;
+            default -> ScreenHandlerType.GENERIC_9X6;
         };
     }
 
     public void fillChest() {
-        for (int j = 0; j < this.backpackInstance.inventory.size(); ++j)
-            this.setSlotRedirect(j, new BackpackSlot(this.backpackInstance.inventory, j, j,0));
+        for (int j = 0; j < size; ++j)
+            this.setSlotRedirect(j, new BackpackSlot(backpackInstance.getInventory(), j, j,0));
     }
 }

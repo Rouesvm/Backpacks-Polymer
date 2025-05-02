@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.8-SNAPSHOT'
+    id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -11,7 +11,10 @@ base {
 }
 
 repositories {
-    maven { url 'https://maven.nucleoid.xyz' }
+    maven { url = uri("https://repo.opencollab.dev/main/") }
+    maven { url = 'https://maven.nucleoid.xyz' }
+    maven { url = "https://maven.terraformersmc.com/" }
+    maven { url = "https://maven.ladysnake.org/releases" }
 }
 
 loom {
@@ -23,7 +26,6 @@ loom {
             sourceSet sourceSets.client
         }
     }
-
 }
 
 dependencies {
@@ -34,13 +36,14 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation ("eu.pb4:polymer-core:${project.polymer}+${project.minecraft_version}")
-    modImplementation ("eu.pb4:polymer-blocks:${project.polymer}+${project.minecraft_version}")
-    modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}+${project.minecraft_version}")
+    modImplementation ("eu.pb4:polymer-core:${project.polymer}")
+    modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
+    modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer}")
+    modImplementation include("eu.pb4:sgui:${project.sgui}")
+    modImplementation include("xyz.nucleoid:server-translations-api:2.5.0+1.21.5-rc1")
 
-    modImplementation include("eu.pb4:sgui:${project.sgui}+${project.minecraft_version}")
-
-    modImplementation include("xyz.nucleoid:server-translations-api:2.3.1+1.21-pre2")
+    modCompileOnly("eu.pb4.polyport:trinkets:${trinkets}")
+    compileOnly('org.geysermc.geyser:api:2.6.1-SNAPSHOT')
 }
 
 processResources {

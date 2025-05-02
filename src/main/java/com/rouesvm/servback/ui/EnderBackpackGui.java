@@ -12,7 +12,7 @@ import net.minecraft.text.Text;
 
 public class EnderBackpackGui extends SimpleGui {
     protected final ItemStack stack;
-    protected Inventory inventory;
+    protected final Inventory inventory;
 
     protected int stackIndex;
     protected boolean outOfSlot = false;
@@ -28,13 +28,7 @@ public class EnderBackpackGui extends SimpleGui {
 
         this.open();
 
-        for (int k = 0; k < 9; ++k) {
-            int index = k + (9 * 4 + 9*3) - 9;
-            if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
-                this.stackIndex = index;
-                break;
-            }
-        }
+        this.lockSlot();
 
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
@@ -46,6 +40,18 @@ public class EnderBackpackGui extends SimpleGui {
 
             }
         });
+    }
+
+    private void lockSlot() {
+        for(int j = 0; j <= 3; ++j) {
+            for(int k = 0; k < 9; ++k) {
+                final int index = j == 0 ? k + (9 * 4 + this.size) - 9 : this.size + (k + j * 9) - 9 ;
+                if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
+                    this.stackIndex = index;
+                    break;
+                }
+            }
+        }
     }
 
     @Override

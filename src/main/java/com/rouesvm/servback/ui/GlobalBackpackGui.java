@@ -29,7 +29,21 @@ public class GlobalBackpackGui extends SimpleGui {
         this.fillChest();
 
         this.open();
+
+        this.lockSlot();
         this.afterOpened();
+    }
+
+    private void lockSlot() {
+        for(int j = 0; j <= 3; ++j) {
+            for(int k = 0; k < 9; ++k) {
+                final int index = j == 0 ? k + (9 * 4 + this.size) - 9 : this.size + (k + j * 9) - 9 ;
+                if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
+                    this.stackIndex = index;
+                    break;
+                }
+            }
+        }
     }
 
     public void afterOpened() {
@@ -52,6 +66,11 @@ public class GlobalBackpackGui extends SimpleGui {
 
             }
         });
+    }
+
+    @Override
+    public void onClose() {
+        BackpackManager.getManager().save(this.getPlayer().getServer());
     }
 
     @Override

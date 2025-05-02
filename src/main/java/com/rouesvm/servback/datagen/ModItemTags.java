@@ -20,6 +20,7 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
     public static final TagKey<Item> LARGE_BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "large_backpacks"));
 
     public static final TagKey<Item> SUPPORTED_BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "supported_backpacks"));
+    public static final TagKey<Item> BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "backpacks"));
 
     public ModItemTags(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
         super(output, registriesFuture);
@@ -40,5 +41,9 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
 
         this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(MEDIUM_BACKPACKS);
         this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(LARGE_BACKPACKS);
+
+        this.getOrCreateTagBuilder(BACKPACKS).addTag(SMALL_BACKPACKS);
+        this.getOrCreateTagBuilder(BACKPACKS).addTag(MEDIUM_BACKPACKS);
+        this.getOrCreateTagBuilder(BACKPACKS).addTag(LARGE_BACKPACKS);
     }
 }

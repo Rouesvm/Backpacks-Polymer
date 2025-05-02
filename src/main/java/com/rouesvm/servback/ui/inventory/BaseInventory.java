@@ -117,7 +117,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     }
 
     public ItemStack removeStack(int slot) {
-        ItemStack itemStack = (ItemStack)this.heldStacks.get(slot);
+        ItemStack itemStack = this.heldStacks.get(slot);
         if (itemStack.isEmpty()) {
             return ItemStack.EMPTY;
         } else {

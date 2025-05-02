@@ -1,0 +1,147 @@
+{
+  "resource_pack_name" : "serverbackpacks",
+  "texture_name" : "atlas.items",
+  "texture_data" : {
+    "serverbackpacks:small" : {
+      "textures" : "textures/serverbackpacks/item/small"
+    },
+    "serverbackpacks:red_small" : {
+      "textures" : "textures/serverbackpacks/item/red_small"
+    },
+    "serverbackpacks:black_small" : {
+      "textures" : "textures/serverbackpacks/item/black_small"
+    },
+    "serverbackpacks:blue_small" : {
+      "textures" : "textures/serverbackpacks/item/blue_small"
+    },
+    "serverbackpacks:cyan_small" : {
+      "textures" : "textures/serverbackpacks/item/cyan_small"
+    },
+    "serverbackpacks:light_blue_small" : {
+      "textures" : "textures/serverbackpacks/item/light_blue_small"
+    },
+    "serverbackpacks:green_small" : {
+      "textures" : "textures/serverbackpacks/item/green_small"
+    },
+    "serverbackpacks:light_gray_small" : {
+      "textures" : "textures/serverbackpacks/item/light_gray_small"
+    },
+    "serverbackpacks:white_small" : {
+      "textures" : "textures/serverbackpacks/item/white_small"
+    },
+    "serverbackpacks:lime_small" : {
+      "textures" : "textures/serverbackpacks/item/lime_small"
+    },
+    "serverbackpacks:magenta_small" : {
+      "textures" : "textures/serverbackpacks/item/magenta_small"
+    },
+    "serverbackpacks:pink_small" : {
+      "textures" : "textures/serverbackpacks/item/pink_small"
+    },
+    "serverbackpacks:purple_small" : {
+      "textures" : "textures/serverbackpacks/item/purple_small"
+    },
+    "serverbackpacks:orange_small" : {
+      "textures" : "textures/serverbackpacks/item/orange_small"
+    },
+    "serverbackpacks:yellow_small" : {
+      "textures" : "textures/serverbackpacks/item/yellow_small"
+    },
+    "serverbackpacks:medium" : {
+      "textures" : "textures/serverbackpacks/item/medium"
+    },
+    "serverbackpacks:red_medium" : {
+      "textures" : "textures/serverbackpacks/item/red_medium"
+    },
+    "serverbackpacks:black_medium" : {
+      "textures" : "textures/serverbackpacks/item/black_medium"
+    },
+    "serverbackpacks:blue_medium" : {
+      "textures" : "textures/serverbackpacks/item/blue_medium"
+    },
+    "serverbackpacks:cyan_medium" : {
+      "textures" : "textures/serverbackpacks/item/cyan_medium"
+    },
+    "serverbackpacks:light_blue_medium" : {
+      "textures" : "textures/serverbackpacks/item/light_blue_medium"
+    },
+    "serverbackpacks:green_medium" : {
+      "textures" : "textures/serverbackpacks/item/green_medium"
+    },
+    "serverbackpacks:light_gray_medium" : {
+      "textures" : "textures/serverbackpacks/item/light_gray_medium"
+    },
+    "serverbackpacks:white_medium" : {
+      "textures" : "textures/serverbackpacks/item/white_medium"
+    },
+    "serverbackpacks:lime_medium" : {
+      "textures" : "textures/serverbackpacks/item/lime_medium"
+    },
+    "serverbackpacks:magenta_medium" : {
+      "textures" : "textures/serverbackpacks/item/magenta_medium"
+    },
+    "serverbackpacks:pink_medium" : {
+      "textures" : "textures/serverbackpacks/item/pink_medium"
+    },
+    "serverbackpacks:purple_medium" : {
+      "textures" : "textures/serverbackpacks/item/purple_medium"
+    },
+    "serverbackpacks:orange_medium" : {
+      "textures" : "textures/serverbackpacks/item/orange_medium"
+    },
+    "serverbackpacks:yellow_medium" : {
+      "textures" : "textures/serverbackpacks/item/yellow_medium"
+    },
+    "serverbackpacks:large" : {
+      "textures" : "textures/serverbackpacks/item/large"
+    },
+    "serverbackpacks:red_large" : {
+      "textures" : "textures/serverbackpacks/item/red_large"
+    },
+    "serverbackpacks:black_large" : {
+      "textures" : "textures/serverbackpacks/item/black_large"
+    },
+    "serverbackpacks:blue_large" : {
+      "textures" : "textures/serverbackpacks/item/blue_large"
+    },
+    "serverbackpacks:cyan_large" : {
+      "textures" : "textures/serverbackpacks/item/cyan_large"
+    },
+    "serverbackpacks:light_blue_large" : {
+      "textures" : "textures/serverbackpacks/item/light_blue_large"
+    },
+    "serverbackpacks:green_large" : {
+      "textures" : "textures/serverbackpacks/item/green_large"
+    },
+    "serverbackpacks:light_gray_large" : {
+      "textures" : "textures/serverbackpacks/item/light_gray_large"
+    },
+    "serverbackpacks:white_large" : {
+      "textures" : "textures/serverbackpacks/item/white_large"
+    },
+    "serverbackpacks:lime_large" : {
+      "textures" : "textures/serverbackpacks/item/lime_large"
+    },
+    "serverbackpacks:magenta_large" : {
+      "textures" : "textures/serverbackpacks/item/magenta_large"
+    },
+    "serverbackpacks:pink_large" : {
+      "textures" : "textures/serverbackpacks/item/pink_large"
+    },
+    "serverbackpacks:purple_large" : {
+      "textures" : "textures/serverbackpacks/item/purple_large"
+    },
+    "serverbackpacks:orange_large" : {
+      "textures" : "textures/serverbackpacks/item/orange_large"
+    },
+    "serverbackpacks:yellow_large" : {
+      "textures" : "textures/serverbackpacks/item/yellow_large"
+    },
+    "serverbackpacks:global" : {
+      "textures" : "textures/serverbackpacks/item/global"
+    },
+    "serverbackpacks:ender" : {
+      "textures" : "textures/serverbackpacks/item/ender"
+    }
+  }
+}

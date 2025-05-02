@@ -1,15 +1,18 @@
 package com.rouesvm.servback.utils;
 
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class BackpackInstance {
-    public UUID uuid;
-    public BackpackInventory inventory;
+    private final UUID uuid;
+    private BackpackInventory inventory;
+
     public long lastAccessed;
 
     public BackpackInstance(UUID uuid, BackpackInventory inventory) {
@@ -17,15 +20,24 @@ public class BackpackInstance {
         this.inventory = inventory;
     }
 
-    public BackpackInstance() {
+    public void setInventory(BackpackInventory inventory) {
+        this.inventory = inventory;
     }
 
     public void setLastAccessed() {
         this.lastAccessed = System.currentTimeMillis();
     }
 
-    public void setInventory(BackpackInventory inventory) {
-        this.inventory = inventory;
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public BackpackInventory getInventory() {
+        return inventory;
+    }
+
+    public DefaultedList<ItemStack> getHeldInventory() {
+        return inventory.getHeldStacks();
     }
 
     public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {

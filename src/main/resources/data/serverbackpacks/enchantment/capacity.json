@@ -1,8 +1,11 @@
 {
-  "description": "Capacity",
+  "description": {
+    "translate": "enchantment.serverbackpacks.capacity",
+    "fallback": "Capacity"
+  },
   "supported_items": "#serverbackpacks:supported_backpacks",
   "weight": 4,
-  "max_level": 3,
+  "max_level": 2,
   "min_cost": {
     "base": 4,
     "per_level_above_first": 7

@@ -1,0 +1,77 @@
+package com.rouesvm.servback.blocks;
+
+import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
+import com.rouesvm.servback.utils.cosmetic.BlockHolder;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.math.BlockPos;
+
+import java.util.UUID;
+
+public class BackpackBlockEntity extends BlockEntity {
+    private UUID uuid;
+    private int size = 9;
+    private int extraSize = 0;
+
+    private DyeColor color;
+
+    public BlockHolder holder;
+
+    public BackpackBlockEntity(BlockPos pos, BlockState state) {
+        super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
+    }
+
+    public void createVisual(BlockState state, BlockPos pos, ServerWorld world) {
+        this.holder = BlockHolder.createDisplay(state, pos, world);
+        holder.setMain(ContainerItem.getColoredBackpack(color, size));
+    }
+
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        nbt.putInt("dye", color.getIndex());
+        nbt.putInt("size", size);
+        nbt.putInt("extraSize", extraSize);
+        nbt.putString("uuid", uuid.toString());
+    }
+
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        color = DyeColor.byIndex(nbt.getInt("dye", 12));
+        size = nbt.getInt("size", 9);
+        extraSize = nbt.getInt("extraSize", 0);
+        uuid = UUID.fromString(nbt.getString("uuid", UUID.randomUUID().toString()));
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getExtraSize() {
+        return extraSize;
+    }
+
+    public void setExtraSize(int extraSize) {
+        this.extraSize = extraSize;
+    }
+
+    public void setColor(DyeColor color) {
+        this.color = color;
+    }
+}

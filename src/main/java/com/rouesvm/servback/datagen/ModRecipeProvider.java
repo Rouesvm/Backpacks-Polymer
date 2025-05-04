@@ -65,7 +65,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_eye", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.SMALL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ContainerItem.getDefaultBackpack(9), 1)
                 .pattern("#S#")
                 .pattern("SCS")
                 .pattern(" # ")

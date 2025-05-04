@@ -36,16 +36,16 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+    modCompileOnly("eu.pb4.polyport:trinkets:${trinkets}")
     modImplementation ("eu.pb4:polymer-core:${project.polymer}")
     modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
-    modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer}")
+    modImplementation ("eu.pb4:polymer-virtual-entity:${project.polymer}")
     modImplementation include("eu.pb4:sgui:${project.sgui}")
     modImplementation include("xyz.nucleoid:server-translations-api:2.5.0+1.21.5-rc1")
 
-    modCompileOnly("eu.pb4.polyport:trinkets:${trinkets}")
-    compileOnly('org.geysermc.geyser:api:2.6.1-SNAPSHOT')
+    modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
-    include(modImplementation("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}"))
+    compileOnly('org.geysermc.geyser:api:2.6.1-SNAPSHOT')
 }
 
 processResources {

@@ -1,33 +1,44 @@
 package com.rouesvm.servback.items;
 
+import com.rouesvm.servback.blocks.BackpackBlockEntity;
+import com.rouesvm.servback.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
-import java.util.Map;
 
 public class ContainerItem extends GuiItem {
     public final int slots;
+    private final DyeColor color;
 
-    public ContainerItem(String name, int slots) {
+    public ContainerItem(String name, int slots, DyeColor color) {
         super(name);
         this.slots = slots;
+        this.color = color;
     }
 
     @Override
@@ -62,6 +73,37 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        if (context.getPlayer() instanceof ServerPlayerEntity player && player.isSneaking()) {
+            BlockState state = BackpackBlockRegistry.BACKPACK.getDefaultState();
+            ServerWorld world = (ServerWorld) context.getWorld();
+
+            BlockPos pos = context.getBlockPos();
+
+            state = state.with(HorizontalFacingBlock.FACING, player.getHorizontalFacing());
+
+            if (world.getBlockState(context.getBlockPos()).isIn(BlockTags.REPLACEABLE) && world.canPlace(state, context.getBlockPos(), ShapeContext.ofPlacement(player))) {
+                world.setBlockState(pos, state);
+            } else if (world.canPlace(state, context.getBlockPos().up(), ShapeContext.ofPlacement(player))) {
+                pos = pos.up();
+                world.setBlockState(pos, state);
+            }
+
+            BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
+            if (entity != null) {
+                entity.setUuid(BackpackManager.getStackUUID(context.getStack()));
+                entity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
+                entity.setSize(slots);
+                entity.setColor(color);
+                entity.createVisual(state, pos, world);
+            }
+
+            return ActionResult.SUCCESS;
+        }
+        return super.useOnBlock(context);
+    }
+
+    @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         onOpen(player, stack);
 
@@ -89,83 +131,33 @@ public class ContainerItem extends GuiItem {
         return slots / 9;
     }
 
-    public static Map<String, Item> getBackpackMap() {
-        return Map.ofEntries(
-                Map.entry("WHITE_1", BackpackItemRegistry.WHITE_SMALL_BACKPACK),
-                Map.entry("WHITE_2", BackpackItemRegistry.WHITE_MEDIUM_BACKPACK),
-                Map.entry("WHITE_3", BackpackItemRegistry.WHITE_LARGE_BACKPACK),
+    public static Item getBackpackMap(DyeColor color, int size) {
+       switch (size) {
+           case 1 -> {
+               return BackpackItemRegistry.SMALL.get(color);
+           } case 2 -> {
+               return BackpackItemRegistry.MEDIUM.get(color);
+           } case 3 -> {
+               return BackpackItemRegistry.LARGE.get(color);
+           }
+       }
 
-                Map.entry("ORANGE_1", BackpackItemRegistry.ORANGE_SMALL_BACKPACK),
-                Map.entry("ORANGE_2", BackpackItemRegistry.ORANGE_MEDIUM_BACKPACK),
-                Map.entry("ORANGE_3", BackpackItemRegistry.ORANGE_LARGE_BACKPACK),
-
-                Map.entry("MAGENTA_1", BackpackItemRegistry.MAGENTA_SMALL_BACKPACK),
-                Map.entry("MAGENTA_2", BackpackItemRegistry.MAGENTA_MEDIUM_BACKPACK),
-                Map.entry("MAGENTA_3", BackpackItemRegistry.MAGENTA_LARGE_BACKPACK),
-
-                Map.entry("LIGHT_BLUE_1", BackpackItemRegistry.LIGHT_BLUE_SMALL_BACKPACK),
-                Map.entry("LIGHT_BLUE_2", BackpackItemRegistry.LIGHT_BLUE_MEDIUM_BACKPACK),
-                Map.entry("LIGHT_BLUE_3", BackpackItemRegistry.LIGHT_BLUE_LARGE_BACKPACK),
-
-                Map.entry("YELLOW_1", BackpackItemRegistry.YELLOW_SMALL_BACKPACK),
-                Map.entry("YELLOW_2", BackpackItemRegistry.YELLOW_MEDIUM_BACKPACK),
-                Map.entry("YELLOW_3", BackpackItemRegistry.YELLOW_LARGE_BACKPACK),
-
-                Map.entry("LIME_1", BackpackItemRegistry.LIME_SMALL_BACKPACK),
-                Map.entry("LIME_2", BackpackItemRegistry.LIME_MEDIUM_BACKPACK),
-                Map.entry("LIME_3", BackpackItemRegistry.LIME_LARGE_BACKPACK),
-
-                Map.entry("PINK_1", BackpackItemRegistry.PINK_SMALL_BACKPACK),
-                Map.entry("PINK_2", BackpackItemRegistry.PINK_MEDIUM_BACKPACK),
-                Map.entry("PINK_3", BackpackItemRegistry.PINK_LARGE_BACKPACK),
-
-                Map.entry("GRAY_1", BackpackItemRegistry.LIGHT_GRAY_SMALL_BACKPACK),
-                Map.entry("GRAY_2", BackpackItemRegistry.LIGHT_GRAY_MEDIUM_BACKPACK),
-                Map.entry("GRAY_3", BackpackItemRegistry.LIGHT_GRAY_LARGE_BACKPACK),
-
-                Map.entry("LIGHT_GRAY_1", BackpackItemRegistry.LIGHT_GRAY_SMALL_BACKPACK),
-                Map.entry("LIGHT_GRAY_2", BackpackItemRegistry.LIGHT_GRAY_MEDIUM_BACKPACK),
-                Map.entry("LIGHT_GRAY_3", BackpackItemRegistry.LIGHT_GRAY_LARGE_BACKPACK),
-
-                Map.entry("CYAN_1", BackpackItemRegistry.CYAN_SMALL_BACKPACK),
-                Map.entry("CYAN_2", BackpackItemRegistry.CYAN_MEDIUM_BACKPACK),
-                Map.entry("CYAN_3", BackpackItemRegistry.CYAN_LARGE_BACKPACK),
-
-                Map.entry("BLUE_1", BackpackItemRegistry.BLUE_SMALL_BACKPACK),
-                Map.entry("BLUE_2", BackpackItemRegistry.BLUE_MEDIUM_BACKPACK),
-                Map.entry("BLUE_3", BackpackItemRegistry.BLUE_LARGE_BACKPACK),
-
-                Map.entry("GREEN_1", BackpackItemRegistry.GREEN_SMALL_BACKPACK),
-                Map.entry("GREEN_2", BackpackItemRegistry.GREEN_MEDIUM_BACKPACK),
-                Map.entry("GREEN_3", BackpackItemRegistry.GREEN_LARGE_BACKPACK),
-
-                Map.entry("RED_1", BackpackItemRegistry.RED_SMALL_BACKPACK),
-                Map.entry("RED_2", BackpackItemRegistry.RED_MEDIUM_BACKPACK),
-                Map.entry("RED_3", BackpackItemRegistry.RED_LARGE_BACKPACK),
-
-                Map.entry("BLACK_1", BackpackItemRegistry.BLACK_SMALL_BACKPACK),
-                Map.entry("BLACK_2", BackpackItemRegistry.BLACK_MEDIUM_BACKPACK),
-                Map.entry("BLACK_3", BackpackItemRegistry.BLACK_LARGE_BACKPACK),
-
-                Map.entry("PURPLE_1", BackpackItemRegistry.PURPLE_SMALL_BACKPACK),
-                Map.entry("PURPLE_2", BackpackItemRegistry.PURPLE_MEDIUM_BACKPACK),
-                Map.entry("PURPLE_3", BackpackItemRegistry.PURPLE_LARGE_BACKPACK)
-        );
+       return getDefaultBackpack(size);
     }
 
     public static Item getColoredBackpack(DyeColor color, int size) {
         Item item;
         if (color != null)
-            item = getBackpackMap().getOrDefault(color.name() + "_" + size, getDefaultBackpack(size));
+            item = getBackpackMap(color, size);
         else item = getDefaultBackpack(size);
         return item;
     }
 
     public static Item getDefaultBackpack(int size) {
         return switch (size) {
-            case 1 -> BackpackItemRegistry.SMALL_BACKPACK;
-            case 2 -> BackpackItemRegistry.MEDIUM_BACKPACK;
-            default -> BackpackItemRegistry.LARGE_BACKPACK;
+            case 1 -> BackpackItemRegistry.SMALL.get(DyeColor.BROWN);
+            case 2 -> BackpackItemRegistry.MEDIUM.get(DyeColor.BROWN);
+            default -> BackpackItemRegistry.LARGE.get(DyeColor.BROWN);
         };
     }
 

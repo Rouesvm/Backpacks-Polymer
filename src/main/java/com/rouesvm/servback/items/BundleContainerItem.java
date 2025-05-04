@@ -11,14 +11,15 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ClickType;
+import net.minecraft.util.DyeColor;
 
 import java.util.UUID;
 
 import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 
 public class BundleContainerItem extends ContainerItem {
-    public BundleContainerItem(String name, int slots) {
-        super(name, slots);
+    public BundleContainerItem(String name, int slots, DyeColor color) {
+        super(name, slots, color);
     }
 
     @Override

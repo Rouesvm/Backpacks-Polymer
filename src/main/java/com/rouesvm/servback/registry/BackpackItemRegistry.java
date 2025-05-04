@@ -10,58 +10,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.DyeColor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.rouesvm.servback.Main.configuration;
 
 public class BackpackItemRegistry {
-    // how do I read this
-    public static final Item SMALL_BACKPACK = register(new BundleContainerItem("small", configuration.getInstance().small_backpack_size));
-    public static final Item BLACK_SMALL_BACKPACK = register(new BundleContainerItem("black_small", configuration.getInstance().small_backpack_size));
-    public static final Item BLUE_SMALL_BACKPACK = register(new BundleContainerItem("blue_small", configuration.getInstance().small_backpack_size));
-    public static final Item CYAN_SMALL_BACKPACK = register(new BundleContainerItem("cyan_small", configuration.getInstance().small_backpack_size));
-    public static final Item GREEN_SMALL_BACKPACK = register(new BundleContainerItem("green_small", configuration.getInstance().small_backpack_size));
-    public static final Item LIGHT_BLUE_SMALL_BACKPACK = register(new BundleContainerItem("light_blue_small", configuration.getInstance().small_backpack_size));
-    public static final Item LIGHT_GRAY_SMALL_BACKPACK = register(new BundleContainerItem("light_gray_small", configuration.getInstance().small_backpack_size));
-    public static final Item LIME_SMALL_BACKPACK = register(new BundleContainerItem("lime_small", configuration.getInstance().small_backpack_size));
-    public static final Item MAGENTA_SMALL_BACKPACK = register(new BundleContainerItem("magenta_small", configuration.getInstance().small_backpack_size));
-    public static final Item ORANGE_SMALL_BACKPACK = register(new BundleContainerItem("orange_small", configuration.getInstance().small_backpack_size));
-    public static final Item PINK_SMALL_BACKPACK = register(new BundleContainerItem("pink_small", configuration.getInstance().small_backpack_size));
-    public static final Item PURPLE_SMALL_BACKPACK = register(new BundleContainerItem("purple_small", configuration.getInstance().small_backpack_size));
-    public static final Item RED_SMALL_BACKPACK = register(new BundleContainerItem("red_small", configuration.getInstance().small_backpack_size));
-    public static final Item WHITE_SMALL_BACKPACK = register(new BundleContainerItem("white_small", configuration.getInstance().small_backpack_size));
-    public static final Item YELLOW_SMALL_BACKPACK = register(new BundleContainerItem("yellow_small", configuration.getInstance().small_backpack_size));
-
-    public static final Item MEDIUM_BACKPACK = register(new BundleContainerItem("medium", configuration.getInstance().medium_backpack_size));
-    public static final Item BLACK_MEDIUM_BACKPACK = register(new BundleContainerItem("black_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item BLUE_MEDIUM_BACKPACK = register(new BundleContainerItem("blue_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item CYAN_MEDIUM_BACKPACK = register(new BundleContainerItem("cyan_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item GREEN_MEDIUM_BACKPACK = register(new BundleContainerItem("green_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item LIGHT_BLUE_MEDIUM_BACKPACK = register(new BundleContainerItem("light_blue_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item LIGHT_GRAY_MEDIUM_BACKPACK = register(new BundleContainerItem("light_gray_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item LIME_MEDIUM_BACKPACK = register(new BundleContainerItem("lime_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item MAGENTA_MEDIUM_BACKPACK = register(new BundleContainerItem("magenta_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item ORANGE_MEDIUM_BACKPACK = register(new BundleContainerItem("orange_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item PINK_MEDIUM_BACKPACK = register(new BundleContainerItem("pink_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item PURPLE_MEDIUM_BACKPACK = register(new BundleContainerItem("purple_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item RED_MEDIUM_BACKPACK = register(new BundleContainerItem("red_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item WHITE_MEDIUM_BACKPACK = register(new BundleContainerItem("white_medium", configuration.getInstance().medium_backpack_size));
-    public static final Item YELLOW_MEDIUM_BACKPACK = register(new BundleContainerItem("yellow_medium", configuration.getInstance().medium_backpack_size));
-
-    public static final Item LARGE_BACKPACK = register(new BundleContainerItem("large", configuration.getInstance().large_backpack_size));
-    public static final Item BLACK_LARGE_BACKPACK = register(new BundleContainerItem("black_large", configuration.getInstance().large_backpack_size));
-    public static final Item BLUE_LARGE_BACKPACK = register(new BundleContainerItem("blue_large", configuration.getInstance().large_backpack_size));
-    public static final Item CYAN_LARGE_BACKPACK = register(new BundleContainerItem("cyan_large", configuration.getInstance().large_backpack_size));
-    public static final Item GREEN_LARGE_BACKPACK = register(new BundleContainerItem("green_large", configuration.getInstance().large_backpack_size));
-    public static final Item LIGHT_BLUE_LARGE_BACKPACK = register(new BundleContainerItem("light_blue_large", configuration.getInstance().large_backpack_size));
-    public static final Item LIGHT_GRAY_LARGE_BACKPACK = register(new BundleContainerItem("light_gray_large", configuration.getInstance().large_backpack_size));
-    public static final Item LIME_LARGE_BACKPACK = register(new BundleContainerItem("lime_large", configuration.getInstance().large_backpack_size));
-    public static final Item MAGENTA_LARGE_BACKPACK = register(new BundleContainerItem("magenta_large", configuration.getInstance().large_backpack_size));
-    public static final Item ORANGE_LARGE_BACKPACK = register(new BundleContainerItem("orange_large", configuration.getInstance().large_backpack_size));
-    public static final Item PINK_LARGE_BACKPACK = register(new BundleContainerItem("pink_large", configuration.getInstance().large_backpack_size));
-    public static final Item PURPLE_LARGE_BACKPACK = register(new BundleContainerItem("purple_large", configuration.getInstance().large_backpack_size));
-    public static final Item RED_LARGE_BACKPACK = register(new BundleContainerItem("red_large", configuration.getInstance().large_backpack_size));
-    public static final Item WHITE_LARGE_BACKPACK = register(new BundleContainerItem("white_large", configuration.getInstance().large_backpack_size));
-    public static final Item YELLOW_LARGE_BACKPACK = register(new BundleContainerItem("yellow_large", configuration.getInstance().large_backpack_size));
+    public static Map<DyeColor, Item> SMALL = new HashMap<>(DyeColor.values().length);
+    public static Map<DyeColor, Item> MEDIUM = new HashMap<>(DyeColor.values().length);
+    public static Map<DyeColor, Item> LARGE = new HashMap<>(DyeColor.values().length);
 
     public static final Item ENDER_BACKPACK = register(new GuiItem("ender") {
         @Override
@@ -80,5 +39,20 @@ public class BackpackItemRegistry {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 
-    public static void initialize() {}
+    public static void initialize() {
+        for (DyeColor color : DyeColor.values()) {
+            String name = color.name().toLowerCase() + "_";
+
+            if (color == DyeColor.GRAY) continue;
+            if (color == DyeColor.BROWN) name = "";
+
+            SMALL.put(color, register(new BundleContainerItem(name + "small", configuration.getInstance().small_backpack_size, color)));
+            MEDIUM.put(color, register(new BundleContainerItem(name + "medium", configuration.getInstance().medium_backpack_size, color)));
+            LARGE.put(color, register(new BundleContainerItem(name + "large", configuration.getInstance().large_backpack_size, color)));
+        }
+
+        SMALL.put(DyeColor.LIGHT_GRAY, SMALL.get(DyeColor.LIGHT_GRAY));
+        MEDIUM.put(DyeColor.LIGHT_GRAY, MEDIUM.get(DyeColor.LIGHT_GRAY));
+        LARGE.put(DyeColor.LIGHT_GRAY, LARGE.get(DyeColor.LIGHT_GRAY));
+    }
 }

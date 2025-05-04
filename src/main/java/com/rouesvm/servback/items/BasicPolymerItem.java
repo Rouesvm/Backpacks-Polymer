@@ -5,14 +5,11 @@ import com.rouesvm.servback.utils.bedrock.BedrockItem;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Rarity;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -30,16 +27,6 @@ public class BasicPolymerItem extends Item implements PolymerItem, PolymerClient
     public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
         if (Main.isBedrock(packetContext.getPlayer())) return this;
         return this.vanillaItem;
-    }
-
-    @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
-        ItemStack stack = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
-        if (Main.isBedrock(context.getPlayer())) {
-            stack.set(DataComponentTypes.RARITY, Rarity.UNCOMMON);
-            return stack;
-        }
-        return stack;
     }
 
     @Override

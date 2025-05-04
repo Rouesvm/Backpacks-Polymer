@@ -1,20 +1,19 @@
 {
   "model": {
-    "type": "minecraft:composite",
-    "models": [
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "cases": [
       {
-        "type": "minecraft:condition",
-        "property": "minecraft:custom_model_data",
-        "index": 1,
-        "on_true": {
-          "type": "minecraft:model",
-          "model": "serverbackpacks:item/model/backpack"
-        },
-        "on_false": {
+        "when": "model",
+        "model": {
           "type": "minecraft:model",
           "model": "serverbackpacks:item/model/backpack"
         }
       }
-    ]
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "serverbackpacks:item/large"
+    }
   }
 }

@@ -4,9 +4,7 @@ import com.rouesvm.servback.compat.geyser.BackpackGeyser;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.config.commands.BackpackCommands;
-import com.rouesvm.servback.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.registry.BackpackItemGroup;
-import com.rouesvm.servback.registry.BackpackItemRegistry;
+import com.rouesvm.servback.registry.*;
 import com.rouesvm.servback.ui.inventory.BaseInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -43,6 +41,9 @@ public class Main implements ModInitializer {
 		PolymerResourcePackUtils.markAsRequired();
 
 		BackpackDataComponentTypes.initialize();
+
+		BackpackBlockEntityRegistry.initialize();
+		BackpackBlockRegistry.initialize();
 
 		BackpackItemRegistry.initialize();
 		BackpackItemGroup.initialize();

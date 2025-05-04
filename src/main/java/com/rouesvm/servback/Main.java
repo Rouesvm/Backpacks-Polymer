@@ -39,7 +39,6 @@ public class Main implements ModInitializer {
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
 
-
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
@@ -48,11 +47,10 @@ public class Main implements ModInitializer {
 		BackpackItemRegistry.initialize();
 		BackpackItemGroup.initialize();
 
+		CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> BackpackCommands.init(dispatcher));
+
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
-		if (hasTrinketLoaded) {
-			BackpackTrinket.initialize();
-			CommandRegistrationCallback.EVENT.register(BackpackCommands::init);
-		}
+		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);

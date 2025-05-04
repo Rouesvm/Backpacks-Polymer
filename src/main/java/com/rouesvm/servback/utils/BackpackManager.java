@@ -73,6 +73,14 @@ public class BackpackManager {
         return uuid;
     }
 
+    public static BackpackInstance getInstance(UUID uuid) {
+        BackpackManager manager = getManager();
+        if (manager.hasBackpack(uuid)) {
+            return manager.storedInstances.get(uuid);
+        }
+        return null;
+    }
+
     public static BackpackInstance getInstance(UUID uuid, int slots) {
         BackpackManager manager = getManager();
         if (manager.hasBackpack(uuid)) {

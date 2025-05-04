@@ -28,8 +28,6 @@ public class BackpackGui extends SimpleGui {
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
         super(getHandler(instance.getInventory().size()), player, false);
 
-        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
-
         this.stack = stack;
 
         this.backpackInstance = instance;
@@ -38,18 +36,16 @@ public class BackpackGui extends SimpleGui {
         this.size = this.backpackInstance.getInventory().size();
         if (this.size > (9*6)) this.size = 9 * 6;
 
-        convertComponentToBackpackData();
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
 
-        if (stack.getCustomName() != null) {
+        if (this.stack != null) {
+            stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
             this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
                     .append(" (")
-                    .append(stack.getCustomName())
+                    .append(stack.getName())
                     .append(")"));
-        } else {
-            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
-                    .append(" (")
-                    .append(stack.getItemName())
-                    .append(")"));
+
+            convertComponentToBackpackData();
         }
 
         this.fillChest();
@@ -71,18 +67,12 @@ public class BackpackGui extends SimpleGui {
     }
 
     public void afterOpened() {
-        for (int k = 0; k < 9; ++k) {
-            int index = k + (9 * 4 + this.size) - 9;
-            if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
-                this.stackIndex = index;
-                break;
-            }
-        }
+        if (stack != null) lockSlot();
 
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
                 BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override
@@ -92,11 +82,23 @@ public class BackpackGui extends SimpleGui {
         });
     }
 
+    private void lockSlot() {
+        for(int j = 0; j <= 3; ++j) {
+            for(int k = 0; k < 9; ++k) {
+                final int index = j == 0 ? k + (9 * 4 + this.size) - 9 : this.size + (k + j * 9) - 9 ;
+                if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
+                    this.stackIndex = index;
+                    break;
+                }
+            }
+        }
+    }
+
     @Override
     public void onClose() {
         BackpackManager manager = BackpackManager.getManager();
         manager.save(this.getPlayer().getServer());
-        stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
+        if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
     }
 
     @Override

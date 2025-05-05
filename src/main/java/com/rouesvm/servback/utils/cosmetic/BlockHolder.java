@@ -1,8 +1,8 @@
 package com.rouesvm.servback.utils.cosmetic;
 
+import com.rouesvm.servback.blocks.BackpackBlockEntity;
 import com.rouesvm.servback.blocks.BasicPolymerBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
@@ -20,8 +20,12 @@ import java.util.List;
 
 public class BlockHolder extends ElementHolder {
     public ItemDisplayElement main;
+    public BlockPos pos;
+    public ServerWorld world;
 
-    public BlockHolder(BlockState state, BlockPos pos) {
+    public boolean alreadySetItem = false;
+
+    public BlockHolder(ServerWorld world, BlockState state, BlockPos pos) {
         this.main = new ItemDisplayElement();
         this.main.setDisplaySize(1, 1);
         this.main.setTranslation(new Vector3f(-0.03F, -0.125F, 0F));
@@ -29,12 +33,20 @@ public class BlockHolder extends ElementHolder {
         this.main.setItemDisplayContext(ItemDisplayContext.FIXED);
         this.main.ignorePositionUpdates();
         this.addElement(main);
+
+        this.world = world;
+        this.pos = pos;
     }
 
-    public static BlockHolder createDisplay(BlockState state, BlockPos blockPos, ServerWorld world) {
-        var model = new BlockHolder(state, blockPos);
-        ChunkAttachment.ofTicking(model, world, blockPos);
-        return model;
+    @Override
+    protected void onTick() {
+        if (!alreadySetItem & world != null) {
+            BackpackBlockEntity blockEntity = (BackpackBlockEntity) world.getBlockEntity(pos);
+            if (blockEntity != null) {
+                this.setMain(blockEntity.getItemStack().getItem());
+                alreadySetItem = true;
+            }
+        }
     }
 
     @Override
@@ -54,7 +66,6 @@ public class BlockHolder extends ElementHolder {
         ItemStack stack = item.getDefaultStack();
         CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
         stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
-        System.out.println(item);
         this.main.setItem(stack);
     }
 }

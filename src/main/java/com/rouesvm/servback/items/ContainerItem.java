@@ -8,37 +8,36 @@ import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.*;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public class ContainerItem extends GuiItem {
+public class ContainerItem extends BasicPolymerBlockItem {
     public final int slots;
     private final DyeColor color;
 
     public ContainerItem(String name, int slots, DyeColor color) {
-        super(name);
-        System.out.println(color);
-
+        super(name, Items.LEATHER, BackpackBlockRegistry.BACKPACK);
         this.slots = slots;
         this.color = color;
     }
@@ -75,43 +74,83 @@ public class ContainerItem extends GuiItem {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getPlayer() instanceof ServerPlayerEntity player && player.isSneaking()) {
-            BlockState state = BackpackBlockRegistry.BACKPACK.getDefaultState();
-            ServerWorld world = (ServerWorld) context.getWorld();
+    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
 
-            BlockPos pos = context.getBlockPos();
+        var cast = player.raycast(5,0,false);
+        if (!(player instanceof ServerPlayerEntity serverPlayer))
+            return ActionResult.PASS;
+        if (player.isSneaking())
+            return ActionResult.PASS;
+        if (cast.getType() == HitResult.Type.BLOCK)
+            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
-            state = state.with(HorizontalFacingBlock.FACING, player.getHorizontalFacing());
-
-            boolean success = false;
-
-            if (world.getBlockState(context.getBlockPos()).isIn(BlockTags.REPLACEABLE) && world.canPlace(state, context.getBlockPos(), ShapeContext.ofPlacement(player))) {
-                world.setBlockState(pos, state);
-                success = true;
-            } else if (world.canPlace(state, context.getBlockPos().up(), ShapeContext.ofPlacement(player))) {
-                pos = pos.up();
-                world.setBlockState(pos, state);
-                success = true;
-            }
-
-            if (success) {
-                BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
-                entity.setUuid(BackpackManager.getStackUUID(context.getStack()));
-                entity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
-                entity.setSize(slots);
-                entity.setColor(color);
-                entity.createVisual(state, pos, world);
-
-                context.getStack().copyAndEmpty();
-                return ActionResult.CONSUME;
-            }
-        }
-        return super.useOnBlock(context);
+        openGui(serverPlayer, stack);
+        player.swingHand(hand, true);
+        return ActionResult.SUCCESS;
     }
 
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer))
+            return ActionResult.PASS;
+        if (serverPlayer.isSneaking())
+            return super.useOnBlock(context);
+
+        openGui(serverPlayer, context.getStack());
+        serverPlayer.swingHand(context.getHand(), true);
+        return ActionResult.SUCCESS;
+    }
 
     @Override
+    public ActionResult place(ItemPlacementContext context) {
+        if (!this.getBlock().isEnabled(context.getWorld().getEnabledFeatures())) {
+            return ActionResult.FAIL;
+        } else if (!context.canPlace()) {
+            return ActionResult.FAIL;
+        } else {
+            ItemPlacementContext itemPlacementContext = this.getPlacementContext(context);
+            if (itemPlacementContext == null) {
+                return ActionResult.FAIL;
+            } else {
+                BlockState blockState = this.getPlacementState(itemPlacementContext);
+                if (blockState == null) {
+                    return ActionResult.FAIL;
+                } else if (!this.place(itemPlacementContext, blockState)) {
+                    return ActionResult.FAIL;
+                } else {
+                    BlockPos blockPos = itemPlacementContext.getBlockPos();
+                    World world = itemPlacementContext.getWorld();
+                    PlayerEntity playerEntity = itemPlacementContext.getPlayer();
+                    ItemStack itemStack = itemPlacementContext.getStack();
+                    BlockState blockState2 = world.getBlockState(blockPos);
+
+                    if (blockState2.isOf(blockState.getBlock())) {
+                        this.postPlacement(blockPos, world, playerEntity, itemStack, blockState2);
+                        blockState2.getBlock().onPlaced(world, blockPos, blockState2, playerEntity, itemStack);
+
+                        if (world.getBlockEntity(blockPos) instanceof BackpackBlockEntity blockEntity) {
+                            blockEntity.setUuid(BackpackManager.getStackUUID(context.getStack()));
+                            blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
+                            blockEntity.setSize(slots);
+                            blockEntity.setColor(color);
+                        }
+
+                        if (playerEntity instanceof ServerPlayerEntity) {
+                            Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)playerEntity, blockPos, itemStack);
+                        }
+                    }
+
+                    BlockSoundGroup blockSoundGroup = blockState2.getSoundGroup();
+                    world.playSound(playerEntity, blockPos, this.getPlaceSound(blockState2), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0F) / 2.0F, blockSoundGroup.getPitch() * 0.8F);
+                    world.emitGameEvent(GameEvent.BLOCK_PLACE, blockPos, GameEvent.Emitter.of(playerEntity, blockState2));
+                    itemStack.decrementUnlessCreative(1, playerEntity);
+                    return ActionResult.SUCCESS;
+                }
+            }
+        }
+    }
+
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         onOpen(player, stack);
 

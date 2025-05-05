@@ -4,6 +4,9 @@ import com.rouesvm.servback.Main;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.utils.cosmetic.BlockHolder;
+import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -20,32 +23,26 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvider {
+public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder {
     public BackpackBlock(String name) {
         super(Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, name))));
+    }
+
+    @Override
+    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return new BlockHolder(world, initialBlockState, pos);
+    }
+
+    @Override
+    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return true;
     }
 
     @Override
     public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (!world.isClient) {
             BackpackBlockEntity entity = (BackpackBlockEntity) blockEntity;
-
-            if (entity != null && entity.holder != null) {
-                ItemStack stack = entity.holder.getItem();
-                dropStack(world, pos, stack);
-
-                entity.holder.destroy();
-            }
-        }
-    }
-
-    @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!world.isClient) {
-            BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
-            if (entity != null && entity.holder != null) {
-                entity.createVisual(state, pos, (ServerWorld) world);
-            }
+            if (entity != null) dropStack(world, pos, entity.getItemStack());
         }
     }
 

@@ -2,12 +2,12 @@ package com.rouesvm.servback.blocks;
 
 import com.rouesvm.servback.items.ContainerItem;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
-import com.rouesvm.servback.utils.cosmetic.BlockHolder;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
@@ -20,15 +20,8 @@ public class BackpackBlockEntity extends BlockEntity {
 
     private DyeColor color;
 
-    public BlockHolder holder;
-
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
-    }
-
-    public void createVisual(BlockState state, BlockPos pos, ServerWorld world) {
-        this.holder = BlockHolder.createDisplay(state, pos, world);
-        holder.setMain(ContainerItem.getColoredBackpack(getColor(), getSize()));
     }
 
     @Override
@@ -38,7 +31,6 @@ public class BackpackBlockEntity extends BlockEntity {
         nbt.putInt("size", size);
         nbt.putInt("extraSize", extraSize);
         nbt.putString("uuid", uuid.toString());
-
     }
 
     @Override
@@ -48,6 +40,12 @@ public class BackpackBlockEntity extends BlockEntity {
         size = nbt.getInt("size", 9);
         extraSize = nbt.getInt("extraSize", 0);
         uuid = UUID.fromString(nbt.getString("uuid", UUID.randomUUID().toString()));
+    }
+
+    public ItemStack getItemStack() {
+        ItemStack stack = ContainerItem.getColoredBackpack(color, size).getDefaultStack();
+        stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
+        return stack;
     }
 
     public UUID getUuid() {

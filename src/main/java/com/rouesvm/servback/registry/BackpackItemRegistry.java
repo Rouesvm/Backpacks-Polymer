@@ -1,5 +1,6 @@
 package com.rouesvm.servback.registry;
 
+import com.rouesvm.servback.items.BasicPolymerBlockItem;
 import com.rouesvm.servback.items.BasicPolymerItem;
 import com.rouesvm.servback.items.BundleContainerItem;
 import com.rouesvm.servback.items.GuiItem;
@@ -36,6 +37,10 @@ public class BackpackItemRegistry {
     });
 
     public static Item register(BasicPolymerItem item) {
+        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
+    }
+
+    public static Item register(BasicPolymerBlockItem item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 

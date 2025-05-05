@@ -20,6 +20,15 @@ public class BackpackTrinket implements Trinket {
     }
 
     @Override
+    public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
+        if (!Main.configuration.getInstance().display_back) return;
+
+        if (entity instanceof ServerPlayerEntity player && CosmeticManager.getManager().getInstance(player) == null) {
+            CosmeticManager.getManager().getOrCreateInstance(player, stack);
+        }
+    }
+
+    @Override
     public void onEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
         if (!Main.configuration.getInstance().display_back) return;
 

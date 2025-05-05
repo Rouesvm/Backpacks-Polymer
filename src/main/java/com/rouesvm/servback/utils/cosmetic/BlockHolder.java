@@ -10,6 +10,8 @@ import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Vector3f;
@@ -37,14 +39,22 @@ public class BlockHolder extends ElementHolder {
 
     @Override
     public void destroy() {
+        for (ServerPlayNetworkHandler player : this.getWatchingPlayers()) {
+            player.sendPacket(new EntitiesDestroyS2CPacket(this.getEntityIds()));
+        }
+
         super.destroy();
-        this.main.setInvisible(true);
+    }
+
+    public ItemStack getItem() {
+        return this.main.getItem();
     }
 
     public void setMain(Item item) {
         ItemStack stack = item.getDefaultStack();
         CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
         stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
+        System.out.println(item);
         this.main.setItem(stack);
     }
 }

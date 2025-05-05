@@ -8,6 +8,7 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -25,10 +26,16 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
     }
 
     @Override
-    protected void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (!world.isClient) {
-            BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
-            if (entity != null && entity.holder != null) entity.holder.destroy();
+            BackpackBlockEntity entity = (BackpackBlockEntity) blockEntity;
+
+            if (entity != null && entity.holder != null) {
+                ItemStack stack = entity.holder.getItem();
+                dropStack(world, pos, stack);
+
+                entity.holder.destroy();
+            }
         }
     }
 
@@ -36,7 +43,7 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (!world.isClient) {
             BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
-            if (entity != null) {
+            if (entity != null && entity.holder != null) {
                 entity.createVisual(state, pos, (ServerWorld) world);
             }
         }

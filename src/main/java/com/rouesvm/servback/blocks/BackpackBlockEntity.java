@@ -28,19 +28,22 @@ public class BackpackBlockEntity extends BlockEntity {
 
     public void createVisual(BlockState state, BlockPos pos, ServerWorld world) {
         this.holder = BlockHolder.createDisplay(state, pos, world);
-        holder.setMain(ContainerItem.getColoredBackpack(color, size));
+        holder.setMain(ContainerItem.getColoredBackpack(getColor(), getSize()));
     }
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        super.writeNbt(nbt, registries);
         nbt.putInt("dye", color.getIndex());
         nbt.putInt("size", size);
         nbt.putInt("extraSize", extraSize);
         nbt.putString("uuid", uuid.toString());
+
     }
 
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        super.writeNbt(nbt, registries);
         color = DyeColor.byIndex(nbt.getInt("dye", 12));
         size = nbt.getInt("size", 9);
         extraSize = nbt.getInt("extraSize", 0);
@@ -69,6 +72,10 @@ public class BackpackBlockEntity extends BlockEntity {
 
     public void setExtraSize(int extraSize) {
         this.extraSize = extraSize;
+    }
+
+    public DyeColor getColor() {
+        return color;
     }
 
     public void setColor(DyeColor color) {

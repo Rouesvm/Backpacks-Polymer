@@ -37,6 +37,8 @@ public class ContainerItem extends GuiItem {
 
     public ContainerItem(String name, int slots, DyeColor color) {
         super(name);
+        System.out.println(color);
+
         this.slots = slots;
         this.color = color;
     }
@@ -82,26 +84,32 @@ public class ContainerItem extends GuiItem {
 
             state = state.with(HorizontalFacingBlock.FACING, player.getHorizontalFacing());
 
+            boolean success = false;
+
             if (world.getBlockState(context.getBlockPos()).isIn(BlockTags.REPLACEABLE) && world.canPlace(state, context.getBlockPos(), ShapeContext.ofPlacement(player))) {
                 world.setBlockState(pos, state);
+                success = true;
             } else if (world.canPlace(state, context.getBlockPos().up(), ShapeContext.ofPlacement(player))) {
                 pos = pos.up();
                 world.setBlockState(pos, state);
+                success = true;
             }
 
-            BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
-            if (entity != null) {
+            if (success) {
+                BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
                 entity.setUuid(BackpackManager.getStackUUID(context.getStack()));
                 entity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
                 entity.setSize(slots);
                 entity.setColor(color);
                 entity.createVisual(state, pos, world);
-            }
 
-            return ActionResult.SUCCESS;
+                context.getStack().copyAndEmpty();
+                return ActionResult.CONSUME;
+            }
         }
         return super.useOnBlock(context);
     }
+
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
@@ -148,7 +156,7 @@ public class ContainerItem extends GuiItem {
     public static Item getColoredBackpack(DyeColor color, int size) {
         Item item;
         if (color != null)
-            item = getBackpackMap(color, size);
+            item = getBackpackMap(color, size / 9);
         else item = getDefaultBackpack(size);
         return item;
     }

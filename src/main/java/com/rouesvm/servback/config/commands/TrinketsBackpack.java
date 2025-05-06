@@ -2,6 +2,9 @@ package com.rouesvm.servback.config.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.ui.BackpackGui;
+import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.utils.BackpackUtils;
 import dev.emi.trinkets.api.TrinketComponent;
 import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.server.command.ServerCommandSource;
@@ -18,7 +21,9 @@ public class TrinketsBackpack {
             Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(player);
             component.ifPresent(trinketComponent -> trinketComponent.forEach((slotReference, stack) -> {
                 if (stack.getItem() instanceof ContainerItem containerItem) {
-                    containerItem.openGui(player, stack);
+                    int slots = containerItem.slots + BackpackUtils.getExtendedSlots(stack);
+                    BackpackUtils.checkEnchantments(stack, player, slots);
+                    new BackpackGui(player, null, BackpackManager.getInstance(BackpackManager.getStackUUID(stack), slots));
                 }
             }));
             return 1;

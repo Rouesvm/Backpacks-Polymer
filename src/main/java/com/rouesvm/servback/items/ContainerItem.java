@@ -95,14 +95,13 @@ public class ContainerItem extends BasicPolymerBlockItem {
         if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer))
             return ActionResult.PASS;
         if (serverPlayer.isSneaking())
-            return super.useOnBlock(context);
+            return ActionResult.PASS;
 
         openGui(serverPlayer, context.getStack());
         serverPlayer.swingHand(context.getHand(), true);
         return ActionResult.SUCCESS;
     }
 
-    @Override
     public ActionResult place(ItemPlacementContext context) {
         if (!this.getBlock().isEnabled(context.getWorld().getEnabledFeatures())) {
             return ActionResult.FAIL;

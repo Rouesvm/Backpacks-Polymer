@@ -18,7 +18,7 @@ public class BackpackBlockEntity extends BlockEntity {
     private int size = 9;
     private int extraSize = 0;
 
-    private DyeColor color;
+    private DyeColor color = DyeColor.BROWN;
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
@@ -30,7 +30,10 @@ public class BackpackBlockEntity extends BlockEntity {
         nbt.putInt("dye", color.getIndex());
         nbt.putInt("size", size);
         nbt.putInt("extraSize", extraSize);
-        nbt.putString("uuid", uuid.toString());
+
+        if (uuid != null) {
+            nbt.putString("uuid", uuid.toString());
+        }
     }
 
     @Override
@@ -43,6 +46,8 @@ public class BackpackBlockEntity extends BlockEntity {
     }
 
     public ItemStack getItemStack() {
+        if (uuid == null) return ContainerItem.getDefaultBackpack(9 * 3).getDefaultStack();
+
         ItemStack stack = ContainerItem.getColoredBackpack(color, size).getDefaultStack();
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
         return stack;

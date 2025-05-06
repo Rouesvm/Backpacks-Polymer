@@ -1,7 +1,6 @@
 package com.rouesvm.servback.items;
 
 import com.rouesvm.servback.blocks.BackpackBlockEntity;
-import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
@@ -15,7 +14,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
@@ -135,12 +133,7 @@ public class ContainerItem extends BasicPolymerBlockItem {
                             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
                             blockEntity.setSize(slots);
                             blockEntity.setColor(color);
-
-                            NbtCompound nbtCompound = new NbtCompound();
-                            Text name = itemStack.get(DataComponentTypes.ITEM_NAME);
-                            if (name != null) nbtCompound.putString("custom_name", name.getString());
-
-                            setBlockEntityData(itemStack, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, nbtCompound);
+                            blockEntity.setCustomName(itemStack.getName());
                         }
 
                         if (playerEntity instanceof ServerPlayerEntity) {

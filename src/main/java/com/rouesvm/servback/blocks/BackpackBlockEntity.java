@@ -21,7 +21,7 @@ public class BackpackBlockEntity extends BlockEntity {
     private int extraSize = 0;
 
     private DyeColor color = DyeColor.BROWN;
-    private String customName = "";
+    private Text customName = Text.of("");
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
@@ -33,7 +33,6 @@ public class BackpackBlockEntity extends BlockEntity {
         nbt.putInt("dye", color.getIndex());
         nbt.putInt("size", size);
         nbt.putInt("extraSize", extraSize);
-        nbt.putString("custom_name", customName);
 
         if (uuid != null) {
             nbt.putString("uuid", uuid.toString());
@@ -47,7 +46,6 @@ public class BackpackBlockEntity extends BlockEntity {
         size = nbt.getInt("size", 9);
         extraSize = nbt.getInt("extraSize", 0);
         uuid = UUID.fromString(nbt.getString("uuid", UUID.randomUUID().toString()));
-        customName = nbt.getString("custom_name", "");
     }
 
     public ItemStack getItemStack() {
@@ -55,7 +53,9 @@ public class BackpackBlockEntity extends BlockEntity {
 
         ItemStack stack = ContainerItem.getColoredBackpack(color, size).getDefaultStack();
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
-        if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(customName));
+        if (customName != stack.getName()) {
+            stack.set(DataComponentTypes.CUSTOM_NAME, customName);
+        }
 
         return stack;
     }
@@ -86,5 +86,9 @@ public class BackpackBlockEntity extends BlockEntity {
 
     public void setColor(DyeColor color) {
         this.color = color;
+    }
+
+    public void setCustomName(Text customName) {
+        this.customName = customName;
     }
 }

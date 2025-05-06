@@ -7,7 +7,7 @@
         "when": "model",
         "model": {
           "type": "minecraft:model",
-          "model": "serverbackpacks:item/model/backpack"
+          "model": "serverbackpacks:item/model/large"
         }
       }
     ],

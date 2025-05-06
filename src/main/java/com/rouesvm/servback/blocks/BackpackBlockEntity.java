@@ -84,10 +84,6 @@ public class BackpackBlockEntity extends BlockEntity {
         this.extraSize = extraSize;
     }
 
-    public DyeColor getColor() {
-        return color;
-    }
-
     public void setColor(DyeColor color) {
         this.color = color;
     }

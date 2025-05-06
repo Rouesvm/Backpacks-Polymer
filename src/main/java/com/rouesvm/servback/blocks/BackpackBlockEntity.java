@@ -5,9 +5,11 @@ import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
@@ -19,6 +21,7 @@ public class BackpackBlockEntity extends BlockEntity {
     private int extraSize = 0;
 
     private DyeColor color = DyeColor.BROWN;
+    private String customName = "";
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
@@ -30,6 +33,7 @@ public class BackpackBlockEntity extends BlockEntity {
         nbt.putInt("dye", color.getIndex());
         nbt.putInt("size", size);
         nbt.putInt("extraSize", extraSize);
+        nbt.putString("custom_name", customName);
 
         if (uuid != null) {
             nbt.putString("uuid", uuid.toString());
@@ -43,6 +47,7 @@ public class BackpackBlockEntity extends BlockEntity {
         size = nbt.getInt("size", 9);
         extraSize = nbt.getInt("extraSize", 0);
         uuid = UUID.fromString(nbt.getString("uuid", UUID.randomUUID().toString()));
+        customName = nbt.getString("custom_name", "");
     }
 
     public ItemStack getItemStack() {
@@ -50,6 +55,8 @@ public class BackpackBlockEntity extends BlockEntity {
 
         ItemStack stack = ContainerItem.getColoredBackpack(color, size).getDefaultStack();
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
+        if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(customName));
+
         return stack;
     }
 

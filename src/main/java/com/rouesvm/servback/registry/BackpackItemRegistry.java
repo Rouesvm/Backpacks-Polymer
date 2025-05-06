@@ -44,6 +44,11 @@ public class BackpackItemRegistry {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 
+    // lazy
+    public static void create(Map<DyeColor, Item> itemMap, DyeColor color, String name, int size) {
+        itemMap.put(color, register(new BundleContainerItem(name, size, color)));
+    }
+
     public static void initialize() {
         for (DyeColor color : DyeColor.values()) {
             String name = color.name().toLowerCase() + "_";
@@ -51,9 +56,9 @@ public class BackpackItemRegistry {
             if (color == DyeColor.GRAY) continue;
             if (color == DyeColor.BROWN) name = "";
 
-            SMALL.put(color, register(new BundleContainerItem(name + "small", configuration.getInstance().small_backpack_size, color)));
-            MEDIUM.put(color, register(new BundleContainerItem(name + "medium", configuration.getInstance().medium_backpack_size, color)));
-            LARGE.put(color, register(new BundleContainerItem(name + "large", configuration.getInstance().large_backpack_size, color)));
+            create(SMALL, color, name + "small", configuration.getInstance().small_backpack_size);
+            create(MEDIUM, color, name + "medium", configuration.getInstance().medium_backpack_size);
+            create(LARGE, color, name + "large", configuration.getInstance().large_backpack_size);
         }
 
         SMALL.put(DyeColor.LIGHT_GRAY, SMALL.get(DyeColor.LIGHT_GRAY));

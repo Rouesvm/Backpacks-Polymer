@@ -1,8 +1,8 @@
 package com.rouesvm.servback.registry;
 
 import com.rouesvm.servback.Main;
-import com.rouesvm.servback.blocks.BackpackBlock;
-import com.rouesvm.servback.blocks.BasicPolymerBlock;
+import com.rouesvm.servback.block.BackpackBlock;
+import com.rouesvm.servback.block.BasicPolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;

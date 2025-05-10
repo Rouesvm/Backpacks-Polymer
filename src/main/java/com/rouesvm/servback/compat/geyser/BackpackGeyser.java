@@ -1,8 +1,10 @@
 package com.rouesvm.servback.compat.geyser;
 
+import com.rouesvm.servback.utils.bedrock.BedrockBlock;
 import com.rouesvm.servback.utils.bedrock.BedrockItem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -10,7 +12,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.geysermc.event.subscribe.Subscribe;
 import org.geysermc.geyser.api.GeyserApi;
+import org.geysermc.geyser.api.block.custom.NonVanillaCustomBlockData;
+import org.geysermc.geyser.api.block.custom.component.BoxComponent;
+import org.geysermc.geyser.api.block.custom.component.CustomBlockComponents;
+import org.geysermc.geyser.api.block.custom.component.GeometryComponent;
+import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBlockState;
+import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBoundingBox;
 import org.geysermc.geyser.api.event.EventRegistrar;
+import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomBlocksEvent;
 import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
 import org.geysermc.geyser.api.event.lifecycle.GeyserLoadResourcePacksEvent;
 import org.geysermc.geyser.api.item.custom.NonVanillaCustomItemData;
@@ -81,6 +90,47 @@ public class BackpackGeyser implements EventRegistrar {
                             .build();
                     event.register(customItemData);
                 });
+    }
+
+    @Subscribe
+    public void onGeyserDefineCustomBlocksEvent(GeyserDefineCustomBlocksEvent event) {
+        for (var entry : Registries.BLOCK.getEntrySet()) {
+            Identifier location = entry.getKey().getValue();
+            Block block = entry.getValue();
+            if (!(block instanceof BedrockBlock))
+                continue;
+
+            BoxComponent collisionBox = BoxComponent.fullBox();
+            BoxComponent selectionBox = BoxComponent.fullBox();
+
+            CustomBlockComponents components = CustomBlockComponents.builder()
+                    .collisionBox(collisionBox)
+                    .selectionBox(selectionBox)
+                    .geometry(GeometryComponent.builder()
+                            .identifier("geometry.backpack")
+                            .build())
+                    .lightEmission(block.getDefaultState().getLuminance())
+                    .lightDampening(block.getDefaultState().getOpacity())
+                    .friction(block.getSlipperiness())
+                    .build();
+
+            JavaBlockState state = JavaBlockState.builder()
+                    .identifier(location.toString())
+                    .javaId(Block.getRawIdFromState(block.getDefaultState()))
+                    .blockHardness(block.getHardness())
+                    .canBreakWithHand(true)
+                    .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
+                    .build();
+
+            NonVanillaCustomBlockData data = NonVanillaCustomBlockData.builder()
+                    .name(location.getPath())
+                    .namespace(location.getNamespace())
+                    .components(components)
+                    .build();
+
+            event.register(data);
+            event.registerOverride(state, data.defaultBlockState());
+        }
     }
 
     public static boolean isPlayerOnBedrock(ServerPlayerEntity player) {

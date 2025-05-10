@@ -1,7 +1,7 @@
 package com.rouesvm.servback.config.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.item.ContainerItem;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;

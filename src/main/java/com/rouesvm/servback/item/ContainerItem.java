@@ -1,6 +1,6 @@
-package com.rouesvm.servback.items;
+package com.rouesvm.servback.item;
 
-import com.rouesvm.servback.blocks.BackpackBlockEntity;
+import com.rouesvm.servback.block.BackpackBlockEntity;
 import com.rouesvm.servback.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
@@ -176,6 +176,10 @@ public class ContainerItem extends BasicPolymerBlockItem {
 
     public int getSize() {
         return slots / 9;
+    }
+
+    public DyeColor getColor() {
+        return color;
     }
 
     public static Item getBackpackMap(DyeColor color, int size) {

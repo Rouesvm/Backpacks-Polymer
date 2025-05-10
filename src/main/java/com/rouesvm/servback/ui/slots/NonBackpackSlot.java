@@ -1,7 +1,7 @@
 package com.rouesvm.servback.ui.slots;
 
-import com.rouesvm.servback.items.ContainerItem;
-import com.rouesvm.servback.items.GuiItem;
+import com.rouesvm.servback.item.ContainerItem;
+import com.rouesvm.servback.item.GuiItem;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;

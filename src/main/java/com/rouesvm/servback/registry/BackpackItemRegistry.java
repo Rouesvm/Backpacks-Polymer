@@ -1,9 +1,9 @@
 package com.rouesvm.servback.registry;
 
-import com.rouesvm.servback.items.BasicPolymerBlockItem;
-import com.rouesvm.servback.items.BasicPolymerItem;
-import com.rouesvm.servback.items.BundleContainerItem;
-import com.rouesvm.servback.items.GuiItem;
+import com.rouesvm.servback.item.BasicPolymerBlockItem;
+import com.rouesvm.servback.item.BasicPolymerItem;
+import com.rouesvm.servback.item.BundleContainerItem;
+import com.rouesvm.servback.item.GuiItem;
 import com.rouesvm.servback.ui.EnderBackpackGui;
 import com.rouesvm.servback.ui.GlobalBackpackGui;
 import net.minecraft.item.Item;

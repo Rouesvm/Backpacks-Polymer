@@ -1,7 +1,7 @@
 package com.rouesvm.servback.compat.trinkets;
 
 import com.rouesvm.servback.Main;
-import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.item.ContainerItem;
 import com.rouesvm.servback.utils.cosmetic.BackHolder;
 import com.rouesvm.servback.utils.cosmetic.CosmeticManager;
 import dev.emi.trinkets.api.SlotReference;
@@ -19,12 +19,15 @@ public class BackpackTrinket implements Trinket {
                 .forEach(item -> TrinketsApi.registerTrinket(item, new BackpackTrinket()));
     }
 
+
+
     @Override
     public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
         if (!Main.configuration.getInstance().display_back) return;
 
-        if (entity instanceof ServerPlayerEntity player && CosmeticManager.getManager().getInstance(player) == null) {
-            CosmeticManager.getManager().getOrCreateInstance(player, stack);
+        if (entity instanceof ServerPlayerEntity player) {
+            if (CosmeticManager.getManager().getInstance(player) == null)
+                CosmeticManager.getManager().getOrCreateInstance(player, stack);
         }
     }
 

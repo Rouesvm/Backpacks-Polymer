@@ -1,6 +1,7 @@
-package com.rouesvm.servback.blocks;
+package com.rouesvm.servback.block;
 
 import com.mojang.serialization.MapCodec;
+import com.rouesvm.servback.Main;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -21,6 +22,7 @@ public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerB
 
     @Override
     public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
+        if (Main.isBedrock(packetContext.getPlayer())) return this.getDefaultState();
         return Blocks.BARRIER.getDefaultState();
     }
 

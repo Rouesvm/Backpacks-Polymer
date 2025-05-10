@@ -1,7 +1,7 @@
 package com.rouesvm.servback.utils.cosmetic;
 
-import com.rouesvm.servback.blocks.BackpackBlockEntity;
-import com.rouesvm.servback.blocks.BasicPolymerBlock;
+import com.rouesvm.servback.block.BackpackBlockEntity;
+import com.rouesvm.servback.block.BasicPolymerBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;

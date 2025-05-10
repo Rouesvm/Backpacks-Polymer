@@ -1,7 +1,7 @@
 package com.rouesvm.servback.registry;
 
 import com.rouesvm.servback.Main;
-import com.rouesvm.servback.blocks.BackpackBlockEntity;
+import com.rouesvm.servback.block.BackpackBlockEntity;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntity;

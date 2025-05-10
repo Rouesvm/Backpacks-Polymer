@@ -1,6 +1,6 @@
 package com.rouesvm.servback.utils;
 
-import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.item.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;

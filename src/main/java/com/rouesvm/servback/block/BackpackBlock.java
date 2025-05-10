@@ -1,9 +1,10 @@
-package com.rouesvm.servback.blocks;
+package com.rouesvm.servback.block;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.utils.bedrock.BedrockBlock;
 import com.rouesvm.servback.utils.cosmetic.BlockHolder;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -23,7 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder {
+public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
     public BackpackBlock(String name) {
         super(Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, name))));
     }

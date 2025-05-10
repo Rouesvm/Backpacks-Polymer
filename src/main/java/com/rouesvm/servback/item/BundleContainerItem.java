@@ -1,4 +1,4 @@
-package com.rouesvm.servback.items;
+package com.rouesvm.servback.item;
 
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;

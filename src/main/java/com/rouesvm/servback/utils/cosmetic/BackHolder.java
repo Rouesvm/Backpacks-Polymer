@@ -1,5 +1,6 @@
 package com.rouesvm.servback.utils.cosmetic;
 
+import com.rouesvm.servback.Main;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
@@ -7,6 +8,8 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import eu.pb4.polymer.virtualentity.impl.EntityExt;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -21,9 +24,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.Objects;
 
 public class BackHolder extends ElementHolder {
+    private final boolean model3D = Main.configuration.getInstance().display_3d_model_on_back;
+
     private final LivingEntity entity;
     private final ItemDisplayElement element;
 
@@ -35,6 +41,11 @@ public class BackHolder extends ElementHolder {
 
         this.entity = entity;
         this.element = new ItemDisplayElement();
+
+        if (model3D) {
+            CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
+        }
 
         this.element.setItem(stack);
 
@@ -89,14 +100,25 @@ public class BackHolder extends ElementHolder {
                 hidden = false;
             }
 
-            this.element.setYaw(entity.bodyYaw);
-            this.element.setPitch(this.entity.isSneaking() ? 25 : 0);
+            boolean sneaking = this.entity.isSneaking();
+
+            this.element.setYaw(model3D ? entity.getBodyYaw() - 180 : entity.getBodyYaw());
+            this.element.setPitch(model3D ? sneaking ? -25 : 0 : sneaking ? 25 : 0);
+
+            float yTranslation = sneaking ? -0.6f : -0.65f;
+            float zTranslation;
 
             if (entity.getEquippedStack(EquipmentSlot.CHEST) != ItemStack.EMPTY) {
-                this.element.setTranslation(new Vector3f(0, this.entity.isSneaking() ? -0.6f : -0.65f, this.entity.isSneaking() ? -0.1f : -0.2f));
+                if (model3D)
+                    zTranslation = sneaking ? -0.225f : -0.468f;
+                else zTranslation = sneaking ? 0.120f : 0.234f;
             } else {
-                this.element.setTranslation(new Vector3f(0, this.entity.isSneaking() ? -0.6f : -0.65f, this.entity.isSneaking() ? 0f : -0.125f));
+                if (model3D)
+                    zTranslation = sneaking ? 0.120f : 0.250f;
+                else zTranslation = sneaking ? 0f : -0.125f;
             }
+
+            this.element.setTranslation(new Vector3f(0, yTranslation, zTranslation));
         }
     }
 

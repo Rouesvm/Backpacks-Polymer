@@ -1,0 +1,69 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"1": "serverbackpacks:item/model/purple_medium"
+	},
+	"elements": [
+		{
+			"from": [4.25, 9, 9],
+			"to": [12.75, 12, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 6.5, 8.5]},
+			"faces": {
+				"north": {"uv": [8.5, 6, 13, 7.5], "texture": "#1"},
+				"east": {"uv": [9, 1, 9.5, 2.5], "texture": "#1"},
+				"south": {"uv": [8.5, 7.5, 13, 9], "texture": "#1"},
+				"west": {"uv": [9, 2.5, 9.5, 4], "texture": "#1"},
+				"up": {"uv": [13.5, 0.5, 9, 0], "texture": "#1"},
+				"down": {"uv": [13.5, 0.5, 9, 1], "texture": "#1"}
+			}
+		},
+		{
+			"from": [4.25, 0, 5],
+			"to": [12.75, 12, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8.5, 6.5, 8.5]},
+			"faces": {
+				"north": {"uv": [0, 0, 4.5, 6], "texture": "#1"},
+				"east": {"uv": [0, 6, 2, 12], "texture": "#1"},
+				"south": {"uv": [4.5, 0, 9, 6], "texture": "#1"},
+				"west": {"uv": [2, 6, 4, 12], "texture": "#1"},
+				"up": {"uv": [8.5, 8, 4, 6], "texture": "#1"},
+				"down": {"uv": [8.5, 8, 4, 10], "texture": "#1"}
+			}
+		},
+		{
+			"from": [7.5, 8.75, 9.25],
+			"to": [9.5, 9.75, 10.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 8, 9]},
+			"faces": {
+				"north": {"uv": [9.5, 1, 10.5, 1.625], "texture": "#1"},
+				"east": {"uv": [9.5, 1, 10.125, 1.625], "texture": "#1"},
+				"south": {"uv": [9.5, 1, 10.5, 1.625], "texture": "#1"},
+				"west": {"uv": [9.5, 1, 10.125, 1.625], "texture": "#1"},
+				"up": {"uv": [9.5, 1, 10.5, 1.625], "texture": "#1"},
+				"down": {"uv": [9.5, 1, 10.5, 1.625], "texture": "#1"}
+			}
+		}
+	],
+	"display": {
+		"firstperson_righthand": {
+			"rotation": [-10, -25, 0],
+			"translation": [-1, 2, 0]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-10, -25, 0],
+			"translation": [-1, 2, 0]
+		},
+		"ground": {
+			"translation": [0, 2, 0],
+			"scale": [0.95, 0.95, 0.95]
+		},
+		"gui": {
+			"rotation": [25, 25, 0],
+			"translation": [0, 1, 0]
+		},
+		"fixed": {
+			"rotation": [0, 180, 0]
+		}
+	}
+}

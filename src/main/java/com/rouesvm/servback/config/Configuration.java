@@ -83,5 +83,8 @@ public class Configuration {
 
         @SerializedName("display_back")
         public boolean display_back = true;
+
+        @SerializedName("display_3d_model_on_back")
+        public boolean display_3d_model_on_back = true;
     }
 }

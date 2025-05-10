@@ -21,7 +21,7 @@ public class BackpackBlockEntity extends BlockEntity {
     private int extraSize = 0;
 
     private DyeColor color = DyeColor.BROWN;
-    private Text customName = Text.of("");
+    private Text customName;
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
@@ -53,7 +53,7 @@ public class BackpackBlockEntity extends BlockEntity {
 
         ItemStack stack = ContainerItem.getColoredBackpack(color, size).getDefaultStack();
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
-        if (customName != stack.getName()) {
+        if (customName != null) {
             stack.set(DataComponentTypes.CUSTOM_NAME, customName);
         }
 

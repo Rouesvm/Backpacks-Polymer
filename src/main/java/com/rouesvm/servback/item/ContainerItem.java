@@ -15,7 +15,6 @@ import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -135,7 +134,10 @@ public class ContainerItem extends BasicPolymerBlockItem{
                             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
                             blockEntity.setSize(slots);
                             blockEntity.setColor(color);
-                            blockEntity.setCustomName(itemStack.getName());
+
+                            if (itemStack.getCustomName() != null) {
+                                blockEntity.setCustomName(itemStack.getCustomName());
+                            }
                         }
 
                         if (playerEntity instanceof ServerPlayerEntity) {
@@ -143,8 +145,11 @@ public class ContainerItem extends BasicPolymerBlockItem{
                         }
                     }
 
-                    BlockSoundGroup blockSoundGroup = blockState2.getSoundGroup();
-                    world.playSound(playerEntity, blockPos, this.getPlaceSound(blockState2), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0F) / 2.0F, blockSoundGroup.getPitch() * 0.8F);
+                    if (playerEntity != null)
+                        playerEntity.playSoundToPlayer(SoundEvents.BLOCK_WOOL_PLACE, SoundCategory.BLOCKS,
+                                1,
+                                0.5F * context.getWorld().getRandom().nextFloat() * 0.8F);
+
                     world.emitGameEvent(GameEvent.BLOCK_PLACE, blockPos, GameEvent.Emitter.of(playerEntity, blockState2));
                     itemStack.decrementUnlessCreative(1, playerEntity);
                     return ActionResult.SUCCESS;

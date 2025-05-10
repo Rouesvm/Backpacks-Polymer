@@ -1,6 +1,7 @@
 package com.rouesvm.servback.block;
 
 import com.rouesvm.servback.Main;
+import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackManager;
@@ -52,6 +53,14 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
         if (!world.isClient) {
             BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
             if (entity != null && entity.getUuid() != null) {
+                if (Main.hasTrinketLoaded && player.isSneaking()) {
+                    if (!BackpackTrinket.hasStackInBackSlot(player)) {
+                        BackpackTrinket.equipStack(player,entity.getItemStack());
+                        world.breakBlock(pos, true);
+                        return ActionResult.SUCCESS;
+                    }
+                }
+
                 new BackpackGui((ServerPlayerEntity) player, null,
                         BackpackManager.getInstance(entity.getUuid(), entity.getSize() + entity.getExtraSize()));
                 return ActionResult.SUCCESS;

@@ -32,7 +32,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public class ContainerItem extends BasicPolymerBlockItem {
+public class ContainerItem extends BasicPolymerBlockItem{
     public final int slots;
     private final DyeColor color;
 
@@ -76,6 +76,8 @@ public class ContainerItem extends BasicPolymerBlockItem {
     @Override
     public ActionResult use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
+
+        System.out.println("test");
 
         var cast = player.raycast(5,0,false);
         if (!(player instanceof ServerPlayerEntity serverPlayer))

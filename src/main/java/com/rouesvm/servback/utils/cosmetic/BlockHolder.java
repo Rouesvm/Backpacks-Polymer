@@ -29,7 +29,7 @@ public class BlockHolder extends ElementHolder {
         this.main = new ItemDisplayElement();
         this.main.setDisplaySize(1, 1);
         this.main.setTranslation(new Vector3f(-0.03F, -0.125F, 0F));
-        this.main.setYaw(-state.get(BasicPolymerBlock.FACING).getPositiveHorizontalDegrees());
+        this.main.setYaw(state.get(BasicPolymerBlock.FACING).getPositiveHorizontalDegrees());
         this.main.setItemDisplayContext(ItemDisplayContext.FIXED);
         this.main.ignorePositionUpdates();
         this.addElement(main);

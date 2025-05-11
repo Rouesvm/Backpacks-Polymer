@@ -203,6 +203,7 @@ public class ContainerItem extends BasicPolymerBlockItem{
        return getDefaultBackpack(size);
     }
 
+    // It's 1-9 (If you have slots = (9 * (size)) you do (slots / 9))
     public static Item getColoredBackpack(DyeColor color, int size) {
         return color != null ? getBackpackMap(color, size) : getDefaultBackpack(size);
     }

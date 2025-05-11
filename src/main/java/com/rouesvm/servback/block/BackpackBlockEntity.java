@@ -49,9 +49,9 @@ public class BackpackBlockEntity extends BlockEntity {
     }
 
     public ItemStack getItemStack() {
-        if (uuid == null) return ContainerItem.getDefaultBackpack(9 * 3).getDefaultStack();
+        if (uuid == null) return ContainerItem.getDefaultBackpack(3).getDefaultStack();
 
-        ItemStack stack = ContainerItem.getColoredBackpack(color, size).getDefaultStack();
+        ItemStack stack = ContainerItem.getColoredBackpack(color, size / 9).getDefaultStack();
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
         if (customName != null) {
             stack.set(DataComponentTypes.CUSTOM_NAME, customName);

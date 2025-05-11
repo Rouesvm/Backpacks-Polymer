@@ -204,11 +204,7 @@ public class ContainerItem extends BasicPolymerBlockItem{
     }
 
     public static Item getColoredBackpack(DyeColor color, int size) {
-        Item item;
-        if (color != null)
-            item = getBackpackMap(color, size / 9);
-        else item = getDefaultBackpack(size);
-        return item;
+        return color != null ? getBackpackMap(color, size) : getDefaultBackpack(size);
     }
 
     public static Item getDefaultBackpack(int size) {

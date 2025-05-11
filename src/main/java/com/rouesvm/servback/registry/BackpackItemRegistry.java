@@ -61,8 +61,8 @@ public class BackpackItemRegistry {
             create(LARGE, color, name + "large", configuration.getInstance().large_backpack_size);
         }
 
-        SMALL.put(DyeColor.LIGHT_GRAY, SMALL.get(DyeColor.LIGHT_GRAY));
-        MEDIUM.put(DyeColor.LIGHT_GRAY, MEDIUM.get(DyeColor.LIGHT_GRAY));
-        LARGE.put(DyeColor.LIGHT_GRAY, LARGE.get(DyeColor.LIGHT_GRAY));
+        SMALL.put(DyeColor.GRAY, SMALL.get(DyeColor.LIGHT_GRAY));
+        MEDIUM.put(DyeColor.GRAY, MEDIUM.get(DyeColor.LIGHT_GRAY));
+        LARGE.put(DyeColor.GRAY, LARGE.get(DyeColor.LIGHT_GRAY));
     }
 }

@@ -1,6 +1,7 @@
 package com.rouesvm.servback.utils.cosmetic;
 
 import com.rouesvm.servback.Main;
+import com.rouesvm.servback.item.ContainerItem;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
@@ -28,10 +29,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class BackHolder extends ElementHolder {
-    private final boolean model3D = Main.configuration.getInstance().display_3d_model_on_back;
-
     private final LivingEntity entity;
     private final ItemDisplayElement element;
+
+    private Vector3f cosmeticPosition = new Vector3f(0f, -0.65f, 0.28f);
+    private Integer cosmeticRotation = 0;
+    private Integer cosmeticPitchWhenSneaking = 25;
 
     private boolean hidden;
     private boolean hideFromPlayer;
@@ -42,23 +45,27 @@ public class BackHolder extends ElementHolder {
         this.entity = entity;
         this.element = new ItemDisplayElement();
 
-        if (model3D) {
-            CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
-        }
+        CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
+        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
 
         this.element.setItem(stack);
 
         this.element.setTranslation(new Vector3f(0, 0.25f, 0));
-        this.element.setScale(new Vector3f(0.625f));
+        this.element.setScale(new Vector3f(0.875f));
 
         this.element.setTeleportDuration(1);
         this.element.ignorePositionUpdates();
 
+        if (this.element.getItem().getItem() instanceof ContainerItem item) {
+            int size = item.getSize();
+            cosmeticPosition = Main.configuration.getInstance().back_positions.get(size);
+            cosmeticRotation = Main.configuration.getInstance().back_yaw.get(size);
+            cosmeticPitchWhenSneaking = Main.configuration.getInstance().back_pitch_when_sneaking.get(size);
+        }
+
         this.addElement(this.element);
     }
 
-    // copy go brrr pls don't sue me
     @Override
     protected void onTick() {
         if (this.entity.isDead() || entity.isRemoved()) {
@@ -102,20 +109,16 @@ public class BackHolder extends ElementHolder {
 
             boolean sneaking = this.entity.isSneaking();
 
-            this.element.setYaw(model3D ? entity.getBodyYaw() - 180 : entity.getBodyYaw());
-            this.element.setPitch(model3D ? sneaking ? -25 : 0 : sneaking ? 25 : 0);
+            this.element.setYaw(entity.getBodyYaw() - cosmeticRotation);
+            this.element.setPitch(sneaking ? cosmeticPitchWhenSneaking : 0);
 
-            float yTranslation = sneaking ? -0.6f : -0.65f;
+            float yTranslation = sneaking ? cosmeticPosition.y - 0.05f : cosmeticPosition.y;
             float zTranslation;
 
+            zTranslation = sneaking ? (cosmeticPosition.z - 0.16f) : (cosmeticPosition.z);
+
             if (entity.getEquippedStack(EquipmentSlot.CHEST) != ItemStack.EMPTY) {
-                if (model3D)
-                    zTranslation = sneaking ? -0.225f : -0.468f;
-                else zTranslation = sneaking ? 0.120f : 0.234f;
-            } else {
-                if (model3D)
-                    zTranslation = sneaking ? 0.120f : 0.250f;
-                else zTranslation = sneaking ? 0f : -0.125f;
+                zTranslation = zTranslation + 0.10f;
             }
 
             this.element.setTranslation(new Vector3f(0, yTranslation, zTranslation));

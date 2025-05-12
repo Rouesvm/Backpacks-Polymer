@@ -6,6 +6,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import net.fabricmc.loader.api.FabricLoader;
+import org.joml.Vector3f;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import static com.rouesvm.servback.Main.MOD_ID;
 
@@ -66,9 +68,6 @@ public class Configuration {
     }
 
     public static class Instance {
-        @SerializedName("//comment_1")
-        public String comment_1 = "Cannot be more than 54 slots";
-
         @SerializedName("small_backpack_size")
         public int small_backpack_size = 9;
 
@@ -78,13 +77,28 @@ public class Configuration {
         @SerializedName("large_backpack_size")
         public int large_backpack_size = 9 * 3;
 
-        @SerializedName("//comment_2")
-        public String comment_2 = "If enabled it will display the backpack on the back if you equipped it on the trinket back slot";
-
         @SerializedName("display_back")
         public boolean display_back = true;
 
-        @SerializedName("display_3d_model_on_back")
-        public boolean display_3d_model_on_back = true;
+        @SerializedName("back_positions")
+        public Map<Integer, Vector3f> back_positions = Map.of(
+                1, new Vector3f(0, -0.45f, 0.280f),
+                2, new Vector3f(0, -0.65f, -0.280f),
+                3, new Vector3f(0, -0.65f, 0.280f)
+        );
+
+        @SerializedName("back_yaw")
+        public Map<Integer, Integer> back_yaw = Map.of(
+                1, 180,
+                2, 0,
+                3, 180
+        );
+
+        @SerializedName("back_pitch_when_sneaking")
+        public Map<Integer, Integer> back_pitch_when_sneaking = Map.of(
+                1, -25,
+                2, 25,
+                3, -25
+        );
     }
 }

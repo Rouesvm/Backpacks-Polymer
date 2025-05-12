@@ -32,7 +32,7 @@ public class Main implements ModInitializer {
 		configuration = new Configuration(MOD_ID + ".json");
 		configuration.load();
 
-		ServerLifecycleEvents.BEFORE_SAVE.register((s, a, b) -> configuration.save());
+		ServerLifecycleEvents.BEFORE_SAVE.register((a, c, b) -> configuration.save());
 
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import org.joml.Vector3f;
 
@@ -19,11 +20,20 @@ import java.util.Map;
 import static com.rouesvm.servback.Main.MOD_ID;
 
 public class Configuration {
+    public static Configuration manager;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final File configFile;
+    private final Instance defaultInstance = new Instance();
     private Instance instance = new Instance();
 
+    public static void initialize() {
+        manager = new Configuration(MOD_ID + ".json");
+        manager.load();
+
+        ServerLifecycleEvents.BEFORE_SAVE.register((a, c, b) -> manager.save());
+    }
+    
     public Configuration(String name) {
         Path configFolder = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/");
         try {
@@ -36,8 +46,8 @@ public class Configuration {
         if (!configFile.exists()) save();
     }
 
-    public Instance getInstance() {
-        return instance;
+    public static Instance getInstance() {
+        return manager.instance;
     }
 
     public void save() {
@@ -52,17 +62,12 @@ public class Configuration {
             if (loaded != null) {
                 instance = loaded;
 
-                if (instance.small_backpack_size > 9 * 6) {
-                    instance.small_backpack_size = 9;
-                }
-
-                if (instance.medium_backpack_size > 9 * 6) {
-                    instance.medium_backpack_size = 9 * 2;
-                }
-
-                if (instance.large_backpack_size > 9 * 6) {
-                    instance.large_backpack_size = 9 * 3;
-                }
+                instance.small_backpack_size = instance.small_backpack_size > 9 * 6
+                        ? defaultInstance.small_backpack_size : instance.small_backpack_size;
+                instance.medium_backpack_size = instance.medium_backpack_size > 9 * 6
+                        ? defaultInstance.medium_backpack_size : instance.medium_backpack_size;
+                instance.large_backpack_size = instance.large_backpack_size > 9 * 6
+                        ? defaultInstance.large_backpack_size : instance.large_backpack_size;
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
     }

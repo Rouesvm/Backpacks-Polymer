@@ -39,11 +39,11 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
             }
         }
 
-        this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(MEDIUM_BACKPACKS);
-        this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(LARGE_BACKPACKS);
-
         this.getOrCreateTagBuilder(BACKPACKS).addTag(SMALL_BACKPACKS);
         this.getOrCreateTagBuilder(BACKPACKS).addTag(MEDIUM_BACKPACKS);
         this.getOrCreateTagBuilder(BACKPACKS).addTag(LARGE_BACKPACKS);
+
+        this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(MEDIUM_BACKPACKS);
+        this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(LARGE_BACKPACKS);
     }
 }

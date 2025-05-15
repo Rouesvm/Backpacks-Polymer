@@ -49,20 +49,13 @@ public class BackpackUtils {
         if (currentSize > 0) {
             int totalSlots = currentSize + maxSlots;
             if (inventory.size() != totalSlots)
-                resizeAndSaveInventory(stack, inventory, totalSlots);
+                BackpackManager.resizeInventory(BackpackManager.getStackUUID(stack), inventory, totalSlots);
             return;
         }
 
         if (inventory.size() > maxSlots)
             dropExcessItems(inventory, maxSlots, player);
-        resizeAndSaveInventory(stack, inventory, maxSlots);
-    }
-
-    public static void resizeAndSaveInventory(ItemStack stack, BackpackInventory inventory, int newSize) {
-        BackpackInventory newInventory = new BackpackInventory(newSize);
-        inventory.copyTo(newInventory);
-        UUID backpackUUID = BackpackManager.getStackUUID(stack);
-        BackpackManager.getManager().saveBackpack(backpackUUID, newInventory);
+        BackpackManager.resizeInventory(BackpackManager.getStackUUID(stack), inventory, maxSlots);
     }
 
     public static void dropExcessItems(BackpackInventory inventory, int maxSlots, ServerPlayerEntity player) {

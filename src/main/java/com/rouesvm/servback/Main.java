@@ -24,21 +24,16 @@ public class Main implements ModInitializer {
 
 	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
-
-	public static Configuration configuration;
-
+	
 	@Override
 	public void onInitialize() {
-		configuration = new Configuration(MOD_ID + ".json");
-		configuration.load();
-
-		ServerLifecycleEvents.BEFORE_SAVE.register((a, c, b) -> configuration.save());
-
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
-
+		
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
+
+		Configuration.initialize();
 
 		BackpackDataComponentTypes.initialize();
 

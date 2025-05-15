@@ -1,6 +1,6 @@
 package com.rouesvm.servback.utils.cosmetic;
 
-import com.rouesvm.servback.Main;
+import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.item.ContainerItem;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
@@ -58,9 +58,9 @@ public class BackHolder extends ElementHolder {
 
         if (this.element.getItem().getItem() instanceof ContainerItem item) {
             int size = item.getSize();
-            cosmeticPosition = Main.configuration.getInstance().back_positions.get(size);
-            cosmeticRotation = Main.configuration.getInstance().back_yaw.get(size);
-            cosmeticPitchWhenSneaking = Main.configuration.getInstance().back_pitch_when_sneaking.get(size);
+            cosmeticPosition = Configuration.getInstance().back_positions.get(size);
+            cosmeticRotation = Configuration.getInstance().back_yaw.get(size);
+            cosmeticPitchWhenSneaking = Configuration.getInstance().back_pitch_when_sneaking.get(size);
         }
 
         this.addElement(this.element);

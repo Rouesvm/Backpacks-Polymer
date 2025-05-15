@@ -31,7 +31,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public class ContainerItem extends BasicPolymerBlockItem{
+public class ContainerItem extends BasicPolymerBlockItem {
     public final int slots;
     private final DyeColor color;
 
@@ -187,31 +187,14 @@ public class ContainerItem extends BasicPolymerBlockItem{
         return color;
     }
 
-    public static Item getBackpackMap(DyeColor color, int size) {
-       switch (size) {
-           case 1 -> {
-               return BackpackItemRegistry.SMALL.get(color);
-           } case 2 -> {
-               return BackpackItemRegistry.MEDIUM.get(color);
-           } case 3 -> {
-               return BackpackItemRegistry.LARGE.get(color);
-           }
-       }
-
-       return getDefaultBackpack(size);
-    }
-
     // It's 1-9 (If you have slots = (9 * (size)) you do (slots / 9))
     public static Item getColoredBackpack(DyeColor color, int size) {
-        return color != null ? getBackpackMap(color, size) : getDefaultBackpack(size);
+        return color != null ? BackpackItemRegistry.getBackpack(color, size) : getDefaultBackpack(size);
     }
 
     public static Item getDefaultBackpack(int size) {
-        return switch (size) {
-            case 1 -> BackpackItemRegistry.SMALL.get(DyeColor.BROWN);
-            case 2 -> BackpackItemRegistry.MEDIUM.get(DyeColor.BROWN);
-            default -> BackpackItemRegistry.LARGE.get(DyeColor.BROWN);
-        };
+        Item item = BackpackItemRegistry.getBackpack(DyeColor.BROWN, size);
+        return item != null ? item : BackpackItemRegistry.getBackpack(DyeColor.BROWN, 1);
     }
 
     public static void playInsertSound(ServerPlayerEntity player) {

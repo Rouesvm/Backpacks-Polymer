@@ -15,7 +15,7 @@ import java.util.Optional;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class TrinketsBackpack {
-    public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void initialize(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("open").executes(context -> {
             ServerPlayerEntity player = context.getSource().getPlayer();
             Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(player);

@@ -10,18 +10,12 @@ import net.minecraft.util.Identifier;
 
 public class BackpackItemGroup {
     public static void addItems(Entries entries) {
-        BackpackItemRegistry.SMALL.forEach((color, item) -> {
-            if (color == DyeColor.GRAY) return;
-            entries.add(item);
-        });
-        BackpackItemRegistry.MEDIUM.forEach((color, item) -> {
-            if (color == DyeColor.GRAY) return;
-            entries.add(item);
-        });
-        BackpackItemRegistry.LARGE.forEach((color, item) -> {
-            if (color == DyeColor.GRAY) return;
-            entries.add(item);
-        });
+        for (DyeColor color : DyeColor.values()) {
+            if (color == DyeColor.GRAY) continue;
+            entries.add(BackpackItemRegistry.getBackpack(color, 1));
+            entries.add(BackpackItemRegistry.getBackpack(color, 2));
+            entries.add(BackpackItemRegistry.getBackpack(color, 3));
+        }
 
         entries.add(BackpackItemRegistry.GLOBAL_BACKPACK);
         entries.add(BackpackItemRegistry.ENDER_BACKPACK);

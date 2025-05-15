@@ -26,8 +26,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
-    public BackpackBlock(String name) {
-        super(Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, name))));
+    public BackpackBlock() {
+        super(Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, "backpack"))));
     }
 
     @Override

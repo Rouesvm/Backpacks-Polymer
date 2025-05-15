@@ -42,20 +42,19 @@ public class BackpackBlockEntity extends BlockEntity {
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.writeNbt(nbt, registries);
-        color = DyeColor.byIndex(nbt.getInt("dye", 12));
+        color = DyeColor.byIndex(nbt.getInt("dye", DyeColor.BROWN.getIndex()));
         size = nbt.getInt("size", 9);
         extraSize = nbt.getInt("extraSize", 0);
         uuid = UUID.fromString(nbt.getString("uuid", UUID.randomUUID().toString()));
     }
 
     public ItemStack getItemStack() {
-        if (uuid == null) return ContainerItem.getDefaultBackpack(3).getDefaultStack();
+        if (uuid == null) return ContainerItem.getDefaultBackpack(1).getDefaultStack();
 
         ItemStack stack = ContainerItem.getColoredBackpack(color, size / 9).getDefaultStack();
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
-        if (customName != null) {
-            stack.set(DataComponentTypes.CUSTOM_NAME, customName);
-        }
+
+        if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
 
         return stack;
     }

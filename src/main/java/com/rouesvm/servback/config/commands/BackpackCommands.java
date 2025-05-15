@@ -19,7 +19,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class BackpackCommands {
     public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
-        if (Main.hasTrinketLoaded) TrinketsBackpack.init(dispatcher);
+        if (Main.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
 
         dispatcher.register(literal("backpacks")
                 .requires(source -> Permissions.check(source, "serverbackpacks.command", 4))

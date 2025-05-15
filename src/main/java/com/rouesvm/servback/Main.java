@@ -11,6 +11,7 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKey;
@@ -18,9 +19,14 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
+
+	public static final List<ServerPlayerEntity> BEDROCK_PLAYERS = new ArrayList<>();
 
 	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
@@ -47,6 +53,15 @@ public class Main implements ModInitializer {
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
 		if (hasTrinketLoaded) BackpackTrinket.initialize();
+
+		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, a, b) -> {
+			if (isBedrock(serverPlayNetworkHandler.getPlayer())) {
+				BEDROCK_PLAYERS.add(serverPlayNetworkHandler.getPlayer());
+			}
+		});
+
+		ServerPlayConnectionEvents.DISCONNECT.register((serverPlayNetworkHandler, a) ->
+				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer()));
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);

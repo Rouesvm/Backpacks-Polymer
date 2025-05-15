@@ -1,22 +1,25 @@
 package com.rouesvm.servback.compat.geyser;
 
+import com.rouesvm.servback.block.BackpackBlock;
 import com.rouesvm.servback.utils.bedrock.BedrockBlock;
 import com.rouesvm.servback.utils.bedrock.BedrockItem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import org.geysermc.event.subscribe.Subscribe;
 import org.geysermc.geyser.api.GeyserApi;
+import org.geysermc.geyser.api.block.custom.CustomBlockPermutation;
 import org.geysermc.geyser.api.block.custom.NonVanillaCustomBlockData;
-import org.geysermc.geyser.api.block.custom.component.BoxComponent;
-import org.geysermc.geyser.api.block.custom.component.CustomBlockComponents;
-import org.geysermc.geyser.api.block.custom.component.GeometryComponent;
-import org.geysermc.geyser.api.block.custom.component.MaterialInstance;
+import org.geysermc.geyser.api.block.custom.component.*;
 import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBlockState;
 import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBoundingBox;
 import org.geysermc.geyser.api.event.EventRegistrar;
@@ -29,6 +32,8 @@ import org.geysermc.geyser.api.pack.ResourcePack;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.rouesvm.servback.Main.MOD_ID;
 
@@ -107,7 +112,7 @@ public class BackpackGeyser implements EventRegistrar {
                     BoxComponent collisionBox = BoxComponent.fullBox();
                     BoxComponent selectionBox = BoxComponent.fullBox();
 
-                    CustomBlockComponents components = CustomBlockComponents.builder()
+                    CustomBlockComponents.Builder components = CustomBlockComponents.builder()
                             .collisionBox(collisionBox)
                             .selectionBox(selectionBox)
                             .materialInstance("backpack", MaterialInstance.builder()
@@ -121,10 +126,9 @@ public class BackpackGeyser implements EventRegistrar {
                                     .build())
                             .lightEmission(block.getDefaultState().getLuminance())
                             .lightDampening(block.getDefaultState().getOpacity())
-                            .friction(block.getSlipperiness() / 2)
-                            .build();
+                            .friction(Math.min(1 - block.getSlipperiness(), 0.9f));
 
-                    JavaBlockState state = JavaBlockState.builder()
+                    JavaBlockState bedrockState = JavaBlockState.builder()
                             .identifier(location.toString())
                             .javaId(Block.getRawIdFromState(block.getDefaultState()))
                             .blockHardness(block.getHardness())
@@ -132,14 +136,44 @@ public class BackpackGeyser implements EventRegistrar {
                             .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
                             .build();
 
-                    NonVanillaCustomBlockData data = NonVanillaCustomBlockData.builder()
+
+                    List<CustomBlockPermutation> permutations = new ArrayList<>();
+
+                    for (BlockState state : block.getStateManager().getStates()) {
+                        Direction rotation = state.get(BackpackBlock.FACING);
+                        CustomBlockComponents.Builder componentsBuilder = components
+                                .transformation(new TransformationComponent(
+                                        0,
+                                        (int) ((360 - Direction.getHorizontalDegreesOrThrow(rotation)) % 360),
+                                        0
+                                ));
+
+
+                        List<String> conditions = new ArrayList<>();
+                        for (Property<?> property : state.getProperties()) {
+                            String propValue = state.get(property).toString();
+                            if (property instanceof EnumProperty<?>) {
+                                propValue = "'" + propValue.toLowerCase() + "'";
+                            }
+
+                            conditions.add(String.format("query.block_property('%s') == %s", property.getName(), propValue));
+                        }
+
+                        String condition = String.join(" && ", conditions);
+                        permutations.add(new CustomBlockPermutation(componentsBuilder.build(), condition));
+                    }
+
+                    NonVanillaCustomBlockData.Builder data = NonVanillaCustomBlockData.builder()
                             .name(location.getPath())
                             .namespace(location.getNamespace())
-                            .components(components)
-                            .build();
+                            .components(components.build());
 
-                    event.register(data);
-                    event.registerOverride(state, data.defaultBlockState());
+                    data.permutations(permutations);
+
+                    NonVanillaCustomBlockData customBlockData = data.build();
+
+                    event.register(customBlockData);
+                    event.registerOverride(bedrockState, customBlockData.defaultBlockState());
                 });
     }
 

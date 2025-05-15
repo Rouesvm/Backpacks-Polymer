@@ -18,10 +18,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
@@ -29,8 +25,6 @@ public class Main implements ModInitializer {
 	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
 
-	public static Set<UUID> bedrockPlayers = new HashSet<>();
-	
 	@Override
 	public void onInitialize() {
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");

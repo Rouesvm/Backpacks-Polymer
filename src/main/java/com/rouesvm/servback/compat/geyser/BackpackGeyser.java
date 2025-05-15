@@ -16,13 +16,16 @@ import org.geysermc.geyser.api.block.custom.NonVanillaCustomBlockData;
 import org.geysermc.geyser.api.block.custom.component.BoxComponent;
 import org.geysermc.geyser.api.block.custom.component.CustomBlockComponents;
 import org.geysermc.geyser.api.block.custom.component.GeometryComponent;
+import org.geysermc.geyser.api.block.custom.component.MaterialInstance;
 import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBlockState;
 import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBoundingBox;
 import org.geysermc.geyser.api.event.EventRegistrar;
 import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomBlocksEvent;
 import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
-import org.geysermc.geyser.api.event.lifecycle.GeyserLoadResourcePacksEvent;
+import org.geysermc.geyser.api.event.lifecycle.GeyserDefineResourcePacksEvent;
 import org.geysermc.geyser.api.item.custom.NonVanillaCustomItemData;
+import org.geysermc.geyser.api.pack.PackCodec;
+import org.geysermc.geyser.api.pack.ResourcePack;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,8 +66,8 @@ public class BackpackGeyser implements EventRegistrar {
     }
 
     @Subscribe
-    public void onDefineResource(GeyserLoadResourcePacksEvent event) {
-        if (GEYSER_PACK.toFile().exists()) event.resourcePacks().add(GEYSER_PACK);
+    public void onDefineResource(GeyserDefineResourcePacksEvent event) {
+        if (GEYSER_PACK != null && GEYSER_PACK.toFile().exists()) event.register(ResourcePack.create(PackCodec.path(GEYSER_PACK)));
     }
 
     @Subscribe
@@ -88,49 +91,56 @@ public class BackpackGeyser implements EventRegistrar {
                             .icon(identifier.toString())
                             .creativeCategory(3)
                             .build();
+
                     event.register(customItemData);
                 });
     }
 
     @Subscribe
     public void onGeyserDefineCustomBlocksEvent(GeyserDefineCustomBlocksEvent event) {
-        for (var entry : Registries.BLOCK.getEntrySet()) {
-            Identifier location = entry.getKey().getValue();
-            Block block = entry.getValue();
-            if (!(block instanceof BedrockBlock))
-                continue;
+        Registries.BLOCK.getEntrySet().stream()
+                .filter(entry -> entry.getValue() instanceof BedrockBlock)
+                .forEach(entry -> {
+                    Identifier location = entry.getKey().getValue();
+                    Block block = entry.getValue();
 
-            BoxComponent collisionBox = BoxComponent.fullBox();
-            BoxComponent selectionBox = BoxComponent.fullBox();
+                    BoxComponent collisionBox = BoxComponent.fullBox();
+                    BoxComponent selectionBox = BoxComponent.fullBox();
 
-            CustomBlockComponents components = CustomBlockComponents.builder()
-                    .collisionBox(collisionBox)
-                    .selectionBox(selectionBox)
-                    .geometry(GeometryComponent.builder()
-                            .identifier("geometry.backpack")
-                            .build())
-                    .lightEmission(block.getDefaultState().getLuminance())
-                    .lightDampening(block.getDefaultState().getOpacity())
-                    .friction(block.getSlipperiness())
-                    .build();
+                    CustomBlockComponents components = CustomBlockComponents.builder()
+                            .collisionBox(collisionBox)
+                            .selectionBox(selectionBox)
+                            .materialInstance("backpack", MaterialInstance.builder()
+                                    .texture("serverbackpacks:large")
+                                    .renderMethod("opaque")
+                                    .faceDimming(true)
+                                    .ambientOcclusion(true)
+                                    .build())
+                            .geometry(GeometryComponent.builder()
+                                    .identifier("geometry.backpack")
+                                    .build())
+                            .lightEmission(block.getDefaultState().getLuminance())
+                            .lightDampening(block.getDefaultState().getOpacity())
+                            .friction(block.getSlipperiness() / 2)
+                            .build();
 
-            JavaBlockState state = JavaBlockState.builder()
-                    .identifier(location.toString())
-                    .javaId(Block.getRawIdFromState(block.getDefaultState()))
-                    .blockHardness(block.getHardness())
-                    .canBreakWithHand(true)
-                    .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
-                    .build();
+                    JavaBlockState state = JavaBlockState.builder()
+                            .identifier(location.toString())
+                            .javaId(Block.getRawIdFromState(block.getDefaultState()))
+                            .blockHardness(block.getHardness())
+                            .canBreakWithHand(true)
+                            .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
+                            .build();
 
-            NonVanillaCustomBlockData data = NonVanillaCustomBlockData.builder()
-                    .name(location.getPath())
-                    .namespace(location.getNamespace())
-                    .components(components)
-                    .build();
+                    NonVanillaCustomBlockData data = NonVanillaCustomBlockData.builder()
+                            .name(location.getPath())
+                            .namespace(location.getNamespace())
+                            .components(components)
+                            .build();
 
-            event.register(data);
-            event.registerOverride(state, data.defaultBlockState());
-        }
+                    event.register(data);
+                    event.registerOverride(state, data.defaultBlockState());
+                });
     }
 
     public static boolean isPlayerOnBedrock(ServerPlayerEntity player) {

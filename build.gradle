@@ -45,7 +45,7 @@ dependencies {
 
     modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
-    compileOnly('org.geysermc.geyser:api:2.6.1-SNAPSHOT')
+    compileOnly('org.geysermc.geyser:api:2.7.1-SNAPSHOT')
 }
 
 processResources {

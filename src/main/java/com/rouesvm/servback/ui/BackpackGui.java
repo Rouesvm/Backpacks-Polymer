@@ -72,7 +72,7 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
                 BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override

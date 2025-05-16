@@ -6,14 +6,20 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
+
+import static com.rouesvm.servback.Main.CAPACITY;
 
 public class BackpackBlockEntity extends BlockEntity {
     private UUID uuid;
@@ -51,7 +57,11 @@ public class BackpackBlockEntity extends BlockEntity {
     public ItemStack getItemStack() {
         if (uuid == null) return ContainerItem.getDefaultBackpack(1).getDefaultStack();
 
+        DynamicRegistryManager registryManager = this.getWorld().getRegistryManager();
+        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
+
         ItemStack stack = ContainerItem.getColoredBackpack(color, size / 9).getDefaultStack();
+        stack.addEnchantment(capacity, extraSize / 9);
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
 
         if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);

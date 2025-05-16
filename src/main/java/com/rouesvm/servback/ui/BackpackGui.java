@@ -9,7 +9,6 @@ import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.ScreenHandlerType;
@@ -28,8 +27,6 @@ public class BackpackGui extends SimpleGui {
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
         super(getHandler(instance.getInventory().size()), player, false);
-
-        this.getPlayer().closeHandledScreen();
 
         this.stack = stack;
 
@@ -75,7 +72,7 @@ public class BackpackGui extends SimpleGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
                 BackpackManager.getManager().saveBackpack(backpackInstance);
             }
             @Override
@@ -101,15 +98,10 @@ public class BackpackGui extends SimpleGui {
     public void onClose() {
         BackpackManager manager = BackpackManager.getManager();
         manager.save(this.getPlayer().getServer());
-        if (stack != null) {
-            stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
-        }
+        if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
 
-        this.getPlayer().networkHandler.sendPacket(new InventoryS2CPacket(
-                -2,
-                0,
-                player.playerScreenHandler.getStacks(),
-                player.playerScreenHandler.getCursorStack()));
+        getPlayer().currentScreenHandler.enableSyncing();
+        getPlayer().currentScreenHandler.sendContentUpdates();
     }
 
     @Override

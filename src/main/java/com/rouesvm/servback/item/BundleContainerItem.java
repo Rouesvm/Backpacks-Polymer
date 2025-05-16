@@ -78,7 +78,6 @@ public class BundleContainerItem extends ContainerItem {
                     this.onContentChanged(serverPlayer);
                     return true;
                 } else if (clickType == ClickType.RIGHT) {
-                    serverPlayer.closeHandledScreen();
                     new BackpackGui(
                             serverPlayer,
                             stack,

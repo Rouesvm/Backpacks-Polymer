@@ -1,7 +1,6 @@
 package com.rouesvm.servback.block;
 
 import com.mojang.serialization.MapCodec;
-import com.rouesvm.servback.Main;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -10,7 +9,6 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.Direction;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerBlock {
     public static final MapCodec<BasicPolymerBlock> CODEC = createCodec(BasicPolymerBlock::new);
@@ -18,12 +16,6 @@ public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerB
     public BasicPolymerBlock(Settings settings) {
         super(settings.nonOpaque());
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
-        if (Main.isBedrock(packetContext.getPlayer())) return this.getDefaultState();
-        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -38,5 +30,10 @@ public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerB
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState blockState) {
+        return Blocks.BARRIER.getDefaultState();
     }
 }

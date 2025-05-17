@@ -18,16 +18,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import xyz.nucleoid.packettweaker.PacketContext;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -47,8 +44,8 @@ public class ContainerItem extends BasicPolymerBlockItem {
     }
 
     @Override
-    public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
-        BackpackInventory itemList = BackpackUtils.getItemList(polymerStack, this.slots);
+    public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, @Nullable ServerPlayerEntity player) {
+        BackpackInventory itemList = BackpackUtils.getItemList(stack, this.slots);
 
         if (itemList == null) return;
         if (itemList.getHeldStacks().isEmpty()) return;
@@ -63,30 +60,30 @@ public class ContainerItem extends BasicPolymerBlockItem {
 
             if (capacityMaxShow <= 4) {
                 capacityMaxShow++;
-                tooltip.add(Text.translatable("item.container.item_count", itemStack.getName(), itemStack.getCount()).formatted(Formatting.GOLD));
+                tooltip.add(Text.translatable("container.shulkerBox.itemCount", itemStack.getName(), itemStack.getCount()).formatted(Formatting.GOLD));
             }
         }
 
         if (capacityAmount - capacityMaxShow > 0) {
-            tooltip.add(Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow).formatted(Formatting.ITALIC).formatted(Formatting.GOLD));
+            tooltip.add(Text.translatable("container.shulkerBox.more", capacityAmount - capacityMaxShow).formatted(Formatting.ITALIC).formatted(Formatting.GOLD));
         }
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
         var cast = player.raycast(5,0,false);
         if (!(player instanceof ServerPlayerEntity serverPlayer))
-            return ActionResult.PASS;
+            return TypedActionResult.pass(stack);
         if (player.isSneaking())
-            return ActionResult.PASS;
+            return TypedActionResult.pass(stack);
         if (cast.getType() == HitResult.Type.BLOCK)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return TypedActionResult.pass(stack);
 
         openGui(serverPlayer, stack);
         player.swingHand(hand, true);
-        return ActionResult.SUCCESS;
+        return TypedActionResult.success(stack);
     }
 
     @Override
@@ -133,8 +130,8 @@ public class ContainerItem extends BasicPolymerBlockItem {
                             blockEntity.setSize(slots);
                             blockEntity.setColor(color);
 
-                            if (itemStack.getCustomName() != null) {
-                                blockEntity.setCustomName(itemStack.getCustomName());
+                            if (itemStack.getName() != null) {
+                                blockEntity.setCustomName(itemStack.getName());
                             }
                         }
 
@@ -210,7 +207,7 @@ public class ContainerItem extends BasicPolymerBlockItem {
     }
 
     public static void playInsertFailSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT_FAIL, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
 }

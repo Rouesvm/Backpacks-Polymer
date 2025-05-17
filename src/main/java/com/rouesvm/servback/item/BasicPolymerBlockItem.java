@@ -1,44 +1,42 @@
 package com.rouesvm.servback.item;
 
 import com.rouesvm.servback.Main;
-import com.rouesvm.servback.utils.bedrock.BedrockItem;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
 
-public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, PolymerClientDecoded, PolymerKeepModel, BedrockItem {
+public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, PolymerClientDecoded, PolymerKeepModel {
     private final Identifier id;
-    private final Item vanillaItem;
+    private final PolymerModelData model;
 
     public BasicPolymerBlockItem(String name, Item vanillaItem, Block block) {
-        super(block, new Settings().maxCount(1).registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Main.MOD_ID, name))));
+        super(block, new Settings().maxCount(1));
         this.id = Identifier.of(Main.MOD_ID, name);
-        this.vanillaItem = vanillaItem;
-    }
-
-    @Override
-    public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
-        if (Main.BEDROCK_PLAYERS.contains(packetContext.getPlayer()))
-            return this;
-        return this.vanillaItem;
-    }
-
-    @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context) {
-        return this.id;
+        this.model = PolymerResourcePackUtils.requestModel(vanillaItem,
+                Identifier.of(Main.MOD_ID, "item/" + getIdentifier().getPath()));
     }
 
     public Identifier getIdentifier() {
         return this.id;
+    }
+
+    @Override
+    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return this.model.item();
+    }
+
+    @Override
+    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return this.model.value();
     }
 }
 

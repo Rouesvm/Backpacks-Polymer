@@ -1,4 +1,4 @@
-package com.rouesvm.servback.items;
+package com.rouesvm.servback.item;
 
 import com.rouesvm.servback.Main;
 import eu.pb4.polymer.core.api.item.PolymerItem;

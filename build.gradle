@@ -42,6 +42,7 @@ dependencies {
 
     modImplementation include("eu.pb4:sgui:${project.sgui}+${project.minecraft_version}")
     modImplementation include("xyz.nucleoid:server-translations-api:2.3.1+1.21-pre2")
+    modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
     modCompileOnly("eu.pb4.polyport:trinkets:${trinkets}")
 }

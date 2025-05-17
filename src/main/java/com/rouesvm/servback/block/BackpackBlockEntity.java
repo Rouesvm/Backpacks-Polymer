@@ -36,7 +36,7 @@ public class BackpackBlockEntity extends BlockEntity {
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.writeNbt(nbt, registries);
-        nbt.putInt("dye", color.getIndex());
+        nbt.putInt("dye", color.getId());
         nbt.putInt("size", size);
         nbt.putInt("extraSize", extraSize);
 
@@ -48,17 +48,17 @@ public class BackpackBlockEntity extends BlockEntity {
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.writeNbt(nbt, registries);
-        color = DyeColor.byIndex(nbt.getInt("dye", DyeColor.BROWN.getIndex()));
-        size = nbt.getInt("size", 9);
-        extraSize = nbt.getInt("extraSize", 0);
-        uuid = UUID.fromString(nbt.getString("uuid", UUID.randomUUID().toString()));
+        color = DyeColor.byId(nbt.getInt("dye"));
+        size = nbt.getInt("size");
+        extraSize = nbt.getInt("extraSize");
+        uuid = UUID.fromString(nbt.getString("uuid"));
     }
 
     public ItemStack getItemStack() {
         if (uuid == null) return ContainerItem.getDefaultBackpack(1).getDefaultStack();
 
         DynamicRegistryManager registryManager = this.getWorld().getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
+        RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
 
         ItemStack stack = ContainerItem.getColoredBackpack(color, size / 9).getDefaultStack();
         stack.addEnchantment(capacity, extraSize / 9);

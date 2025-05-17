@@ -9,8 +9,6 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import eu.pb4.polymer.virtualentity.impl.EntityExt;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -25,7 +23,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 
-import java.util.List;
 import java.util.Objects;
 
 public class BackHolder extends ElementHolder {
@@ -44,9 +41,6 @@ public class BackHolder extends ElementHolder {
 
         this.entity = entity;
         this.element = new ItemDisplayElement();
-
-        CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
-        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
 
         this.element.setItem(stack);
 

@@ -2,6 +2,7 @@ package com.rouesvm.servback.utils.cosmetic;
 
 import com.rouesvm.servback.block.BackpackBlockEntity;
 import com.rouesvm.servback.block.BasicPolymerBlock;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
@@ -24,7 +25,7 @@ public class BlockHolder extends ElementHolder {
         this.main = new ItemDisplayElement();
         this.main.setDisplaySize(1, 1);
         this.main.setTranslation(new Vector3f(-0.03F, -0.125F, 0F));
-        this.main.setYaw(state.get(BasicPolymerBlock.FACING).getHorizontal());
+        this.main.setYaw(state.get(BasicPolymerBlock.FACING).asRotation());
         this.main.ignorePositionUpdates();
         this.addElement(main);
 
@@ -58,6 +59,7 @@ public class BlockHolder extends ElementHolder {
 
     public void setMain(Item item) {
         ItemStack stack = item.getDefaultStack();
+        stack.set(BackpackDataComponentTypes.EQUIPPED_TYPE, true);
         this.main.setItem(stack);
     }
 }

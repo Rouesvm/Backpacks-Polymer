@@ -55,8 +55,6 @@
   "item.serverbackpacks.gui_ender" : "Ender Backpack",
   "item.serverbackpacks.gui_global" : "Global Backpack",
 
-  "block.serverbackpacks.backpack" : "Backpack",
-
   "enchantment.serverbackpacks.capacity" : "Capacity",
 
   "command.serverbackpacks.empty": "The provided value is empty!",

@@ -33,16 +33,16 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
     modImplementation ("eu.pb4:polymer-core:${project.polymer}+${project.minecraft_version}")
     modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}+${project.minecraft_version}")
-    modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer}+${project.minecraft_version}")
+    modImplementation ("eu.pb4:polymer-virtual-entity:${project.polymer}+${project.minecraft_version}")
 
     modImplementation include("eu.pb4:sgui:${project.sgui}+${project.minecraft_version}")
     modImplementation include("xyz.nucleoid:server-translations-api:2.3.1+1.21-pre2")
-    modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
     modCompileOnly("eu.pb4.polyport:trinkets:${trinkets}")
 }

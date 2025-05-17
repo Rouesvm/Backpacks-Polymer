@@ -16,6 +16,11 @@ public class BackpackDataComponentTypes {
             "boolean"
     );
 
+    public static final ComponentType<Boolean> EQUIPPED_TYPE = register(
+            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build(),
+            "equipped"
+    );
+
     public static final ComponentType<String> UUID_TYPE = register(
             ComponentType.<String>builder().codec(Codec.STRING).packetCodec(PacketCodecs.STRING).build(),
             "uuid"

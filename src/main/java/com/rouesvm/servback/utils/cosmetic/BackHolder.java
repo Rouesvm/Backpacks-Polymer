@@ -2,6 +2,7 @@ package com.rouesvm.servback.utils.cosmetic;
 
 import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.item.ContainerItem;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
@@ -41,7 +42,7 @@ public class BackHolder extends ElementHolder {
 
         this.entity = entity;
         this.element = new ItemDisplayElement();
-
+        stack.set(BackpackDataComponentTypes.EQUIPPED_TYPE, true);
         this.element.setItem(stack);
 
         this.element.setTranslation(new Vector3f(0, 0.25f, 0));

@@ -24,7 +24,7 @@ public class BlockHolder extends ElementHolder {
     public BlockHolder(ServerWorld world, BlockState state, BlockPos pos) {
         this.main = new ItemDisplayElement();
         this.main.setDisplaySize(1, 1);
-        this.main.setTranslation(new Vector3f(-0.03F, -0.125F, 0F));
+        this.main.setTranslation(new Vector3f(0, 0, 0F));
         this.main.setYaw(state.get(BasicPolymerBlock.FACING).asRotation());
         this.main.ignorePositionUpdates();
         this.addElement(main);

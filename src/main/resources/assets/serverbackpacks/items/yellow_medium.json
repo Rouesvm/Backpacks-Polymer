@@ -1,6 +1,19 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "serverbackpacks:item/yellow_medium"
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "cases": [
+      {
+        "when": "model",
+        "model": {
+          "type": "minecraft:model",
+          "model": "serverbackpacks:item/model/yellow_medium"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "serverbackpacks:item/yellow_medium"
+    }
   }
 }

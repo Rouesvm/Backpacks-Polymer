@@ -1,4 +1,4 @@
-package com.rouesvm.servback.items;
+package com.rouesvm.servback.item;
 
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.entity.player.PlayerEntity;

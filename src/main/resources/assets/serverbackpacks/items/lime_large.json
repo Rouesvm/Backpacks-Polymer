@@ -1,6 +1,19 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "serverbackpacks:item/lime_large"
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "cases": [
+      {
+        "when": "model",
+        "model": {
+          "type": "minecraft:model",
+          "model": "serverbackpacks:item/model/lime_large"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "serverbackpacks:item/lime_large"
+    }
   }
 }

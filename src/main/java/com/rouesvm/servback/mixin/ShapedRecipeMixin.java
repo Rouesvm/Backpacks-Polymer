@@ -1,6 +1,6 @@
 package com.rouesvm.servback.mixin;
 
-import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.item.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;

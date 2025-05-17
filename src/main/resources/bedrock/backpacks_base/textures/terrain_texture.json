@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "serverbackpacks",
+  "texture_name": "atlas.terrain",
+  "texture_data": {
+    "serverbackpacks:large": {
+      "textures": "textures/serverbackpacks/block/large/large"
+    }
+  }
+}

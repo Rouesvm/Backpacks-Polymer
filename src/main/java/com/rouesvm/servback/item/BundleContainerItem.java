@@ -1,4 +1,4 @@
-package com.rouesvm.servback.items;
+package com.rouesvm.servback.item;
 
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
@@ -11,12 +11,13 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ClickType;
+import net.minecraft.util.DyeColor;
 
 import java.util.UUID;
 
 public class BundleContainerItem extends ContainerItem {
-    public BundleContainerItem(String name, int slots) {
-        super(name, slots);
+    public BundleContainerItem(String name, int slots, DyeColor color) {
+        super(name, slots, color);
     }
 
     @Override
@@ -74,7 +75,6 @@ public class BundleContainerItem extends ContainerItem {
                     this.onContentChanged(serverPlayer);
                     return true;
                 } else if (clickType == ClickType.RIGHT) {
-                    serverPlayer.closeHandledScreen();
                     new BackpackGui(
                             serverPlayer,
                             stack,

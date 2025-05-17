@@ -3,20 +3,23 @@ package com.rouesvm.servback;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.config.commands.BackpackCommands;
-import com.rouesvm.servback.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.registry.BackpackItemGroup;
-import com.rouesvm.servback.registry.BackpackItemRegistry;
+import com.rouesvm.servback.registry.*;
 import com.rouesvm.servback.ui.inventory.BaseInventory;
 import com.rouesvm.servback.utils.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
@@ -24,29 +27,25 @@ public class Main implements ModInitializer {
 
 	public static boolean hasTrinketLoaded;
 
-	public static Configuration configuration;
-
 	@Override
 	public void onInitialize() {
-		configuration = new Configuration(MOD_ID + ".json");
-		configuration.load();
-
-		ServerLifecycleEvents.BEFORE_SAVE.register((s, a, b) -> configuration.save());
-
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
+		Configuration.initialize();
+
 		BackpackDataComponentTypes.initialize();
+
+		BackpackBlockEntityRegistry.initialize();
+		BackpackBlockRegistry.initialize();
 
 		BackpackItemRegistry.initialize();
 		BackpackItemGroup.initialize();
 
-		if (hasTrinketLoaded) {
-			BackpackTrinket.initialize();
-			CommandRegistrationCallback.EVENT.register(BackpackCommands::init);
-		}
+		CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> BackpackCommands.init(dispatcher));
+		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);

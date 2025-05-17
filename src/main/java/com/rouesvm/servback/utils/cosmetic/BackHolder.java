@@ -1,5 +1,7 @@
 package com.rouesvm.servback.utils.cosmetic;
 
+import com.rouesvm.servback.config.Configuration;
+import com.rouesvm.servback.item.ContainerItem;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
@@ -7,6 +9,8 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import eu.pb4.polymer.virtualentity.impl.EntityExt;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -21,11 +25,16 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.Objects;
 
 public class BackHolder extends ElementHolder {
     private final LivingEntity entity;
     private final ItemDisplayElement element;
+
+    private Vector3f cosmeticPosition = new Vector3f(0f, -0.65f, 0.28f);
+    private Integer cosmeticRotation = 0;
+    private Integer cosmeticPitchWhenSneaking = 25;
 
     private boolean hidden;
     private boolean hideFromPlayer;
@@ -36,18 +45,27 @@ public class BackHolder extends ElementHolder {
         this.entity = entity;
         this.element = new ItemDisplayElement();
 
+        CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
+        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
+
         this.element.setItem(stack);
 
         this.element.setTranslation(new Vector3f(0, 0.25f, 0));
-        this.element.setScale(new Vector3f(0.625f));
+        this.element.setScale(new Vector3f(0.875f));
 
         this.element.setTeleportDuration(1);
         this.element.ignorePositionUpdates();
 
+        if (this.element.getItem().getItem() instanceof ContainerItem item) {
+            int size = item.getSize();
+            cosmeticPosition = Configuration.getInstance().back_positions.get(size);
+            cosmeticRotation = Configuration.getInstance().back_yaw.get(size);
+            cosmeticPitchWhenSneaking = Configuration.getInstance().back_pitch_when_sneaking.get(size);
+        }
+
         this.addElement(this.element);
     }
 
-    // copy go brrr pls don't sue me
     @Override
     protected void onTick() {
         if (this.entity.isDead() || entity.isRemoved()) {
@@ -89,14 +107,21 @@ public class BackHolder extends ElementHolder {
                 hidden = false;
             }
 
-            this.element.setYaw(entity.bodyYaw);
-            this.element.setPitch(this.entity.isSneaking() ? 25 : 0);
+            boolean sneaking = this.entity.isSneaking();
+
+            this.element.setYaw(entity.getBodyYaw() - cosmeticRotation);
+            this.element.setPitch(sneaking ? cosmeticPitchWhenSneaking : 0);
+
+            float yTranslation = sneaking ? cosmeticPosition.y - 0.05f : cosmeticPosition.y;
+            float zTranslation;
+
+            zTranslation = sneaking ? (cosmeticPosition.z - 0.16f) : (cosmeticPosition.z);
 
             if (entity.getEquippedStack(EquipmentSlot.CHEST) != ItemStack.EMPTY) {
-                this.element.setTranslation(new Vector3f(0, this.entity.isSneaking() ? -0.6f : -0.65f, this.entity.isSneaking() ? -0.1f : -0.2f));
-            } else {
-                this.element.setTranslation(new Vector3f(0, this.entity.isSneaking() ? -0.6f : -0.65f, this.entity.isSneaking() ? 0f : -0.125f));
+                zTranslation = zTranslation + 0.10f;
             }
+
+            this.element.setTranslation(new Vector3f(0, yTranslation, zTranslation));
         }
     }
 

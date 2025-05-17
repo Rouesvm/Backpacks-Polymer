@@ -1,6 +1,6 @@
 package com.rouesvm.servback.datagen;
 
-import com.rouesvm.servback.items.ContainerItem;
+import com.rouesvm.servback.item.ContainerItem;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
@@ -53,7 +53,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(FabricRecipeProvider.hasItem(Items.ENDER_EYE), FabricRecipeProvider.conditionsFromItem(Items.ENDER_EYE))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, BackpackItemRegistry.SMALL_BACKPACK, 1)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ContainerItem.getDefaultBackpack(1), 1)
                 .pattern("#S#")
                 .pattern("SCS")
                 .pattern(" # ")

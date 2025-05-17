@@ -26,7 +26,7 @@ public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, Pol
         this.model = PolymerResourcePackUtils.requestModel(vanillaItem,
                 Identifier.of(Main.MOD_ID, "item/" + getIdentifier().getPath()));
         this.model_3D = PolymerResourcePackUtils.requestModel(vanillaItem,
-                Identifier.of(Main.MOD_ID, "item/model" + getIdentifier().getPath()));
+                Identifier.of(Main.MOD_ID, "item/model/" + getIdentifier().getPath()));
     }
 
     public String getTranslationKey() {

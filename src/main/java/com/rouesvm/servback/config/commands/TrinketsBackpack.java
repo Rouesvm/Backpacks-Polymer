@@ -21,9 +21,8 @@ public class TrinketsBackpack {
             Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(player);
             component.ifPresent(trinketComponent -> trinketComponent.forEach((slotReference, stack) -> {
                 if (stack.getItem() instanceof ContainerItem containerItem) {
-                    int slots = containerItem.slots + BackpackUtils.getExtendedSlots(stack);
-                    BackpackUtils.checkEnchantments(stack, player, slots);
-                    new BackpackGui(player, null, BackpackManager.getInstance(BackpackManager.getStackUUID(stack), slots));
+                    BackpackUtils.checkEnchantments(stack, player, containerItem.slots, BackpackUtils.getExtendedSlots(stack));
+                    new BackpackGui(player, null, BackpackManager.getInstance(BackpackManager.getStackUUID(stack), containerItem.slots + BackpackUtils.getExtendedSlots(stack)));
                 }
             }));
             return 1;

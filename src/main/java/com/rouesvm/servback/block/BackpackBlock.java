@@ -5,6 +5,7 @@ import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.utils.BackpackUtils;
 import com.rouesvm.servback.utils.bedrock.BedrockBlock;
 import com.rouesvm.servback.utils.cosmetic.BlockHolder;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -25,6 +26,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import static com.rouesvm.servback.utils.BackpackUtils.resize;
+
 public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
     public BackpackBlock() {
         super(Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, "backpack"))));
@@ -44,7 +47,11 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
     public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (!world.isClient) {
             BackpackBlockEntity entity = (BackpackBlockEntity) blockEntity;
-            if (entity != null) dropStack(world, pos, entity.getItemStack());
+            if (entity != null) {
+                ItemStack stack = entity.getItemStack().copy();
+                BackpackUtils.checkEnchantments(stack, (ServerPlayerEntity) player, entity.getSize(), entity.getExtraSize());
+                dropStack(world, pos, stack);
+            }
         }
     }
 
@@ -60,6 +67,14 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
                         return ActionResult.SUCCESS;
                     }
                 }
+
+                resize(
+                        entity.getExtraSize(),
+                        entity.getSize(),
+                        entity.getUuid(),
+                        BackpackManager.getInventory(entity.getUuid(), entity.getSize() + entity.getExtraSize()),
+                        (ServerPlayerEntity) player
+                );
 
                 new BackpackGui((ServerPlayerEntity) player, null,
                         BackpackManager.getInstance(entity.getUuid(), entity.getSize() + entity.getExtraSize()));

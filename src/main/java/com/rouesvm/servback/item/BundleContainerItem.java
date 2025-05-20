@@ -25,7 +25,7 @@ public class BundleContainerItem extends ContainerItem {
     @Override
     public boolean onStackClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player) {
         UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackInventory inventory = BackpackUtils.getItemList(stack, this.slots);
+        BackpackInventory inventory = BackpackUtils.getItemList(stack, BackpackUtils.getExtendedSlots(stack) + this.slots);
 
         if (inventory == null) {
             return false;
@@ -59,7 +59,7 @@ public class BundleContainerItem extends ContainerItem {
             setSelectedStackIndex(stack, -1);
         } else {
             UUID uuid = BackpackManager.getStackUUID(stack);
-            BackpackInventory inventory = BackpackUtils.getItemList(stack, this.slots);
+            BackpackInventory inventory = BackpackUtils.getItemList(stack, BackpackUtils.getExtendedSlots(stack) + this.slots);
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
             if (!otherStack.getItem().canBeNested()) return false;
@@ -78,6 +78,7 @@ public class BundleContainerItem extends ContainerItem {
                     this.onContentChanged(serverPlayer);
                     return true;
                 } else if (clickType == ClickType.RIGHT) {
+                    BackpackUtils.checkEnchantments(stack, serverPlayer, this.slots, BackpackUtils.getExtendedSlots(stack));
                     new BackpackGui(
                             serverPlayer,
                             stack,

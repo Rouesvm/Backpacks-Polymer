@@ -48,7 +48,7 @@ public class ContainerItem extends BasicPolymerBlockItem {
 
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
-        BackpackInventory itemList = BackpackUtils.getItemList(polymerStack, this.slots);
+        BackpackInventory itemList = BackpackUtils.getItemList(polymerStack, BackpackUtils.getExtendedSlots(polymerStack) + this.slots);
 
         if (itemList == null) return;
         if (itemList.getHeldStacks().isEmpty()) return;
@@ -175,7 +175,7 @@ public class ContainerItem extends BasicPolymerBlockItem {
 
     public void onOpen(ServerPlayerEntity player, ItemStack stack) {
         BackpackManager.createNewUUID(stack);
-        BackpackUtils.checkEnchantments(stack, player, this.slots);
+        BackpackUtils.checkEnchantments(stack, player, this.slots, BackpackUtils.getExtendedSlots(stack));
         playInsertSound(player);
     }
 

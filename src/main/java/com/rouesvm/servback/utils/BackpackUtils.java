@@ -40,7 +40,6 @@ public class BackpackUtils {
         RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
-        System.out.println(level);
         int currentExtendedSize = 9 * level;
 
         NbtCompound compound = new NbtCompound();

@@ -130,7 +130,7 @@ public class BackHolder extends ElementHolder {
     }
 
     public static BackHolder createDisplay(ItemStack stack, ServerPlayerEntity entity) {
-        var model = new BackHolder(stack, entity);
+        var model = new BackHolder(stack.copy(), entity);
 
         EntityAttachment.ofTicking(model, entity);
         model.startWatching(entity);

@@ -111,7 +111,6 @@ public class BackpackManager {
 
     public void saveBackpack(BackpackInstance instance) {
         if (instance.getUuid() != null && instance.getInventory() != null) {
-            System.out.println(instance.getInventory().heldStacks);
             this.storedInstances.put(instance.getUuid(), instance);
         }
     }

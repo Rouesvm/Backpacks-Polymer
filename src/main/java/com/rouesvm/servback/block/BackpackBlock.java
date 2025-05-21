@@ -62,8 +62,10 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
             if (entity != null && entity.getUuid() != null) {
                 if (Main.hasTrinketLoaded && player.isSneaking()) {
                     if (!BackpackTrinket.hasStackInBackSlot(player)) {
-                        BackpackTrinket.equipStack(player,entity.getItemStack());
-                        world.breakBlock(pos, true);
+                        ItemStack stack = entity.getItemStack().copy();
+                        BackpackUtils.checkEnchantments(stack, (ServerPlayerEntity) player, entity.getSize(), entity.getExtraSize());
+                        BackpackTrinket.equipStack(player, stack);
+                        world.breakBlock(pos, false);
                         return ActionResult.SUCCESS;
                     }
                 }

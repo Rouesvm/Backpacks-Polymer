@@ -24,6 +24,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 import static com.rouesvm.servback.utils.BackpackUtils.resize;
@@ -41,6 +42,20 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
     @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
+    }
+
+    @Override
+    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        if (!world.isClient()) {
+            BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
+            if (entity != null) {
+                ItemStack stack = entity.getItemStack();
+                if (includeData)
+                    return stack.copy();
+                else return stack.getItem().getDefaultStack();
+            }
+        }
+        return super.getPickStack(world, pos, state, includeData);
     }
 
     @Override

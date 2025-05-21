@@ -128,10 +128,10 @@ public class ContainerItem extends BasicPolymerBlockItem {
                         blockState2.getBlock().onPlaced(world, blockPos, blockState2, playerEntity, itemStack);
 
                         if (world.getBlockEntity(blockPos) instanceof BackpackBlockEntity blockEntity) {
-                            blockEntity.setUuid(BackpackManager.getStackUUID(context.getStack()));
                             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
                             blockEntity.setSize(slots);
                             blockEntity.setColor(color);
+                            blockEntity.setUuid(BackpackManager.getStackUUID(context.getStack()));
 
                             if (itemStack.getCustomName() != null) {
                                 blockEntity.setCustomName(itemStack.getCustomName());

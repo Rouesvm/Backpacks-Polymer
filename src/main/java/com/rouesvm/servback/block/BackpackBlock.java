@@ -12,6 +12,7 @@ import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,6 +21,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -37,9 +39,16 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
         super(Settings.create()
                 .registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, "backpack")))
                 .pistonBehavior(PistonBehavior.DESTROY)
+                .sounds(BlockSoundGroup.WOOL)
+                .breakInstantly()
                 .nonOpaque()
-                .hardness(0.1f)
+                .solidBlock(Blocks::never)
         );
+    }
+
+    @Override
+    protected int getOpacity(BlockState state) {
+        return 1;
     }
 
     @Override

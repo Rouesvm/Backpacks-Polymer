@@ -3,6 +3,7 @@ package com.rouesvm.servback.block;
 import com.rouesvm.servback.item.ContainerItem;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.utils.BackpackUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
@@ -13,6 +14,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
@@ -63,6 +65,8 @@ public class BackpackBlockEntity extends BlockEntity {
         ItemStack stack = ContainerItem.getColoredBackpack(color, size / 9).getDefaultStack();
         stack.addEnchantment(capacity, extraSize / 9);
         stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
+
+        BackpackUtils.addCustomData(stack, (ServerWorld) world);
 
         if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
 

@@ -12,6 +12,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 
 import java.util.UUID;
 
@@ -34,19 +35,27 @@ public class BackpackUtils {
 
     public static void checkEnchantments(ItemStack stack, ServerPlayerEntity player, int maxBackpackSlot, int maxExtendedSlot) {
         BackpackInventory inventory = getItemList(stack, maxExtendedSlot + maxBackpackSlot);
-        if (inventory == null) return;
+        if (inventory != null) {
+            resize(
+                    addCustomData(stack, player.getServerWorld()),
+                    maxBackpackSlot,
+                    BackpackManager.getStackUUID(stack),
+                    inventory,
+                    player
+            );
+        }
+    }
 
-        DynamicRegistryManager registryManager = player.getWorld().getRegistryManager();
+    public static int addCustomData(ItemStack stack, ServerWorld world) {
+        DynamicRegistryManager registryManager = world.getRegistryManager();
         RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
-        int currentExtendedSize = 9 * level;
-
         NbtCompound compound = new NbtCompound();
         compound.putInt("level", level);
         stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
 
-        resize(currentExtendedSize, maxBackpackSlot, BackpackManager.getStackUUID(stack), inventory, player);
+        return 9 * level;
     }
 
     public static void resize(int currentExtendedSize, int maxBackpackSlot, UUID uuid, BackpackInventory inventory, ServerPlayerEntity player) {

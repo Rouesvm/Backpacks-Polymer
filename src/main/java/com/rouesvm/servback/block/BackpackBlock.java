@@ -13,6 +13,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
@@ -27,11 +28,18 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 import static com.rouesvm.servback.utils.BackpackUtils.resize;
 
 public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
     public BackpackBlock() {
-        super(Settings.create().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, "backpack"))));
+        super(Settings.create()
+                .registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Main.MOD_ID, "backpack")))
+                .pistonBehavior(PistonBehavior.DESTROY)
+                .nonOpaque()
+                .hardness(0.1f)
+        );
     }
 
     @Override
@@ -58,15 +66,25 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
         return super.getPickStack(world, pos, state, includeData);
     }
 
+    // this is definitely used wrongly
     @Override
-    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (!world.isClient) {
-            BackpackBlockEntity entity = (BackpackBlockEntity) blockEntity;
-            if (entity != null) {
-                ItemStack stack = entity.getItemStack().copy();
-                BackpackUtils.checkEnchantments(stack, (ServerPlayerEntity) player, entity.getSize(), entity.getExtraSize());
-                dropStack(world, pos, stack);
-            }
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        Optional<BackpackBlockEntity> entity = world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY);
+        if (entity.isPresent()) {
+            ItemStack stack = entity.get().getItemStack().copy();
+            BackpackUtils.addCustomData(stack, (ServerWorld) world);
+            dropStack(world, pos, stack);
+        }
+        return super.onBreak(world, pos, state, player);
+    }
+
+    @Override
+    protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
+        Optional<BackpackBlockEntity> entity = world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY);
+        if (entity.isPresent()) {
+            ItemStack stack = entity.get().getItemStack().copy();
+            BackpackUtils.addCustomData(stack, world);
+            dropStack(world, pos, stack);
         }
     }
 

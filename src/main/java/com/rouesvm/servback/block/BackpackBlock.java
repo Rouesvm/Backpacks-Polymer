@@ -57,7 +57,7 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
             BlockState neighborState,
             Random random
     ) {
-        return world.getFluidState(neighborPos) != null
+        return world.getFluidState(neighborPos).canFlowTo(world, pos)
                 ? Blocks.AIR.getDefaultState()
                 : super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }

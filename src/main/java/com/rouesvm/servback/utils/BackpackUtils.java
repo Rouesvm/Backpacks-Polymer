@@ -13,12 +13,25 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.util.UUID;
 
 import static com.rouesvm.servback.Main.CAPACITY;
 
 public class BackpackUtils {
+    public static void convertComponentToBackpackData(BackpackInstance instance, ItemStack stack) {
+        BackpackInventory inventory = instance.getInventory();
+        if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
+            DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
+            if (inventory.insertItems(itemStacks)) {
+                instance.setInventory(inventory);
+                BackpackManager.getManager().saveBackpack(instance.getUuid(), instance.getInventory());
+            }
+            stack.set(DataComponentTypes.CONTAINER, null);
+        }
+    }
+
     public static BackpackInventory getItemList(ItemStack stack, int maxPossibleSlot) {
         if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = BackpackManager.getStackUUID(stack);

@@ -1,6 +1,6 @@
 package com.rouesvm.servback.item;
 
-import com.rouesvm.servback.ui.DumbBackpackGui;
+import com.rouesvm.servback.ui.BasicGui;
 import com.rouesvm.servback.ui.inventory.BaseInventory;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
@@ -134,6 +134,6 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         ContainerItem.playInsertSound(player);
-        new DumbBackpackGui(player, stack, getInventory(player, stack));
+        new BasicGui(player, stack, getInventory(player, stack));
     }
 }

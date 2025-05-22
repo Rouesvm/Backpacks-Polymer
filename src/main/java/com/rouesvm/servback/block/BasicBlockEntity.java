@@ -11,11 +11,11 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
-public class DumbBackpackBlockEntity extends BlockEntity {
+public class BasicBlockEntity extends BlockEntity {
     private int size = 9;
     private Text customName;
 
-    public DumbBackpackBlockEntity(BlockPos pos, BlockState state) {
+    public BasicBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
     }
 

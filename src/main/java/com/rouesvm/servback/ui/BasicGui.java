@@ -11,7 +11,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-public class DumbBackpackGui extends SimpleGui {
+public class BasicGui extends SimpleGui {
     protected final ItemStack stack;
     protected final Inventory inventory;
 
@@ -20,7 +20,7 @@ public class DumbBackpackGui extends SimpleGui {
 
     private final int slots;
 
-    public DumbBackpackGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+    public BasicGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
         super(getHandler(inventory.size()), player, false);
 
         this.stack = stack;
@@ -59,7 +59,7 @@ public class DumbBackpackGui extends SimpleGui {
         });
     }
 
-    private void lockSlot() {
+    public void lockSlot() {
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
                 final int index = j == 0 ? k + (9 * 4 + this.slots) - 9 : this.slots + (k + j * 9) - 9 ;

@@ -21,11 +21,12 @@ import static com.rouesvm.servback.Main.MOD_ID;
 
 public class Configuration {
     public static Configuration manager;
+
+    public static final Instance defaultInstance = new Instance();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final File configFile;
-    private final Instance defaultInstance = new Instance();
-    private Instance instance = new Instance();
+    public Instance instance = new Instance();
 
     public static void initialize() {
         manager = new Configuration(MOD_ID + ".json");

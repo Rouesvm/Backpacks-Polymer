@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.Main;
+import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
@@ -58,6 +59,11 @@ public class BackpackCommands {
                                 CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
                                 Text.translatable("command.serverbackpacks.empty"));
                     }
+                    return 1;
+                }))).then(literal("config").then(literal("reset").executes(context -> {
+                    Configuration.manager.instance = new Configuration.Instance();
+                    context.getSource().sendFeedback(
+                            () -> Text.translatable("command.serverbackpacks.reset"), false);
                     return 1;
                 })))
         );

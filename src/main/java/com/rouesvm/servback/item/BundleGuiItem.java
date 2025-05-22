@@ -1,45 +1,76 @@
 package com.rouesvm.servback.item;
 
-import com.rouesvm.servback.ui.inventory.BackpackInventory;
-import com.rouesvm.servback.utils.BackpackManager;
-import com.rouesvm.servback.utils.BackpackUtils;
+import com.rouesvm.servback.ui.DumbBackpackGui;
+import com.rouesvm.servback.ui.inventory.BaseInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
-import net.minecraft.util.DyeColor;
-
-import java.util.UUID;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.world.World;
 
 import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 
-public class BundleContainerItem extends ContainerItem {
-    public BundleContainerItem(String name, int slots, DyeColor color) {
-        super(name, slots, color);
+public class BundleGuiItem extends BasicPolymerItem  {
+    public BundleGuiItem(String name) {
+        super(name, Items.LEATHER);
+    }
+
+    @Override
+    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
+
+        var cast = player.raycast(5,0,false);
+        if (!(player instanceof ServerPlayerEntity serverPlayer))
+            return ActionResult.PASS;
+        if (player.isSneaking())
+            return ActionResult.PASS;
+        if (cast.getType() == HitResult.Type.BLOCK)
+            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+
+        openGui(serverPlayer, stack);
+        player.swingHand(hand, true);
+        return ActionResult.SUCCESS;
+    }
+
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer))
+            return ActionResult.PASS;
+        if (serverPlayer.isSneaking())
+            return ActionResult.PASS;
+
+        openGui(serverPlayer, context.getStack());
+        serverPlayer.swingHand(context.getHand(), true);
+        return ActionResult.SUCCESS;
     }
 
     @Override
     public boolean onStackClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player) {
-        BackpackInventory inventory = BackpackUtils.getItemList(stack, BackpackUtils.getExtendedSlots(stack) + this.slots);
+        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+        Inventory inventory = getInventory(serverPlayer);
 
         if (inventory == null) {
             return false;
         } else {
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             ItemStack itemStack = slot.getStack();
 
             if (!itemStack.getItem().canBeNested()) return false;
 
             if (clickType == ClickType.LEFT && !itemStack.isEmpty()) {
-                if (inventory.canInsert(itemStack)) {
-                    itemStack = inventory.addStack(itemStack);
-                    playInsertSound(serverPlayer);
+                if (BaseInventory.canInsert(itemStack, inventory)) {
+                    itemStack = BaseInventory.addStack(itemStack, inventory);
+                    ContainerItem.playInsertSound(serverPlayer);
                 } else {
-                    playInsertFailSound(serverPlayer);
+                    ContainerItem.playInsertFailSound(serverPlayer);
                 }
 
                 slot.setStack(itemStack);
@@ -56,18 +87,18 @@ public class BundleContainerItem extends ContainerItem {
         if (clickType == ClickType.LEFT && otherStack.isEmpty()) {
             setSelectedStackIndex(stack, -1);
         } else {
-            BackpackInventory inventory = BackpackUtils.getItemList(stack, BackpackUtils.getExtendedSlots(stack) + this.slots);
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            Inventory inventory = getInventory(serverPlayer);
 
             if (!otherStack.getItem().canBeNested()) return false;
 
             if (inventory != null) {
                 if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
-                    if (inventory.canInsert(otherStack)) {
-                        otherStack = inventory.addStack(otherStack);
-                        playInsertSound(serverPlayer);
+                    if (BaseInventory.canInsert(otherStack, inventory)) {
+                        otherStack = BaseInventory.addStack(otherStack, inventory);
+                        ContainerItem.playInsertSound(serverPlayer);
                     } else {
-                        playInsertFailSound(serverPlayer);
+                        ContainerItem.playInsertFailSound(serverPlayer);
                     }
 
                     cursorStackReference.set(otherStack);
@@ -84,9 +115,11 @@ public class BundleContainerItem extends ContainerItem {
         return false;
     }
 
+    public Inventory getInventory(ServerPlayerEntity player) {
+        return null;
+    }
+
     private void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
-        UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackManager.getManager().saveBackpack(uuid, (BackpackInventory) inventory);
         onContentChanged(player);
     }
 
@@ -95,5 +128,10 @@ public class BundleContainerItem extends ContainerItem {
         if (screenHandler != null) {
             screenHandler.onContentChanged(user.getInventory());
         }
+    }
+
+    public void openGui(ServerPlayerEntity player, ItemStack stack) {
+        ContainerItem.playInsertSound(player);
+        new DumbBackpackGui(player, stack, getInventory(player));
     }
 }

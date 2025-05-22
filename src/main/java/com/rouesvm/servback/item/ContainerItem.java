@@ -164,7 +164,7 @@ public class ContainerItem extends BasicPolymerBlockItem {
                 BackpackUtils.getExtendedSlots(stack) + this.slots
         );
 
-        new BackpackGui(player, stack, instance);
+        if (instance != null) new BackpackGui(player, stack, instance);
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {

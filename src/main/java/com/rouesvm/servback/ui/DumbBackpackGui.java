@@ -10,20 +10,20 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-public class EnderBackpackGui extends SimpleGui {
+public class DumbBackpackGui extends SimpleGui {
     protected final ItemStack stack;
     protected final Inventory inventory;
 
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
-    public EnderBackpackGui(ServerPlayerEntity player, ItemStack stack) {
+    public DumbBackpackGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
         super(ScreenHandlerType.GENERIC_9X3, player, false);
 
         this.stack = stack;
-        this.inventory = player.getEnderChestInventory();
+        this.inventory = inventory;
 
-        this.setTitle(Text.translatable("item.serverbackpacks.gui_ender"));
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         this.fillChest();
 
         this.open();

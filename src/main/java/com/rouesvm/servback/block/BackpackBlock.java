@@ -5,6 +5,7 @@ import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
+import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
 import com.rouesvm.servback.utils.bedrock.BedrockBlock;
@@ -20,6 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
@@ -64,6 +66,19 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
     }
 
     @Override
+    protected boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        Optional<BackpackBlockEntity> blockEntity = world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY);
+        blockEntity.ifPresent(backpackBlockEntity ->
+                ScreenHandler.calculateComparatorOutput(BackpackManager.getInventory(backpackBlockEntity.getUuid())));
+        return 0;
+    }
+
+    @Override
     protected int getOpacity(BlockState state) {
         return 1;
     }
@@ -83,7 +98,7 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
         if (!world.isClient()) {
             BackpackBlockEntity entity = (BackpackBlockEntity) world.getBlockEntity(pos);
             if (entity != null) {
-                ItemStack stack = entity.getItemStack();
+                ItemStack stack = entity.getDefaultStack();
                 if (includeData)
                     return stack.copy();
                 else return stack.getItem().getDefaultStack();
@@ -97,7 +112,7 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         Optional<BackpackBlockEntity> entity = world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY);
         if (entity.isPresent()) {
-            ItemStack stack = entity.get().getItemStack().copy();
+            ItemStack stack = entity.get().getDefaultStack().copy();
             BackpackUtils.addCustomData(stack, (ServerWorld) world);
             dropStack(world, pos, stack);
         }
@@ -108,7 +123,7 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
     protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
         Optional<BackpackBlockEntity> entity = world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY);
         if (entity.isPresent()) {
-            ItemStack stack = entity.get().getItemStack().copy();
+            ItemStack stack = entity.get().getDefaultStack().copy();
             BackpackUtils.addCustomData(stack, world);
             dropStack(world, pos, stack);
         }
@@ -121,7 +136,7 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
             if (entity != null && entity.getUuid() != null) {
                 if (Main.hasTrinketLoaded && player.isSneaking()) {
                     if (!BackpackTrinket.hasStackInBackSlot(player)) {
-                        ItemStack stack = entity.getItemStack().copy();
+                        ItemStack stack = entity.getDefaultStack().copy();
                         BackpackUtils.checkEnchantments(stack, (ServerPlayerEntity) player, entity.getSize(), entity.getExtraSize());
                         BackpackTrinket.equipStack(player, stack);
                         world.breakBlock(pos, false);
@@ -129,16 +144,17 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
                     }
                 }
 
+                BackpackInstance instance = entity.getInstance();
+
                 resize(
                         entity.getExtraSize(),
                         entity.getSize(),
                         entity.getUuid(),
-                        BackpackManager.getInventory(entity.getUuid(), entity.getSize() + entity.getExtraSize()),
+                        instance.getInventory(),
                         (ServerPlayerEntity) player
                 );
 
-                new BackpackGui((ServerPlayerEntity) player, null,
-                        BackpackManager.getInstance(entity.getUuid(), entity.getSize() + entity.getExtraSize()));
+                new BackpackGui((ServerPlayerEntity) player, null, instance);
                 return ActionResult.SUCCESS;
             }
         }

@@ -1,10 +1,8 @@
 package com.rouesvm.servback.ui.inventory;
 
-import com.google.common.collect.Lists;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtList;
@@ -12,7 +10,6 @@ import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,30 +18,9 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     private final int size;
     public DefaultedList<ItemStack> heldStacks;
 
-    @Nullable
-    private List<InventoryChangedListener> listeners;
-
     public BaseInventory(int size) {
         this.size = size;
         this.heldStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
-    }
-
-    public BaseInventory(ItemStack... items) {
-        this.size = items.length;
-        this.heldStacks = DefaultedList.copyOf(ItemStack.EMPTY, items);
-    }
-
-    public void addListener(InventoryChangedListener listener) {
-        if (this.listeners == null) {
-            this.listeners = Lists.newArrayList();
-        }
-        this.listeners.add(listener);
-    }
-
-    public void removeListener(InventoryChangedListener listener) {
-        if (this.listeners != null) {
-            this.listeners.remove(listener);
-        }
     }
 
     public ItemStack getStack(int slot) {
@@ -89,31 +65,11 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     }
 
     public ItemStack addStack(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        } else {
-            ItemStack itemStack = stack.copy();
-            this.addToExistingSlot(itemStack);
-            if (itemStack.isEmpty()) {
-                return ItemStack.EMPTY;
-            } else {
-                this.addToNewSlot(itemStack);
-                return itemStack.isEmpty() ? ItemStack.EMPTY : itemStack;
-            }
-        }
+        return BaseInventory.addStack(stack, this);
     }
 
     public boolean canInsert(ItemStack stack) {
-        boolean bl = false;
-
-        for(ItemStack itemStack : this.heldStacks) {
-            if (itemStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() < itemStack.getMaxCount()) {
-                bl = true;
-                break;
-            }
-        }
-
-        return bl;
+        return BaseInventory.canInsert(stack, this);
     }
 
     public ItemStack removeStack(int slot) {
@@ -146,14 +102,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return true;
     }
 
-    public void markDirty() {
-        if (this.listeners != null) {
-            for(InventoryChangedListener inventoryChangedListener : this.listeners) {
-                inventoryChangedListener.onInventoryChanged(this);
-            }
-        }
-
-    }
+    public void markDirty() {}
 
     public boolean canPlayerUse(PlayerEntity player) {
         return true;
@@ -163,8 +112,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         this.heldStacks.clear();
         this.markDirty();
     }
-
-
 
     @Override
     public void provideRecipeInputs(RecipeFinder finder) {
@@ -177,40 +124,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return (this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).toList()).toString();
     }
 
-    private void addToNewSlot(ItemStack stack) {
-        for(int i = 0; i < this.size; ++i) {
-            ItemStack itemStack = this.getStack(i);
-            if (itemStack.isEmpty()) {
-                this.setStack(i, stack.copyAndEmpty());
-                return;
-            }
-        }
-
-    }
-
-    private void addToExistingSlot(ItemStack stack) {
-        for(int i = 0; i < this.size; ++i) {
-            ItemStack itemStack = this.getStack(i);
-            if (ItemStack.areItemsAndComponentsEqual(itemStack, stack)) {
-                this.transfer(stack, itemStack);
-                if (stack.isEmpty()) {
-                    return;
-                }
-            }
-        }
-
-    }
-
-    private void transfer(ItemStack source, ItemStack target) {
-        int i = this.getMaxCount(target);
-        int j = Math.min(source.getCount(), i - target.getCount());
-        if (j > 0) {
-            target.increment(j);
-            source.decrement(j);
-            this.markDirty();
-        }
-
-    }
 
     public void readNbtList(NbtList list, RegistryWrapper.WrapperLookup registries) {
         this.clear();
@@ -236,5 +149,66 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
 
     public DefaultedList<ItemStack> getHeldStacks() {
         return this.heldStacks;
+    }
+
+    public static ItemStack addStack(ItemStack stack, Inventory inventory) {
+        if (stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        } else {
+            ItemStack itemStack = stack.copy();
+            BaseInventory.addToExistingSlot(itemStack, inventory);
+            if (itemStack.isEmpty()) {
+                return ItemStack.EMPTY;
+            } else {
+                BaseInventory.addToNewSlot(itemStack, inventory);
+                return itemStack.isEmpty() ? ItemStack.EMPTY : itemStack;
+            }
+        }
+    }
+
+    private static void addToNewSlot(ItemStack stack, Inventory inventory) {
+        for(int i = 0; i < inventory.size(); ++i) {
+            ItemStack itemStack = inventory.getStack(i);
+            if (itemStack.isEmpty()) {
+                inventory.setStack(i, stack.copyAndEmpty());
+                return;
+            }
+        }
+
+    }
+
+    private static void addToExistingSlot(ItemStack stack, Inventory inventory) {
+        for (int i = 0; i < inventory.size(); ++i) {
+            ItemStack itemStack = inventory.getStack(i);
+            if (ItemStack.areItemsAndComponentsEqual(itemStack, stack)) {
+                BaseInventory.transfer(stack, itemStack, inventory);
+                if (stack.isEmpty()) {
+                    return;
+                }
+            }
+        }
+    }
+
+    public static boolean canInsert(ItemStack stack, Inventory inventory) {
+        boolean bl = false;
+
+        for(ItemStack itemStack : inventory) {
+            if (itemStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() < itemStack.getMaxCount()) {
+                bl = true;
+                break;
+            }
+        }
+
+        return bl;
+    }
+
+    private static void transfer(ItemStack source, ItemStack target, Inventory inventory) {
+        int i = inventory.getMaxCount(target);
+        int j = Math.min(source.getCount(), i - target.getCount());
+        if (j > 0) {
+            target.increment(j);
+            source.decrement(j);
+            inventory.markDirty();
+        }
     }
 }

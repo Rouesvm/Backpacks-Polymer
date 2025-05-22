@@ -1,14 +1,13 @@
 package com.rouesvm.servback.registry;
 
+import com.rouesvm.servback.Main;
 import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.item.BasicPolymerItem;
 import com.rouesvm.servback.item.BundleContainerItem;
-import com.rouesvm.servback.item.GuiItem;
-import com.rouesvm.servback.ui.EnderBackpackGui;
-import com.rouesvm.servback.ui.GlobalBackpackGui;
+import com.rouesvm.servback.item.BundleGuiItem;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,16 +22,16 @@ public class BackpackItemRegistry {
     public static Map<DyeColor, Item> MEDIUM = new HashMap<>(DyeColor.values().length);
     public static Map<DyeColor, Item> LARGE = new HashMap<>(DyeColor.values().length);
 
-    public static final Item ENDER_BACKPACK = register(new GuiItem("ender") {
+    public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender") {
         @Override
-        public void openGui(ServerPlayerEntity player, ItemStack stack) {
-            new EnderBackpackGui(player, stack);
+        public Inventory getInventory(ServerPlayerEntity player) {
+            return player.getEnderChestInventory();
         }
     });
-    public static final Item GLOBAL_BACKPACK = register(new GuiItem("global") {
+    public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global") {
         @Override
-        public void openGui(ServerPlayerEntity player, ItemStack stack) {
-            new GlobalBackpackGui(player, stack);
+        public Inventory getInventory(ServerPlayerEntity player) {
+            return Main.getInventory();
         }
     });
 

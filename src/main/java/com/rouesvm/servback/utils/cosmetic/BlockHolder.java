@@ -38,7 +38,7 @@ public class BlockHolder extends ElementHolder {
         if (!alreadySetItem & world != null) {
             BackpackBlockEntity blockEntity = (BackpackBlockEntity) world.getBlockEntity(pos);
             if (blockEntity != null) {
-                this.setMain(blockEntity.getItemStack().getItem());
+                this.setMain(blockEntity.getDefaultStack().getItem());
                 alreadySetItem = true;
             }
         }

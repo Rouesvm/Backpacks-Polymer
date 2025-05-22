@@ -64,7 +64,7 @@ public class BackpackBlockEntity extends BlockEntity {
         setStorage();
     }
 
-    public ItemStack getItemStack() {
+    public ItemStack getDefaultStack() {
         if (uuid == null) return ContainerItem.getDefaultBackpack(1).getDefaultStack();
 
         DynamicRegistryManager registryManager = this.getWorld().getRegistryManager();
@@ -93,6 +93,10 @@ public class BackpackBlockEntity extends BlockEntity {
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
         setStorage();
+    }
+
+    public BackpackInstance getInstance() {
+        return instance;
     }
 
     public int getSize() {

@@ -134,6 +134,6 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         ContainerItem.playInsertSound(player);
-        new DumbBackpackGui(player, stack, getInventory(stack, player));
+        new DumbBackpackGui(player, stack, getInventory(player, stack));
     }
 }

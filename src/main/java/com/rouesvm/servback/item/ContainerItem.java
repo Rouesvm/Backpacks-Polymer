@@ -13,7 +13,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -21,24 +24,31 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import java.util.UUID;
 
-public class ContainerItem extends BasicPolymerBlockItem {
+public class ContainerItem extends BundleGuiItem {
     public final int slots;
     private final DyeColor color;
 
     public ContainerItem(String name, int slots, DyeColor color) {
-        super(name, Items.LEATHER, BackpackBlockRegistry.BACKPACK);
+        super(name, BackpackBlockRegistry.BACKPACK);
         this.slots = slots;
         this.color = color;
+    }
+
+    public int getSize() {
+        return slots / 9;
+    }
+
+    public DyeColor getColor() {
+        return color;
     }
 
     @Override
@@ -70,35 +80,6 @@ public class ContainerItem extends BasicPolymerBlockItem {
         if (capacityAmount - capacityMaxShow > 0) {
             tooltip.add(Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow).formatted(Formatting.ITALIC).formatted(Formatting.GOLD));
         }
-    }
-
-    @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
-
-        var cast = player.raycast(5,0,false);
-        if (!(player instanceof ServerPlayerEntity serverPlayer))
-            return ActionResult.PASS;
-        if (player.isSneaking())
-            return ActionResult.PASS;
-        if (cast.getType() == HitResult.Type.BLOCK)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-
-        openGui(serverPlayer, stack);
-        player.swingHand(hand, true);
-        return ActionResult.SUCCESS;
-    }
-
-    @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer))
-            return ActionResult.PASS;
-        if (serverPlayer.isSneaking())
-            return super.useOnBlock(context);
-
-        openGui(serverPlayer, context.getStack());
-        serverPlayer.swingHand(context.getHand(), true);
-        return ActionResult.SUCCESS;
     }
 
     public ActionResult place(ItemPlacementContext context) {
@@ -156,8 +137,16 @@ public class ContainerItem extends BasicPolymerBlockItem {
         }
     }
 
+    @Override
+    public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
+        return BackpackManager.getInventory(BackpackManager.getStackUUID(stack));
+    }
+
+    @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        onOpen(player, stack);
+        BackpackManager.createNewUUID(stack);
+        BackpackUtils.checkEnchantments(stack, player, this.slots, BackpackUtils.getExtendedSlots(stack));
+        playInsertSound(player);
 
         BackpackInstance instance = BackpackManager.getInstance(
                 BackpackManager.getStackUUID(stack),
@@ -167,24 +156,16 @@ public class ContainerItem extends BasicPolymerBlockItem {
         if (instance != null) new BackpackGui(player, stack, instance);
     }
 
+    @Override
+    public void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+        UUID uuid = BackpackManager.getStackUUID(stack);
+        BackpackManager.getManager().saveBackpack(uuid, (BackpackInventory) inventory);
+    }
+
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
         DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots + BackpackUtils.getExtendedSlots(stack), ItemStack.EMPTY);
         stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
         return list;
-    }
-
-    public void onOpen(ServerPlayerEntity player, ItemStack stack) {
-        BackpackManager.createNewUUID(stack);
-        BackpackUtils.checkEnchantments(stack, player, this.slots, BackpackUtils.getExtendedSlots(stack));
-        playInsertSound(player);
-    }
-
-    public int getSize() {
-        return slots / 9;
-    }
-
-    public DyeColor getColor() {
-        return color;
     }
 
     // It's 1-9 (If you have slots = (9 * (size)) you do (slots / 9))

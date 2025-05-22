@@ -11,7 +11,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
@@ -23,18 +22,18 @@ public class BackpackGui extends SimpleGui {
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
-    private int size;
+    private int slots;
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
-        super(getHandler(instance.getInventory().size()), player, false);
+        super(DumbBackpackGui.getHandler(instance.getInventory().size()), player, false);
 
         this.stack = stack;
 
         this.backpackInstance = instance;
         this.backpackInstance.setLastAccessed();
 
-        this.size = this.backpackInstance.getInventory().size();
-        if (this.size > (9*6)) this.size = 9 * 6;
+        this.slots = this.backpackInstance.getInventory().size();
+        if (this.slots > (9*6)) this.slots = 9 * 6;
 
         this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
 
@@ -85,7 +84,7 @@ public class BackpackGui extends SimpleGui {
     private void lockSlot() {
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
-                final int index = j == 0 ? k + (9 * 4 + this.size) - 9 : this.size + (k + j * 9) - 9 ;
+                final int index = j == 0 ? k + (9 * 4 + this.slots) - 9 : this.slots + (k + j * 9) - 9 ;
                 if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
                     this.stackIndex = index;
                     break;
@@ -111,19 +110,8 @@ public class BackpackGui extends SimpleGui {
         if (outOfSlot) this.close();
     }
 
-    public static ScreenHandlerType<?> getHandler(int slots) {
-        return switch (slots/9) {
-            case 1 -> ScreenHandlerType.GENERIC_9X1;
-            case 2 -> ScreenHandlerType.GENERIC_9X2;
-            case 3 -> ScreenHandlerType.GENERIC_9X3;
-            case 4 -> ScreenHandlerType.GENERIC_9X4;
-            case 5 -> ScreenHandlerType.GENERIC_9X5;
-            default -> ScreenHandlerType.GENERIC_9X6;
-        };
-    }
-
     public void fillChest() {
-        for (int j = 0; j < size; ++j)
+        for (int j = 0; j < slots; ++j)
             this.setSlotRedirect(j, new BackpackSlot(backpackInstance.getInventory(), j, j,0));
     }
 }

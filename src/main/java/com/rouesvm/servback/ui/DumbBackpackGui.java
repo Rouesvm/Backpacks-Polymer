@@ -1,5 +1,6 @@
 package com.rouesvm.servback.ui;
 
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.ui.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.inventory.Inventory;
@@ -17,23 +18,39 @@ public class DumbBackpackGui extends SimpleGui {
     protected int stackIndex;
     protected boolean outOfSlot = false;
 
+    private final int slots;
+
     public DumbBackpackGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
-        super(ScreenHandlerType.GENERIC_9X3, player, false);
+        super(getHandler(inventory.size()), player, false);
 
         this.stack = stack;
         this.inventory = inventory;
 
-        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
-        this.fillChest();
+        this.slots = inventory.size();
 
+        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
+
+        if (this.stack != null) {
+            stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
+                    .append(" (")
+                    .append(stack.getName())
+                    .append(")"));
+        }
+
+        this.fillChest();
         this.open();
 
-        this.lockSlot();
+        this.afterOpened();
+    }
+
+    public void afterOpened() {
+        if (stack != null) this.lockSlot();
 
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
@@ -45,7 +62,7 @@ public class DumbBackpackGui extends SimpleGui {
     private void lockSlot() {
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
-                final int index = j == 0 ? k + (9 * 4 + this.size) - 9 : this.size + (k + j * 9) - 9 ;
+                final int index = j == 0 ? k + (9 * 4 + this.slots) - 9 : this.slots + (k + j * 9) - 9 ;
                 if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
                     this.stackIndex = index;
                     break;
@@ -59,8 +76,19 @@ public class DumbBackpackGui extends SimpleGui {
         if (outOfSlot) this.close();
     }
 
+    public static ScreenHandlerType<?> getHandler(int slots) {
+        return switch (slots/9) {
+            case 1 -> ScreenHandlerType.GENERIC_9X1;
+            case 2 -> ScreenHandlerType.GENERIC_9X2;
+            case 3 -> ScreenHandlerType.GENERIC_9X3;
+            case 4 -> ScreenHandlerType.GENERIC_9X4;
+            case 5 -> ScreenHandlerType.GENERIC_9X5;
+            default -> ScreenHandlerType.GENERIC_9X6;
+        };
+    }
+
     public void fillChest() {
-        for (int i = 0; i < 27; i++)
+        for (int i = 0; i < this.slots; i++)
             this.setSlotRedirect(i, new NonBackpackSlot(this.inventory, i, i, 0));
     }
 }

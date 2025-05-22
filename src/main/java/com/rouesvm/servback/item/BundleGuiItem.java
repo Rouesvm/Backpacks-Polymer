@@ -2,6 +2,7 @@ package com.rouesvm.servback.item;
 
 import com.rouesvm.servback.ui.DumbBackpackGui;
 import com.rouesvm.servback.ui.inventory.BaseInventory;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.StackReference;
@@ -19,9 +20,9 @@ import net.minecraft.world.World;
 
 import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 
-public class BundleGuiItem extends BasicPolymerItem  {
-    public BundleGuiItem(String name) {
-        super(name, Items.LEATHER);
+public class BundleGuiItem extends BasicPolymerBlockItem  {
+    public BundleGuiItem(String name, Block block) {
+        super(name, Items.LEATHER, block);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class BundleGuiItem extends BasicPolymerItem  {
     @Override
     public boolean onStackClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player) {
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-        Inventory inventory = getInventory(serverPlayer);
+        Inventory inventory = getInventory(serverPlayer, stack);
 
         if (inventory == null) {
             return false;
@@ -75,6 +76,7 @@ public class BundleGuiItem extends BasicPolymerItem  {
 
                 slot.setStack(itemStack);
                 afterChanged(serverPlayer, stack, inventory);
+                onContentChanged(player);
                 return true;
             } else {
                 return false;
@@ -88,7 +90,7 @@ public class BundleGuiItem extends BasicPolymerItem  {
             setSelectedStackIndex(stack, -1);
         } else {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            Inventory inventory = getInventory(serverPlayer);
+            Inventory inventory = getInventory(serverPlayer, stack);
 
             if (!otherStack.getItem().canBeNested()) return false;
 
@@ -103,6 +105,7 @@ public class BundleGuiItem extends BasicPolymerItem  {
 
                     cursorStackReference.set(otherStack);
                     afterChanged(serverPlayer, stack, inventory);
+                    onContentChanged(player);
                     return true;
                 } else if (clickType == ClickType.RIGHT) {
                     openGui(serverPlayer, stack);
@@ -115,15 +118,14 @@ public class BundleGuiItem extends BasicPolymerItem  {
         return false;
     }
 
-    public Inventory getInventory(ServerPlayerEntity player) {
+    public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
         return null;
     }
 
-    private void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
-        onContentChanged(player);
+    public void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
     }
 
-    private void onContentChanged(PlayerEntity user) {
+    public void onContentChanged(PlayerEntity user) {
         ScreenHandler screenHandler = user.currentScreenHandler;
         if (screenHandler != null) {
             screenHandler.onContentChanged(user.getInventory());
@@ -132,6 +134,6 @@ public class BundleGuiItem extends BasicPolymerItem  {
 
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         ContainerItem.playInsertSound(player);
-        new DumbBackpackGui(player, stack, getInventory(player));
+        new DumbBackpackGui(player, stack, getInventory(stack, player));
     }
 }

@@ -3,11 +3,11 @@ package com.rouesvm.servback.registry;
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.item.BasicPolymerBlockItem;
-import com.rouesvm.servback.item.BasicPolymerItem;
-import com.rouesvm.servback.item.BundleContainerItem;
 import com.rouesvm.servback.item.BundleGuiItem;
+import com.rouesvm.servback.item.ContainerItem;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,22 +22,18 @@ public class BackpackItemRegistry {
     public static Map<DyeColor, Item> MEDIUM = new HashMap<>(DyeColor.values().length);
     public static Map<DyeColor, Item> LARGE = new HashMap<>(DyeColor.values().length);
 
-    public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender") {
+    public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.BACKPACK) {
         @Override
-        public Inventory getInventory(ServerPlayerEntity player) {
+        public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
             return player.getEnderChestInventory();
         }
     });
-    public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global") {
+    public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.BACKPACK) {
         @Override
-        public Inventory getInventory(ServerPlayerEntity player) {
+        public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
             return Main.getInventory();
         }
     });
-
-    public static Item register(BasicPolymerItem item) {
-        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
-    }
 
     public static Item register(BasicPolymerBlockItem item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
@@ -45,7 +41,7 @@ public class BackpackItemRegistry {
 
     // lazy
     public static void create(Map<DyeColor, Item> itemMap, DyeColor color, String name, int size) {
-        itemMap.put(color, register(new BundleContainerItem(name, size, color)));
+        itemMap.put(color, register(new ContainerItem(name, size, color)));
     }
 
     public static Item getBackpack(@NotNull DyeColor color, int size) {

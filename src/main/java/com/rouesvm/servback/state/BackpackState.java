@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.PersistentStateType;
+import net.minecraft.world.World;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class BackpackState extends PersistentState {
     }
 
     public static BackpackState getServerState(MinecraftServer server) {
-        PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();
+        PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
         BackpackState state = persistentStateManager.getOrCreate(type);
         state.markDirty();
         return state;

@@ -83,6 +83,9 @@ public class BackpackManager {
 
     public static BackpackInstance getInstance(UUID uuid, int slots) {
         BackpackManager manager = getManager();
+
+        if (manager == null) return null;
+
         if (manager.hasBackpack(uuid)) {
             BackpackInstance backpack = manager.storedInstances.get(uuid);
             BackpackInventory inventory = backpack.getInventory();
@@ -110,13 +113,14 @@ public class BackpackManager {
     }
 
     public void saveBackpack(BackpackInstance instance) {
-        if (instance.getUuid() != null && instance.getInventory() != null) {
-            this.storedInstances.put(instance.getUuid(), instance);
-        }
+        if (instance != null) saveBackpack(instance.getUuid(), instance.getInventory());
     }
 
     public void saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
-        saveBackpack(new BackpackInstance(uuid, backpackInventory));
+        if (uuid != null && backpackInventory != null) {
+            BackpackInstance accessedInstance = this.storedInstances.putIfAbsent(uuid, new BackpackInstance(uuid, backpackInventory));
+            if (accessedInstance != null) accessedInstance.saveToInventory(backpackInventory);
+        }
     }
 
     public void load(Set<BackpackInstance> instances) {

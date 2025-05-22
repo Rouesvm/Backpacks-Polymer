@@ -65,6 +65,10 @@ public class Main implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
+
+		ServerLifecycleEvents.AFTER_SAVE.register((minecraftServer, b, b1) -> {
+			if (BackpackManager.getManager() != null) BackpackManager.getManager().save(minecraftServer);
+		});
 	}
 
 	public static BaseInventory getInventory() {

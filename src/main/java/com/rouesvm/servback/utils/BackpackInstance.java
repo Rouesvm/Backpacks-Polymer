@@ -22,6 +22,10 @@ public class BackpackInstance {
         this.inventory = inventory;
     }
 
+    public void saveToInventory(BackpackInventory inventory) {
+        inventory.copyTo(this.inventory);
+    }
+
     public void setLastAccessed() {
         this.lastAccessed = System.currentTimeMillis();
     }

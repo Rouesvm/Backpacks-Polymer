@@ -3,7 +3,10 @@ package com.rouesvm.servback.block;
 import com.rouesvm.servback.item.ContainerItem;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.utils.BackpackInstance;
+import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
@@ -18,6 +21,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -31,6 +36,9 @@ public class BackpackBlockEntity extends BlockEntity {
     private DyeColor color = DyeColor.BROWN;
     private Text customName;
 
+    private BackpackInstance instance;
+    private InventoryStorage storage;
+
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
     }
@@ -42,9 +50,8 @@ public class BackpackBlockEntity extends BlockEntity {
         nbt.putInt("size", size);
         nbt.putInt("extraSize", extraSize);
 
-        if (uuid != null) {
-            nbt.putString("uuid", uuid.toString());
-        }
+        if (uuid != null) nbt.putString("uuid", uuid.toString());
+        if (instance != null) BackpackManager.getManager().saveBackpack(instance);
     }
 
     @Override
@@ -54,6 +61,7 @@ public class BackpackBlockEntity extends BlockEntity {
         size = nbt.getInt("size", 9);
         extraSize = nbt.getInt("extraSize", 0);
         uuid = UUID.fromString(nbt.getString("uuid", UUID.randomUUID().toString()));
+        setStorage();
     }
 
     public ItemStack getItemStack() {
@@ -73,12 +81,18 @@ public class BackpackBlockEntity extends BlockEntity {
         return stack;
     }
 
+    public void setStorage() {
+        if (instance == null) instance = BackpackManager.getInstance(uuid, extraSize + size);
+        if (instance != null && storage == null) storage = InventoryStorage.of(instance.getInventory(), null);
+    }
+
     public UUID getUuid() {
         return uuid;
     }
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+        setStorage();
     }
 
     public int getSize() {
@@ -103,5 +117,9 @@ public class BackpackBlockEntity extends BlockEntity {
 
     public void setCustomName(Text customName) {
         this.customName = customName;
+    }
+
+    public @Nullable InventoryStorage getInventoryProvider(@Nullable Direction direction) {
+        return storage;
     }
 }

@@ -4,6 +4,7 @@ import com.rouesvm.servback.Main;
 import com.rouesvm.servback.block.BackpackBlockEntity;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
@@ -21,5 +22,7 @@ public class BackpackBlockEntityRegistry {
         return entity;
     }
 
-    public static void initialize() {}
+    public static void initialize() {
+        ItemStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getInventoryProvider, BACKPACK_BLOCK_ENTITY);
+    }
 }

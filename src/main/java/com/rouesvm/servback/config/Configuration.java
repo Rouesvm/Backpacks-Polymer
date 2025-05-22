@@ -73,7 +73,7 @@ public class Configuration {
     }
 
     public static class Instance {
-        @SerializedName("display_back")
+        @SerializedName("breaks_with_flow")
         public boolean breaks_with_flow = true;
 
         @SerializedName("small_backpack_size")

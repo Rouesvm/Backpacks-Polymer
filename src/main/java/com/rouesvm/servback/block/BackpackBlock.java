@@ -2,6 +2,7 @@ package com.rouesvm.servback.block;
 
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
+import com.rouesvm.servback.config.Configuration;
 import com.rouesvm.servback.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
 import com.rouesvm.servback.utils.BackpackManager;
@@ -57,7 +58,7 @@ public class BackpackBlock extends BasicPolymerBlock implements BlockEntityProvi
             BlockState neighborState,
             Random random
     ) {
-        return world.getFluidState(neighborPos).canFlowTo(world, pos)
+        return (Configuration.getInstance().breaks_with_flow && world.getFluidState(neighborPos).canFlowTo(world, pos))
                 ? Blocks.AIR.getDefaultState()
                 : super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }

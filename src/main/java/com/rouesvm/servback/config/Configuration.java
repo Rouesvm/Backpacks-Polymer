@@ -73,6 +73,9 @@ public class Configuration {
     }
 
     public static class Instance {
+        @SerializedName("display_back")
+        public boolean breaks_with_flow = false;
+
         @SerializedName("small_backpack_size")
         public int small_backpack_size = 9;
 

@@ -1,6 +1,7 @@
 package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.item.ContainerItem;
+import com.rouesvm.servback.registry.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.item.Item;
@@ -38,6 +39,9 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
                 }
             }
         }
+
+        this.getOrCreateTagBuilder(BACKPACKS).add(BackpackItemRegistry.GLOBAL_BACKPACK);
+        this.getOrCreateTagBuilder(BACKPACKS).add(BackpackItemRegistry.ENDER_BACKPACK);
 
         this.getOrCreateTagBuilder(BACKPACKS).addTag(SMALL_BACKPACKS);
         this.getOrCreateTagBuilder(BACKPACKS).addTag(MEDIUM_BACKPACKS);

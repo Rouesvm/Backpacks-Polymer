@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
 public class BasicBlockEntity extends BlockEntity {
@@ -34,11 +35,17 @@ public class BasicBlockEntity extends BlockEntity {
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.writeNbt(nbt, registries);
-        item = Registries.ITEM.get(
+
+        size = nbt.getInt("size", 9);
+
+        if (nbt.getInt("dye").isPresent()) {
+            item = ContainerItem.getColoredBackpack(DyeColor.byIndex(nbt.getInt("dye", 1)), size / 9);
+        }
+
+        if (item == null) item = Registries.ITEM.get(
                 nbt.getInt("item", Registries.ITEM.getRawId(
                         ContainerItem.getDefaultBackpack(1)
                 )));
-        size = nbt.getInt("size", 9);
     }
 
     public ItemStack getDefaultStack() {

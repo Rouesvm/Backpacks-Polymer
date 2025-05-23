@@ -113,7 +113,7 @@ public class BackpackManager {
             BackpackInventory inventory = backpack.getInventory();
             if (inventory.size() != slots) {
                 backpack.setInventory(resizeInventory(inventory, slots));
-                manager.saveBackpack(backpack);
+                manager.saveNewInventoryBackpack(uuid, inventory);
             }
             return backpack;
         } else return new BackpackInstance(uuid, new BackpackInventory(slots));
@@ -141,8 +141,19 @@ public class BackpackManager {
 
     public static void resizeInventory(UUID uuid, BackpackInventory inventory, int newSize) {
         if (uuid != null && inventory != null) {
+            BackpackInstance accessedInstance = getInstance(uuid, newSize);
+            if (accessedInstance != null) manager.saveNewInventoryBackpack(uuid, resizeInventory(inventory, newSize));
+        }
+    }
+
+    public void saveNewInventoryBackpack(BackpackInstance instance) {
+        if (instance != null) saveNewInventoryBackpack(instance.getUuid(), instance.getInventory());
+    }
+
+    public void saveNewInventoryBackpack(UUID uuid, BackpackInventory inventory) {
+        if (uuid != null && inventory != null) {
             BackpackInstance accessedInstance = getInstance(uuid);
-            if (accessedInstance != null) accessedInstance.setInventory(resizeInventory(inventory, newSize));
+            if (accessedInstance != null) accessedInstance.setInventory(inventory);
         }
     }
 

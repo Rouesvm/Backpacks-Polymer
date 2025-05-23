@@ -22,13 +22,13 @@ public class BackpackItemRegistry {
     public static Map<DyeColor, Item> MEDIUM = new HashMap<>(DyeColor.values().length);
     public static Map<DyeColor, Item> LARGE = new HashMap<>(DyeColor.values().length);
 
-    public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.BACKPACK) {
+    public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
         @Override
         public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
             return player.getEnderChestInventory();
         }
     });
-    public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.BACKPACK) {
+    public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.GLOBAL_BACKPACK) {
         @Override
         public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
             return Main.getInventory();

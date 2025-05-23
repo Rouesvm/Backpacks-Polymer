@@ -64,13 +64,13 @@ public class BackpackState extends PersistentState {
 
     public void setStoredInventories(Set<BackpackInstance> backpackInstances) {
         this.storedInventories.clear();
-        for (BackpackInstance instance : backpackInstances) {
+        backpackInstances.forEach(instance -> {
             BackpackData data = new BackpackData(
                     instance.getUuid(),
                     new InventoryData(SlotData.writeToCodec(instance.getHeldInventory()))
             );
             this.storedInventories.add(data);
-        }
+        });
         markDirty();
     }
 }

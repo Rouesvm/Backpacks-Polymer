@@ -30,7 +30,7 @@ public class BackpackManager {
 
     public static void setup(MinecraftServer server) {
         if (Main.hasTrinketLoaded) CosmeticManager.setup();
-        
+
         manager = new BackpackManager();
         manager.load(server);
         BackpackDataFixer.onWorldLoading(server);
@@ -86,7 +86,7 @@ public class BackpackManager {
         } else return UUID.fromString(uuidString);
     }
 
-    private static UUID generateUniqueUUID() {
+    public static UUID generateUniqueUUID() {
         UUID uuid = UUID.randomUUID();
         if (manager != null) {
             int attempts = 0;
@@ -140,17 +140,20 @@ public class BackpackManager {
     }
 
     public static void resizeInventory(UUID uuid, BackpackInventory inventory, int newSize) {
-        manager.saveBackpack(uuid, resizeInventory(inventory, newSize));
+        if (uuid != null && inventory != null) {
+            BackpackInstance accessedInstance = getInstance(uuid);
+            if (accessedInstance != null) accessedInstance.setInventory(resizeInventory(inventory, newSize));
+        }
     }
 
     public void saveBackpack(BackpackInstance instance) {
         if (instance != null) saveBackpack(instance.getUuid(), instance.getInventory());
     }
 
-    public void saveBackpack(UUID uuid, BackpackInventory backpackInventory) {
-        if (uuid != null && backpackInventory != null) {
-            BackpackInstance accessedInstance = this.storedInstances.putIfAbsent(uuid, new BackpackInstance(uuid, backpackInventory));
-            if (accessedInstance != null) accessedInstance.saveToInventory(backpackInventory);
+    public void saveBackpack(UUID uuid, BackpackInventory inventory) {
+        if (uuid != null && inventory != null) {
+            BackpackInstance accessedInstance = this.storedInstances.putIfAbsent(uuid, new BackpackInstance(uuid, inventory));
+            if (accessedInstance != null) accessedInstance.saveToInventory(inventory);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
@@ -28,7 +29,7 @@ public class BackpackGui extends BasicGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                BackpackManager.getManager().saveBackpack(backpackInstance);
+                BackpackManager.getManager().saveBackpack(backpackInstance.getUuid(), (BackpackInventory) inventory);
                 if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
             }
             @Override

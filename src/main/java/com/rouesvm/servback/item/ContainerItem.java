@@ -1,6 +1,6 @@
 package com.rouesvm.servback.item;
 
-import com.rouesvm.servback.block.BackpackBlockEntity;
+import com.rouesvm.servback.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
 import com.rouesvm.servback.ui.BackpackGui;
@@ -82,6 +82,7 @@ public class ContainerItem extends BundleGuiItem {
         }
     }
 
+    @Override
     public ActionResult place(ItemPlacementContext context) {
         if (!this.getBlock().isEnabled(context.getWorld().getEnabledFeatures())) {
             return ActionResult.FAIL;
@@ -109,9 +110,11 @@ public class ContainerItem extends BundleGuiItem {
                         blockState2.getBlock().onPlaced(world, blockPos, blockState2, playerEntity, itemStack);
 
                         if (world.getBlockEntity(blockPos) instanceof BackpackBlockEntity blockEntity) {
+                            BackpackUtils.checkEnchantments(itemStack, (ServerPlayerEntity) playerEntity, this.slots, BackpackUtils.getExtendedSlots(itemStack));
+
+                            blockEntity.setItem(this);
                             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
                             blockEntity.setSize(slots);
-                            blockEntity.setColor(color);
                             blockEntity.setUuid(BackpackManager.getStackUUID(context.getStack()));
 
                             if (itemStack.getCustomName() != null) {

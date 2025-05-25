@@ -47,7 +47,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.writeNbt(nbt, registries);
+        super.readNbt(nbt, registries);
         extraSize = nbt.getInt("extraSize", 0);
         uuid = UUID.fromString(nbt.getString("uuid", BackpackManager.generateUniqueUUID().toString()));
 

@@ -27,20 +27,21 @@ public class BasicBlockEntity extends BlockEntity {
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.writeNbt(nbt, registries);
-        nbt.putInt("size", size);
 
+        nbt.putInt("size", size);
         if (item != null) nbt.putInt("item", Registries.ITEM.getRawId(item));
     }
 
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.writeNbt(nbt, registries);
+        super.readNbt(nbt, registries);
 
         size = nbt.getInt("size", 9);
 
-        if (nbt.getInt("dye").isPresent()) {
-            item = ContainerItem.getColoredBackpack(DyeColor.byIndex(nbt.getInt("dye", 1)), size / 9);
-        }
+        nbt.getInt("dye").ifPresent(integer -> {
+            item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9);
+            nbt.putInt("dye", -1);
+        });
 
         if (item == null) item = Registries.ITEM.get(
                 nbt.getInt("item", Registries.ITEM.getRawId(

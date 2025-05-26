@@ -42,14 +42,11 @@ public class BackpackGeyser implements EventRegistrar {
         GEYSER_PACK = PACKS_FOLDER.resolve("backpack.zip");
 
         try {
-            if (!GEYSER_PACK.toFile().exists()) {
-                Files.createDirectories(PACKS_FOLDER);
-                Path file = FabricLoader.getInstance().getModContainer(MOD_ID).flatMap(
-                        modContainer -> modContainer.findPath("bedrock/backpack.zip")).get();
-                Files.copy(file, GEYSER_PACK);
-
-                GEYSER_PACK = PACKS_FOLDER.resolve("backpack.zip");
-            }
+            if (!PACKS_FOLDER.toFile().exists()) Files.createDirectories(PACKS_FOLDER);
+            Path file = FabricLoader.getInstance().getModContainer(MOD_ID).flatMap(
+                    modContainer -> modContainer.findPath("bedrock/backpack.zip")).get();
+            Files.copy(file, GEYSER_PACK);
+            GEYSER_PACK = PACKS_FOLDER.resolve("backpack.zip");
         } catch (Exception ignored) {}
     }
 

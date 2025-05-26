@@ -11,10 +11,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import org.geysermc.geyser.api.block.custom.CustomBlockPermutation;
 import org.geysermc.geyser.api.block.custom.NonVanillaCustomBlockData;
-import org.geysermc.geyser.api.block.custom.component.BoxComponent;
-import org.geysermc.geyser.api.block.custom.component.CustomBlockComponents;
-import org.geysermc.geyser.api.block.custom.component.GeometryComponent;
-import org.geysermc.geyser.api.block.custom.component.MaterialInstance;
+import org.geysermc.geyser.api.block.custom.component.*;
 import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBlockState;
 import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBoundingBox;
 import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomBlocksEvent;
@@ -22,12 +19,17 @@ import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomBlocksEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class BackpackGeyserBlock {
     public static List<String> dye_colors = Arrays.stream(DyeColor.values()).map(DyeColor::asString).toList();
     public static List<String> facing = HorizontalFacingBlock.FACING.getValues().stream().map(Direction::asString).toList();
-    public static List<Integer> slots = IntStream.range(1, 4).boxed().toList();
+    public static List<Integer> slots = new ArrayList<>();
+
+    static {
+        slots.add(1);
+        slots.add(2);
+        slots.add(3);
+    }
 
     public static String STATE_CONDITION = "query.block_property('%s') == %s";
 
@@ -104,29 +106,48 @@ public class BackpackGeyserBlock {
     private static List<CustomBlockPermutation> createBackpackPermutations(Block block) {
         List<CustomBlockPermutation> permutations = new ArrayList<>();
 
+        for (String direction : facing) {
+            int yRot;
+
+            switch (direction) {
+                case "south" -> yRot = 180;
+                case "west" -> yRot = 90;
+                case "east" -> yRot = 270;
+                default -> yRot = 0;
+            }
+
+            CustomBlockComponents customBlockComponents = CustomBlockComponents.builder()
+                    .transformation(new TransformationComponent(
+                            0,
+                            (360 - yRot) % 360,
+                            0
+                    ))
+                    .build();
+
+            permutations.add(new CustomBlockPermutation(customBlockComponents, String.format(STATE_CONDITION,
+                    BackpackBlock.FACING.getName(), "'" + direction.toLowerCase() + "'")));
+        }
+
         for (int size : slots) {
             for (String dyeColor : dye_colors) {
-                MaterialInstance materialInstance = MaterialInstance.builder()
-                        .texture("serverbackpacks:red_3")
-                        .renderMethod("opaque")
-                        .faceDimming(true)
-                        .ambientOcclusion(true)
-                        .build();
-
                 CustomBlockComponents customBlockComponents = CustomBlockComponents.builder()
-                        .materialInstance("*", materialInstance)
+                        .materialInstance("*", MaterialInstance.builder()
+                                .texture("serverbackpacks:" + dyeColor + "_" + size)
+                                .renderMethod("opaque")
+                                .faceDimming(true)
+                                .ambientOcclusion(true)
+                                .build())
                         .build();
 
                 permutations.add(new CustomBlockPermutation(customBlockComponents, String.format(STATE_CONDITION,
+                        BackpackBlock.SLOTS.getName(), size) + " && " + String.format(STATE_CONDITION,
                         BackpackBlock.DYE_COLOR.getName(), "'" + dyeColor.toLowerCase() + "'")));
             }
 
-            GeometryComponent geometryComponent = GeometryComponent.builder()
-                    .identifier("geometry.backpack_" + size)
-                    .build();
-
             CustomBlockComponents customBlockComponents = CustomBlockComponents.builder()
-                    .geometry(geometryComponent)
+                    .geometry(GeometryComponent.builder()
+                            .identifier("geometry.backpack_" + size)
+                            .build())
                     .build();
 
             permutations.add(new CustomBlockPermutation(customBlockComponents, String.format(STATE_CONDITION,

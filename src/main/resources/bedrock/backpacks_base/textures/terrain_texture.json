@@ -2,6 +2,15 @@
   "resource_pack_name": "serverbackpacks",
   "texture_name": "atlas.terrain",
   "texture_data": {
+    "serverbackpacks:brown_1": {
+      "textures": "textures/serverbackpacks/block/small/brown_small"
+    },
+    "serverbackpacks:brown_2": {
+      "textures": "textures/serverbackpacks/block/medium/brown_medium"
+    },
+    "serverbackpacks:brown_3": {
+      "textures": "textures/serverbackpacks/block/large/brown_large"
+    },
     "serverbackpacks:red_1": {
       "textures": "textures/serverbackpacks/block/small/red_small"
     },

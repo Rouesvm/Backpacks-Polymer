@@ -22,13 +22,13 @@ public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerB
 
     @Override
     public BlockState getPolymerBlockState(BlockState blockState, PacketContext context) {
-        if (Main.isBedrock(context.getPlayer())) return this.getDefaultState();
+        if (Main.isBedrock(context.getPlayer())) return blockState;
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        if (Main.isBedrock(context.getPlayer())) return this.getDefaultState();
+        if (Main.isBedrock(context.getPlayer())) return state;
         return Blocks.BARRIER.getDefaultState();
     }
 

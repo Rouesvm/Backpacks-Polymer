@@ -41,7 +41,33 @@ public class BackpackItemRegistry {
 
     // lazy
     public static void create(Map<DyeColor, Item> itemMap, DyeColor color, String name, int size) {
-        itemMap.put(color, register(new ContainerItem(name, size, color)));
+        itemMap.put(color, register(new ContainerItem(name, size)));
+    }
+
+    public static DyeColor getBackpackDyeColor(ContainerItem item) {
+        switch (item.getSize()) {
+            case 1 -> {
+                return SMALL.entrySet().stream()
+                        .filter(entry -> entry.getValue() == item)
+                        .map(Map.Entry::getKey)
+                        .findFirst()
+                        .orElse(DyeColor.BROWN);
+            } case 2 -> {
+                return MEDIUM.entrySet().stream()
+                        .filter(entry -> entry.getValue() == item)
+                        .map(Map.Entry::getKey)
+                        .findFirst()
+                        .orElse(DyeColor.BROWN);
+            } case 3 -> {
+                return LARGE.entrySet().stream()
+                        .filter(entry -> entry.getValue() == item)
+                        .map(Map.Entry::getKey)
+                        .findFirst()
+                        .orElse(DyeColor.BROWN);
+            } default -> {
+                return DyeColor.BROWN;
+            }
+        }
     }
 
     public static Item getBackpack(@NotNull DyeColor color, int size) {

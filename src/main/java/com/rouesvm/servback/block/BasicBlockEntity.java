@@ -40,7 +40,7 @@ public class BasicBlockEntity extends BlockEntity {
 
         nbt.getInt("dye").ifPresent(integer -> {
             item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9);
-            nbt.putInt("dye", -1);
+            nbt.remove("dye");
         });
 
         if (item == null) item = Registries.ITEM.get(
@@ -57,6 +57,10 @@ public class BasicBlockEntity extends BlockEntity {
 
     public int getSize() {
         return size;
+    }
+
+    public Item getItem() {
+        return item;
     }
 
     public void setItem(Item item) {

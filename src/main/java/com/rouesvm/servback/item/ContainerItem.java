@@ -1,5 +1,6 @@
 package com.rouesvm.servback.item;
 
+import com.rouesvm.servback.block.backpack.BackpackBlock;
 import com.rouesvm.servback.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
@@ -35,20 +36,14 @@ import java.util.UUID;
 
 public class ContainerItem extends BundleGuiItem {
     public final int slots;
-    private final DyeColor color;
 
-    public ContainerItem(String name, int slots, DyeColor color) {
+    public ContainerItem(String name, int slots) {
         super(name, BackpackBlockRegistry.BACKPACK);
         this.slots = slots;
-        this.color = color;
     }
 
     public int getSize() {
         return slots / 9;
-    }
-
-    public DyeColor getColor() {
-        return color;
     }
 
     @Override
@@ -94,6 +89,11 @@ public class ContainerItem extends BundleGuiItem {
                 return ActionResult.FAIL;
             } else {
                 BlockState blockState = this.getPlacementState(itemPlacementContext);
+
+                if (blockState != null) {
+                    blockState = blockState.with(BackpackBlock.DYE_COLOR, BackpackItemRegistry.getBackpackDyeColor(this));
+                }
+
                 if (blockState == null) {
                     return ActionResult.FAIL;
                 } else if (!this.place(itemPlacementContext, blockState)) {

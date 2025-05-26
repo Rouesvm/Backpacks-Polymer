@@ -9,9 +9,26 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class BackpackItemGroup {
+    public static DyeColor[] dyeColors = {
+            DyeColor.BROWN,
+            DyeColor.BLACK,
+            DyeColor.LIGHT_GRAY,
+            DyeColor.LIGHT_BLUE,
+            DyeColor.BLUE,
+            DyeColor.CYAN,
+            DyeColor.PURPLE,
+            DyeColor.MAGENTA,
+            DyeColor.PINK,
+            DyeColor.RED,
+            DyeColor.ORANGE,
+            DyeColor.YELLOW,
+            DyeColor.GREEN,
+            DyeColor.LIME,
+            DyeColor.WHITE
+    };
+
     public static void addItems(Entries entries) {
-        for (DyeColor color : DyeColor.values()) {
-            if (color == DyeColor.GRAY) continue;
+        for (DyeColor color : dyeColors) {
             entries.add(BackpackItemRegistry.getBackpack(color, 1));
             entries.add(BackpackItemRegistry.getBackpack(color, 2));
             entries.add(BackpackItemRegistry.getBackpack(color, 3));

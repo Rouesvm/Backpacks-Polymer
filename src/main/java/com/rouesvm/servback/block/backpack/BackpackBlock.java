@@ -10,13 +10,18 @@ import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
 import com.rouesvm.servback.utils.bedrock.BedrockBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -26,8 +31,20 @@ import java.util.Optional;
 import static com.rouesvm.servback.utils.BackpackUtils.resize;
 
 public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
+    public static EnumProperty<DyeColor> DYE_COLOR = EnumProperty.of("dye_color", DyeColor.class);
+
     public BackpackBlock() {
         super("backpack");
+        this.setDefaultState(super.stateManager.getDefaultState().with(DYE_COLOR, DyeColor.BROWN));
+    }
+
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext context) {
+        return super.getPlacementState(context).with(DYE_COLOR, DyeColor.BROWN);
+    }
+
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING).add(DYE_COLOR);
     }
 
     @Override

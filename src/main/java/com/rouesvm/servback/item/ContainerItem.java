@@ -1,6 +1,5 @@
 package com.rouesvm.servback.item;
 
-import com.rouesvm.servback.block.backpack.BackpackBlock;
 import com.rouesvm.servback.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.registry.BackpackItemRegistry;
@@ -89,10 +88,6 @@ public class ContainerItem extends BundleGuiItem {
                 return ActionResult.FAIL;
             } else {
                 BlockState blockState = this.getPlacementState(itemPlacementContext);
-
-                if (blockState != null) {
-                    blockState = blockState.with(BackpackBlock.DYE_COLOR, BackpackItemRegistry.getBackpackDyeColor(this));
-                }
 
                 if (blockState == null) {
                     return ActionResult.FAIL;

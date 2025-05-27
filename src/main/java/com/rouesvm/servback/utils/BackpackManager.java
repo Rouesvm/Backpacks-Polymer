@@ -90,9 +90,8 @@ public class BackpackManager {
         UUID uuid = UUID.randomUUID();
         if (manager != null) {
             int attempts = 0;
-            while (manager.hasBackpack(uuid) && attempts < 100) {
+            if (manager.hasBackpack(uuid)) {
                 uuid = UUID.randomUUID();
-                attempts++;
             }
         }
         return uuid;

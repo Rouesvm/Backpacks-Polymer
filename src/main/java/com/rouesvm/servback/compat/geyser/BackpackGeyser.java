@@ -14,6 +14,7 @@ import org.geysermc.geyser.api.pack.ResourcePack;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import static com.rouesvm.servback.Main.MOD_ID;
 
@@ -45,7 +46,7 @@ public class BackpackGeyser implements EventRegistrar {
             if (!PACKS_FOLDER.toFile().exists()) Files.createDirectories(PACKS_FOLDER);
             Path file = FabricLoader.getInstance().getModContainer(MOD_ID).flatMap(
                     modContainer -> modContainer.findPath("bedrock/backpack.zip")).get();
-            Files.copy(file, GEYSER_PACK);
+            Files.copy(file, GEYSER_PACK, StandardCopyOption.REPLACE_EXISTING);
             GEYSER_PACK = PACKS_FOLDER.resolve("backpack.zip");
         } catch (Exception ignored) {}
     }

@@ -6,10 +6,15 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.registry.Registries;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import org.geysermc.geyser.api.block.custom.CustomBlockPermutation;
+import org.geysermc.geyser.api.block.custom.CustomBlockState;
 import org.geysermc.geyser.api.block.custom.NonVanillaCustomBlockData;
 import org.geysermc.geyser.api.block.custom.component.*;
 import org.geysermc.geyser.api.block.custom.nonvanilla.JavaBlockState;
@@ -40,70 +45,87 @@ public class BackpackGeyserBlock {
                     Identifier location = entry.getKey().getValue();
                     Block block = entry.getValue();
 
-                    if (!(block instanceof BackpackBlock)) return;
-
-                    BoxComponent collisionBox = BoxComponent.fullBox();
-                    BoxComponent selectionBox = BoxComponent.fullBox();
-
-                    CustomBlockComponents components = CustomBlockComponents.builder()
-                            .collisionBox(collisionBox)
-                            .selectionBox(selectionBox)
-                            .geometry(GeometryComponent.builder()
-                                    .identifier("geometry.backpack_1")
-                                    .build())
-                            .collisionBox(collisionBox)
-                            .selectionBox(selectionBox)
-                            .lightEmission(block.getDefaultState().getLuminance())
-                            .lightDampening(block.getDefaultState().getOpacity())
-                            .friction(Math.min(1 - block.getSlipperiness(), 0.9f))
+                    NonVanillaCustomBlockData customBlockData = createHorizontalBlock(block, location)
+                            .permutations(createHorizontalBlockPermutations())
                             .build();
 
-                    NonVanillaCustomBlockData data = NonVanillaCustomBlockData.builder()
-                            .intProperty(BackpackBlock.SLOTS.getName(), slots)
-                            .stringProperty(BackpackBlock.FACING.getName(), facing)
-                            .stringProperty(BackpackBlock.DYE_COLOR.getName(), dye_colors)
-                            .permutations(createBackpackPermutations(block))
-                            .components(components)
-                            .name(location.getPath())
-                            .namespace(location.getNamespace())
-                            .build();
+                    if (block instanceof BackpackBlock) customBlockData = registerBackpackBlock(block, location);
+
+                    event.register(customBlockData);
 
                     int blockId = Registries.BLOCK.getRawId(block);
-                    event.register(data);
-
-                    for (String facing : facing) {
-                        for (String dye_color : dye_colors) {
-                            for (int size : slots) {
-
-                                BlockState state = block.getDefaultState()
-                                        .with(BackpackBlock.FACING, Direction.byId(facing))
-                                        .with(BackpackBlock.DYE_COLOR, DyeColor.byId(dye_color, null))
-                                        .with(BackpackBlock.SLOTS, size);
-
-                                int rawID = Block.getRawIdFromState(state);
-
-                                JavaBlockState facingStates = JavaBlockState.builder()
-                                        .identifier(location.toString())
-                                        .blockHardness(block.getHardness())
-                                        .canBreakWithHand(true)
-                                        .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
-                                        .javaId(rawID)
-                                        .stateGroupId(blockId)
-                                        .build();
-
-                                event.registerOverride(facingStates, data.blockStateBuilder()
-                                        .stringProperty(BackpackBlock.DYE_COLOR.getName(), dye_color)
-                                        .stringProperty(BackpackBlock.FACING.getName(), facing)
-                                        .intProperty(BackpackBlock.SLOTS.getName(), size)
-                                        .build());
+                    for (BlockState state : block.getStateManager().getStates()) {
+                        CustomBlockState.Builder stateBuilder = customBlockData.blockStateBuilder();
+                        for (Property<?> property : state.getProperties()) {
+                            if (property instanceof IntProperty intProperty) {
+                                stateBuilder.intProperty(property.getName(), state.get(intProperty));
+                            } else if (property instanceof BooleanProperty booleanProperty) {
+                                stateBuilder.booleanProperty(property.getName(), state.get(booleanProperty));
+                            } else if (property instanceof EnumProperty<?> enumProperty) {
+                                stateBuilder.stringProperty(enumProperty.getName(), state.get(enumProperty).asString());
+                            } else {
+                                throw new IllegalArgumentException("Unknown property type: " + property.getClass().getName());
                             }
                         }
+
+                        JavaBlockState javaBlockState = JavaBlockState.builder()
+                                .identifier(location.toString())
+                                .blockHardness(block.getHardness())
+                                .canBreakWithHand(true)
+                                .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
+                                .javaId(Block.getRawIdFromState(state))
+                                .stateGroupId(blockId)
+                                .build();
+
+                        event.registerOverride(javaBlockState, stateBuilder.build());
                     }
                 });
     }
 
+    private static NonVanillaCustomBlockData registerBackpackBlock(Block block, Identifier location) {
+        NonVanillaCustomBlockData data = createHorizontalBlock(block, location)
+                .intProperty(BackpackBlock.SLOTS.getName(), slots)
+                .stringProperty(BackpackBlock.DYE_COLOR.getName(), dye_colors)
+                .permutations(createBackpackPermutations())
+                .name(location.getPath())
+                .namespace(location.getNamespace())
+                .build();
+        return data;
+    }
 
-    private static List<CustomBlockPermutation> createBackpackPermutations(Block block) {
+    private static NonVanillaCustomBlockData.Builder createHorizontalBlock(Block block, Identifier location) {
+        BoxComponent collisionBox = BoxComponent.fullBox();
+        BoxComponent selectionBox = BoxComponent.fullBox();
+
+        CustomBlockComponents components = CustomBlockComponents.builder()
+                .collisionBox(collisionBox)
+                .selectionBox(selectionBox)
+                .materialInstance("*", MaterialInstance.builder()
+                        .texture("serverbackpacks:" + location.getPath())
+                        .renderMethod("opaque")
+                        .faceDimming(true)
+                        .ambientOcclusion(true)
+                        .build())
+                .geometry(GeometryComponent.builder()
+                        .identifier("geometry.backpack_3")
+                        .build())
+                .collisionBox(collisionBox)
+                .selectionBox(selectionBox)
+                .lightEmission(block.getDefaultState().getLuminance())
+                .lightDampening(block.getDefaultState().getOpacity())
+                .friction(Math.min(1 - block.getSlipperiness(), 0.9f))
+                .build();
+
+        NonVanillaCustomBlockData.Builder data = NonVanillaCustomBlockData.builder()
+                .stringProperty(BackpackBlock.FACING.getName(), facing)
+                .name(location.getPath())
+                .namespace(location.getNamespace())
+                .components(components);
+
+        return data;
+    }
+
+    private static List<CustomBlockPermutation> createHorizontalBlockPermutations() {
         List<CustomBlockPermutation> permutations = new ArrayList<>();
 
         for (String direction : facing) {
@@ -111,8 +133,8 @@ public class BackpackGeyserBlock {
 
             switch (direction) {
                 case "south" -> yRot = 180;
-                case "west" -> yRot = 90;
-                case "east" -> yRot = 270;
+                case "west" -> yRot = 270;
+                case "east" -> yRot = 90;
                 default -> yRot = 0;
             }
 
@@ -127,6 +149,12 @@ public class BackpackGeyserBlock {
             permutations.add(new CustomBlockPermutation(customBlockComponents, String.format(STATE_CONDITION,
                     BackpackBlock.FACING.getName(), "'" + direction.toLowerCase() + "'")));
         }
+        return permutations;
+    }
+
+    private static List<CustomBlockPermutation> createBackpackPermutations() {
+        List<CustomBlockPermutation> permutations = new ArrayList<>();
+        permutations.addAll(createHorizontalBlockPermutations());
 
         for (int size : slots) {
             for (String dyeColor : dye_colors) {

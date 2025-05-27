@@ -2,6 +2,12 @@
   "resource_pack_name": "serverbackpacks",
   "texture_name": "atlas.terrain",
   "texture_data": {
+    "serverbackpacks:global_backpack": {
+      "textures": "textures/serverbackpacks/block/global"
+    },
+    "serverbackpacks:ender_backpack": {
+      "textures": "textures/serverbackpacks/block/ender"
+    },
     "serverbackpacks:brown_1": {
       "textures": "textures/serverbackpacks/block/small/brown_small"
     },

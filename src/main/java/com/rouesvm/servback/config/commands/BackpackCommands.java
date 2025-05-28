@@ -2,6 +2,7 @@ package com.rouesvm.servback.config.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.config.Configuration;
@@ -60,12 +61,28 @@ public class BackpackCommands {
                                 Text.translatable("command.serverbackpacks.empty"));
                     }
                     return 1;
-                }))).then(literal("config").then(literal("reset").executes(context -> {
+                }))).then(configCommand())
+        );
+    }
+
+    public static LiteralArgumentBuilder<ServerCommandSource> configCommand() {
+        return literal("config")
+                .then(literal("reset").executes(context -> {
                     Configuration.manager.instance = new Configuration.Instance();
                     context.getSource().sendFeedback(
-                            () -> Text.translatable("command.serverbackpacks.reset"), false);
+                            () -> Text.translatable("command.serverbackpacks.reset"), true);
                     return 1;
-                })))
-        );
+                })).then(literal("reload").executes(context -> {
+                    Configuration.manager.load();
+                    context.getSource().sendFeedback(
+                            () -> Text.translatable("command.serverbackpacks.reload"), true);
+                    return 1;
+                }))
+                .then(literal("save").executes(context -> {
+                    Configuration.manager.save();
+                    context.getSource().sendFeedback(
+                            () -> Text.translatable("command.serverbackpacks.save"), true);
+                    return 1;
+                }));
     }
 }

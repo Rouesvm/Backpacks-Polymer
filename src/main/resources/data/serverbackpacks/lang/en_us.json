@@ -60,5 +60,8 @@
   "command.serverbackpacks.empty": "The provided value is empty!",
   "command.serverbackpacks.incorrect_uuid": "UUID does not exist or is invalid!",
   "command.serverbackpacks.list": "Current backpack instances:",
-  "command.serverbackpacks.reset": "Config has been reset!"
+
+  "command.serverbackpacks.reset": "Config has been reset!",
+  "command.serverbackpacks.reload": "Config has been reloaded!",
+  "command.serverbackpacks.save": "Config has been saved!"
 }

@@ -1,7 +1,7 @@
 package com.rouesvm.servback.compat.trinkets;
 
 import com.rouesvm.servback.config.Configuration;
-import com.rouesvm.servback.item.ContainerItem;
+import com.rouesvm.servback.item.BundleGuiItem;
 import com.rouesvm.servback.utils.cosmetic.BackHolder;
 import com.rouesvm.servback.utils.cosmetic.CosmeticManager;
 import dev.emi.trinkets.api.*;
@@ -24,7 +24,7 @@ public class BackpackTrinket implements Trinket {
     public static void initialize() {
         UseBlockCallback.EVENT.register(BackpackTrinket::tryPlaceBackpack);
         Registries.ITEM.stream()
-                .filter(item -> item instanceof ContainerItem)
+                .filter(item -> item instanceof BundleGuiItem)
                 .forEach(item -> TrinketsApi.registerTrinket(item, new BackpackTrinket()));
     }
 
@@ -66,7 +66,7 @@ public class BackpackTrinket implements Trinket {
                     && player.getMainHandStack().isEmpty()
                     && player.getOffHandStack().isEmpty())
             {
-                ContainerItem item = (ContainerItem) stack.getItem();
+                BundleGuiItem item = (BundleGuiItem) stack.getItem();
                 ItemPlacementContext context = new ItemPlacementContext(player, hand, stack, blockHitResult);
                 item.place(context);
                 return ActionResult.SUCCESS;
@@ -98,7 +98,7 @@ public class BackpackTrinket implements Trinket {
                 for(TrinketInventory inv : group.values()) {
                     for(int i = 0; i < inv.size(); ++i) {
                         ItemStack stack = inv.getStack(i);
-                        if (!stack.isEmpty() && stack.getItem() instanceof ContainerItem) {
+                        if (!stack.isEmpty() && stack.getItem() instanceof BundleGuiItem) {
                             return stack;
                         }
                     }

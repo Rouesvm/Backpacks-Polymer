@@ -6,10 +6,11 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -22,16 +23,16 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 import static com.rouesvm.servback.Main.CAPACITY;
 
-public class BackpackBlockEntity extends BasicBlockEntity implements SidedInventory {
+public class BackpackBlockEntity extends BasicBlockEntity {
     private UUID uuid;
 
     private int extraSize = 0;
 
     private BackpackInstance instance;
+    private InventoryStorage storage;
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
@@ -71,6 +72,7 @@ public class BackpackBlockEntity extends BasicBlockEntity implements SidedInvent
 
     public void setStorage() {
         if (instance == null) instance = BackpackManager.getInstance(uuid, extraSize + getSize());
+        if (instance != null && storage != null) storage = InventoryStorage.of(instance.getInventory(), null);
     }
 
     public UUID getUuid() {
@@ -95,63 +97,7 @@ public class BackpackBlockEntity extends BasicBlockEntity implements SidedInvent
         this.extraSize = extraSize;
     }
 
-    @Override
-    public int[] getAvailableSlots(Direction side) {
-        return IntStream.range(0, this.extraSize + this.size()).toArray();
-    }
-
-    @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return true;
-    }
-
-    @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return stack.getItem().canBeNested() && instance != null && instance.getInventory().canInsert(stack);
-    }
-
-    @Override
-    public int size() {
-        return instance != null ? instance.getInventory().size() : 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return instance == null || instance.getInventory().isEmpty();
-    }
-
-    @Override
-    public ItemStack getStack(int slot) {
-        return instance != null ? instance.getInventory().getStack(slot) : null;
-    }
-
-    @Override
-    public ItemStack removeStack(int slot, int amount) {
-        return instance != null ? instance.getInventory().removeStack(slot, amount) : null;
-    }
-
-    @Override
-    public ItemStack removeStack(int slot) {
-        return instance != null ? instance.getInventory().removeStack(slot) : null;
-    }
-
-    @Override
-    public void setStack(int slot, ItemStack stack) {
-        if (instance != null) {
-            instance.getInventory().setStack(slot, stack);
-        }
-    }
-
-    @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        return instance != null ? instance.getInventory().canPlayerUse(player) : null;
-    }
-
-    @Override
-    public void clear() {
-        if (instance != null) {
-            instance.getInventory().clear();
-            BackpackManager.getManager().saveBackpack(instance);
-        }
+    public @Nullable Storage<ItemVariant> getInventoryProvider(@Nullable Direction direction) {
+        return storage;
     }
 }

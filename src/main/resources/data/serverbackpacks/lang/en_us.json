@@ -54,6 +54,8 @@
   "item.serverbackpacks.gui_backpack" : "Backpack",
 
   "block.serverbackpacks.backpack" : "Backpack",
+  "block.serverbackpacks.global_backpack" : "EnderPack",
+  "block.serverbackpacks.ender_backpack" : "GlobalPack",
 
   "enchantment.serverbackpacks.capacity" : "Capacity",
 

@@ -23,6 +23,11 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         this.heldStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
     }
 
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        return canInsert(stack);
+    }
+
     public ItemStack getStack(int slot) {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : ItemStack.EMPTY;
     }
@@ -154,6 +159,8 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     public static ItemStack addStack(ItemStack stack, Inventory inventory) {
         if (stack.isEmpty()) {
             return ItemStack.EMPTY;
+        } else if (!canInsert(stack, inventory)) {
+                return ItemStack.EMPTY;
         } else {
             ItemStack itemStack = stack.copy();
             BaseInventory.addToExistingSlot(itemStack, inventory);
@@ -189,11 +196,18 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         }
     }
 
+    @Override
+    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
+        return canInsert(stack);
+    }
+
     public static boolean canInsert(ItemStack stack, Inventory inventory) {
         boolean bl = false;
 
+        if (!stack.getItem().canBeNested()) return false;
+
         for(ItemStack itemStack : inventory) {
-            if (itemStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() < itemStack.getMaxCount()) {
+            if (itemStack.isEmpty()  || ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() < itemStack.getMaxCount()) {
                 bl = true;
                 break;
             }

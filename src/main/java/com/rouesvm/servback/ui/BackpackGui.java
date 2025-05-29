@@ -2,6 +2,7 @@ package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
+import com.rouesvm.servback.ui.slots.BackpackSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
@@ -66,5 +67,11 @@ public class BackpackGui extends BasicGui {
 
         getPlayer().currentScreenHandler.enableSyncing();
         getPlayer().currentScreenHandler.sendContentUpdates();
+    }
+
+    @Override
+    public void fillChest() {
+        for (int i = 0; i < this.slots(); i++)
+            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i, 0));
     }
 }

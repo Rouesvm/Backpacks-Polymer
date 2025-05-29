@@ -26,7 +26,7 @@ public class BackpackDataSaver {
     private static final Codec<List<BackpackData>> SAVE_CODEC = BackpackData.CODEC.listOf().fieldOf("backpackContents").codec();
 
     public static void onServerStarting(MinecraftServer server) {
-        var path = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.dat");
+        var path = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
         savePath = path;
 
         if (Files.exists(path)) {

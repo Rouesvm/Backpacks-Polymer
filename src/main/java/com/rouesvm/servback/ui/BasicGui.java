@@ -44,6 +44,10 @@ public class BasicGui extends SimpleGui {
         this.afterOpened();
     }
 
+    public int slots() {
+        return slots;
+    }
+
     public void afterOpened() {
         if (stack != null) this.lockSlot();
 

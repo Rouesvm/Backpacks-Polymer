@@ -40,6 +40,9 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
                 .noCollision()
                 .breakInstantly()
                 .pistonBehavior(PistonBehavior.DESTROY)
+                .allowsSpawning(Blocks::never)
+                .nonOpaque()
+                .solidBlock(Blocks::never)
         );
     }
 

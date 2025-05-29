@@ -63,7 +63,13 @@ public class Main implements ModInitializer {
 		ServerPlayConnectionEvents.DISCONNECT.register((serverPlayNetworkHandler, a) ->
 				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer()));
 
-		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::setup);
+		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::setup);
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+			BackpackManager manager = BackpackManager.getManager();
+			manager.load(server);
+			manager.loadOnServerStarted(server);
+		});
+
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
 
 		ServerLifecycleEvents.AFTER_SAVE.register((minecraftServer, b, b1) -> {

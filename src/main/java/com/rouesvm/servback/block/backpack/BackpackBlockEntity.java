@@ -42,7 +42,6 @@ public class BackpackBlockEntity extends BasicBlockEntity {
         nbt.putInt("extraSize", extraSize);
 
         if (uuid != null) nbt.putString("uuid", uuid.toString());
-        if (instance != null && BackpackManager.getManager() != null) BackpackManager.getManager().saveBackpack(instance);
     }
 
     @Override
@@ -97,6 +96,11 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     }
 
     public @Nullable InventoryStorage getInventoryProvider(@Nullable Direction direction) {
-        return storage;
+        if (instance != null && instance.getInventory() != null && storage != null) {
+            this.world.updateComparators(this.getPos(), this.getCachedState().getBlock());
+            return storage;
+        }
+
+        return null;
     }
 }

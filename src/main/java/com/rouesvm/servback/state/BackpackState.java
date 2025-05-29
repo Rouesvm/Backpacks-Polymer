@@ -43,6 +43,8 @@ public class BackpackState extends PersistentState {
     }
 
     public static BackpackState getServerState(MinecraftServer server) {
+        if (server.getWorld(World.OVERWORLD) == null) return null;
+
         PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
         BackpackState state = persistentStateManager.getOrCreate(type);
         state.markDirty();
@@ -51,6 +53,10 @@ public class BackpackState extends PersistentState {
 
     public List<BackpackData> getStoredInventories() {
         return new ArrayList<>(this.storedInventories);
+    }
+
+    public void clearBackpackInstances() {
+        this.storedInventories.clear();
     }
 
     public Set<BackpackInstance> getBackpackInstances() {

@@ -22,7 +22,7 @@ public class TrinketsBackpack {
             component.ifPresent(trinketComponent -> trinketComponent.forEach((slotReference, stack) -> {
                 if (stack.getItem() instanceof ContainerItem containerItem) {
                     BackpackUtils.checkEnchantments(stack, player, containerItem.slots, BackpackUtils.getExtendedSlots(stack));
-                    new BackpackGui(player, null, BackpackManager.getInstance(BackpackManager.getStackUUID(stack), containerItem.slots + BackpackUtils.getExtendedSlots(stack)));
+                    new BackpackGui(player, BackpackManager.getInstance(BackpackManager.getStackUUID(stack), containerItem.slots + BackpackUtils.getExtendedSlots(stack)));
                 }
             }));
             return 1;

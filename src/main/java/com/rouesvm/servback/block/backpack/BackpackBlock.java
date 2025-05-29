@@ -29,8 +29,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
 import static com.rouesvm.servback.utils.BackpackUtils.resize;
 
 public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
@@ -61,10 +59,10 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
 
     @Override
     protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        Optional<BackpackBlockEntity> blockEntity = world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY);
-        blockEntity.ifPresent(backpackBlockEntity ->
-                ScreenHandler.calculateComparatorOutput(getInventory(blockEntity.get(), null)));
-        return 0;
+        return ScreenHandler.calculateComparatorOutput(getInventory(
+                world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY).get(),
+                null
+        ));
     }
 
     @Override
@@ -90,11 +88,13 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
                 player
         );
 
-        new BackpackGui(player, null, instance);
+        entity.getWorld().updateComparators(entity.getPos(), this);
+        new BackpackGui(player, entity, instance);
     }
 
     @Override
     public Inventory getInventory(BlockEntity entity, @Nullable ServerPlayerEntity player) {
+        if (entity == null) return null;
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
         return BackpackManager.getInventory(backpackBlockEntity.getUuid());
     }

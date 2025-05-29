@@ -3,6 +3,7 @@ package com.rouesvm.servback.utils;
 import com.rouesvm.servback.Main;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.state.BackpackDataFixer;
+import com.rouesvm.servback.state.BackpackDataSaver;
 import com.rouesvm.servback.state.BackpackState;
 import com.rouesvm.servback.state.GlobalBackpackState;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
@@ -33,7 +34,6 @@ public class BackpackManager {
 
         manager = new BackpackManager();
         manager.load(server);
-        BackpackDataFixer.onWorldLoading(server);
     }
 
     public static void destroy(MinecraftServer server) {
@@ -45,15 +45,34 @@ public class BackpackManager {
         }
     }
 
-
     public void load(Set<BackpackInstance> instances) {
         instances.forEach(this::saveBackpack);
     }
 
     public void load(MinecraftServer server) {
         BackpackState backpackState = BackpackState.getServerState(server);
-        this.load(backpackState.getBackpackInstances());
 
+        if (backpackState != null) {
+            Set<BackpackInstance> stateInstances = backpackState.getBackpackInstances();
+            if (stateInstances != null && !stateInstances.isEmpty()) {
+                this.load(stateInstances);
+
+                BackpackDataSaver.setStoredInventories(stateInstances);
+                backpackState.clearBackpackInstances();
+                backpackState.markDirty();
+            }
+        } else {
+            BackpackDataSaver.onServerStarting(server);
+            BackpackDataFixer.onWorldLoading(server);
+
+            Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
+            if (dataInstances != null && !dataInstances.isEmpty()) {
+                this.load(dataInstances);
+            }
+        }
+    }
+
+    public void loadOnServerStarted(MinecraftServer server) {
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         this.globalInventory = globalBackpackState.globalInventory;
     }
@@ -63,8 +82,8 @@ public class BackpackManager {
     }
 
     public void save(MinecraftServer server) {
-        BackpackState backpackState = BackpackState.getServerState(server);
-        backpackState.setStoredInventories(this.save());
+        BackpackDataSaver.setStoredInventories(this.save());
+        BackpackDataSaver.save(server);
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         globalBackpackState.globalInventory = this.globalInventory;
@@ -143,10 +162,6 @@ public class BackpackManager {
             BackpackInstance accessedInstance = getInstance(uuid, newSize);
             if (accessedInstance != null) manager.saveNewInventoryBackpack(uuid, resizeInventory(inventory, newSize));
         }
-    }
-
-    public void saveNewInventoryBackpack(BackpackInstance instance) {
-        if (instance != null) saveNewInventoryBackpack(instance.getUuid(), instance.getInventory());
     }
 
     public void saveNewInventoryBackpack(UUID uuid, BackpackInventory inventory) {

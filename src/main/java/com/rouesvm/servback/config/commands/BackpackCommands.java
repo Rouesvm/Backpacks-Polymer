@@ -49,7 +49,7 @@ public class BackpackCommands {
                         UUID uuid = UUID.fromString(search);
                         BackpackInstance instance = BackpackManager.getInstance(uuid);
                         if (instance != null) {
-                            new BackpackGui(context.getSource().getPlayer(), null, instance);
+                            new BackpackGui(context.getSource().getPlayer(), instance);
                         } else {
                             throw new CommandSyntaxException(
                                     CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),

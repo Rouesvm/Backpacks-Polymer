@@ -33,8 +33,8 @@ public class BackHolder extends ElementHolder {
     private final ItemDisplayElement element;
 
     private Vector3f cosmeticPosition = new Vector3f(0f, -0.65f, 0.28f);
-    private Integer cosmeticRotation = 0;
-    private Integer cosmeticPitchWhenSneaking = 25;
+    private Integer cosmeticRotation = 180;
+    private Integer cosmeticPitchWhenSneaking = -25;
 
     private boolean hidden;
     private boolean hideFromPlayer;

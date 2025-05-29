@@ -18,7 +18,7 @@ import java.util.*;
 public class BackpackManager {
     private static BackpackManager manager = null;
 
-    public boolean loaded = false;
+    public static boolean loaded = false;
 
     public BackpackInventory globalInventory;
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
@@ -52,9 +52,21 @@ public class BackpackManager {
     }
 
     public void load(MinecraftServer server) {
+        BackpackDataFixer.onWorldLoading(server);
+
         BackpackState backpackState = BackpackState.getServerState(server);
 
-        if (backpackState != null) {
+        if (!loaded) {
+            BackpackDataSaver.onServerStarting(server);
+
+            Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
+            if (dataInstances != null && !dataInstances.isEmpty()) {
+                this.load(dataInstances);
+                loaded = true;
+            }
+        }
+
+        if (!loaded && backpackState != null) {
             Set<BackpackInstance> stateInstances = backpackState.getBackpackInstances();
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 this.load(stateInstances);
@@ -64,16 +76,6 @@ public class BackpackManager {
                 backpackState.markDirty();
 
                 loaded = true;
-            }
-        }
-
-        if (!loaded) {
-            BackpackDataSaver.onServerStarting(server);
-            BackpackDataFixer.onWorldLoading(server);
-
-            Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
-            if (dataInstances != null && !dataInstances.isEmpty()) {
-                this.load(dataInstances);
             }
         }
     }

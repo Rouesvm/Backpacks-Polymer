@@ -18,6 +18,8 @@ import java.util.*;
 public class BackpackManager {
     private static BackpackManager manager = null;
 
+    public boolean loaded = false;
+
     public BackpackInventory globalInventory;
     public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
@@ -60,8 +62,12 @@ public class BackpackManager {
                 BackpackDataSaver.setStoredInventories(stateInstances);
                 backpackState.clearBackpackInstances();
                 backpackState.markDirty();
+
+                loaded = true;
             }
-        } else {
+        }
+
+        if (!loaded) {
             BackpackDataSaver.onServerStarting(server);
             BackpackDataFixer.onWorldLoading(server);
 

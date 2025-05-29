@@ -3,7 +3,8 @@
   "package": "com.rouesvm.servback.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ShapedRecipeMixin"
+    "ShapedRecipeMixin",
+    "ShulkerBoxMixin"
   ],
   "injectors": {
     "defaultRequire": 1

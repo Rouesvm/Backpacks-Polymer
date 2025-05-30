@@ -38,4 +38,10 @@ public class BackpackInventory extends BaseInventory {
     public void setInventoryDirectly(DefaultedList<ItemStack> inventory) {
         this.heldStacks = inventory;
     }
+
+    public void resize(int size) {
+        for (int i = this.heldStacks.size(); i <= size; i++) {
+            this.heldStacks.add(ItemStack.EMPTY);
+        }
+    }
 }

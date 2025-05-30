@@ -112,6 +112,8 @@ public class ContainerItem extends BundleGuiItem {
                             blockEntity.setSize(slots);
                             blockEntity.setUuid(BackpackManager.getStackUUID(context.getStack()));
 
+                            blockEntity.setStorage();
+
                             if (itemStack.getCustomName() != null) {
                                 blockEntity.setCustomName(itemStack.getCustomName());
                             }

@@ -18,18 +18,25 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
+
+	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
 	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
 
 	public static final List<ServerPlayerEntity> BEDROCK_PLAYERS = new ArrayList<>();
 
 	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
+
+
 
 	@Override
 	public void onInitialize() {

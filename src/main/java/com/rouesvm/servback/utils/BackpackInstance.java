@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class BackpackInstance {
     private final UUID uuid;
-    private BackpackInventory inventory;
+    public BackpackInventory inventory;
 
     public long lastAccessed;
 

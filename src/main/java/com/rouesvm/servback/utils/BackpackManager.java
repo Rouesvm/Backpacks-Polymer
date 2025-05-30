@@ -42,6 +42,8 @@ public class BackpackManager {
         CosmeticManager.destroy();
 
         if (manager != null) {
+            Main.LOGGER.info("Saving Server Backpacks's data!");
+
             manager.save(server);
             manager = null;
         }
@@ -136,10 +138,9 @@ public class BackpackManager {
         if (manager == null) return null;
         if (manager.hasBackpack(uuid)) {
             BackpackInstance backpack = manager.storedInstances.get(uuid);
-            BackpackInventory inventory = backpack.getInventory();
+            BackpackInventory inventory = backpack.inventory;
             if (inventory.size() != slots) {
-                backpack.setInventory(resizeInventory(inventory, slots));
-                manager.saveNewInventoryBackpack(uuid, inventory);
+                resizeInventory(inventory, slots);
             }
             return backpack;
         } else return new BackpackInstance(uuid, new BackpackInventory(slots));
@@ -160,22 +161,14 @@ public class BackpackManager {
     }
 
     public static BackpackInventory resizeInventory(BackpackInventory inventory, int newSize) {
-        BackpackInventory newInventory = new BackpackInventory(newSize);
-        inventory.copyTo(newInventory);
-        return newInventory;
+        inventory.resize(newSize);
+        return inventory;
     }
 
     public static void resizeInventory(UUID uuid, BackpackInventory inventory, int newSize) {
         if (uuid != null && inventory != null) {
             BackpackInstance accessedInstance = getInstance(uuid, newSize);
-            if (accessedInstance != null) manager.saveNewInventoryBackpack(uuid, resizeInventory(inventory, newSize));
-        }
-    }
-
-    public void saveNewInventoryBackpack(UUID uuid, BackpackInventory inventory) {
-        if (uuid != null && inventory != null) {
-            BackpackInstance accessedInstance = getInstance(uuid);
-            if (accessedInstance != null) accessedInstance.setInventory(inventory);
+            if (accessedInstance != null) resizeInventory(inventory, newSize);
         }
     }
 

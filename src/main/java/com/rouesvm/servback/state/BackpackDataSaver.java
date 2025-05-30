@@ -1,6 +1,7 @@
 package com.rouesvm.servback.state;
 
 import com.mojang.serialization.Codec;
+import com.rouesvm.servback.Main;
 import com.rouesvm.servback.state.codecs.BackpackData;
 import com.rouesvm.servback.state.codecs.InventoryData;
 import com.rouesvm.servback.state.codecs.SlotData;
@@ -11,7 +12,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,8 +31,11 @@ public class BackpackDataSaver {
         savePath = path;
 
         if (Files.exists(path)) {
+            Main.LOGGER.info("Loading Server Backpacks's data!");
+
             try {
-                var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), NbtIo.read(path));
+                var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), NbtIo.readCompound(new DataInputStream(
+                        new FileInputStream(path.toFile()))));
                 data.result().ifPresentOrElse(result ->
                         storedInventories = result.getFirst(),
                         () -> storedInventories = new ArrayList<>()
@@ -49,7 +53,7 @@ public class BackpackDataSaver {
         var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE), List.copyOf(storedInventories));
         if (data.isSuccess()) {
             try {
-                Files.writeString(savePath, data.result().get().toString());
+                NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(savePath.toFile())));
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -72,7 +72,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
     public void setStorage() {
         if (instance == null) instance = BackpackManager.getInstance(uuid, extraSize + getSize());
-        if (instance != null && storage != null) storage = InventoryStorage.of(instance.getInventory(), null);
+        if (instance != null && storage == null) storage = InventoryStorage.of(instance.getInventory(), null);
     }
 
     public UUID getUuid() {

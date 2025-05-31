@@ -74,7 +74,7 @@ public class BackpackDataSaver {
         backpackInstances.forEach(instance -> {
             BackpackData data = new BackpackData(
                     instance.getUuid(),
-                    new InventoryData(SlotData.writeToCodec(instance.getHeldInventory()))
+                    new InventoryData(SlotData.writeToCodec(instance.heldInventory()))
             );
             storedInventories.add(data);
         });

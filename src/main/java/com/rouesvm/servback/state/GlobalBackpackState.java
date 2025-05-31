@@ -21,7 +21,7 @@ public class GlobalBackpackState extends PersistentState {
             (instance) ->
                     instance.group(
                             SlotData.CODEC.listOf().fieldOf("itemStacks").forGetter(GlobalBackpackState::getInventory)
-                    ).apply(instance, GlobalBackpackState::new));;
+                    ).apply(instance, GlobalBackpackState::new));
 
 
     private static final PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(

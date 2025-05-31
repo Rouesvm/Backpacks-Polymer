@@ -34,11 +34,11 @@ public class BackpackInstance {
         return uuid;
     }
 
-    public BackpackInventory getInventory() {
+    public BackpackInventory inventory() {
         return inventory;
     }
 
-    public DefaultedList<ItemStack> getHeldInventory() {
+    public DefaultedList<ItemStack> heldInventory() {
         return inventory.heldStacks();
     }
 

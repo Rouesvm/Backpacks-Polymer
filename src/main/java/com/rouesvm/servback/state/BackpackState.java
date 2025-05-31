@@ -73,7 +73,7 @@ public class BackpackState extends PersistentState {
         backpackInstances.forEach(instance -> {
             BackpackData data = new BackpackData(
                     instance.getUuid(),
-                    new InventoryData(SlotData.writeToCodec(instance.getHeldInventory()))
+                    new InventoryData(SlotData.writeToCodec(instance.heldInventory()))
             );
             this.storedInventories.add(data);
         });

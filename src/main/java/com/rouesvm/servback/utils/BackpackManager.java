@@ -35,7 +35,7 @@ public class BackpackManager {
         if (instance != null) {
             Main.LOGGER.info("Saving Server Backpacks's data!");
 
-            instance.save(server);
+            save(server);
             instance = null;
         }
     }
@@ -95,9 +95,9 @@ public class BackpackManager {
     //
 
     public static void saveBackpack(BackpackInstance instance) {
-        if (instance.getUuid() != null && instance.getInventory() != null) {
+        if (instance.getUuid() != null && instance.inventory() != null) {
             BackpackInstance accessedInstance = addBackpack(instance);
-            if (accessedInstance != null) accessedInstance.saveToInventory(instance.getInventory());
+            if (accessedInstance != null) accessedInstance.saveToInventory(instance.inventory());
         }
     }
 
@@ -106,7 +106,7 @@ public class BackpackManager {
     }
 
     public static BackpackInstance addBackpack(BackpackInstance backpackInstance) {
-        if (backpackInstance.getUuid() != null && backpackInstance.getInventory() != null) {
+        if (backpackInstance.getUuid() != null && backpackInstance.inventory() != null) {
             return instance.storedInstances.putIfAbsent(backpackInstance.getUuid(), backpackInstance);
         }
 
@@ -166,14 +166,14 @@ public class BackpackManager {
     public static @Nullable BackpackInventory getInventory(UUID uuid, int slots) {
         BackpackInstance instance = getInstance(uuid, slots);
         if (instance != null)
-            return instance.getInventory();
+            return instance.inventory();
         else return null;
     }
 
     public static @Nullable BackpackInventory getInventory(UUID uuid) {
         BackpackInstance instance = getInstance(uuid);
         if (instance != null)
-            return instance.getInventory();
+            return instance.inventory();
         else return null;
     }
 

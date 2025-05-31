@@ -21,12 +21,12 @@ import static com.rouesvm.servback.Main.CAPACITY;
 
 public class BackpackUtils {
     public static void convertComponentToBackpackData(BackpackInstance instance, ItemStack stack) {
-        BackpackInventory inventory = instance.getInventory();
+        BackpackInventory inventory = instance.inventory();
         if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (inventory.insertItems(itemStacks)) {
                 instance.setInventory(inventory);
-                BackpackManager.instance.addBackpack(instance.getUuid(), instance.getInventory());
+                BackpackManager.addBackpack(instance.getUuid(), instance.inventory());
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
@@ -52,7 +52,7 @@ public class BackpackUtils {
         else return 0;
     }
 
-    public static void checkEnchantments(ItemStack stack, ServerPlayerEntity player, int maxBackpackSlot, int maxExtendedSlot) {
+    public static void checkEnchantments(ItemStack stack, ServerPlayerEntity player, int maxBackpackSlot) {
         BackpackInventory inventory = getItemList(stack);
         if (inventory != null) {
             resize(

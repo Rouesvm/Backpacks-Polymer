@@ -17,7 +17,7 @@ public class BackpackGui extends BasicGui {
     protected BlockEntity entity;
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
-        super(player, stack, instance.getInventory());
+        super(player, stack, instance.inventory());
 
         this.backpackInstance = instance;
         this.backpackInstance.setLastAccessed();
@@ -26,7 +26,7 @@ public class BackpackGui extends BasicGui {
     }
 
     public BackpackGui(ServerPlayerEntity player, BackpackInstance instance) {
-        super(player, null, instance.getInventory());
+        super(player, null, instance.inventory());
 
         this.backpackInstance = instance;
         this.backpackInstance.setLastAccessed();

@@ -76,7 +76,7 @@ public class Main implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
 
 		ServerLifecycleEvents.AFTER_SAVE.register((minecraftServer, b, b1) -> {
-			if (BackpackManager.instance != null) BackpackManager.instance.save(minecraftServer);
+			if (BackpackManager.instance != null) BackpackManager.save(minecraftServer);
 		});
 	}
 

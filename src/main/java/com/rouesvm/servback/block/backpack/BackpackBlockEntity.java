@@ -8,6 +8,7 @@ import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
@@ -32,7 +33,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     private int extraSize = 0;
 
     private BackpackInstance instance;
-    private InventoryStorage storage;
+    private SlottedStorage<ItemVariant> storage;
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
@@ -98,6 +99,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     }
 
     public @Nullable Storage<ItemVariant> getInventoryProvider(@Nullable Direction direction) {
+        if (this != null && this.getWorld() != null) this.getWorld().updateComparators(this.getPos(), this.getCachedState().getBlock());
         return storage;
     }
 }

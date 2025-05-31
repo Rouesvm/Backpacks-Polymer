@@ -70,7 +70,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 
         ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
-        BackpackUtils.checkEnchantments(stack, player, backpackBlockEntity.getSize(), backpackBlockEntity.getExtraSize());
+        BackpackUtils.checkEnchantments(stack, player, backpackBlockEntity.getSize());
         BackpackTrinket.equipStack(player, stack);
         world.breakBlock(pos, false);
     }
@@ -84,11 +84,10 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
                 backpackBlockEntity.getExtraSize(),
                 backpackBlockEntity.getSize(),
                 backpackBlockEntity.getUuid(),
-                instance.getInventory(),
+                instance.inventory(),
                 player
         );
 
-        entity.getWorld().updateComparators(entity.getPos(), this);
         new BackpackGui(player, entity, instance);
     }
 

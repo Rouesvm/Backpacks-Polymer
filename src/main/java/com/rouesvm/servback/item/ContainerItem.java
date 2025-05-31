@@ -105,7 +105,7 @@ public class ContainerItem extends BundleGuiItem {
                         blockState2.getBlock().onPlaced(world, blockPos, blockState2, playerEntity, itemStack);
 
                         if (world.getBlockEntity(blockPos) instanceof BackpackBlockEntity blockEntity) {
-                            BackpackUtils.checkEnchantments(itemStack, (ServerPlayerEntity) playerEntity, this.slots);
+                            BackpackUtils.resizeIfIncorrectSize((ServerPlayerEntity) playerEntity, itemStack, this.slots);
 
                             blockEntity.setItem(this);
                             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
@@ -145,7 +145,7 @@ public class ContainerItem extends BundleGuiItem {
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         BackpackManager.createNewUUID(stack);
-        BackpackUtils.checkEnchantments(stack, player, this.slots);
+        BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
         playInsertSound(player);
 
         BackpackInstance instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack));

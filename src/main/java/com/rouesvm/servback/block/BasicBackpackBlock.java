@@ -97,7 +97,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
         if (entity != null) {
             ItemStack stack = entity.getDefaultStack().copy();
-            BackpackUtils.addCustomData(stack, (ServerWorld) world);
+            BackpackUtils.addCustomData((ServerWorld) world, stack);
             dropStack(world, pos, stack);
         }
         return super.onBreak(world, pos, state, player);
@@ -108,7 +108,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
         if (entity != null) {
             ItemStack stack = entity.getDefaultStack().copy();
-            BackpackUtils.addCustomData(stack, world);
+            BackpackUtils.addCustomData(world, stack);
             dropStack(world, pos, stack);
         }
     }

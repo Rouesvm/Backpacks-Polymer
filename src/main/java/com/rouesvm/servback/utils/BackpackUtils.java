@@ -51,21 +51,7 @@ public class BackpackUtils {
         else return 0;
     }
 
-    public static void checkEnchantments(ItemStack stack, ServerPlayerEntity player, int maxBackpackSlot) {
-        UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackInventory inventory = BackpackManager.getInventory(uuid);
-        if (inventory != null) {
-            resize(
-                    addCustomData(stack, player.getServerWorld()),
-                    maxBackpackSlot,
-                    uuid,
-                    inventory,
-                    player
-            );
-        }
-    }
-
-    public static int addCustomData(ItemStack stack, ServerWorld world) {
+    public static int addCustomData(ServerWorld world, ItemStack stack) {
         DynamicRegistryManager registryManager = world.getRegistryManager();
         RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
 
@@ -78,7 +64,18 @@ public class BackpackUtils {
         return 9 * level;
     }
 
-    public static void dropExcessItems(BackpackInventory inventory, int maxBackpackSlot, ServerPlayerEntity player) {
+
+    public static void resizeIfIncorrectSize(ServerPlayerEntity player, ItemStack stack, int maxBackpackSlot) {
+        UUID uuid = BackpackManager.getStackUUID(stack);
+        BackpackInventory inventory = BackpackManager.getInventory(uuid);
+        if (inventory != null) {
+            resize(
+                    player, uuid, inventory, maxBackpackSlot, addCustomData(player.getServerWorld(), stack)
+            );
+        }
+    }
+
+    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory inventory, int maxBackpackSlot) {
         for (int i = inventory.size(); i > maxBackpackSlot; --i) {
             ItemStack excessItem =  i < inventory.heldStacks().size() ? inventory.heldStacks().get(i) : ItemStack.EMPTY;
             player.dropItem(excessItem, true);
@@ -86,7 +83,7 @@ public class BackpackUtils {
         ContainerItem.playDropContentsSound(player);
     }
 
-    public static void resize(int currentExtendedSize, int maxBackpackSlot, UUID uuid, BackpackInventory inventory, ServerPlayerEntity player) {
+    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory inventory, int maxBackpackSlot, int currentExtendedSize) {
         if (currentExtendedSize > 0) {
             int totalSlots = currentExtendedSize + maxBackpackSlot;
             if (inventory.size() != totalSlots)
@@ -95,7 +92,7 @@ public class BackpackUtils {
         }
 
         if (inventory.size() > maxBackpackSlot)
-            dropExcessItems(inventory, maxBackpackSlot, player);
+            dropExcessItems(player, inventory, maxBackpackSlot);
         BackpackManager.resizeInventory(uuid, inventory, maxBackpackSlot);
     }
 }

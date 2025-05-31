@@ -71,21 +71,17 @@ public class Main implements ModInitializer {
 				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer()));
 
 		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::setup);
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			BackpackManager manager = BackpackManager.getManager();
-			manager.load(server);
-			manager.loadOnServerStarted(server);
-		});
+		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::loadOnServerStarted);
 
 		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
 
 		ServerLifecycleEvents.AFTER_SAVE.register((minecraftServer, b, b1) -> {
-			if (BackpackManager.getManager() != null) BackpackManager.getManager().save(minecraftServer);
+			if (BackpackManager.instance != null) BackpackManager.instance.save(minecraftServer);
 		});
 	}
 
 	public static BaseInventory getInventory() {
-		return BackpackManager.getManager().globalInventory;
+		return BackpackManager.instance.globalInventory;
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

@@ -55,12 +55,12 @@ public class ContainerItem extends BundleGuiItem {
         BackpackInventory itemList = BackpackUtils.getItemList(polymerStack, BackpackUtils.getExtendedSlots(polymerStack) + this.slots);
 
         if (itemList == null) return;
-        if (itemList.getHeldStacks().isEmpty()) return;
+        if (itemList.heldStacks().isEmpty()) return;
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
 
-        for (ItemStack itemStack : itemList.getHeldStacks()) {
+        for (ItemStack itemStack : itemList.heldStacks()) {
             if (itemStack.isEmpty()) continue;
 
             capacityAmount++;
@@ -159,7 +159,7 @@ public class ContainerItem extends BundleGuiItem {
     @Override
     public void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
         UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackManager.getManager().saveBackpack(uuid, (BackpackInventory) inventory);
+        BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {

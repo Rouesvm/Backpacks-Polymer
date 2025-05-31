@@ -39,9 +39,9 @@ public class BackpackDataFixer {
         if (oldData != null) {
             Set<BackpackInstance> instances = convertToV2Format(oldData, server.getRegistryManager());
             instances.forEach(backpackInstance ->
-                    BackpackManager.getManager().storedInstances.put(backpackInstance.getUuid(), backpackInstance));
+                    BackpackManager.instance.storedInstances.put(backpackInstance.getUuid(), backpackInstance));
 
-            BackpackManager.getManager().save(server);
+            BackpackManager.instance.save(server);
 
             try {
                 Files.delete(path);
@@ -71,7 +71,7 @@ public class BackpackDataFixer {
             Optional<NbtCompound> globalNbt = compound.getCompound("global");
             if (globalNbt.isPresent()) {
                 BackpackInventory globalInventory = loadInventory(globalNbt.get(), registryLookup);
-                BackpackManager.getManager().setGlobalInventory(globalInventory.getHeldStacks());
+                BackpackManager.instance.setGlobalInventory(globalInventory.heldStacks());
             }
         }
 

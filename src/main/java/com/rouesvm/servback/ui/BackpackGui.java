@@ -1,7 +1,6 @@
 package com.rouesvm.servback.ui;
 
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.ui.slots.BackpackSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
@@ -46,7 +45,7 @@ public class BackpackGui extends BasicGui {
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                BackpackManager.getManager().saveBackpack(backpackInstance.getUuid(), (BackpackInventory) inventory);
+                BackpackManager.saveBackpack(backpackInstance);
                 if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
             }
             @Override
@@ -58,9 +57,7 @@ public class BackpackGui extends BasicGui {
 
     @Override
     public void onClose() {
-        BackpackManager manager = BackpackManager.getManager();
-        manager.saveBackpack(backpackInstance);
-        manager.save(this.getPlayer().getServer());
+        BackpackManager.save(this.getPlayer().getServer());
 
         if (entity != null) entity.getWorld().updateComparators(entity.getPos(), entity.getCachedState().getBlock());
         if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);

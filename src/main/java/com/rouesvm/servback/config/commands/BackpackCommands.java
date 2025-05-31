@@ -29,7 +29,7 @@ public class BackpackCommands {
                     context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);
                     return 1;
                 }).then(literal("list").executes(context -> {
-                    Set<UUID> instances = BackpackManager.getManager().storedInstances.keySet();
+                    Set<UUID> instances = BackpackManager.instance.storedInstances.keySet();
                     context.getSource().sendFeedback(
                             () -> Text.translatable("command.serverbackpacks.list"), false);
                     for (UUID uuid : instances) {

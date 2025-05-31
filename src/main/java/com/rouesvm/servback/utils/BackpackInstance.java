@@ -39,7 +39,7 @@ public class BackpackInstance {
     }
 
     public DefaultedList<ItemStack> getHeldInventory() {
-        return inventory.getHeldStacks();
+        return inventory.heldStacks();
     }
 
     @Override

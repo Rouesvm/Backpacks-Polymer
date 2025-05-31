@@ -26,10 +26,16 @@ public class BackpackUtils {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (inventory.insertItems(itemStacks)) {
                 instance.setInventory(inventory);
-                BackpackManager.getManager().saveBackpack(instance.getUuid(), instance.getInventory());
+                BackpackManager.instance.addBackpack(instance.getUuid(), instance.getInventory());
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
+    }
+
+    public static BackpackInventory getItemList(ItemStack stack) {
+        if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
+        UUID uuid = BackpackManager.getStackUUID(stack);
+        return BackpackManager.getInventory(uuid);
     }
 
     public static BackpackInventory getItemList(ItemStack stack, int maxPossibleSlot) {
@@ -47,7 +53,7 @@ public class BackpackUtils {
     }
 
     public static void checkEnchantments(ItemStack stack, ServerPlayerEntity player, int maxBackpackSlot, int maxExtendedSlot) {
-        BackpackInventory inventory = getItemList(stack, maxExtendedSlot + maxBackpackSlot);
+        BackpackInventory inventory = getItemList(stack);
         if (inventory != null) {
             resize(
                     addCustomData(stack, player.getServerWorld()),
@@ -64,11 +70,20 @@ public class BackpackUtils {
         RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
+
         NbtCompound compound = new NbtCompound();
         compound.putInt("level", level);
         stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
 
         return 9 * level;
+    }
+
+    public static void dropExcessItems(BackpackInventory inventory, int maxBackpackSlot, ServerPlayerEntity player) {
+        for (int i = inventory.size(); i > maxBackpackSlot; --i) {
+            ItemStack excessItem =  i < inventory.heldStacks().size() ? inventory.heldStacks().get(i) : ItemStack.EMPTY;
+            player.dropItem(excessItem, true);
+        }
+        ContainerItem.playDropContentsSound(player);
     }
 
     public static void resize(int currentExtendedSize, int maxBackpackSlot, UUID uuid, BackpackInventory inventory, ServerPlayerEntity player) {
@@ -82,13 +97,5 @@ public class BackpackUtils {
         if (inventory.size() > maxBackpackSlot)
             dropExcessItems(inventory, maxBackpackSlot, player);
         BackpackManager.resizeInventory(uuid, inventory, maxBackpackSlot);
-    }
-
-    public static void dropExcessItems(BackpackInventory inventory, int maxBackpackSlot, ServerPlayerEntity player) {
-        for (int i = inventory.size(); i > maxBackpackSlot; --i) {
-            ItemStack excessItem = inventory.getHeldStacks().get(i - 1);
-            player.dropItem(excessItem, true);
-        }
-        ContainerItem.playDropContentsSound(player);
     }
 }

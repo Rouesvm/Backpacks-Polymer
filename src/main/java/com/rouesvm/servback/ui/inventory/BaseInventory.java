@@ -15,11 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BaseInventory implements Inventory, RecipeInputProvider {
-    private final int size;
     public DefaultedList<ItemStack> heldStacks;
 
     public BaseInventory(int size) {
-        this.size = size;
         this.heldStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
     }
 
@@ -50,7 +48,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     public ItemStack removeItem(Item item, int count) {
         ItemStack itemStack = new ItemStack(item, 0);
 
-        for(int i = this.size - 1; i >= 0; --i) {
+        for(int i = this.size() - 1; i >= 0; --i) {
             ItemStack itemStack2 = this.getStack(i);
             if (itemStack2.getItem().equals(item)) {
                 int j = count - itemStack.getCount();
@@ -94,7 +92,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     }
 
     public int size() {
-        return this.size;
+        return this.heldStacks.size();
     }
 
     public boolean isEmpty() {
@@ -152,7 +150,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return nbtList;
     }
 
-    public DefaultedList<ItemStack> getHeldStacks() {
+    public DefaultedList<ItemStack> heldStacks() {
         return this.heldStacks;
     }
 

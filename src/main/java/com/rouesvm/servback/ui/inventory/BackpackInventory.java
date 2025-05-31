@@ -39,9 +39,14 @@ public class BackpackInventory extends BaseInventory {
         this.heldStacks = inventory;
     }
 
-    public void resize(int size) {
-        for (int i = this.heldStacks.size(); i <= size; i++) {
-            this.heldStacks.add(ItemStack.EMPTY);
+    public void resize(int newSize) {
+        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
+
+        for(int i = 0; i < stacks.size(); ++i) {
+            ItemStack itemStack = i < this.heldStacks.size() ? this.heldStacks.get(i) : ItemStack.EMPTY;
+            stacks.set(i, itemStack.copy());
         }
+
+        this.heldStacks = stacks;
     }
 }

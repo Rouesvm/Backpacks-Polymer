@@ -51,6 +51,6 @@ public class GlobalBackpackState extends PersistentState {
     }
 
     public List<SlotData> getInventory() {
-        return SlotData.writeToCodec(this.globalInventory.getHeldStacks());
+        return SlotData.writeToCodec(this.globalInventory.heldStacks());
     }
 }

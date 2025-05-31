@@ -64,7 +64,6 @@ public class BackpackUtils {
         return 9 * level;
     }
 
-
     public static void resizeIfIncorrectSize(ServerPlayerEntity player, ItemStack stack, int maxBackpackSlot) {
         UUID uuid = BackpackManager.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);

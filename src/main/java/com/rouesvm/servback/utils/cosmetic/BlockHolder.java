@@ -7,7 +7,6 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -38,7 +37,7 @@ public class BlockHolder extends ElementHolder {
         if (!alreadySetItem & world != null) {
             BasicBlockEntity blockEntity = (BasicBlockEntity) world.getBlockEntity(pos);
             if (blockEntity != null) {
-                this.setMain(blockEntity.getDefaultStack().getItem());
+                this.setMain(blockEntity.getDefaultStack());
                 alreadySetItem = true;
             }
         }
@@ -57,8 +56,7 @@ public class BlockHolder extends ElementHolder {
         return this.main.getItem();
     }
 
-    public void setMain(Item item) {
-        ItemStack stack = item.getDefaultStack();
+    public void setMain(ItemStack stack) {
         CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
         stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
         this.main.setItem(stack);

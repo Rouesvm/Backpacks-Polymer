@@ -99,7 +99,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     }
 
     public @Nullable Storage<ItemVariant> getInventoryProvider(@Nullable Direction direction) {
-        if (this != null && this.getWorld() != null) this.getWorld().updateComparators(this.getPos(), this.getCachedState().getBlock());
+        if (this.getWorld() != null) this.getWorld().updateComparators(this.getPos(), this.getCachedState().getBlock());
         return storage;
     }
 }

@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.state.codecs.BackpackData;
 import com.rouesvm.servback.state.codecs.InventoryData;
-import com.rouesvm.servback.state.codecs.SlotData;
 import com.rouesvm.servback.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.utils.BackpackInstance;
 import net.minecraft.server.MinecraftServer;
@@ -66,17 +65,5 @@ public class BackpackState extends PersistentState {
                         new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().getItemStacks()))
                 ))
                 .collect(Collectors.toSet());
-    }
-
-    public void setStoredInventories(Set<BackpackInstance> backpackInstances) {
-        this.storedInventories.clear();
-        backpackInstances.forEach(instance -> {
-            BackpackData data = new BackpackData(
-                    instance.getUuid(),
-                    new InventoryData(SlotData.writeToCodec(instance.heldInventory()))
-            );
-            this.storedInventories.add(data);
-        });
-        markDirty();
     }
 }

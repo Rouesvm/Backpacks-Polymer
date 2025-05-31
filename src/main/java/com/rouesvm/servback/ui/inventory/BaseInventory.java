@@ -5,10 +5,8 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
@@ -125,29 +123,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
 
     public String toString() {
         return (this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).toList()).toString();
-    }
-
-
-    public void readNbtList(NbtList list, RegistryWrapper.WrapperLookup registries) {
-        this.clear();
-
-        for(int i = 0; i < list.size(); ++i) {
-            ItemStack.fromNbt(registries, list.getCompoundOrEmpty(i)).ifPresent(this::addStack);
-        }
-
-    }
-
-    public NbtList toNbtList(RegistryWrapper.WrapperLookup registries) {
-        NbtList nbtList = new NbtList();
-
-        for(int i = 0; i < this.size(); ++i) {
-            ItemStack itemStack = this.getStack(i);
-            if (!itemStack.isEmpty()) {
-                nbtList.add(itemStack.toNbt(registries));
-            }
-        }
-
-        return nbtList;
     }
 
     public DefaultedList<ItemStack> heldStacks() {

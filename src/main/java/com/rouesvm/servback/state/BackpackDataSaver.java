@@ -42,7 +42,7 @@ public class BackpackDataSaver {
                 );
 
             } catch (Throwable e) {
-                e.printStackTrace();
+               Main.LOGGER.error("Failed to load Server Backpack's data.");
             }
         } else {
             save(server);
@@ -55,7 +55,7 @@ public class BackpackDataSaver {
             try {
                 NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(savePath.toFile())));
             } catch (IOException e) {
-                e.printStackTrace();
+                Main.LOGGER.error("Failed to save Server Backpack's data.");
             }
         }
     }

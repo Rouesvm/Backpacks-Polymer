@@ -69,30 +69,23 @@ public class BackpackUtils {
         UUID uuid = BackpackManager.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
         if (inventory != null) {
-            resize(
-                    player, uuid, inventory, maxBackpackSlot, addCustomData(player.getServerWorld(), stack)
-            );
+            resize(player, uuid, inventory,
+                    maxBackpackSlot + addCustomData(player.getServerWorld(), stack));
         }
     }
 
-    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory inventory, int maxBackpackSlot) {
-        for (int i = inventory.size(); i > maxBackpackSlot; --i) {
+    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory inventory, int totalSlots) {
+        for (int i = inventory.size(); i >= totalSlots; i--) {
             ItemStack excessItem =  i < inventory.heldStacks().size() ? inventory.heldStacks().get(i) : ItemStack.EMPTY;
             player.dropItem(excessItem, true);
         }
         ContainerItem.playDropContentsSound(player);
     }
 
-    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory inventory, int maxBackpackSlot, int currentExtendedSize) {
-        if (currentExtendedSize > 0) {
-            int totalSlots = currentExtendedSize + maxBackpackSlot;
-            if (inventory.size() != totalSlots)
-                BackpackManager.resizeInventory(uuid, inventory, totalSlots);
-            return;
+    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory inventory, int totalSlots) {
+        dropExcessItems(player, inventory, totalSlots);
+        if (inventory.size() != totalSlots) {
+            BackpackManager.resizeInventory(uuid, inventory, totalSlots);
         }
-
-        if (inventory.size() > maxBackpackSlot)
-            dropExcessItems(player, inventory, maxBackpackSlot);
-        BackpackManager.resizeInventory(uuid, inventory, maxBackpackSlot);
     }
 }

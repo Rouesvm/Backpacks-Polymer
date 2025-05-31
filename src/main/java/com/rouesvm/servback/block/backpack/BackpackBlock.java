@@ -80,9 +80,8 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
         BackpackInstance instance = backpackBlockEntity.getInstance();
 
-        resize(
-                player, backpackBlockEntity.getUuid(), instance.inventory(), backpackBlockEntity.getSize(), backpackBlockEntity.getExtraSize()
-        );
+        resize(player, backpackBlockEntity.getUuid(), instance.inventory(),
+                backpackBlockEntity.getSize() + backpackBlockEntity.getExtraSize());
 
         new BackpackGui(player, entity, instance);
     }

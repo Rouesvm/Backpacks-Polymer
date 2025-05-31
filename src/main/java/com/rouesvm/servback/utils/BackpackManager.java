@@ -156,7 +156,7 @@ public class BackpackManager {
     public static @Nullable BackpackInstance getInstance(UUID uuid, int slots) {
         if (instance == null) return null;
         if (instance.hasBackpack(uuid)) {
-            BackpackInstance backpack = instance.storedInstances.get(uuid);
+            BackpackInstance backpack = getInstance(uuid);
             BackpackInventory inventory = backpack.inventory;
             if (inventory.size() != slots) inventory.resize(slots);
             return backpack;
@@ -181,8 +181,8 @@ public class BackpackManager {
 
     public static void resizeInventory(UUID uuid, BackpackInventory inventory, int newSize) {
         if (uuid != null && inventory != null) {
-            BackpackInstance accessedInstance = getInstance(uuid, newSize);
-            if (accessedInstance != null) inventory.resize(newSize);
+            BackpackInstance accessedInstance = getInstance(uuid);
+            if (accessedInstance != null) accessedInstance.inventory.resize(newSize);
         }
     }
 

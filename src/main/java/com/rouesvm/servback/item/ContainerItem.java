@@ -52,15 +52,15 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
-        BackpackInventory itemList = BackpackUtils.getItemList(polymerStack, BackpackUtils.getExtendedSlots(polymerStack) + this.slots);
+        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(polymerStack);
 
         if (itemList == null) return;
-        if (itemList.heldStacks().isEmpty()) return;
+        if (itemList.isEmpty()) return;
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
 
-        for (ItemStack itemStack : itemList.heldStacks()) {
+        for (ItemStack itemStack : itemList) {
             if (itemStack.isEmpty()) continue;
 
             capacityAmount++;
@@ -148,11 +148,7 @@ public class ContainerItem extends BundleGuiItem {
         BackpackUtils.checkEnchantments(stack, player, this.slots);
         playInsertSound(player);
 
-        BackpackInstance instance = BackpackManager.getInstance(
-                BackpackManager.getStackUUID(stack),
-                BackpackUtils.getExtendedSlots(stack) + this.slots
-        );
-
+        BackpackInstance instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack));
         if (instance != null) new BackpackGui(player, stack, instance);
     }
 

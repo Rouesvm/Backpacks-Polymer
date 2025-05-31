@@ -32,16 +32,15 @@ public class BackpackUtils {
         }
     }
 
-    public static BackpackInventory getItemList(ItemStack stack) {
+    public static DefaultedList<ItemStack> getItemList(ItemStack stack) {
         if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = BackpackManager.getStackUUID(stack);
-        return BackpackManager.getInventory(uuid);
-    }
+        BackpackInventory inventory = BackpackManager.getInventory(uuid);
 
-    public static BackpackInventory getItemList(ItemStack stack, int maxPossibleSlot) {
-        if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
-        UUID uuid = BackpackManager.getStackUUID(stack);
-        return BackpackManager.getInventory(uuid, maxPossibleSlot);
+        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.heldStacks.size());
+        stacks.addAll(inventory.heldStacks);
+
+        return stacks;
     }
 
     public static int getExtendedSlots(ItemStack stack) {
@@ -53,12 +52,13 @@ public class BackpackUtils {
     }
 
     public static void checkEnchantments(ItemStack stack, ServerPlayerEntity player, int maxBackpackSlot) {
-        BackpackInventory inventory = getItemList(stack);
+        UUID uuid = BackpackManager.getStackUUID(stack);
+        BackpackInventory inventory = BackpackManager.getInventory(uuid);
         if (inventory != null) {
             resize(
                     addCustomData(stack, player.getServerWorld()),
                     maxBackpackSlot,
-                    BackpackManager.getStackUUID(stack),
+                    uuid,
                     inventory,
                     player
             );

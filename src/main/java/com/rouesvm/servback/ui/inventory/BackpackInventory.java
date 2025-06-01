@@ -1,9 +1,12 @@
 package com.rouesvm.servback.ui.inventory;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 
 public class BackpackInventory extends BaseInventory {
+    private BlockEntity entity;
+
     public BackpackInventory(int slots) {
         super(slots);
     }
@@ -11,6 +14,12 @@ public class BackpackInventory extends BaseInventory {
     public BackpackInventory(DefaultedList<ItemStack> stacks) {
         super(stacks.size());
         this.heldStacks = stacks;
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        super.setStack(slot, stack);
+        if (entity != null) entity.markDirty();
     }
 
     public BackpackInventory(int slots, DefaultedList<ItemStack> stacks) {
@@ -48,5 +57,9 @@ public class BackpackInventory extends BaseInventory {
         }
 
         this.heldStacks = stacks;
+    }
+
+    public void setEntity(BlockEntity entity) {
+        this.entity = entity;
     }
 }

@@ -73,7 +73,10 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
     public void setStorage() {
         if (instance == null) instance = BackpackManager.getInstance(uuid, extraSize + getSize());
-        if (instance != null && storage == null) storage = InventoryStorage.of(instance.inventory, null);
+        if (instance != null && storage == null) {
+            instance.inventory.setEntity(this);
+            storage = InventoryStorage.of(instance.inventory, null);
+        }
     }
 
     public UUID getUuid() {
@@ -99,7 +102,6 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     }
 
     public @Nullable Storage<ItemVariant> getInventoryProvider(@Nullable Direction direction) {
-        if (this.getWorld() != null) this.getWorld().updateComparators(this.getPos(), this.getCachedState().getBlock());
         return storage;
     }
 }

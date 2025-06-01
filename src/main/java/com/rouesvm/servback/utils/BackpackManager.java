@@ -107,7 +107,7 @@ public class BackpackManager {
 
     public static BackpackInstance addBackpack(BackpackInstance backpackInstance) {
         if (backpackInstance.getUuid() != null && backpackInstance.inventory() != null) {
-            return instance.storedInstances.putIfAbsent(backpackInstance.getUuid(), backpackInstance);
+            instance.storedInstances.putIfAbsent(backpackInstance.getUuid(), backpackInstance);
         }
 
         return instance.storedInstances.get(backpackInstance.getUuid());
@@ -160,7 +160,9 @@ public class BackpackManager {
             BackpackInventory inventory = backpack.inventory;
             if (inventory.size() != slots) inventory.resize(slots);
             return backpack;
-        } else return addBackpack(new BackpackInstance(uuid, new BackpackInventory(slots)));
+        }
+
+        return addBackpack(uuid, new BackpackInventory(slots));
     }
 
     public static @Nullable BackpackInventory getInventory(UUID uuid, int slots) {

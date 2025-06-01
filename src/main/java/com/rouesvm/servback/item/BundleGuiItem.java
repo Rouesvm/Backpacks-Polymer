@@ -176,6 +176,9 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 } else {
                     setSelectedStackIndex(stack, -1);
                 }
+            } else if (clickType == ClickType.RIGHT) {
+                openGui(serverPlayer, stack);
+                return true;
             }
         }
         return false;

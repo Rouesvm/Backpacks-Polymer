@@ -59,6 +59,7 @@ public class BackpackGui extends BasicGui {
     public void onClose() {
         BackpackManager.save(this.getPlayer().getServer());
 
+        if (entity != null) entity.getWorld().updateComparators(entity.getPos(), entity.getCachedState().getBlock());
         if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
 
         getPlayer().currentScreenHandler.enableSyncing();

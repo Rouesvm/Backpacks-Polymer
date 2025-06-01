@@ -37,10 +37,13 @@ public class BackpackUtils {
         UUID uuid = BackpackManager.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
 
-        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.heldStacks.size());
-        stacks.addAll(inventory.heldStacks);
+        if (inventory != null) {
+            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.heldStacks.size());
+            stacks.addAll(inventory.heldStacks);
+            return stacks;
+        }
 
-        return stacks;
+        return DefaultedList.of();
     }
 
     public static int getExtendedSlots(ItemStack stack) {

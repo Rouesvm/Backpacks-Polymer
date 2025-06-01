@@ -1,6 +1,7 @@
 package com.rouesvm.servback.registry;
 
 import com.rouesvm.servback.Main;
+import com.rouesvm.servback.config.Configuration;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import net.minecraft.item.ItemGroup.Entries;
 import net.minecraft.item.ItemStack;
@@ -12,6 +13,7 @@ public class BackpackItemGroup {
     public static DyeColor[] dyeColors = {
             DyeColor.BROWN,
             DyeColor.BLACK,
+            DyeColor.GRAY,
             DyeColor.LIGHT_GRAY,
             DyeColor.LIGHT_BLUE,
             DyeColor.BLUE,
@@ -29,9 +31,9 @@ public class BackpackItemGroup {
 
     public static void addItems(Entries entries) {
         for (DyeColor color : dyeColors) {
-            entries.add(BackpackItemRegistry.getBackpack(color, 1));
-            entries.add(BackpackItemRegistry.getBackpack(color, 2));
-            entries.add(BackpackItemRegistry.getBackpack(color, 3));
+            for (int i = 1; i <= Configuration.getInstance().types_of_backpacks.keySet().size(); i++) {
+                entries.add(BackpackItemRegistry.getBackpack(color, i));
+            }
         }
 
         entries.add(BackpackItemRegistry.GLOBAL_BACKPACK);

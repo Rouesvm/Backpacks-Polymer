@@ -159,18 +159,18 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
-        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots + BackpackUtils.getExtendedSlots(stack), ItemStack.EMPTY);
+        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots, ItemStack.EMPTY);
         stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
         return list;
     }
 
-    // It's 1-9 (If you have slots = (9 * (size)) you do (slots / 9))
-    public static Item getColoredBackpack(DyeColor color, int size) {
-        return color != null ? BackpackItemRegistry.getBackpack(color, size) : getDefaultBackpack(size);
+    // It's 1-9 (If you have slots = (9 * (order)) you do (slots / 9))
+    public static Item getColoredBackpack(DyeColor color, int order) {
+        return color != null ? BackpackItemRegistry.getBackpack(color, order) : getDefaultBackpack(order);
     }
 
-    public static Item getDefaultBackpack(int size) {
-        Item item = BackpackItemRegistry.getBackpack(DyeColor.BROWN, size);
+    public static Item getDefaultBackpack(int order) {
+        Item item = BackpackItemRegistry.getBackpack(DyeColor.BROWN, order);
         return item != null ? item : BackpackItemRegistry.getBackpack(DyeColor.BROWN, 1);
     }
 

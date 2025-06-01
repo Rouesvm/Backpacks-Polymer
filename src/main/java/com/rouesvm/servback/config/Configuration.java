@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.rouesvm.servback.Main.MOD_ID;
@@ -27,6 +28,8 @@ public class Configuration {
 
     private final File configFile;
     public Instance instance = new Instance();
+
+    private final int maxSlots = 9 * 6;
 
     public static void initialize() {
         manager = new Configuration(MOD_ID + ".json");
@@ -63,51 +66,52 @@ public class Configuration {
             if (loaded != null) {
                 instance = loaded;
 
-                instance.small_backpack_size = instance.small_backpack_size > 9 * 6
-                        ? defaultInstance.small_backpack_size : instance.small_backpack_size;
-                instance.medium_backpack_size = instance.medium_backpack_size > 9 * 6
-                        ? defaultInstance.medium_backpack_size : instance.medium_backpack_size;
-                instance.large_backpack_size = instance.large_backpack_size > 9 * 6
-                        ? defaultInstance.large_backpack_size : instance.large_backpack_size;
+                instance.types_of_backpacks.replaceAll((key, value) -> value.slots > maxSlots
+                        ? defaultInstance.types_of_backpacks.getOrDefault(key, new BackpackType(value.name, 9))
+                        : value);
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
     }
+
+    public static <K, V> LinkedHashMap<K, V> createMap(Map<K, V> map) {
+        return new LinkedHashMap<>(map);
+    }
+
+    public record BackpackType(String name, int slots) {}
 
     public static class Instance {
         @SerializedName("breaks_with_flow")
         public boolean breaks_with_flow = true;
 
-        @SerializedName("small_backpack_size")
-        public int small_backpack_size = 9;
-
-        @SerializedName("medium_backpack_size")
-        public int medium_backpack_size = 9 * 2;
-
-        @SerializedName("large_backpack_size")
-        public int large_backpack_size = 9 * 3;
-
         @SerializedName("display_back")
         public boolean display_back = true;
 
+        @SerializedName("types_of_backpacks")
+        public Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
+                1, new BackpackType("small", 9),
+                2, new BackpackType("medium", 18),
+                3, new BackpackType("large", 27)
+        ));
+
         @SerializedName("back_positions")
-        public Map<Integer, Vector3f> back_positions = Map.of(
+        public Map<Integer, Vector3f> back_positions = createMap(Map.of(
                 1, new Vector3f(0, -0.45f, 0.280f),
                 2, new Vector3f(0, -0.65f, 0.280f),
                 3, new Vector3f(0, -0.65f, 0.280f)
-        );
+        ));
 
         @SerializedName("back_yaw")
-        public Map<Integer, Integer> back_yaw = Map.of(
+        public Map<Integer, Integer> back_yaw = createMap(Map.of(
                 1, 180,
                 2, 180,
                 3, 180
-        );
+        ));
 
         @SerializedName("back_pitch_when_sneaking")
-        public Map<Integer, Integer> back_pitch_when_sneaking = Map.of(
+        public Map<Integer, Integer> back_pitch_when_sneaking = createMap(Map.of(
                 1, -25,
                 2, -25,
                 3, -25
-        );
+        ));
     }
 }

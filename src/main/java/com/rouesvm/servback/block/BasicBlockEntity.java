@@ -59,16 +59,16 @@ public class BasicBlockEntity extends BlockEntity {
         return size;
     }
 
+    public void setSize(int size) {
+        this.size = size;
+    }
+
     public Item getItem() {
         return item;
     }
 
     public void setItem(Item item) {
         this.item = item;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
     }
 
     public void setCustomName(Text customName) {

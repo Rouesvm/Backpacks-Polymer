@@ -1,6 +1,6 @@
 package com.rouesvm.servback.compat.geyser;
 
-import com.rouesvm.servback.utils.bedrock.BedrockItem;
+import com.rouesvm.servback.compat.geyser.bedrock.BedrockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;

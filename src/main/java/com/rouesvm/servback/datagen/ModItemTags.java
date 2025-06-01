@@ -1,7 +1,7 @@
 package com.rouesvm.servback.datagen;
 
-import com.rouesvm.servback.item.ContainerItem;
-import com.rouesvm.servback.registry.BackpackItemRegistry;
+import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.registry.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.item.Item;
@@ -13,7 +13,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.rouesvm.servback.Main.MOD_ID;
+import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class ModItemTags extends FabricTagProvider.ItemTagProvider {
     public static final TagKey<Item> SMALL_BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "small_backpacks"));

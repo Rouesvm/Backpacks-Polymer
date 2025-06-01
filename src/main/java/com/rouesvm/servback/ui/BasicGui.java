@@ -28,14 +28,14 @@ public class BasicGui extends SimpleGui {
 
         this.slots = inventory.size();
 
-        this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
-
         if (this.stack != null) {
             stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
             this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack")
                     .append(" (")
                     .append(stack.getName())
                     .append(")"));
+        } else {
+            this.setTitle(Text.translatable("item.serverbackpacks.gui_backpack"));
         }
 
         this.fillChest();
@@ -67,7 +67,7 @@ public class BasicGui extends SimpleGui {
         for(int j = 0; j <= 3; ++j) {
             for(int k = 0; k < 9; ++k) {
                 final int index = j == 0 ? k + (9 * 4 + this.slots) - 9 : this.slots + (k + j * 9) - 9 ;
-                if (this.screenHandler.getSlot(index).getStack().equals(this.stack)) {
+                if (ItemStack.areItemsAndComponentsEqual(this.screenHandler.getSlot(index).getStack(), this.stack)) {
                     this.stackIndex = index;
                     break;
                 }

@@ -36,8 +36,6 @@ public class Main implements ModInitializer {
 	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
 
-
-
 	@Override
 	public void onInitialize() {
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");

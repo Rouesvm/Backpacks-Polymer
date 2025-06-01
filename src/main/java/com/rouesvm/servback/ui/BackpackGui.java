@@ -5,7 +5,6 @@ import com.rouesvm.servback.ui.slots.BackpackSlot;
 import com.rouesvm.servback.utils.BackpackInstance;
 import com.rouesvm.servback.utils.BackpackManager;
 import com.rouesvm.servback.utils.BackpackUtils;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
@@ -13,8 +12,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class BackpackGui extends BasicGui {
     protected final BackpackInstance backpackInstance;
-
-    protected BlockEntity entity;
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
         super(player, stack, instance.inventory());
@@ -30,12 +27,6 @@ public class BackpackGui extends BasicGui {
 
         this.backpackInstance = instance;
         this.backpackInstance.setLastAccessed();
-    }
-
-    public BackpackGui(ServerPlayerEntity player, BlockEntity entity, BackpackInstance instance) {
-        this(player, instance);
-
-        this.entity = entity;
     }
 
     @Override
@@ -59,7 +50,6 @@ public class BackpackGui extends BasicGui {
     public void onClose() {
         BackpackManager.save(this.getPlayer().getServer());
 
-        if (entity != null) entity.getWorld().updateComparators(entity.getPos(), entity.getCachedState().getBlock());
         if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
 
         getPlayer().currentScreenHandler.enableSyncing();

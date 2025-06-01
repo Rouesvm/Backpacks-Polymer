@@ -92,7 +92,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                     case 3 -> createTransmuteRecipe(exporter, itemWrap.getOrThrow(LARGE_BACKPACKS), dyeColor, regular_dyed_backpack, i, name + "_" + i);
                 }
 
-                if (i+1 == 4) continue;
+                if (i + 1 == 4) continue;
                 ContainerItem backpackUpATier = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
                 createUpgradeRecipe(itemWrap, exporter,
                         regular_dyed_backpack, backpackUpATier,

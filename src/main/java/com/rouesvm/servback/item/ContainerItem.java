@@ -148,10 +148,7 @@ public class ContainerItem extends BundleGuiItem {
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
         playInsertSound(player);
 
-        System.out.println("test");
-
         BackpackInstance instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
-        System.out.println(instance);
         if (instance != null) new BackpackGui(player, stack, instance);
     }
 

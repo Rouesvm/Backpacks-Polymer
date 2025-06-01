@@ -67,7 +67,7 @@ public class Configuration {
                 instance = loaded;
 
                 instance.types_of_backpacks.replaceAll((key, value) -> value.slots > maxSlots
-                        ? defaultInstance.types_of_backpacks.getOrDefault(key, new BackpackType(value.name, 9))
+                        ? defaultInstance.types_of_backpacks.getOrDefault(key, new BackpackType(value.name, 9, true))
                         : value);
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
@@ -77,7 +77,7 @@ public class Configuration {
         return new LinkedHashMap<>(map);
     }
 
-    public record BackpackType(String name, int slots) {}
+    public record BackpackType(String name, int slots, boolean dyeable) {}
 
     public static class Instance {
         @SerializedName("breaks_with_flow")
@@ -88,9 +88,9 @@ public class Configuration {
 
         @SerializedName("types_of_backpacks")
         public Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
-                1, new BackpackType("small", 9),
-                2, new BackpackType("medium", 18),
-                3, new BackpackType("large", 27)
+                1, new BackpackType("small", 9, true),
+                2, new BackpackType("medium", 18, true),
+                3, new BackpackType("large", 27, true)
         ));
 
         @SerializedName("back_positions")

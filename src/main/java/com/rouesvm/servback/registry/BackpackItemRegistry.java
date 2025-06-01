@@ -72,11 +72,15 @@ public class BackpackItemRegistry {
 
             Map<DyeColor, Item> sizeMap = new EnumMap<>(DyeColor.class);
 
-            for (DyeColor color : DyeColor.values()) {
-                String name = color.name().toLowerCase() + "_";
-                if (color == DyeColor.BROWN) name = "";
+            if (backpackType.dyeable()) {
+                for (DyeColor color : DyeColor.values()) {
+                    String name = color.name().toLowerCase() + "_";
+                    if (color == DyeColor.BROWN) name = "";
 
-                create(sizeMap, color, name + backpackString, backpackSlots);
+                    create(sizeMap, color, name + backpackString, backpackSlots);
+                }
+            } else {
+                create(sizeMap, DyeColor.BROWN, backpackString, backpackSlots);
             }
 
             BACKPACKS.put(order, sizeMap);

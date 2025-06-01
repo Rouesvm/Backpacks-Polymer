@@ -1,6 +1,7 @@
 package com.rouesvm.servback.block;
 
 import com.rouesvm.servback.item.ContainerItem;
+import com.rouesvm.servback.registry.BackpackItemRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -29,7 +30,7 @@ public class BasicBlockEntity extends BlockEntity {
         super.writeNbt(nbt, registries);
 
         nbt.putInt("size", size);
-        if (item != null) nbt.putInt("item", Registries.ITEM.getRawId(item));
+        nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor((ContainerItem) item).getIndex());
     }
 
     @Override
@@ -38,10 +39,8 @@ public class BasicBlockEntity extends BlockEntity {
 
         size = nbt.getInt("size", 9);
 
-        nbt.getInt("dye").ifPresent(integer -> {
-            item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9);
-            nbt.remove("dye");
-        });
+        nbt.getInt("dye").ifPresent(integer ->
+                item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9));
 
         if (item == null) item = Registries.ITEM.get(
                 nbt.getInt("item", Registries.ITEM.getRawId(

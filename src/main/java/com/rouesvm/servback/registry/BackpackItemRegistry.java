@@ -14,12 +14,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.DyeColor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BackpackItemRegistry {
-    public static Map<Integer, Map<DyeColor, Item>> BACKPACKS = new HashMap<>();
+    public static Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
 
     public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
         @Override
@@ -34,6 +33,8 @@ public class BackpackItemRegistry {
         }
     });
 
+    private static final DyeColor defaultDye = DyeColor.BROWN;
+
     public static Item register(BasicPolymerBlockItem item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
@@ -41,27 +42,36 @@ public class BackpackItemRegistry {
     public static DyeColor getBackpackDyeColor(ContainerItem item) {
         return BACKPACKS.getOrDefault(item.getSize(), BACKPACKS.get(1))
                .entrySet().stream()
-               .filter(entry -> entry.getValue() == item)
+               .filter(entry -> entry.getValue().equals(item))
                .map(Map.Entry::getKey)
                .findFirst()
-               .orElse(DyeColor.BROWN);
+                .map(DyeColor::byIndex)
+               .orElse(defaultDye);
     }
 
     public static Item getBackpack(@NotNull DyeColor color, int order) {
         var defaultMap = BACKPACKS.get(1);
         return BACKPACKS
                 .getOrDefault(order, defaultMap)
-                .getOrDefault(color, defaultMap.get(DyeColor.BROWN));
+                .getOrDefault(color.getIndex(), defaultMap.get(defaultDye.getIndex()));
     }
 
-    public static void create(Map<DyeColor, Item> itemMap, DyeColor color, String name, int slots) {
-        itemMap.put(color, register(new ContainerItem(name, slots)));
+    public static void create(Map<Integer, Item> itemMap, Integer order, String name, int slots) {
+        itemMap.put(order, register(new ContainerItem(name, slots)));
     }
 
     public static void initialize() {
         Configuration.Instance instance = Configuration.getInstance();
 
-        if (instance.types_of_backpacks == null) return;
+        if (instance.types_of_backpacks == null) {
+            Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
+            create(sizeMap, defaultDye.getIndex(), "small", 9);
+            BACKPACKS.put(1, sizeMap);
+
+            return;
+        }
+
+        int registeredSize = 0;
 
         for (Map.Entry<Integer, Configuration.BackpackType> entry : instance.types_of_backpacks.entrySet()) {
             int order = entry.getKey();
@@ -70,20 +80,24 @@ public class BackpackItemRegistry {
             int backpackSlots = backpackType.slots();
             String backpackString = backpackType.name();
 
-            Map<DyeColor, Item> sizeMap = new EnumMap<>(DyeColor.class);
+            Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
 
             if (backpackType.dyeable()) {
                 for (DyeColor color : DyeColor.values()) {
                     String name = color.name().toLowerCase() + "_";
                     if (color == DyeColor.BROWN) name = "";
 
-                    create(sizeMap, color, name + backpackString, backpackSlots);
+                    create(sizeMap, color.getIndex(), name + backpackString, backpackSlots);
+                    registeredSize++;
                 }
             } else {
-                create(sizeMap, DyeColor.BROWN, backpackString, backpackSlots);
+                create(sizeMap, defaultDye.getIndex(), backpackString, backpackSlots);
+                registeredSize++;
             }
 
             BACKPACKS.put(order, sizeMap);
         }
+
+        Main.LOGGER.info("Finished registering {} items.", registeredSize);
     }
 }

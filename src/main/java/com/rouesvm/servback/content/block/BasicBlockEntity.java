@@ -30,7 +30,10 @@ public class BasicBlockEntity extends BlockEntity {
         super.writeNbt(nbt, registries);
 
         nbt.putInt("size", size);
-        nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor((ContainerItem) item).getIndex());
+
+        if (item instanceof ContainerItem containerItem) {
+            nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
+        } else nbt.putInt("dye", DyeColor.BROWN.getIndex());
     }
 
     @Override
@@ -49,7 +52,7 @@ public class BasicBlockEntity extends BlockEntity {
     }
 
     public ItemStack getDefaultStack() {
-        ItemStack stack = item != null ? item.getDefaultStack() : ContainerItem.getDefaultBackpack(1).getDefaultStack();
+        ItemStack stack = item != null ? item.getDefaultStack() : ContainerItem.getDefaultBackpack(size / 9).getDefaultStack();
         if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
         return stack;
     }

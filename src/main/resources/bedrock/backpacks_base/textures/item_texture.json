@@ -2,6 +2,15 @@
   "resource_pack_name" : "serverbackpacks",
   "texture_name" : "atlas.items",
   "texture_data" : {
+    "serverbackpacks:gray_small" : {
+      "textures" : "textures/serverbackpacks/item/small"
+    },
+    "serverbackpacks:gray_medium" : {
+      "textures" : "textures/serverbackpacks/item/small"
+    },
+    "serverbackpacks:gray_large" : {
+      "textures" : "textures/serverbackpacks/item/small"
+    },
     "serverbackpacks:small" : {
       "textures" : "textures/serverbackpacks/item/small"
     },

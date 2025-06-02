@@ -89,6 +89,15 @@
     "serverbackpacks:light_gray_3": {
       "textures": "textures/serverbackpacks/block/large/light_gray_large"
     },
+    "serverbackpacks:gray_1": {
+      "textures": "textures/serverbackpacks/block/small/gray_small"
+    },
+    "serverbackpacks:gray_2": {
+      "textures": "textures/serverbackpacks/block/medium/gray_medium"
+    },
+    "serverbackpacks:gray_3": {
+      "textures": "textures/serverbackpacks/block/large/gray_large"
+    },
     "serverbackpacks:lime_1": {
       "textures": "textures/serverbackpacks/block/small/lime_small"
     },

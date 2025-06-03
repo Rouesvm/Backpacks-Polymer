@@ -1,5 +1,6 @@
 package com.rouesvm.servback.technical.cosmetic;
 
+import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBlockEntity;
 import com.rouesvm.servback.content.block.BasicPolymerBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -8,7 +9,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -32,6 +32,7 @@ public class BlockHolder extends ElementHolder {
         this.pos = pos;
     }
 
+    // wonky
     @Override
     protected void onTick() {
         if (!alreadySetItem & world != null) {
@@ -44,12 +45,11 @@ public class BlockHolder extends ElementHolder {
     }
 
     @Override
-    public void destroy() {
-        for (ServerPlayNetworkHandler player : this.getWatchingPlayers()) {
-            player.sendPacket(new EntitiesDestroyS2CPacket(this.getEntityIds()));
+    public boolean startWatching(ServerPlayNetworkHandler player) {
+        if (ServerBackpacks.BEDROCK_PLAYERS.contains(player.getPlayer())) {
+            return false;
         }
-
-        super.destroy();
+        return super.startWatching(player);
     }
 
     public ItemStack getItem() {

@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.cosmetic;
 
-import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.technical.config.Configuration;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
@@ -112,13 +112,13 @@ public class BackHolder extends ElementHolder {
             this.element.setYaw(entity.getBodyYaw() - cosmeticRotation);
             this.element.setPitch(sneaking ? cosmeticPitchWhenSneaking : 0);
 
-            float yTranslation = sneaking ? cosmeticPosition.y - 0.05f : cosmeticPosition.y;
+            float yTranslation = sneaking ? cosmeticPosition.y - 0.02f : cosmeticPosition.y;
             float zTranslation;
 
-            zTranslation = sneaking ? (cosmeticPosition.z - 0.16f) : (cosmeticPosition.z);
+            zTranslation = sneaking ? (cosmeticPosition.z - 0.10f) : (cosmeticPosition.z);
 
             if (entity.getEquippedStack(EquipmentSlot.CHEST) != ItemStack.EMPTY) {
-                zTranslation = zTranslation + 0.10f;
+                zTranslation = zTranslation + 0.05f;
             }
 
             this.element.setTranslation(new Vector3f(0, yTranslation, zTranslation));

@@ -1,6 +1,7 @@
 package com.rouesvm.servback.technical.ui.slots;
 
 import com.rouesvm.servback.content.item.BundleGuiItem;
+import com.rouesvm.servback.content.item.ContainerItem;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -12,6 +13,6 @@ public class NonBackpackSlot extends Slot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return !(stack.getItem() instanceof BundleGuiItem);
+        return !(stack.getItem() instanceof BundleGuiItem) || (stack.getItem() instanceof ContainerItem);
     }
 }

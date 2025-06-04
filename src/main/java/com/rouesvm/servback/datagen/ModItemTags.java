@@ -1,5 +1,6 @@
 package com.rouesvm.servback.datagen;
 
+import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -32,22 +33,23 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
         for (int i = 1; i <= 3; i++) {
             for (DyeColor color : DyeColor.values()) {
                 ContainerItem item = (ContainerItem) ContainerItem.getColoredBackpack(color, i);
+                Identifier itemID = item.getIdentifier();
                 switch (i) {
-                    case 1 -> this.getOrCreateTagBuilder(SMALL_BACKPACKS).add(item);
-                    case 2 -> this.getOrCreateTagBuilder(MEDIUM_BACKPACKS).add(item);
-                    case 3 -> this.getOrCreateTagBuilder(LARGE_BACKPACKS).add(item);
+                    case 1 -> this.getTagBuilder(SMALL_BACKPACKS).add(itemID);
+                    case 2 -> this.getTagBuilder(MEDIUM_BACKPACKS).add(itemID);
+                    case 3 -> this.getTagBuilder(LARGE_BACKPACKS).add(itemID);
                 }
             }
         }
 
-        this.getOrCreateTagBuilder(BACKPACKS).add(BackpackItemRegistry.GLOBAL_BACKPACK);
-        this.getOrCreateTagBuilder(BACKPACKS).add(BackpackItemRegistry.ENDER_BACKPACK);
+        this.getTagBuilder(BACKPACKS).add(((BasicPolymerBlockItem) BackpackItemRegistry.GLOBAL_BACKPACK).getIdentifier());
+        this.getTagBuilder(BACKPACKS).add(((BasicPolymerBlockItem) BackpackItemRegistry.ENDER_BACKPACK).getIdentifier());
 
-        this.getOrCreateTagBuilder(BACKPACKS).addTag(SMALL_BACKPACKS);
-        this.getOrCreateTagBuilder(BACKPACKS).addTag(MEDIUM_BACKPACKS);
-        this.getOrCreateTagBuilder(BACKPACKS).addTag(LARGE_BACKPACKS);
+        this.getTagBuilder(BACKPACKS).addTag(SMALL_BACKPACKS.id());
+        this.getTagBuilder(BACKPACKS).addTag(MEDIUM_BACKPACKS.id());
+        this.getTagBuilder(BACKPACKS).addTag(LARGE_BACKPACKS.id());
 
-        this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(MEDIUM_BACKPACKS);
-        this.getOrCreateTagBuilder(SUPPORTED_BACKPACKS).addTag(LARGE_BACKPACKS);
+        this.getTagBuilder(SUPPORTED_BACKPACKS).addTag(MEDIUM_BACKPACKS.id());
+        this.getTagBuilder(SUPPORTED_BACKPACKS).addTag(LARGE_BACKPACKS.id());
     }
 }

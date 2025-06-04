@@ -72,7 +72,7 @@ public class BackpackUtils {
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
         if (inventory != null) {
             resize(player, uuid, inventory,
-                    maxBackpackSlot + addCustomData(player.getServerWorld(), stack));
+                    maxBackpackSlot + addCustomData(player.getWorld(), stack));
         }
     }
 

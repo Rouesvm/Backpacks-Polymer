@@ -1,8 +1,9 @@
 package com.rouesvm.servback.data.state;
 
-import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -10,6 +11,8 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.collection.DefaultedList;
@@ -80,7 +83,7 @@ public class BackpackDataFixer {
 
     public static BackpackInventory loadInventory(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
         DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
-        Inventories.readNbt(nbtCompound, itemStacks, registryLookup);
+        Inventories.readData(NbtReadView.create(new ErrorReporter.Logging(ServerBackpacks.LOGGER), registryLookup, nbtCompound), itemStacks);
         return new BackpackInventory(itemStacks);
     }
 }

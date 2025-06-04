@@ -18,27 +18,26 @@ import org.jetbrains.annotations.Nullable;
 public class BackpackBlockRegistry {
     public static final Block BACKPACK = register("backpack", new BackpackBlock());
 
-    public static final Block GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
-        @Override
-        public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
-            return ServerBackpacks.getInventory();
-        }
-
-        @Override
-        public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-            return BackpackBlockEntityRegistry.GLOBAL_BACKPACK_BLOCK_ENTITY.instantiate(pos, state);
-        }
-    });
-
     public static final Block ENDER_BACKPACK = register("ender_backpack", new BasicBackpackBlock("ender_backpack") {
         @Override
-        public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
+        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
             return player != null ? player.getEnderChestInventory() : null;
         }
 
         @Override
         public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
             return BackpackBlockEntityRegistry.ENDER_BACKPACK_BLOCK_ENTITY.instantiate(pos, state);
+        }
+    });
+    public static final Block GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
+        @Override
+        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
+            return ServerBackpacks.getInventory();
+        }
+
+        @Override
+        public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+            return BackpackBlockEntityRegistry.GLOBAL_BACKPACK_BLOCK_ENTITY.instantiate(pos, state);
         }
     });
 

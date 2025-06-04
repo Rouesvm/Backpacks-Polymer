@@ -60,8 +60,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     @Override
     protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return ScreenHandler.calculateComparatorOutput(getInventory(
-                world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY).get(),
-                null
+                null, world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY).get()
         ));
     }
 
@@ -76,7 +75,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     }
 
     @Override
-    public void openGui(BlockEntity entity, ServerPlayerEntity player) {
+    public void openGui(ServerPlayerEntity player, BlockEntity entity) {
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
         BackpackInstance instance = backpackBlockEntity.getInstance();
 
@@ -89,7 +88,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     }
 
     @Override
-    public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
+    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
         if (entity == null) return null;
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
         return BackpackManager.getInventory(backpackBlockEntity.getUuid());

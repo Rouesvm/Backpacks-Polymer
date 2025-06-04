@@ -126,7 +126,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
                     }
                 }
 
-                openGui(entity, (ServerPlayerEntity) player);
+                openGui((ServerPlayerEntity) player, entity);
                 return ActionResult.SUCCESS;
             }
         }
@@ -140,12 +140,12 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         world.breakBlock(pos, false);
     }
 
-    public void openGui(BlockEntity entity, ServerPlayerEntity player) {
+    public void openGui(ServerPlayerEntity player, BlockEntity entity) {
         ContainerItem.playOpenSound(player);
-        new BasicGui(player, null, getInventory(entity, player));
+        new BasicGui(player, null, getInventory(player, entity));
     }
 
-    public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
+    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
         return null;
     }
 

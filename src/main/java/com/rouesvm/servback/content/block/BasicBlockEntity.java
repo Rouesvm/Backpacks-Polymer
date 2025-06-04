@@ -13,6 +13,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 public class BasicBlockEntity extends BlockEntity {
@@ -33,7 +34,7 @@ public class BasicBlockEntity extends BlockEntity {
 
         if (item instanceof ContainerItem containerItem) {
             nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
-        } else nbt.putInt("dye", DyeColor.BROWN.getIndex());
+        } else nbt.putString("item", item.toString());
     }
 
     @Override
@@ -45,10 +46,16 @@ public class BasicBlockEntity extends BlockEntity {
         nbt.getInt("dye").ifPresent(integer ->
                 item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9));
 
-        if (item == null) item = Registries.ITEM.get(
-                nbt.getInt("item", Registries.ITEM.getRawId(
-                        ContainerItem.getDefaultBackpack(1)
-                )));
+        if (item == null) {
+            if (nbt.getString("item").isPresent()) {
+                item = Registries.ITEM.get(Identifier.of(nbt.getString("item").get()));
+            } else {
+                item = Registries.ITEM.get(
+                        nbt.getInt("item", Registries.ITEM.getRawId(
+                                ContainerItem.getDefaultBackpack(1)
+                        )));
+            }
+        }
     }
 
     public ItemStack getDefaultStack() {

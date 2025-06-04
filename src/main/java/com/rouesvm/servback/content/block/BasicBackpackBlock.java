@@ -1,12 +1,13 @@
 package com.rouesvm.servback.content.block;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
-import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.ui.BasicGui;
-import com.rouesvm.servback.data.BackpackUtils;
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
+import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
+import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.data.BackpackUtils;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BlockHolder;
+import com.rouesvm.servback.technical.ui.BasicGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.BlockEntityProvider;
@@ -140,6 +141,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     }
 
     public void openGui(BlockEntity entity, ServerPlayerEntity player) {
+        ContainerItem.playInsertSound(player);
         new BasicGui(player, null, getInventory(entity, player));
     }
 

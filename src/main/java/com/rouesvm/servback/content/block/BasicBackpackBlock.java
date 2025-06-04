@@ -2,7 +2,6 @@ package com.rouesvm.servback.content.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
-import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.data.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
@@ -119,13 +118,6 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         if (!world.isClient) {
             BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
             if (entity != null) {
-                if (ServerBackpacks.hasTrinketLoaded && player.isSneaking()) {
-                    if (!BackpackTrinket.hasStackInBackSlot(player)) {
-                        trinketInteraction(entity, (ServerPlayerEntity) player, world, pos);
-                        return ActionResult.SUCCESS;
-                    }
-                }
-
                 openGui((ServerPlayerEntity) player, entity);
                 return ActionResult.SUCCESS;
             }
@@ -136,7 +128,6 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
 
     public void trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
         ItemStack stack = entity.getDefaultStack().copy();
-        BackpackTrinket.equipStack(player, stack);
         world.breakBlock(pos, false);
     }
 

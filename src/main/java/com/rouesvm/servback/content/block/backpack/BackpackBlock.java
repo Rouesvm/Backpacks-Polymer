@@ -1,7 +1,6 @@
 package com.rouesvm.servback.content.block.backpack;
 
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
-import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBlockEntity;
 import com.rouesvm.servback.content.item.ContainerItem;
@@ -70,7 +69,6 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
 
         ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
         BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
-        BackpackTrinket.equipStack(player, stack);
         world.breakBlock(pos, false);
     }
 

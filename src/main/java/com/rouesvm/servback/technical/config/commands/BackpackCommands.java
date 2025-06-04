@@ -4,12 +4,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
-import me.lucko.fabric.api.permissions.v0.Permissions;
+import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.ui.BackpackGui;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -21,10 +19,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class BackpackCommands {
     public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
-        if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
-
         dispatcher.register(literal("backpacks")
-                .requires(source -> Permissions.check(source, "serverbackpacks.command", 4))
                 .executes(context -> {
                     context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);
                     return 1;

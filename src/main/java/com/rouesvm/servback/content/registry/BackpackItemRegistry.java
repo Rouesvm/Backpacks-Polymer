@@ -4,6 +4,7 @@ import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.data.BackpackManager;
 import com.rouesvm.servback.technical.config.Configuration;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -24,13 +25,13 @@ public class BackpackItemRegistry {
     public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
         @Override
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-            return player.getEnderChestInventory();
+            return player != null ? player.getEnderChestInventory() : null;
         }
     });
     public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.GLOBAL_BACKPACK) {
         @Override
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-            return ServerBackpacks.getInventory();
+            return BackpackManager.getGlobalInventory();
         }
     });
 

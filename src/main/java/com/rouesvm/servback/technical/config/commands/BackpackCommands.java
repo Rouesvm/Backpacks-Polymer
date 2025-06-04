@@ -5,11 +5,12 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
+import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.ui.BackpackGui;
 import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -20,7 +21,11 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class BackpackCommands {
-    public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void initialize() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> init(dispatcher));
+    }
+
+    private static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
         if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
 
         dispatcher.register(literal("backpacks")
@@ -65,7 +70,7 @@ public class BackpackCommands {
         );
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> configCommand() {
+    private static LiteralArgumentBuilder<ServerCommandSource> configCommand() {
         return literal("config")
                 .then(literal("reset").executes(context -> {
                     Configuration.manager.instance = new Configuration.Instance();

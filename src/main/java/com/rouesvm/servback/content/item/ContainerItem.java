@@ -142,14 +142,13 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-        return BackpackManager.getInventory(BackpackManager.getStackUUID(stack));
+        return stack != null ? BackpackManager.getInventory(BackpackManager.getStackUUID(stack)) : null;
     }
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         BackpackManager.createNewUUID(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
-        ContainerItem.playOpenSound(player);
 
         BackpackInstance instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
         if (instance != null) new BackpackGui(player, stack, instance);

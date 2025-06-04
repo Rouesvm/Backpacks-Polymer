@@ -92,20 +92,14 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         return super.getPickStack(world, pos, state, includeData);
     }
 
-    // this is definitely used wrongly
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
-        if (entity != null) {
-            ItemStack stack = entity.getDefaultStack().copy();
-            BackpackUtils.addCustomData((ServerWorld) world, stack);
-            dropStack(world, pos, stack);
-        }
+        onStacksDropped(state, (ServerWorld) world, pos, null, false);
         return super.onBreak(world, pos, state, player);
     }
 
     @Override
-    protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
+    protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
         BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
         if (entity != null) {
             ItemStack stack = entity.getDefaultStack().copy();
@@ -119,14 +113,12 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         if (!world.isClient) {
             BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
             if (entity != null) {
-                if (ServerBackpacks.hasTrinketLoaded && player.isSneaking()) {
-                    if (!BackpackTrinket.hasStackInBackSlot(player)) {
-                        trinketInteraction(entity, (ServerPlayerEntity) player, world, pos);
-                        return ActionResult.SUCCESS;
-                    }
-                }
+                if (ServerBackpacks.hasTrinketLoaded
+                        && player.isSneaking()
+                        && !trinketInteraction(entity, (ServerPlayerEntity) player, world, pos))
+                    return ActionResult.SUCCESS;
 
-                openGui((ServerPlayerEntity) player, entity);
+                onOpenGui((ServerPlayerEntity) player, entity);
                 return ActionResult.SUCCESS;
             }
         }
@@ -134,14 +126,23 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         return ActionResult.PASS;
     }
 
-    public void trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        ItemStack stack = entity.getDefaultStack().copy();
-        BackpackTrinket.equipStack(player, stack);
-        world.breakBlock(pos, false);
+    public boolean trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
+        if (!BackpackTrinket.hasStackInBackSlot(player)) {
+            ItemStack stack = entity.getDefaultStack().copy();
+            BackpackTrinket.equipStack(player, stack);
+            world.breakBlock(pos, false);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void onOpenGui(ServerPlayerEntity player, BlockEntity entity) {
+        ContainerItem.playOpenSound(player);
+        openGui(player, entity);
     }
 
     public void openGui(ServerPlayerEntity player, BlockEntity entity) {
-        ContainerItem.playOpenSound(player);
         new BasicGui(player, null, getInventory(player, entity));
     }
 

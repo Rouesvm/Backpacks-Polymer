@@ -65,26 +65,28 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     }
 
     @Override
-    public void trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
+    public boolean trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
+        if (!BackpackTrinket.hasStackInBackSlot(player)) {
+            BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 
-        ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
-        BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
-        BackpackTrinket.equipStack(player, stack);
-        world.breakBlock(pos, false);
+            ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
+            BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
+            BackpackTrinket.equipStack(player, stack);
+            world.breakBlock(pos, false);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void openGui(ServerPlayerEntity player, BlockEntity entity) {
-        BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
-        BackpackInstance instance = backpackBlockEntity.getInstance();
+        if (entity instanceof BackpackBlockEntity backpackBlockEntity) {
+            BackpackInstance instance = backpackBlockEntity.getInstance();
+            resize(player, backpackBlockEntity.getUuid(), instance.inventory(),
+                    backpackBlockEntity.getSize() + backpackBlockEntity.getExtraSize());
 
-        ContainerItem.playOpenSound(player);
-
-        resize(player, backpackBlockEntity.getUuid(), instance.inventory(),
-                backpackBlockEntity.getSize() + backpackBlockEntity.getExtraSize());
-
-        new BackpackGui(player, instance);
+            new BackpackGui(player, instance);
+        }
     }
 
     @Override

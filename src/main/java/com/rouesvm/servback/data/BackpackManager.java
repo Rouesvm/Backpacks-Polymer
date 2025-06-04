@@ -6,8 +6,8 @@ import com.rouesvm.servback.data.state.BackpackDataFixer;
 import com.rouesvm.servback.data.state.BackpackDataSaver;
 import com.rouesvm.servback.data.state.BackpackState;
 import com.rouesvm.servback.data.state.GlobalBackpackState;
-import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;
@@ -188,8 +188,12 @@ public class BackpackManager {
         }
     }
 
-    public void setGlobalInventory(DefaultedList<ItemStack> stacks) {
-        this.globalInventory.setInventoryDirectly(stacks);
+    public static void setGlobalInventory(DefaultedList<ItemStack> stacks) {
+        instance.globalInventory.setInventoryDirectly(stacks);
+    }
+
+    public static BackpackInventory getGlobalInventory() {
+        return instance.globalInventory;
     }
 
     public boolean hasBackpack(UUID uuid) {

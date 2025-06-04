@@ -1,16 +1,16 @@
 package com.rouesvm.servback.content.block.backpack;
 
+import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
+import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBlockEntity;
-import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.content.registry.BackpackItemRegistry;
-import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
 import com.rouesvm.servback.data.BackpackUtils;
-import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
+import com.rouesvm.servback.technical.ui.BackpackGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -87,7 +87,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     }
 
     @Override
-    public Inventory getInventory(BlockEntity entity, @Nullable ServerPlayerEntity player) {
+    public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
         if (entity == null) return null;
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
         return BackpackManager.getInventory(backpackBlockEntity.getUuid());

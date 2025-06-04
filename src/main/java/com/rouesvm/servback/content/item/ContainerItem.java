@@ -3,11 +3,11 @@ package com.rouesvm.servback.content.item;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.content.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.content.registry.BackpackItemRegistry;
-import com.rouesvm.servback.technical.ui.BackpackGui;
-import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
 import com.rouesvm.servback.data.BackpackUtils;
+import com.rouesvm.servback.technical.ui.BackpackGui;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
@@ -117,6 +117,8 @@ public class ContainerItem extends BundleGuiItem {
                             if (itemStack.getCustomName() != null) {
                                 blockEntity.setCustomName(itemStack.getCustomName());
                             }
+
+                            blockEntity.markDirty();
                         }
 
                         if (playerEntity instanceof ServerPlayerEntity) {

@@ -15,7 +15,7 @@ public class BasicGui extends SimpleGui {
     protected final ItemStack stack;
     protected final Inventory inventory;
 
-    protected int stackIndex;
+    protected int stackIndex = -1;
     protected boolean outOfSlot = false;
 
     private final int slots;
@@ -48,13 +48,17 @@ public class BasicGui extends SimpleGui {
         return slots;
     }
 
+    public void slotUpdate() {
+    }
+
     public void afterOpened() {
         if (stack != null) this.lockSlot();
 
         this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
             @Override
             public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
+                slotUpdate();
+                if (stackIndex != -1 && stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
             }
             @Override
             public void onPropertyUpdate(ScreenHandler handler, int property, int value) {

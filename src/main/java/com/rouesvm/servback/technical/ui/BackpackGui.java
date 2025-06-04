@@ -1,13 +1,11 @@
 package com.rouesvm.servback.technical.ui;
 
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
 import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
 import com.rouesvm.servback.data.BackpackUtils;
+import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class BackpackGui extends BasicGui {
@@ -30,20 +28,8 @@ public class BackpackGui extends BasicGui {
     }
 
     @Override
-    public void afterOpened() {
-        if (stack != null) lockSlot();
-
-        this.getPlayer().currentScreenHandler.addListener(new ScreenHandlerListener() {
-            @Override
-            public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stackSlot) {
-                BackpackManager.saveBackpack(backpackInstance);
-                if (stack != null && handler.getSlot(stackIndex).getStack() != stack) outOfSlot = true;
-            }
-            @Override
-            public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
-
-            }
-        });
+    public void slotUpdate() {
+        BackpackManager.saveBackpack(backpackInstance);
     }
 
     @Override

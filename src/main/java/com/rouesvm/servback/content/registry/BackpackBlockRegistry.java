@@ -20,7 +20,7 @@ public class BackpackBlockRegistry {
 
     public static final Block GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
         @Override
-        public Inventory getInventory(BlockEntity entity, @Nullable ServerPlayerEntity player) {
+        public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
             return ServerBackpacks.getInventory();
         }
 
@@ -32,7 +32,7 @@ public class BackpackBlockRegistry {
 
     public static final Block ENDER_BACKPACK = register("ender_backpack", new BasicBackpackBlock("ender_backpack") {
         @Override
-        public Inventory getInventory(BlockEntity entity, @Nullable ServerPlayerEntity player) {
+        public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
             return player != null ? player.getEnderChestInventory() : null;
         }
 

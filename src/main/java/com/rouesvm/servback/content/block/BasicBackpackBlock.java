@@ -145,7 +145,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         new BasicGui(player, null, getInventory(entity, player));
     }
 
-    public Inventory getInventory(BlockEntity entity, @Nullable ServerPlayerEntity player) {
+    public Inventory getInventory(@Nullable BlockEntity entity, @Nullable ServerPlayerEntity player) {
         return null;
     }
 

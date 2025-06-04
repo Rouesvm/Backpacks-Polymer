@@ -19,7 +19,7 @@
       "com.rouesvm.servback.datagen.BackpacksDataGenerator"
     ],
     "main": [
-      "com.rouesvm.servback.Main"
+      "com.rouesvm.servback.ServerBackpacks"
     ]
   },
   "mixins": [

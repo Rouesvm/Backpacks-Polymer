@@ -1,9 +1,9 @@
 package com.rouesvm.servback.compat.trinkets;
 
-import com.rouesvm.servback.config.Configuration;
-import com.rouesvm.servback.item.BundleGuiItem;
-import com.rouesvm.servback.utils.cosmetic.BackHolder;
-import com.rouesvm.servback.utils.cosmetic.CosmeticManager;
+import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.content.item.BundleGuiItem;
+import com.rouesvm.servback.technical.cosmetic.BackHolder;
+import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import dev.emi.trinkets.api.*;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.entity.LivingEntity;

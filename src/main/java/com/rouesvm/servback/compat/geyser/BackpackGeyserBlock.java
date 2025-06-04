@@ -1,7 +1,7 @@
 package com.rouesvm.servback.compat.geyser;
 
-import com.rouesvm.servback.block.backpack.BackpackBlock;
-import com.rouesvm.servback.utils.bedrock.BedrockBlock;
+import com.rouesvm.servback.content.block.backpack.BackpackBlock;
+import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;

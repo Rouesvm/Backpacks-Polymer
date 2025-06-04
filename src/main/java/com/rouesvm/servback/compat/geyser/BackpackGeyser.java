@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import static com.rouesvm.servback.Main.MOD_ID;
+import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class BackpackGeyser implements EventRegistrar {
     public static Path PACKS_FOLDER;

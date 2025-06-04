@@ -81,12 +81,12 @@ public class BackpackUtils {
             ItemStack excessItem =  i < inventory.heldStacks().size() ? inventory.heldStacks().get(i) : ItemStack.EMPTY;
             player.dropItem(excessItem, true);
         }
-        ContainerItem.playDropContentsSound(player);
+        ContainerItem.playDropContentsSound(player, -0.2F);
     }
 
     public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory inventory, int totalSlots) {
-        dropExcessItems(player, inventory, totalSlots);
         if (inventory.size() != totalSlots) {
+            dropExcessItems(player, inventory, totalSlots);
             BackpackManager.resizeInventory(uuid, inventory, totalSlots);
         }
     }

@@ -141,7 +141,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     }
 
     public void openGui(BlockEntity entity, ServerPlayerEntity player) {
-        ContainerItem.playInsertSound(player);
+        ContainerItem.playOpenSound(player);
         new BasicGui(player, null, getInventory(entity, player));
     }
 

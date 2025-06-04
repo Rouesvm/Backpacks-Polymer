@@ -1,9 +1,9 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.block.BasicBlockEntity;
+import com.rouesvm.servback.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
-import com.rouesvm.servback.data.BackpackUtils;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -26,6 +26,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 
@@ -132,7 +133,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             if (clickType == ClickType.LEFT && !itemStack.isEmpty()) {
                 if (BaseInventory.canInsert(itemStack, inventory)) {
                     itemStack = BaseInventory.addStack(itemStack, inventory);
-                    ContainerItem.playInsertSound(serverPlayer);
+                    ContainerItem.playInsertSound(serverPlayer, 0.8F);
                 } else {
                     ContainerItem.playInsertFailSound(serverPlayer);
                 }
@@ -161,7 +162,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
                     if (BaseInventory.canInsert(otherStack, inventory)) {
                         otherStack = BaseInventory.addStack(otherStack, inventory);
-                        ContainerItem.playInsertSound(serverPlayer);
+                        ContainerItem.playInsertSound(serverPlayer, 0.8F);
                     } else {
                         ContainerItem.playInsertFailSound(serverPlayer);
                     }
@@ -184,7 +185,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         return false;
     }
 
-    public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
+    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
         return null;
     }
 
@@ -199,7 +200,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        ContainerItem.playInsertSound(player);
+        ContainerItem.playOpenSound(player);
         new BasicGui(player, stack, getInventory(player, stack));
     }
 }

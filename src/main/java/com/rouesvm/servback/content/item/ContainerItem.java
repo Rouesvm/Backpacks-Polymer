@@ -28,6 +28,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
@@ -140,7 +141,7 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
+    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
         return BackpackManager.getInventory(BackpackManager.getStackUUID(stack));
     }
 
@@ -148,7 +149,7 @@ public class ContainerItem extends BundleGuiItem {
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         BackpackManager.createNewUUID(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
-        playInsertSound(player);
+        ContainerItem.playOpenSound(player);
 
         BackpackInstance instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
         if (instance != null) new BackpackGui(player, stack, instance);
@@ -176,12 +177,17 @@ public class ContainerItem extends BundleGuiItem {
         return item != null ? item : BackpackItemRegistry.getBackpack(DyeColor.BROWN, 1);
     }
 
-    public static void playInsertSound(ServerPlayerEntity player) {
+    public static void playOpenSound(ServerPlayerEntity player) {
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
         player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
-    public static void playDropContentsSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+    public static void playInsertSound(ServerPlayerEntity player, float pitch) {
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, pitch + player.getWorld().getRandom().nextFloat() * 0.4F);
+    }
+
+    public static void playDropContentsSound(ServerPlayerEntity player, float pitch) {
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, pitch + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playRemoveOneSound(ServerPlayerEntity player) {

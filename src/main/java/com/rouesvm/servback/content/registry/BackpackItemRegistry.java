@@ -1,10 +1,10 @@
 package com.rouesvm.servback.content.registry;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.technical.config.Configuration;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,6 +13,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.DyeColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +23,13 @@ public class BackpackItemRegistry {
 
     public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
         @Override
-        public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
+        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
             return player.getEnderChestInventory();
         }
     });
     public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.GLOBAL_BACKPACK) {
         @Override
-        public Inventory getInventory(ServerPlayerEntity player, ItemStack stack) {
+        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
             return ServerBackpacks.getInventory();
         }
     });

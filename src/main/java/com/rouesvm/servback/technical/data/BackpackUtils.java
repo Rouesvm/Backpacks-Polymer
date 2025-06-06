@@ -1,7 +1,6 @@
-package com.rouesvm.servback.data;
+package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -33,7 +32,6 @@ public class BackpackUtils {
     }
 
     public static DefaultedList<ItemStack> getItemList(ItemStack stack) {
-        if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = BackpackManager.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
 
@@ -87,7 +85,7 @@ public class BackpackUtils {
     public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory inventory, int totalSlots) {
         if (inventory.size() != totalSlots) {
             dropExcessItems(player, inventory, totalSlots);
-            BackpackManager.resizeInventory(uuid, inventory, totalSlots);
+            BackpackManager.resizeInventory(uuid, totalSlots);
         }
     }
 }

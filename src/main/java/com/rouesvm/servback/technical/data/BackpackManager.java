@@ -1,12 +1,12 @@
-package com.rouesvm.servback.data;
+package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.data.state.BackpackDataFixer;
-import com.rouesvm.servback.data.state.BackpackDataSaver;
-import com.rouesvm.servback.data.state.BackpackState;
-import com.rouesvm.servback.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
+import com.rouesvm.servback.technical.data.state.BackpackDataFixer;
+import com.rouesvm.servback.technical.data.state.BackpackDataSaver;
+import com.rouesvm.servback.technical.data.state.BackpackState;
+import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -93,6 +93,8 @@ public class BackpackManager {
     }
 
     //
+    // SAVING AND ADDING BACKPACKS
+    //
 
     public static void saveBackpack(BackpackInstance instance) {
         if (instance.getUuid() != null && instance.inventory() != null) {
@@ -109,7 +111,6 @@ public class BackpackManager {
         if (backpackInstance.getUuid() != null && backpackInstance.inventory() != null) {
             instance.storedInstances.putIfAbsent(backpackInstance.getUuid(), backpackInstance);
         }
-
         return instance.storedInstances.get(backpackInstance.getUuid());
     }
 
@@ -118,75 +119,67 @@ public class BackpackManager {
     }
 
     //
+    // UUID
+    //
 
     public static UUID getStackUUID(ItemStack stack) {
+        UUID uuid = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
         String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
-        if (uuidString == null)
-            uuidString = String.valueOf(createNewUUID(stack));
-        return UUID.fromString(uuidString);
+
+        if (uuidString != null) {
+            uuid = UUID.fromString(uuidString);
+            stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
+            stack.remove(BackpackDataComponentTypes.UUID_TYPE);
+        } else if (uuid == null) uuid = createNewUUID(stack);
+
+        return uuid;
     }
 
     public static UUID createNewUUID(ItemStack stack) {
-        String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
-        if (uuidString == null) {
+        UUID stackUUID = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
+        if (stackUUID == null) {
             UUID uuid = generateUniqueUUID();
-            stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
+            stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
             return uuid;
-        } else return UUID.fromString(uuidString);
+        } else return stackUUID;
     }
 
+    // It's near impossible to generate an uuid that is the same, but I'm just going to regenerate just in case.
     public static UUID generateUniqueUUID() {
         UUID uuid = UUID.randomUUID();
-        if (instance != null) {
-            if (instance.hasBackpack(uuid)) {
-                uuid = UUID.randomUUID();
-            }
+        if (instance != null && instance.hasBackpack(uuid)) {
+            uuid = UUID.randomUUID();
         }
         return uuid;
     }
 
     //
+    // GET (INSTANCE, INVENTORY)
+    //
 
-    public static BackpackInstance getInstance(UUID uuid) {
+    public static Optional<BackpackInstance> getInstance(UUID uuid) {
         if (instance.hasBackpack(uuid))
-            return instance.storedInstances.get(uuid);
-        else return null;
+            return Optional.ofNullable(instance.storedInstances.get(uuid));
+        else return Optional.empty();
     }
 
-    public static @Nullable BackpackInstance getInstance(UUID uuid, int slots) {
-        if (instance == null) return null;
+    public static Optional<BackpackInstance> getInstance(UUID uuid, int slots) {
+        if (instance == null) return Optional.empty();
         if (instance.hasBackpack(uuid)) {
-            BackpackInstance backpack = getInstance(uuid);
-            BackpackInventory inventory = backpack.inventory;
-            if (inventory.size() != slots) inventory.resize(slots);
-            return backpack;
-        }
+            resizeInventory(uuid, slots);
+        } else addBackpack(uuid, new BackpackInventory(slots));
 
-        return addBackpack(uuid, new BackpackInventory(slots));
-    }
-
-    public static @Nullable BackpackInventory getInventory(UUID uuid, int slots) {
-        BackpackInstance instance = getInstance(uuid, slots);
-        if (instance != null)
-            return instance.inventory();
-        else return null;
+        return getInstance(uuid);
     }
 
     public static @Nullable BackpackInventory getInventory(UUID uuid) {
-        BackpackInstance instance = getInstance(uuid);
-        if (instance != null)
-            return instance.inventory();
-        else return null;
+        Optional<BackpackInstance> instance = getInstance(uuid);
+        return instance.map(BackpackInstance::inventory).orElse(null);
     }
 
     //
-
-    public static void resizeInventory(UUID uuid, BackpackInventory inventory, int newSize) {
-        if (uuid != null && inventory != null) {
-            BackpackInstance accessedInstance = getInstance(uuid);
-            if (accessedInstance != null) accessedInstance.inventory.resize(newSize);
-        }
-    }
+    // GENERAL
+    //
 
     public static void setGlobalInventory(DefaultedList<ItemStack> stacks) {
         instance.globalInventory.setInventoryDirectly(stacks);
@@ -194,6 +187,12 @@ public class BackpackManager {
 
     public static BackpackInventory getGlobalInventory() {
         return instance.globalInventory;
+    }
+
+    public static void resizeInventory(UUID uuid, int newSize) {
+        if (uuid != null) getInstance(uuid).ifPresent(
+                backpackInstance ->
+                        backpackInstance.inventory.resize(newSize));
     }
 
     public boolean hasBackpack(UUID uuid) {

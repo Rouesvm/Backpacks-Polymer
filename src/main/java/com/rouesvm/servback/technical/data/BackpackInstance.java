@@ -1,4 +1,4 @@
-package com.rouesvm.servback.data;
+package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;

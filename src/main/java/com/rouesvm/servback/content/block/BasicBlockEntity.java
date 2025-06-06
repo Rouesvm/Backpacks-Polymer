@@ -71,10 +71,6 @@ public class BasicBlockEntity extends BlockEntity {
         this.size = size;
     }
 
-    public Item getItem() {
-        return item;
-    }
-
     public void setItem(Item item) {
         this.item = item;
     }

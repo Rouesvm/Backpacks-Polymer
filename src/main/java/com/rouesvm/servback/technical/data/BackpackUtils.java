@@ -25,7 +25,7 @@ public class BackpackUtils {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (inventory.insertItems(itemStacks)) {
                 instance.setInventory(inventory);
-                BackpackManager.addBackpack(instance.getUuid(), instance.inventory());
+                BackpackManager.addBackpack(instance);
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }

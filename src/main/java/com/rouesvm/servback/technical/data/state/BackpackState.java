@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class BackpackState extends PersistentState {
-    public Set<BackpackData> storedInventories;
+    public final Set<BackpackData> storedInventories;
 
     private static final Codec<BackpackState> SAVE_CODEC = RecordCodecBuilder.create(
             instance -> instance.group(

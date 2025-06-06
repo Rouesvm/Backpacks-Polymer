@@ -139,7 +139,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 }
 
                 slot.setStack(itemStack);
-                afterChanged(serverPlayer, stack, inventory);
+                afterChanged(stack, inventory);
                 onContentChanged(player);
                 return true;
             } else {
@@ -168,7 +168,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                     }
 
                     cursorStackReference.set(otherStack);
-                    afterChanged(serverPlayer, stack, inventory);
+                    afterChanged(stack, inventory);
                     onContentChanged(player);
                     return true;
                 } else if (clickType == ClickType.RIGHT) {
@@ -189,7 +189,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         return null;
     }
 
-    public void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+    public void afterChanged(ItemStack stack, Inventory inventory) {
     }
 
     public void onContentChanged(PlayerEntity user) {

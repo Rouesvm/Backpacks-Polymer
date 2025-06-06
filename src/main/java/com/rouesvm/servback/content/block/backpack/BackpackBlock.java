@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import static com.rouesvm.servback.technical.data.BackpackUtils.resize;
 
 public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
-    public static EnumProperty<DyeColor> DYE_COLOR = EnumProperty.of("dye_color", DyeColor.class);
-    public static IntProperty SLOTS = IntProperty.of("slots", 1, 3);
+    public static final EnumProperty<DyeColor> DYE_COLOR = EnumProperty.of("dye_color", DyeColor.class);
+    public static final IntProperty SLOTS = IntProperty.of("slots", 1, 3);
 
     public BackpackBlock() {
         super("backpack");
@@ -66,7 +66,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
 
     @Override
     public boolean trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        if (!BackpackTrinket.hasStackInBackSlot(player)) {
+        if (BackpackTrinket.isStackEmptyInBackSlot(player)) {
             BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 
             ItemStack stack = backpackBlockEntity.getDefaultStack().copy();

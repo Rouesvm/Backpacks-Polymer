@@ -101,7 +101,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
         this.extraSize = extraSize;
     }
 
-    public @Nullable Storage<ItemVariant> getInventoryProvider(@Nullable Direction direction) {
+    public @Nullable Storage<ItemVariant> getInventoryProvider(@Nullable Direction ignoredDirection) {
         return storage;
     }
 }

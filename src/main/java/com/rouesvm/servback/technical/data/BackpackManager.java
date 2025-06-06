@@ -19,7 +19,7 @@ public class BackpackManager {
     public static BackpackManager instance;
 
     public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
-    public Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
+    public final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
     private static boolean loaded = false;
 
@@ -103,10 +103,6 @@ public class BackpackManager {
         }
     }
 
-    public static void saveBackpack(UUID uuid, BackpackInventory inventory) {
-        saveBackpack(new BackpackInstance(uuid, inventory));
-    }
-
     public static BackpackInstance addBackpack(BackpackInstance backpackInstance) {
         if (backpackInstance.getUuid() != null && backpackInstance.inventory() != null) {
             instance.storedInstances.putIfAbsent(backpackInstance.getUuid(), backpackInstance);
@@ -114,8 +110,8 @@ public class BackpackManager {
         return instance.storedInstances.get(backpackInstance.getUuid());
     }
 
-    public static BackpackInstance addBackpack(UUID uuid, BackpackInventory inventory) {
-        return addBackpack(new BackpackInstance(uuid, inventory));
+    public static void addBackpack(UUID uuid, BackpackInventory inventory) {
+        addBackpack(new BackpackInstance(uuid, inventory));
     }
 
     //

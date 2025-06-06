@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BackpackItemRegistry {
-    public static Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
+    public static final Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
 
     public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
         @Override

@@ -35,5 +35,6 @@ public class BackpackDataComponentTypes {
         return registry;
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void initialize() {}
 }

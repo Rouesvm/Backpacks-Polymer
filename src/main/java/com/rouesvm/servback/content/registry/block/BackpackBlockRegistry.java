@@ -46,5 +46,6 @@ public class BackpackBlockRegistry {
         return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, name), block);
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void initialize() {}
 }

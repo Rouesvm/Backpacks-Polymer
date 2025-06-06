@@ -26,9 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BackpackGeyserBlock {
-    public static List<String> dye_colors = Arrays.stream(DyeColor.values()).map(DyeColor::asString).toList();
-    public static List<String> facing = HorizontalFacingBlock.FACING.getValues().stream().map(Direction::asString).toList();
-    public static List<Integer> slots = new ArrayList<>();
+    public static final List<String> dye_colors = Arrays.stream(DyeColor.values()).map(DyeColor::asString).toList();
+    public static final List<String> facing = HorizontalFacingBlock.FACING.getValues().stream().map(Direction::asString).toList();
+    public static final List<Integer> slots = new ArrayList<>();
 
     static {
         slots.add(1);
@@ -36,7 +36,7 @@ public class BackpackGeyserBlock {
         slots.add(3);
     }
 
-    public static String STATE_CONDITION = "query.block_property('%s') == %s";
+    public static final String STATE_CONDITION = "query.block_property('%s') == %s";
 
     public static void onGeyserDefineCustomBlocksEvent(GeyserDefineCustomBlocksEvent event) {
         Registries.BLOCK.getEntrySet().stream()

@@ -157,7 +157,7 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    public void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+    public void afterChanged(ItemStack stack, Inventory inventory) {
         UUID uuid = BackpackManager.getStackUUID(stack);
         BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
     }
@@ -189,10 +189,6 @@ public class ContainerItem extends BundleGuiItem {
 
     public static void playDropContentsSound(ServerPlayerEntity player, float pitch) {
         player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, pitch + player.getWorld().getRandom().nextFloat() * 0.4F);
-    }
-
-    public static void playRemoveOneSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_REMOVE_ONE, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertFailSound(ServerPlayerEntity player) {

@@ -9,10 +9,14 @@ import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.util.collection.DefaultedList;
 
 public class BaseInventory implements Inventory, RecipeInputProvider {
-    public DefaultedList<ItemStack> heldStacks;
+    private DefaultedList<ItemStack> heldStacks;
 
     public BaseInventory(int size) {
         this.heldStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
+    }
+
+    public BaseInventory(DefaultedList<ItemStack> stacks) {
+        this.heldStacks = stacks;
     }
 
     @Override
@@ -96,6 +100,10 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
 
     public DefaultedList<ItemStack> heldStacks() {
         return this.heldStacks;
+    }
+
+    public void setInventoryDirectly(DefaultedList<ItemStack> inventory) {
+        this.heldStacks = inventory;
     }
 
     public static ItemStack addStack(ItemStack stack, Inventory inventory) {

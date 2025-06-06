@@ -18,7 +18,7 @@ import java.util.*;
 public class BackpackManager {
     public static BackpackManager instance;
 
-    public BackpackInventory globalInventory = new BackpackInventory(9 * 3);
+    public final BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
     private static boolean loaded = false;
@@ -89,7 +89,7 @@ public class BackpackManager {
         load(server);
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
-        instance.globalInventory = globalBackpackState.globalInventory;
+        instance.globalInventory.setInventoryDirectly(globalBackpackState.globalInventory.heldStacks());
     }
 
     //

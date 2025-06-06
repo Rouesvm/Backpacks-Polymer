@@ -36,8 +36,8 @@ public class BackpackUtils {
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
 
         if (inventory != null) {
-            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.heldStacks.size());
-            stacks.addAll(inventory.heldStacks);
+            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.size());
+            stacks.addAll(inventory.heldStacks());
             return stacks;
         }
 

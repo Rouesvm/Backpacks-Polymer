@@ -23,7 +23,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
@@ -33,7 +32,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
     private int extraSize = 0;
 
-    private Optional<BackpackInstance> instance = Optional.empty();
+    private BackpackInstance instance = null;
     private SlottedStorage<ItemVariant> storage;
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
@@ -73,10 +72,10 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     }
 
     public void setStorage() {
-        if (instance.isEmpty()) instance = BackpackManager.getInstance(uuid, extraSize + getSize());
-        if (instance.isPresent() && storage == null) {
-            instance.get().inventory.setEntity(this);
-            storage = InventoryStorage.of(instance.get().inventory, null);
+        if (instance == null) instance = BackpackManager.getInstance(uuid, extraSize + getSize()).get();
+        if (instance != null && storage == null) {
+            instance.inventory.setEntity(this);
+            storage = InventoryStorage.of(instance.inventory, null);
         }
     }
 
@@ -86,12 +85,12 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
-        if (instance.isEmpty()) setStorage();
+        if (instance == null) setStorage();
     }
 
     public BackpackInstance getInstance() {
-        if (instance.isEmpty()) setStorage();
-        return instance.get();
+        if (instance == null) setStorage();
+        return instance;
     }
 
     public int getExtraSize() {

@@ -32,11 +32,11 @@ public class BasicBlockEntity extends BlockEntity {
 
         nbt.putInt("size", size);
 
-        if (item != null && item instanceof ContainerItem containerItem)
-            nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
-        else if (item != null)
-            nbt.putString("item", item.toString());
-        else nbt.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
+        if (item != null) {
+            if (item instanceof ContainerItem containerItem)
+                nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
+            else nbt.putString("item", item.toString());
+        } else nbt.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
     }
 
     @Override
@@ -49,14 +49,11 @@ public class BasicBlockEntity extends BlockEntity {
                 item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9));
 
         if (item == null) {
-            if (nbt.getString("item").isPresent()) {
+            if (nbt.getString("item").isPresent())
                 item = Registries.ITEM.get(Identifier.of(nbt.getString("item").get()));
-            } else {
-                item = Registries.ITEM.get(
+            else item = Registries.ITEM.get(
                         nbt.getInt("item", Registries.ITEM.getRawId(
-                                ContainerItem.getDefaultBackpack(1)
-                        )));
-            }
+                                ContainerItem.getDefaultBackpack(1))));
         }
     }
 

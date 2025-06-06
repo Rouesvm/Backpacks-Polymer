@@ -1,4 +1,4 @@
-package com.rouesvm.servback.content.registry;
+package com.rouesvm.servback.content.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;

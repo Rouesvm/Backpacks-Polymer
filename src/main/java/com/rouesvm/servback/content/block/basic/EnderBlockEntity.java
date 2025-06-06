@@ -2,7 +2,7 @@ package com.rouesvm.servback.content.block.basic;
 
 
 import com.rouesvm.servback.content.block.BasicBlockEntity;
-import com.rouesvm.servback.content.registry.BackpackBlockEntityRegistry;
+import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 

@@ -1,8 +1,8 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
-import com.rouesvm.servback.content.registry.BackpackBlockRegistry;
-import com.rouesvm.servback.content.registry.BackpackItemRegistry;
+import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.data.BackpackUtils;

@@ -2,7 +2,11 @@ package com.rouesvm.servback;
 
 import com.rouesvm.servback.compat.geyser.BackpackGeyser;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
-import com.rouesvm.servback.content.registry.*;
+import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
+import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemGroup;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
 import com.rouesvm.servback.technical.data.BackpackManager;

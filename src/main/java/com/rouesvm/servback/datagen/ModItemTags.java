@@ -1,7 +1,7 @@
 package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.content.registry.BackpackItemRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.item.Item;

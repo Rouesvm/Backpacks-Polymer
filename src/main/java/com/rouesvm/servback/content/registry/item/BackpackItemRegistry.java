@@ -1,9 +1,10 @@
-package com.rouesvm.servback.content.registry;
+package com.rouesvm.servback.content.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.inventory.Inventory;

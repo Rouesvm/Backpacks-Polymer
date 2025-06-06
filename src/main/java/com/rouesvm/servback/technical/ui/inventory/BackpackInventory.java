@@ -38,7 +38,7 @@ public class BackpackInventory extends BaseInventory {
     }
 
     public void copyTo(BackpackInventory inventory) {
-        for(int i = 0; i < inventory.size(); ++i) {
+        for (int i = 0; i < inventory.size(); ++i) {
             ItemStack itemStack = i < this.heldStacks.size() ? this.heldStacks.get(i) : ItemStack.EMPTY;
             inventory.setStack(i, itemStack.copy());
         }
@@ -49,14 +49,16 @@ public class BackpackInventory extends BaseInventory {
     }
 
     public void resize(int newSize) {
-        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
+        if (this.size() != newSize) {
+            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
 
-        for(int i = 0; i < stacks.size(); ++i) {
-            ItemStack itemStack = i < this.heldStacks.size() ? this.heldStacks.get(i) : ItemStack.EMPTY;
-            stacks.set(i, itemStack.copy());
+            for (int i = 0; i < stacks.size(); ++i) {
+                ItemStack itemStack = i < this.size() ? this.heldStacks.get(i) : ItemStack.EMPTY;
+                stacks.set(i, itemStack.copy());
+            }
+
+            this.heldStacks = stacks;
         }
-
-        this.heldStacks = stacks;
     }
 
     public void setEntity(BlockEntity entity) {

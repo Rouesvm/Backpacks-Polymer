@@ -58,9 +58,9 @@ public class BackHolder extends ElementHolder {
 
         if (this.element.getItem().getItem() instanceof ContainerItem item) {
             int size = item.getSize();
-            cosmeticPosition = Configuration.getInstance().back_positions.get(size);
-            cosmeticRotation = Configuration.getInstance().back_yaw.get(size);
-            cosmeticPitchWhenSneaking = Configuration.getInstance().back_pitch_when_sneaking.get(size);
+            cosmeticPosition = Configuration.instance().back_positions.get(size);
+            cosmeticRotation = Configuration.instance().back_yaw.get(size);
+            cosmeticPitchWhenSneaking = Configuration.instance().back_pitch_when_sneaking.get(size);
         }
 
         this.addElement(this.element);

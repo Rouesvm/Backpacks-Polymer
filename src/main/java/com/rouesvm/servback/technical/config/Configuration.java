@@ -50,7 +50,7 @@ public class Configuration {
         if (!configFile.exists()) save();
     }
 
-    public static Instance getInstance() {
+    public static Instance instance() {
         return manager.instance;
     }
 

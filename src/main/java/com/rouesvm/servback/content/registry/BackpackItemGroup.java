@@ -31,7 +31,7 @@ public class BackpackItemGroup {
 
     public static void addItems(Entries entries) {
         for (DyeColor color : dyeColors) {
-            for (int i = 1; i <= Configuration.getInstance().types_of_backpacks.keySet().size(); i++) {
+            for (int i = 1; i <= Configuration.instance().types_of_backpacks.keySet().size(); i++) {
                 entries.add(BackpackItemRegistry.getBackpack(color, i));
             }
         }

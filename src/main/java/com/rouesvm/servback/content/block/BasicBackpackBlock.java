@@ -4,9 +4,9 @@ import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.data.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BlockHolder;
+import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -58,7 +58,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
             BlockState neighborState,
             Random random
     ) {
-        return (Configuration.getInstance().breaks_with_flow && world.getFluidState(neighborPos).canFlowTo(world, pos))
+        return (Configuration.instance().breaks_with_flow && world.getFluidState(neighborPos).canFlowTo(world, pos))
                 ? Blocks.AIR.getDefaultState()
                 : super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }

@@ -3,9 +3,9 @@ package com.rouesvm.servback.content.block.backpack;
 import com.rouesvm.servback.content.block.BasicBlockEntity;
 import com.rouesvm.servback.content.registry.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.data.BackpackInstance;
-import com.rouesvm.servback.data.BackpackManager;
-import com.rouesvm.servback.data.BackpackUtils;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.data.BackpackUtils;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
@@ -32,7 +33,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
     private int extraSize = 0;
 
-    private BackpackInstance instance;
+    private Optional<BackpackInstance> instance = Optional.empty();
     private SlottedStorage<ItemVariant> storage;
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
@@ -64,7 +65,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
         ItemStack stack = super.getDefaultStack().copy();
         stack.addEnchantment(capacity, extraSize / 9);
-        stack.set(BackpackDataComponentTypes.UUID_TYPE, uuid.toString());
+        stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
 
         BackpackUtils.addCustomData((ServerWorld) world, stack);
 
@@ -72,10 +73,10 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     }
 
     public void setStorage() {
-        if (instance == null) instance = BackpackManager.getInstance(uuid, extraSize + getSize());
-        if (instance != null && storage == null) {
-            instance.inventory.setEntity(this);
-            storage = InventoryStorage.of(instance.inventory, null);
+        if (instance.isEmpty()) instance = BackpackManager.getInstance(uuid, extraSize + getSize());
+        if (instance.isPresent() && storage == null) {
+            instance.get().inventory.setEntity(this);
+            storage = InventoryStorage.of(instance.get().inventory, null);
         }
     }
 
@@ -85,12 +86,12 @@ public class BackpackBlockEntity extends BasicBlockEntity {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
-        if (instance == null) setStorage();
+        if (instance.isEmpty()) setStorage();
     }
 
     public BackpackInstance getInstance() {
-        if (instance == null) setStorage();
-        return instance;
+        if (instance.isEmpty()) setStorage();
+        return instance.get();
     }
 
     public int getExtraSize() {

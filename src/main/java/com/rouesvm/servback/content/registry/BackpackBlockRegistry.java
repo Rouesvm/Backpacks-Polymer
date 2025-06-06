@@ -4,7 +4,7 @@ import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicPolymerBlock;
 import com.rouesvm.servback.content.block.backpack.BackpackBlock;
-import com.rouesvm.servback.data.BackpackManager;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

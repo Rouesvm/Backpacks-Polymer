@@ -1,7 +1,7 @@
 package com.rouesvm.servback.compat.trinkets;
 
-import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.content.item.BundleGuiItem;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BackHolder;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import dev.emi.trinkets.api.*;
@@ -30,31 +30,34 @@ public class BackpackTrinket implements Trinket {
 
     @Override
     public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (!Configuration.getInstance().display_back) return;
+        if (!Configuration.instance().display_back) return;
 
         if (entity instanceof ServerPlayerEntity player) {
-            if (CosmeticManager.getManager().getInstance(player) == null)
-                CosmeticManager.getManager().getOrCreateInstance(player, stack);
+            CosmeticManager manager = CosmeticManager.manager();
+            if (manager.getInstance(player).isEmpty())
+                manager.getOrCreateInstance(player, stack);
         }
     }
 
     @Override
     public void onEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (!Configuration.getInstance().display_back) return;
+        if (!Configuration.instance().display_back) return;
 
         if (entity instanceof ServerPlayerEntity player) {
-            CosmeticManager.getManager().getOrCreateInstance(player, stack);
+            CosmeticManager.manager().getOrCreateInstance(player, stack);
         }
     }
 
     @Override
     public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (!Configuration.getInstance().display_back) return;
+        if (!Configuration.instance().display_back) return;
 
         if (entity instanceof ServerPlayerEntity player) {
-            BackHolder holder = CosmeticManager.getManager().getOrCreateInstance(player, stack);
+            CosmeticManager manager = CosmeticManager.manager();
+
+            BackHolder holder = manager.getOrCreateInstance(player, stack);
             holder.destroy();
-            CosmeticManager.getManager().removeInstance(player);
+            manager.removeInstance(player);
         }
     }
 

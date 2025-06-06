@@ -4,8 +4,8 @@ import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.data.BackpackManager;
 import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -63,7 +63,7 @@ public class BackpackItemRegistry {
     }
 
     public static void initialize() {
-        Configuration.Instance instance = Configuration.getInstance();
+        Configuration.Instance instance = Configuration.instance();
 
         if (instance.types_of_backpacks == null) {
             Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);

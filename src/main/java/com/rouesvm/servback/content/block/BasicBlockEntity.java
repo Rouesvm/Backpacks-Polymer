@@ -32,9 +32,11 @@ public class BasicBlockEntity extends BlockEntity {
 
         nbt.putInt("size", size);
 
-        if (item instanceof ContainerItem containerItem) {
+        if (item != null && item instanceof ContainerItem containerItem)
             nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
-        } else nbt.putString("item", item.toString());
+        else if (item != null)
+            nbt.putString("item", item.toString());
+        else nbt.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
     }
 
     @Override

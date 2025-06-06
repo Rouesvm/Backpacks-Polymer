@@ -3,9 +3,9 @@ package com.rouesvm.servback.content.item;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.content.registry.BackpackBlockRegistry;
 import com.rouesvm.servback.content.registry.BackpackItemRegistry;
-import com.rouesvm.servback.data.BackpackInstance;
-import com.rouesvm.servback.data.BackpackManager;
-import com.rouesvm.servback.data.BackpackUtils;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.advancement.criterion.Criteria;
@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ContainerItem extends BundleGuiItem {
@@ -55,8 +56,9 @@ public class ContainerItem extends BundleGuiItem {
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
         DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(polymerStack);
 
-        if (itemList == null) return;
         if (itemList.isEmpty()) return;
+
+        tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
@@ -150,8 +152,8 @@ public class ContainerItem extends BundleGuiItem {
         BackpackManager.createNewUUID(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
 
-        BackpackInstance instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
-        if (instance != null) new BackpackGui(player, stack, instance);
+        Optional<BackpackInstance> instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
+        instance.ifPresent(backpackInstance -> new BackpackGui(player, stack, backpackInstance));
     }
 
     @Override

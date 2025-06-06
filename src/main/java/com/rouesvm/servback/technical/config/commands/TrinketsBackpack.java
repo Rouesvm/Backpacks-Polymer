@@ -2,10 +2,10 @@ package com.rouesvm.servback.technical.config.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BackpackGui;
-import com.rouesvm.servback.data.BackpackInstance;
-import com.rouesvm.servback.data.BackpackManager;
-import com.rouesvm.servback.data.BackpackUtils;
 import dev.emi.trinkets.api.TrinketComponent;
 import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.server.command.ServerCommandSource;
@@ -23,11 +23,11 @@ public class TrinketsBackpack {
             component.ifPresent(trinketComponent -> trinketComponent.forEach((slotReference, stack) -> {
                 if (stack.getItem() instanceof ContainerItem containerItem) {
                     BackpackUtils.resizeIfIncorrectSize(player, stack, containerItem.slots);
-                    BackpackInstance instance = BackpackManager.getInstance(
+                    Optional<BackpackInstance> instance = BackpackManager.getInstance(
                             BackpackManager.getStackUUID(stack),
                             containerItem.slots + BackpackUtils.getExtendedSlots(stack)
                     );
-                    if (instance != null) new BackpackGui(player, instance);
+                    instance.ifPresent(backpackInstance -> new BackpackGui(player, backpackInstance));
                 }
             }));
             return 1;

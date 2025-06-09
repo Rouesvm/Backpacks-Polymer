@@ -36,18 +36,14 @@ public class CosmeticManager {
     }
 
     public BackHolder getOrCreateInstance(ServerPlayerEntity player, ItemStack stack) {
-        UUID uuid = player.getUuid();
-        Optional<BackHolder> backHolder = getInstance(player);
-
-        if (backHolder.isEmpty())
-            backHolder = Optional.ofNullable(manager.storedInstances.put(uuid,
-                    BackHolder.createDisplay(stack, player)));
-
-        return backHolder.get();
+        return getInstance(player).orElseGet(() -> {
+            BackHolder holder = BackHolder.createDisplay(stack, player);
+            manager.storedInstances.put(player.getUuid(), holder);
+            return holder;
+        });
     }
 
     public void removeInstance(ServerPlayerEntity player) {
-        Optional<BackHolder> holder = getInstance(player);
-        if (holder.isPresent()) manager.storedInstances.remove(player.getUuid());
+        getInstance(player).ifPresent(h -> manager.storedInstances.remove(player.getUuid()));
     }
 }

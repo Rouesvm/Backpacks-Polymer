@@ -58,8 +58,7 @@ public class BackpackManager {
 
     public static void load(MinecraftServer server) {
         BackpackDataFixer.onWorldLoading(server);
-
-        BackpackState backpackState = BackpackState.getServerState(server);
+        BackpackState state = BackpackState.getServerState(server);
 
         if (!loaded) {
             BackpackDataSaver.onServerStarting(server);
@@ -71,14 +70,14 @@ public class BackpackManager {
             }
         }
 
-        if (!loaded && backpackState != null) {
-            Set<BackpackInstance> stateInstances = backpackState.getBackpackInstances();
+        if (!loaded && state != null) {
+            Set<BackpackInstance> stateInstances = state.getBackpackInstances();
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 instance.load(stateInstances);
 
                 BackpackDataSaver.setStoredInventories(stateInstances);
-                backpackState.clearBackpackInstances();
-                backpackState.markDirty();
+                state.clearBackpackInstances();
+                state.markDirty();
 
                 loaded = true;
             }
@@ -98,16 +97,17 @@ public class BackpackManager {
 
     public static void saveBackpack(BackpackInstance instance) {
         if (instance.getUuid() != null && instance.inventory() != null) {
-            BackpackInstance accessedInstance = addBackpack(instance);
-            if (accessedInstance != null) accessedInstance.saveToInventory(instance.inventory());
+            addBackpack(instance).ifPresent(saved ->
+                    saved.saveToInventory(instance.inventory()));
         }
     }
 
-    public static BackpackInstance addBackpack(BackpackInstance backpackInstance) {
-        if (backpackInstance.getUuid() != null && backpackInstance.inventory() != null) {
-            instance.storedInstances.putIfAbsent(backpackInstance.getUuid(), backpackInstance);
+    public static Optional<BackpackInstance> addBackpack(BackpackInstance instance) {
+        UUID uuid = instance.getUuid();
+        if (uuid != null && instance.inventory() != null) {
+            BackpackManager.instance.storedInstances.putIfAbsent(uuid, instance);
         }
-        return instance.storedInstances.get(backpackInstance.getUuid());
+        return getInstance(uuid);
     }
 
     public static void addBackpack(UUID uuid, BackpackInventory inventory) {
@@ -120,24 +120,26 @@ public class BackpackManager {
 
     public static UUID getStackUUID(ItemStack stack) {
         UUID uuid = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
-        String uuidString = stack.get(BackpackDataComponentTypes.UUID_TYPE);
 
-        if (uuidString != null) {
-            uuid = UUID.fromString(uuidString);
-            stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
-            stack.remove(BackpackDataComponentTypes.UUID_TYPE);
-        } else if (uuid == null) uuid = createNewUUID(stack);
+        if (uuid == null) {
+            String legacy = stack.get(BackpackDataComponentTypes.UUID_TYPE);
+            if (legacy != null) {
+                uuid = UUID.fromString(legacy);
+                stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
+                stack.remove(BackpackDataComponentTypes.UUID_TYPE);
+            } else uuid = createNewUUID(stack);
+        }
 
         return uuid;
     }
 
     public static UUID createNewUUID(ItemStack stack) {
-        UUID stackUUID = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
-        if (stackUUID == null) {
-            UUID uuid = generateUniqueUUID();
+        UUID uuid = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
+        if (uuid == null) {
+            uuid = generateUniqueUUID();
             stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
-            return uuid;
-        } else return stackUUID;
+        }
+        return uuid;
     }
 
     // It's near impossible to generate an uuid that is the same, but I'm just going to regenerate just in case.
@@ -154,23 +156,25 @@ public class BackpackManager {
     //
 
     public static Optional<BackpackInstance> getInstance(UUID uuid) {
-        if (instance.hasBackpack(uuid))
-            return Optional.ofNullable(instance.storedInstances.get(uuid));
-        else return Optional.empty();
+        return instance.hasBackpack(uuid)
+                ? Optional.ofNullable(instance.storedInstances.get(uuid))
+                : Optional.empty();
     }
 
     public static Optional<BackpackInstance> getInstance(UUID uuid, int slots) {
         if (instance == null) return Optional.empty();
-        if (instance.hasBackpack(uuid)) {
+
+        if (instance.hasBackpack(uuid))
             resizeInventory(uuid, slots);
-        } else addBackpack(uuid, new BackpackInventory(slots));
+        else addBackpack(uuid, new BackpackInventory(slots));
 
         return getInstance(uuid);
     }
 
     public static @Nullable BackpackInventory getInventory(UUID uuid) {
-        Optional<BackpackInstance> instance = getInstance(uuid);
-        return instance.map(BackpackInstance::inventory).orElse(null);
+        return getInstance(uuid)
+                .map(BackpackInstance::inventory)
+                .orElse(null);
     }
 
     //

@@ -192,7 +192,7 @@ public class BackpackManager {
     public static void resizeInventory(UUID uuid, int newSize) {
         if (uuid != null) getInstance(uuid).ifPresent(
                 backpackInstance ->
-                        backpackInstance.inventory.resize(newSize));
+                        backpackInstance.inventory().resize(newSize));
     }
 
     public boolean hasBackpack(UUID uuid) {

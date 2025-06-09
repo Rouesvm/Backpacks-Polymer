@@ -21,33 +21,33 @@ public class BackpackInventory extends BaseInventory {
         if (entity != null) entity.markDirty();
     }
 
-    public boolean insertItems(DefaultedList<ItemStack> itemStacks) {
-        if (itemStacks != null && !itemStacks.isEmpty()) {
+    public boolean insertItems(DefaultedList<ItemStack> target) {
+        if (target != null && !target.isEmpty()) {
             markDirty();
-            itemStacks.forEach(this::addStack);
+            target.forEach(this::addStack);
             return true;
         }
 
         return false;
     }
 
-    public void copyTo(BackpackInventory inventory) {
-        for (int i = 0; i < inventory.size(); ++i) {
+    public void copyTo(BackpackInventory target) {
+        for (int i = 0; i < target.size(); ++i) {
             ItemStack itemStack = i < this.size() ? this.getStack(i) : ItemStack.EMPTY;
-            inventory.setStack(i, itemStack.copy());
+            target.setStack(i, itemStack.copy());
         }
     }
 
     public void resize(int newSize) {
         if (this.size() != newSize) {
-            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
+            DefaultedList<ItemStack> copy = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
+            int limit = Math.min(this.size(), newSize);
 
-            for (int i = 0; i < stacks.size(); ++i) {
-                ItemStack itemStack = i < this.size() ? this.getStack(i) : ItemStack.EMPTY;
-                stacks.set(i, itemStack.copy());
+            for (int i = 0; i < limit; ++i) {
+                copy.set(i, this.getStack(i).copy());
             }
 
-            setInventoryDirectly(stacks);
+            setInventoryDirectly(copy);
         }
     }
 

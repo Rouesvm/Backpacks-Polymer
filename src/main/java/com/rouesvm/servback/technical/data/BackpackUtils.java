@@ -74,17 +74,17 @@ public class BackpackUtils {
         }
     }
 
-    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory inventory, int totalSlots) {
-        for (int i = inventory.size(); i >= totalSlots; i--) {
-            ItemStack excessItem =  i < inventory.heldStacks().size() ? inventory.heldStacks().get(i) : ItemStack.EMPTY;
+    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory target, int totalSlots) {
+        for (int i = target.size(); i >= totalSlots; i--) {
+            ItemStack excessItem =  i < target.heldStacks().size() ? target.heldStacks().get(i) : ItemStack.EMPTY;
             player.dropItem(excessItem, true);
         }
         ContainerItem.playDropContentsSound(player, -0.2F);
     }
 
-    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory inventory, int totalSlots) {
-        if (inventory.size() != totalSlots) {
-            dropExcessItems(player, inventory, totalSlots);
+    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory target, int totalSlots) {
+        if (target.size() != totalSlots) {
+            dropExcessItems(player, target, totalSlots);
             BackpackManager.resizeInventory(uuid, totalSlots);
         }
     }

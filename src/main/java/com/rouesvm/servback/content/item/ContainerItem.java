@@ -1,5 +1,6 @@
 package com.rouesvm.servback.content.item;
 
+import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
@@ -58,7 +59,8 @@ public class ContainerItem extends BundleGuiItem {
 
         if (itemList.isEmpty()) return;
 
-        tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
+        if (ServerBackpacks.isDevEnvironment)
+            tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;

@@ -41,9 +41,10 @@ public class ServerBackpacks implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		isDevEnvironment = FabricLoader.getInstance().isDevelopmentEnvironment();
+
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
-		isDevEnvironment = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();

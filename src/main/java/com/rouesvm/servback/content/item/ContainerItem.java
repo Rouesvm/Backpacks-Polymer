@@ -115,7 +115,10 @@ public class ContainerItem extends BundleGuiItem {
                             blockEntity.setItem(this);
                             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
                             blockEntity.setSize(slots);
-                            blockEntity.setUuid(BackpackManager.getStackUUID(context.getStack()));
+
+                            UUID uuid = BackpackManager.getStackUUID(context.getStack());
+                            if (uuid == null) uuid = BackpackManager.createNewUUID(context.getStack());
+                            blockEntity.setUuid(uuid);
 
                             blockEntity.setStorage();
 
@@ -161,7 +164,7 @@ public class ContainerItem extends BundleGuiItem {
     @Override
     public void afterChanged(ItemStack stack, Inventory inventory) {
         UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
+        if (uuid != null) BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {

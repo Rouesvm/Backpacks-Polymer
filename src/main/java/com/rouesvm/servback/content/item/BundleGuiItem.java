@@ -158,28 +158,23 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
             if (!otherStack.getItem().canBeNested()) return false;
 
+            if (clickType == ClickType.RIGHT) {
+                onOpenGui(serverPlayer, stack);
+                return true;
+            }
+
             if (inventory != null) {
                 if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
                     if (BaseInventory.canInsert(otherStack, inventory)) {
                         otherStack = BaseInventory.addStack(otherStack, inventory);
                         ContainerItem.playInsertSound(serverPlayer, 0.8F);
-                    } else {
-                        ContainerItem.playInsertFailSound(serverPlayer);
-                    }
+                    } else ContainerItem.playInsertFailSound(serverPlayer);
 
                     cursorStackReference.set(otherStack);
                     afterChanged(stack, inventory);
                     onContentChanged(player);
                     return true;
-                } else if (clickType == ClickType.RIGHT) {
-                    onOpenGui(serverPlayer, stack);
-                    return true;
-                } else {
-                    setSelectedStackIndex(stack, -1);
-                }
-            } else if (clickType == ClickType.RIGHT) {
-                onOpenGui(serverPlayer, stack);
-                return true;
+                } else setSelectedStackIndex(stack, -1);
             }
         }
         return false;

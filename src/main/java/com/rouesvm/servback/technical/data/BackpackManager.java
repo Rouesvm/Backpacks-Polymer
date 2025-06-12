@@ -118,7 +118,7 @@ public class BackpackManager {
     // UUID
     //
 
-    public static UUID getStackUUID(ItemStack stack) {
+    public static @Nullable UUID getStackUUID(ItemStack stack) {
         UUID uuid = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
 
         if (uuid == null) {
@@ -127,7 +127,7 @@ public class BackpackManager {
                 uuid = UUID.fromString(legacy);
                 stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
                 stack.remove(BackpackDataComponentTypes.UUID_TYPE);
-            } else uuid = createNewUUID(stack);
+            }
         }
 
         return uuid;

@@ -1,9 +1,10 @@
-package com.rouesvm.servback.content.registry;
+package com.rouesvm.servback.content.registry.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicPolymerBlock;
 import com.rouesvm.servback.content.block.backpack.BackpackBlock;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -32,7 +33,7 @@ public class BackpackBlockRegistry {
     public static final Block GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
         @Override
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
-            return ServerBackpacks.getInventory();
+            return BackpackManager.getGlobalInventory();
         }
 
         @Override
@@ -45,5 +46,6 @@ public class BackpackBlockRegistry {
         return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, name), block);
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void initialize() {}
 }

@@ -3,20 +3,20 @@ package com.rouesvm.servback.technical.ui.inventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.util.collection.DefaultedList;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class BaseInventory implements Inventory, RecipeInputProvider {
-    public DefaultedList<ItemStack> heldStacks;
+    private DefaultedList<ItemStack> heldStacks;
 
     public BaseInventory(int size) {
         this.heldStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
+    }
+
+    public BaseInventory(DefaultedList<ItemStack> stacks) {
+        this.heldStacks = stacks;
     }
 
     @Override
@@ -28,12 +28,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : ItemStack.EMPTY;
     }
 
-    public List<ItemStack> clearToList() {
-        List<ItemStack> list = this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).collect(Collectors.toList());
-        this.clear();
-        return list;
-    }
-
     public ItemStack removeStack(int slot, int amount) {
         ItemStack itemStack = Inventories.splitStack(this.heldStacks, slot, amount);
         if (!itemStack.isEmpty()) {
@@ -43,28 +37,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return itemStack;
     }
 
-    public ItemStack removeItem(Item item, int count) {
-        ItemStack itemStack = new ItemStack(item, 0);
-
-        for(int i = this.size() - 1; i >= 0; --i) {
-            ItemStack itemStack2 = this.getStack(i);
-            if (itemStack2.getItem().equals(item)) {
-                int j = count - itemStack.getCount();
-                ItemStack itemStack3 = itemStack2.split(j);
-                itemStack.increment(itemStack3.getCount());
-                if (itemStack.getCount() == count) {
-                    break;
-                }
-            }
-        }
-
-        if (!itemStack.isEmpty()) {
-            this.markDirty();
-        }
-
-        return itemStack;
-    }
-
+    @SuppressWarnings("UnusedReturnValue")
     public ItemStack addStack(ItemStack stack) {
         return BaseInventory.addStack(stack, this);
     }
@@ -127,6 +100,10 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
 
     public DefaultedList<ItemStack> heldStacks() {
         return this.heldStacks;
+    }
+
+    public void setInventoryDirectly(DefaultedList<ItemStack> inventory) {
+        this.heldStacks = inventory;
     }
 
     public static ItemStack addStack(ItemStack stack, Inventory inventory) {

@@ -1,10 +1,12 @@
-package com.rouesvm.servback.content.registry;
+package com.rouesvm.servback.content.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,18 +21,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BackpackItemRegistry {
-    public static Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
+    public static final Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
 
     public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
         @Override
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-            return player.getEnderChestInventory();
+            return player != null ? player.getEnderChestInventory() : null;
         }
     });
     public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.GLOBAL_BACKPACK) {
         @Override
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-            return ServerBackpacks.getInventory();
+            return BackpackManager.getGlobalInventory();
         }
     });
 
@@ -62,7 +64,7 @@ public class BackpackItemRegistry {
     }
 
     public static void initialize() {
-        Configuration.Instance instance = Configuration.getInstance();
+        Configuration.Instance instance = Configuration.instance();
 
         if (instance.types_of_backpacks == null) {
             Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);

@@ -16,17 +16,17 @@ public class BackpackGeyserItem {
                     Item item = entry.getValue();
                     int id = Registries.ITEM.getRawId(item);
                     Identifier identifier = entry.getKey().getValue();
+                    String stringIdentifier = identifier.toString();
 
                     NonVanillaCustomItemData customItemData = NonVanillaCustomItemData.builder()
                             .displayName(Text.translatable(item.getTranslationKey()).getString())
-                            .name(Text.translatable(item.getTranslationKey()).getString())
+                            .name(identifier.getPath())
                             .javaId(id)
                             .stackSize(1)
-                            .identifier(identifier.toString())
-                            .translationString(item.getTranslationKey())
+                            .identifier(stringIdentifier)
                             .allowOffhand(true)
                             .displayHandheld(true)
-                            .icon(identifier.toString())
+                            .icon(stringIdentifier)
                             .creativeCategory(3)
                             .build();
 

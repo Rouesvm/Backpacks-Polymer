@@ -1,7 +1,7 @@
 package com.rouesvm.servback.compat.geyser;
 
-import com.rouesvm.servback.content.block.backpack.BackpackBlock;
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
+import com.rouesvm.servback.content.block.backpack.BackpackBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
@@ -26,9 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BackpackGeyserBlock {
-    public static List<String> dye_colors = Arrays.stream(DyeColor.values()).map(DyeColor::asString).toList();
-    public static List<String> facing = HorizontalFacingBlock.FACING.getValues().stream().map(Direction::asString).toList();
-    public static List<Integer> slots = new ArrayList<>();
+    public static final List<String> dye_colors = Arrays.stream(DyeColor.values()).map(DyeColor::asString).toList();
+    public static final List<String> facing = HorizontalFacingBlock.FACING.getValues().stream().map(Direction::asString).toList();
+    public static final List<Integer> slots = new ArrayList<>();
 
     static {
         slots.add(1);
@@ -36,7 +36,7 @@ public class BackpackGeyserBlock {
         slots.add(3);
     }
 
-    public static String STATE_CONDITION = "query.block_property('%s') == %s";
+    public static final String STATE_CONDITION = "query.block_property('%s') == %s";
 
     public static void onGeyserDefineCustomBlocksEvent(GeyserDefineCustomBlocksEvent event) {
         Registries.BLOCK.getEntrySet().stream()
@@ -57,14 +57,14 @@ public class BackpackGeyserBlock {
                     for (BlockState state : block.getStateManager().getStates()) {
                         CustomBlockState.Builder stateBuilder = customBlockData.blockStateBuilder();
                         for (Property<?> property : state.getProperties()) {
-                            if (property instanceof IntProperty intProperty) {
-                                stateBuilder.intProperty(property.getName(), state.get(intProperty));
-                            } else if (property instanceof BooleanProperty booleanProperty) {
-                                stateBuilder.booleanProperty(property.getName(), state.get(booleanProperty));
-                            } else if (property instanceof EnumProperty<?> enumProperty) {
-                                stateBuilder.stringProperty(enumProperty.getName(), state.get(enumProperty).asString());
-                            } else {
-                                throw new IllegalArgumentException("Unknown property type: " + property.getClass().getName());
+                            switch (property) {
+                                case IntProperty intProperty ->
+                                        stateBuilder.intProperty(property.getName(), state.get(intProperty));
+                                case BooleanProperty booleanProperty ->
+                                        stateBuilder.booleanProperty(property.getName(), state.get(booleanProperty));
+                                case EnumProperty<?> enumProperty ->
+                                        stateBuilder.stringProperty(enumProperty.getName(), state.get(enumProperty).asString());
+                                default -> throw new IllegalArgumentException("Unknown property type: " + property.getClass().getName());
                             }
                         }
 
@@ -83,14 +83,13 @@ public class BackpackGeyserBlock {
     }
 
     private static NonVanillaCustomBlockData registerBackpackBlock(Block block, Identifier location) {
-        NonVanillaCustomBlockData data = createHorizontalBlock(block, location)
+        return createHorizontalBlock(block, location)
                 .intProperty(BackpackBlock.SLOTS.getName(), slots)
                 .stringProperty(BackpackBlock.DYE_COLOR.getName(), dye_colors)
                 .permutations(createBackpackPermutations())
                 .name(location.getPath())
                 .namespace(location.getNamespace())
                 .build();
-        return data;
     }
 
     private static NonVanillaCustomBlockData.Builder createHorizontalBlock(Block block, Identifier location) {
@@ -113,22 +112,22 @@ public class BackpackGeyserBlock {
                 .selectionBox(selectionBox)
                 .lightEmission(block.getDefaultState().getLuminance())
                 .lightDampening(block.getDefaultState().getOpacity())
+                .destructibleByMining(block.getHardness())
                 .friction(Math.min(1 - block.getSlipperiness(), 0.9f))
                 .build();
 
-        NonVanillaCustomBlockData.Builder data = NonVanillaCustomBlockData.builder()
+        return NonVanillaCustomBlockData.builder()
                 .stringProperty(BackpackBlock.FACING.getName(), facing)
                 .name(location.getPath())
                 .namespace(location.getNamespace())
                 .components(components);
-
-        return data;
     }
 
     private static List<CustomBlockPermutation> createHorizontalBlockPermutations() {
         List<CustomBlockPermutation> permutations = new ArrayList<>();
 
         for (String direction : facing) {
+            // got lazy
             int yRot;
 
             switch (direction) {
@@ -153,8 +152,7 @@ public class BackpackGeyserBlock {
     }
 
     private static List<CustomBlockPermutation> createBackpackPermutations() {
-        List<CustomBlockPermutation> permutations = new ArrayList<>();
-        permutations.addAll(createHorizontalBlockPermutations());
+        List<CustomBlockPermutation> permutations = new ArrayList<>(createHorizontalBlockPermutations());
 
         for (int size : slots) {
             for (String dyeColor : dye_colors) {

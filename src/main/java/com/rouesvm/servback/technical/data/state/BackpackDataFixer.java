@@ -1,8 +1,11 @@
-package com.rouesvm.servback.data.state;
+package com.rouesvm.servback.technical.data.state;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
@@ -74,7 +77,7 @@ public class BackpackDataFixer {
             Optional<NbtCompound> globalNbt = compound.getCompound("global");
             if (globalNbt.isPresent()) {
                 BackpackInventory globalInventory = loadInventory(globalNbt.get(), registryLookup);
-                BackpackManager.instance.setGlobalInventory(globalInventory.heldStacks());
+                BackpackManager.setGlobalInventory(globalInventory.heldStacks());
             }
         }
 

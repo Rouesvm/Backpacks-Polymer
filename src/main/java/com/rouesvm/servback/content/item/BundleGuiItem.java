@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.block.BasicBlockEntity;
-import com.rouesvm.servback.data.BackpackUtils;
+import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
 import net.minecraft.advancement.criterion.Criteria;
@@ -101,7 +101,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         if (cast.getType() == HitResult.Type.BLOCK)
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
-        openGui(serverPlayer, stack);
+        onOpenGui(serverPlayer, stack);
         player.swingHand(hand, true);
         return ActionResult.SUCCESS;
     }
@@ -113,7 +113,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         if (serverPlayer.isSneaking())
             return super.useOnBlock(context);
 
-        openGui(serverPlayer, context.getStack());
+        onOpenGui(serverPlayer, context.getStack());
         serverPlayer.swingHand(context.getHand(), true);
         return ActionResult.SUCCESS;
     }
@@ -139,7 +139,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 }
 
                 slot.setStack(itemStack);
-                afterChanged(serverPlayer, stack, inventory);
+                afterChanged(stack, inventory);
                 onContentChanged(player);
                 return true;
             } else {
@@ -158,28 +158,23 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
             if (!otherStack.getItem().canBeNested()) return false;
 
+            if (clickType == ClickType.RIGHT) {
+                onOpenGui(serverPlayer, stack);
+                return true;
+            }
+
             if (inventory != null) {
                 if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
                     if (BaseInventory.canInsert(otherStack, inventory)) {
                         otherStack = BaseInventory.addStack(otherStack, inventory);
                         ContainerItem.playInsertSound(serverPlayer, 0.8F);
-                    } else {
-                        ContainerItem.playInsertFailSound(serverPlayer);
-                    }
+                    } else ContainerItem.playInsertFailSound(serverPlayer);
 
                     cursorStackReference.set(otherStack);
-                    afterChanged(serverPlayer, stack, inventory);
+                    afterChanged(stack, inventory);
                     onContentChanged(player);
                     return true;
-                } else if (clickType == ClickType.RIGHT) {
-                    openGui(serverPlayer, stack);
-                    return true;
-                } else {
-                    setSelectedStackIndex(stack, -1);
-                }
-            } else if (clickType == ClickType.RIGHT) {
-                openGui(serverPlayer, stack);
-                return true;
+                } else setSelectedStackIndex(stack, -1);
             }
         }
         return false;
@@ -189,7 +184,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         return null;
     }
 
-    public void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+    public void afterChanged(ItemStack stack, Inventory inventory) {
     }
 
     public void onContentChanged(PlayerEntity user) {
@@ -199,8 +194,12 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         }
     }
 
-    public void openGui(ServerPlayerEntity player, ItemStack stack) {
+    public void onOpenGui(ServerPlayerEntity player, ItemStack stack) {
         ContainerItem.playOpenSound(player);
+        openGui(player, stack);
+    }
+
+    public void openGui(ServerPlayerEntity player, ItemStack stack) {
         new BasicGui(player, stack, getInventory(player, stack));
     }
 }

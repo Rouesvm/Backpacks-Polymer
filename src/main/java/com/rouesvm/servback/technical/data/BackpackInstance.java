@@ -1,4 +1,4 @@
-package com.rouesvm.servback.data;
+package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class BackpackInstance {
     private final UUID uuid;
-    public BackpackInventory inventory;
+    private BackpackInventory inventory;
 
     public long lastAccessed;
 
@@ -22,8 +22,8 @@ public class BackpackInstance {
         this.inventory = inventory;
     }
 
-    public void saveToInventory(BackpackInventory inventory) {
-        inventory.copyTo(this.inventory);
+    public void saveToInventory(BackpackInventory target) {
+        target.copyTo(this.inventory);
     }
 
     public void setLastAccessed() {

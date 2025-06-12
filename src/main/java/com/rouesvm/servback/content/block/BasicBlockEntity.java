@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.block;
 
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.content.registry.BackpackItemRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -30,9 +30,11 @@ public class BasicBlockEntity extends BlockEntity {
     protected void writeData(WriteView view) {
         view.putInt("size", size);
 
-        if (item instanceof ContainerItem containerItem) {
-            view.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
-        } else view.putString("item", item.toString());
+        if (item != null) {
+            if (item instanceof ContainerItem containerItem)
+                view.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
+            else view.putString("item", item.toString());
+        } else view.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
     }
 
     @Override
@@ -66,10 +68,6 @@ public class BasicBlockEntity extends BlockEntity {
 
     public void setSize(int size) {
         this.size = size;
-    }
-
-    public Item getItem() {
-        return item;
     }
 
     public void setItem(Item item) {

@@ -1,10 +1,15 @@
 package com.rouesvm.servback;
 
 import com.rouesvm.servback.compat.geyser.BackpackGeyser;
-import com.rouesvm.servback.content.registry.*;
-import com.rouesvm.servback.data.BackpackManager;
+import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
+import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
+import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemGroup;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
+import com.rouesvm.servback.technical.config.commands.BackpackCommands;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -32,12 +37,15 @@ public class ServerBackpacks implements ModInitializer {
 
 	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
+	public static boolean isDevEnvironment;
 
 	@Override
 	public void onInitialize() {
+		isDevEnvironment = FabricLoader.getInstance().isDevelopmentEnvironment();
+
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
-		
+
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();
 
@@ -51,10 +59,15 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackItemRegistry.initialize();
 		BackpackItemGroup.initialize();
 
-		//CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> BackpackCommands.init(dispatcher));
+		BackpackCommands.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
+		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
+		serverEvents();
+	}
+
+	private static void serverEvents() {
 		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, a, b) -> {
 			if (isBedrock(serverPlayNetworkHandler.getPlayer())) {
 				BEDROCK_PLAYERS.add(serverPlayNetworkHandler.getPlayer());
@@ -72,10 +85,6 @@ public class ServerBackpacks implements ModInitializer {
 		ServerLifecycleEvents.AFTER_SAVE.register((minecraftServer, b, b1) -> {
 			if (BackpackManager.instance != null) BackpackManager.save(minecraftServer);
 		});
-	}
-
-	public static BaseInventory getInventory() {
-		return BackpackManager.instance.globalInventory;
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

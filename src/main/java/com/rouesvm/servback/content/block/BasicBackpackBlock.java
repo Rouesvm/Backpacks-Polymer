@@ -2,10 +2,11 @@ package com.rouesvm.servback.content.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
+import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.data.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BlockHolder;
+import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -57,7 +58,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
             BlockState neighborState,
             Random random
     ) {
-        return (Configuration.getInstance().breaks_with_flow && world.getFluidState(neighborPos).canFlowTo(world, pos))
+        return (Configuration.instance().breaks_with_flow && world.getFluidState(neighborPos).canFlowTo(world, pos))
                 ? Blocks.AIR.getDefaultState()
                 : super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
@@ -91,20 +92,14 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         return super.getPickStack(world, pos, state, includeData);
     }
 
-    // this is definitely used wrongly
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
-        if (entity != null) {
-            ItemStack stack = entity.getDefaultStack().copy();
-            BackpackUtils.addCustomData((ServerWorld) world, stack);
-            dropStack(world, pos, stack);
-        }
+        onStacksDropped(state, (ServerWorld) world, pos, null, false);
         return super.onBreak(world, pos, state, player);
     }
 
     @Override
-    protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
+    protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
         BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
         if (entity != null) {
             ItemStack stack = entity.getDefaultStack().copy();
@@ -118,7 +113,12 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         if (!world.isClient) {
             BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
             if (entity != null) {
-                openGui((ServerPlayerEntity) player, entity);
+                if (ServerBackpacks.hasTrinketLoaded
+                        && player.isSneaking()
+                        && !trinketInteraction(entity, (ServerPlayerEntity) player, world, pos))
+                    return ActionResult.SUCCESS;
+
+                onOpenGui((ServerPlayerEntity) player, entity);
                 return ActionResult.SUCCESS;
             }
         }
@@ -126,13 +126,23 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         return ActionResult.PASS;
     }
 
-    public void trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        ItemStack stack = entity.getDefaultStack().copy();
-        world.breakBlock(pos, false);
+    public boolean trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
+        if (BackpackTrinket.isStackEmptyInBackSlot(player)) {
+            ItemStack stack = entity.getDefaultStack().copy();
+            BackpackTrinket.equipStack(player, stack);
+            world.breakBlock(pos, false);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void onOpenGui(ServerPlayerEntity player, BlockEntity entity) {
+        ContainerItem.playOpenSound(player);
+        openGui(player, entity);
     }
 
     public void openGui(ServerPlayerEntity player, BlockEntity entity) {
-        ContainerItem.playOpenSound(player);
         new BasicGui(player, null, getInventory(player, entity));
     }
 

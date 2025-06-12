@@ -1,12 +1,12 @@
-package com.rouesvm.servback.data.state;
+package com.rouesvm.servback.technical.data.state;
 
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.data.state.codecs.BackpackData;
-import com.rouesvm.servback.data.state.codecs.InventoryData;
-import com.rouesvm.servback.data.state.codecs.SlotData;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.state.codecs.BackpackData;
+import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
+import com.rouesvm.servback.technical.data.state.codecs.SlotData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import com.rouesvm.servback.data.BackpackInstance;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;

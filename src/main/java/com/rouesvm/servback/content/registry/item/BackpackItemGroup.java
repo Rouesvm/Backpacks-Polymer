@@ -1,4 +1,4 @@
-package com.rouesvm.servback.content.registry;
+package com.rouesvm.servback.content.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
@@ -10,7 +10,7 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class BackpackItemGroup {
-    public static DyeColor[] dyeColors = {
+    public static final DyeColor[] dyeColors = {
             DyeColor.BROWN,
             DyeColor.BLACK,
             DyeColor.GRAY,
@@ -31,7 +31,7 @@ public class BackpackItemGroup {
 
     public static void addItems(Entries entries) {
         for (DyeColor color : dyeColors) {
-            for (int i = 1; i <= Configuration.getInstance().types_of_backpacks.keySet().size(); i++) {
+            for (int i = 1; i <= Configuration.instance().types_of_backpacks.size(); i++) {
                 entries.add(BackpackItemRegistry.getBackpack(color, i));
             }
         }

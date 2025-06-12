@@ -1,11 +1,12 @@
 package com.rouesvm.servback.content.item;
 
+import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
-import com.rouesvm.servback.content.registry.BackpackBlockRegistry;
-import com.rouesvm.servback.content.registry.BackpackItemRegistry;
-import com.rouesvm.servback.data.BackpackInstance;
-import com.rouesvm.servback.data.BackpackManager;
-import com.rouesvm.servback.data.BackpackUtils;
+import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.advancement.criterion.Criteria;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ContainerItem extends BundleGuiItem {
@@ -55,8 +57,10 @@ public class ContainerItem extends BundleGuiItem {
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
         DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(polymerStack);
 
-        if (itemList == null) return;
         if (itemList.isEmpty()) return;
+
+        if (ServerBackpacks.isDevEnvironment)
+            tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
@@ -111,7 +115,10 @@ public class ContainerItem extends BundleGuiItem {
                             blockEntity.setItem(this);
                             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
                             blockEntity.setSize(slots);
-                            blockEntity.setUuid(BackpackManager.getStackUUID(context.getStack()));
+
+                            UUID uuid = BackpackManager.getStackUUID(context.getStack());
+                            if (uuid == null) uuid = BackpackManager.createNewUUID(context.getStack());
+                            blockEntity.setUuid(uuid);
 
                             blockEntity.setStorage();
 
@@ -142,23 +149,22 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-        return BackpackManager.getInventory(BackpackManager.getStackUUID(stack));
+        return stack != null ? BackpackManager.getInventory(BackpackManager.getStackUUID(stack)) : null;
     }
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
         BackpackManager.createNewUUID(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
-        ContainerItem.playOpenSound(player);
 
-        BackpackInstance instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
-        if (instance != null) new BackpackGui(player, stack, instance);
+        Optional<BackpackInstance> instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
+        instance.ifPresent(backpackInstance -> new BackpackGui(player, stack, backpackInstance));
     }
 
     @Override
-    public void afterChanged(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+    public void afterChanged(ItemStack stack, Inventory inventory) {
         UUID uuid = BackpackManager.getStackUUID(stack);
-        BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
+        if (uuid != null) BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
     }
 
     public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
@@ -188,10 +194,6 @@ public class ContainerItem extends BundleGuiItem {
 
     public static void playDropContentsSound(ServerPlayerEntity player, float pitch) {
         player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, pitch + player.getWorld().getRandom().nextFloat() * 0.4F);
-    }
-
-    public static void playRemoveOneSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_REMOVE_ONE, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertFailSound(ServerPlayerEntity player) {

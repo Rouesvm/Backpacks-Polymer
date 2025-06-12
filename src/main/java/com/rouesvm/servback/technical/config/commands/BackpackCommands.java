@@ -8,9 +8,17 @@ import com.rouesvm.servback.data.BackpackInstance;
 import com.rouesvm.servback.data.BackpackManager;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.ui.BackpackGui;
+import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.ui.BackpackGui;
+import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +26,10 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class BackpackCommands {
+    public static void initialize() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> init(dispatcher));
+    }
+
     public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("backpacks")
                 .executes(context -> {
@@ -35,32 +47,27 @@ public class BackpackCommands {
                 })).then(literal("open").then(argument("uuid", StringArgumentType.word()).executes(context -> {
                     String search = StringArgumentType.getString(context, "uuid");
                     if (!search.isEmpty()) {
-                        if (search.length() != 36) {
-                            throw new CommandSyntaxException(
+                        if (search.length() != 36) throw new CommandSyntaxException(
                                     CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
                                     Text.translatable("command.serverbackpacks.incorrect_uuid"));
-                        }
 
                         UUID uuid = UUID.fromString(search);
-                        BackpackInstance instance = BackpackManager.getInstance(uuid);
-                        if (instance != null) {
-                            new BackpackGui(context.getSource().getPlayer(), instance);
-                        } else {
-                            throw new CommandSyntaxException(
+                        Optional<BackpackInstance> instance = BackpackManager.getInstance(uuid);
+
+                        if (instance.isPresent()) {
+                            new BackpackGui(context.getSource().getPlayer(), instance.get());
+                        } else throw new CommandSyntaxException(
                                     CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
                                     Text.translatable("command.serverbackpacks.incorrect_uuid"));
-                        }
-                    } else {
-                        throw new CommandSyntaxException(
+                    } else throw new CommandSyntaxException(
                                 CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
                                 Text.translatable("command.serverbackpacks.empty"));
-                    }
                     return 1;
                 }))).then(configCommand())
         );
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> configCommand() {
+    private static LiteralArgumentBuilder<ServerCommandSource> configCommand() {
         return literal("config")
                 .then(literal("reset").executes(context -> {
                     Configuration.manager.instance = new Configuration.Instance();

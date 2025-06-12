@@ -12,8 +12,7 @@ public class BackpackInventory extends BaseInventory {
     }
 
     public BackpackInventory(DefaultedList<ItemStack> stacks) {
-        super(stacks.size());
-        this.heldStacks = stacks;
+        super(stacks);
     }
 
     @Override
@@ -22,41 +21,34 @@ public class BackpackInventory extends BaseInventory {
         if (entity != null) entity.markDirty();
     }
 
-    public BackpackInventory(int slots, DefaultedList<ItemStack> stacks) {
-        super(slots);
-        this.heldStacks = stacks;
-    }
-
-    public boolean insertItems(DefaultedList<ItemStack> itemStacks) {
-        if (itemStacks != null && !itemStacks.isEmpty()) {
+    public boolean insertItems(DefaultedList<ItemStack> target) {
+        if (target != null && !target.isEmpty()) {
             markDirty();
-            itemStacks.forEach(this::addStack);
+            target.forEach(this::addStack);
             return true;
         }
 
         return false;
     }
 
-    public void copyTo(BackpackInventory inventory) {
-        for(int i = 0; i < inventory.size(); ++i) {
-            ItemStack itemStack = i < this.heldStacks.size() ? this.heldStacks.get(i) : ItemStack.EMPTY;
-            inventory.setStack(i, itemStack.copy());
+    public void copyTo(BackpackInventory target) {
+        for (int i = 0; i < target.size(); ++i) {
+            ItemStack itemStack = i < this.size() ? this.getStack(i) : ItemStack.EMPTY;
+            target.setStack(i, itemStack.copy());
         }
-    }
-
-    public void setInventoryDirectly(DefaultedList<ItemStack> inventory) {
-        this.heldStacks = inventory;
     }
 
     public void resize(int newSize) {
-        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
+        if (this.size() != newSize) {
+            DefaultedList<ItemStack> copy = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
+            int limit = Math.min(this.size(), newSize);
 
-        for(int i = 0; i < stacks.size(); ++i) {
-            ItemStack itemStack = i < this.heldStacks.size() ? this.heldStacks.get(i) : ItemStack.EMPTY;
-            stacks.set(i, itemStack.copy());
+            for (int i = 0; i < limit; ++i) {
+                copy.set(i, this.getStack(i).copy());
+            }
+
+            setInventoryDirectly(copy);
         }
-
-        this.heldStacks = stacks;
     }
 
     public void setEntity(BlockEntity entity) {

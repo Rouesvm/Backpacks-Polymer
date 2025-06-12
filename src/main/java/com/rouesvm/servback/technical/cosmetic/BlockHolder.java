@@ -16,9 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import java.util.List;
 
 public class BlockHolder extends ElementHolder {
-    public ItemDisplayElement main;
-    public BlockPos pos;
-    public ServerWorld world;
+    public final ItemDisplayElement main;
+    public final BlockPos pos;
+    public final ServerWorld world;
 
     public boolean alreadySetItem = false;
 
@@ -50,10 +50,6 @@ public class BlockHolder extends ElementHolder {
             return false;
         }
         return super.startWatching(player);
-    }
-
-    public ItemStack getItem() {
-        return this.main.getItem();
     }
 
     public void setMain(ItemStack stack) {

@@ -1,8 +1,8 @@
-package com.rouesvm.servback.data.state;
+package com.rouesvm.servback.technical.data.state;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.rouesvm.servback.data.state.codecs.SlotData;
+import com.rouesvm.servback.technical.data.state.codecs.SlotData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;

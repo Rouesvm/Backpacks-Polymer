@@ -1,7 +1,6 @@
-package com.rouesvm.servback.data;
+package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -26,20 +25,19 @@ public class BackpackUtils {
             DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
             if (inventory.insertItems(itemStacks)) {
                 instance.setInventory(inventory);
-                BackpackManager.addBackpack(instance.getUuid(), instance.inventory());
+                BackpackManager.addBackpack(instance);
             }
             stack.set(DataComponentTypes.CONTAINER, null);
         }
     }
 
     public static DefaultedList<ItemStack> getItemList(ItemStack stack) {
-        if (stack.get(BackpackDataComponentTypes.UUID_TYPE) == null) return null;
         UUID uuid = BackpackManager.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
 
         if (inventory != null) {
-            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.heldStacks.size());
-            stacks.addAll(inventory.heldStacks);
+            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.size());
+            stacks.addAll(inventory.heldStacks());
             return stacks;
         }
 
@@ -76,18 +74,18 @@ public class BackpackUtils {
         }
     }
 
-    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory inventory, int totalSlots) {
-        for (int i = inventory.size(); i >= totalSlots; i--) {
-            ItemStack excessItem =  i < inventory.heldStacks().size() ? inventory.heldStacks().get(i) : ItemStack.EMPTY;
+    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory target, int totalSlots) {
+        for (int i = target.size(); i >= totalSlots; i--) {
+            ItemStack excessItem =  i < target.heldStacks().size() ? target.heldStacks().get(i) : ItemStack.EMPTY;
             player.dropItem(excessItem, true);
         }
         ContainerItem.playDropContentsSound(player, -0.2F);
     }
 
-    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory inventory, int totalSlots) {
-        if (inventory.size() != totalSlots) {
-            dropExcessItems(player, inventory, totalSlots);
-            BackpackManager.resizeInventory(uuid, inventory, totalSlots);
+    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory target, int totalSlots) {
+        if (target.size() != totalSlots) {
+            dropExcessItems(player, target, totalSlots);
+            BackpackManager.resizeInventory(uuid, totalSlots);
         }
     }
 }

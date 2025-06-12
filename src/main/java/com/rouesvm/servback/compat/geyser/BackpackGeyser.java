@@ -18,6 +18,7 @@ import java.nio.file.StandardCopyOption;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
+@SuppressWarnings("unused")
 public class BackpackGeyser implements EventRegistrar {
     public static Path PACKS_FOLDER;
     public static Path GEYSER_PACK;

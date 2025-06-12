@@ -4,7 +4,7 @@
     "description": "Adds 3D items for use with a Geyser proxy",
     "name": "Contains all of the textures for Server Backpacks!.",
     "uuid": "69df3df2-3439-41d8-ada1-08947e871376",
-    "version":[1,1,0],
+    "version":[1,1,2],
     "min_engine_version": [1,18,3]
   },
   "modules": [
@@ -12,7 +12,7 @@
       "description": "Adds 3D items for use with a Geyser proxy",
       "type": "resources",
       "uuid": "ca830d2b-5f32-4596-b0d8-71a0681544f1",
-      "version":[1,1,0]
+      "version":[1,1,2]
     }
   ]
 }

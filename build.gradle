@@ -42,7 +42,7 @@ dependencies {
     modImplementation include("eu.pb4:sgui:${project.sgui}")
     modImplementation include("xyz.nucleoid:server-translations-api:${project.server_translations}")
 
-    //modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
+    modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
     modCompileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
     compileOnly("org.geysermc.geyser:api:${project.geyser}")

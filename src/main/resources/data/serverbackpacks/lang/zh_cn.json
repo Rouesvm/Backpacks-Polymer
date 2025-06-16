@@ -7,7 +7,5 @@
   "item.serverbackpacks.ender" : "末影背包",
 
   "item.serverbackpacks.gui_backpacks" : "背包",
-  "item.serverbackpacks.gui_backpack" : "背包",
-  "item.serverbackpacks.gui_ender" : "末影背包",
-  "item.serverbackpacks.gui_global" : "共有背包"
+  "item.serverbackpacks.gui_backpack" : "背包"
 }

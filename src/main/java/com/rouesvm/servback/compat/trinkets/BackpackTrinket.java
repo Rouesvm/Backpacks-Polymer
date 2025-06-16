@@ -1,9 +1,9 @@
 package com.rouesvm.servback.compat.trinkets;
 
-import com.rouesvm.servback.config.Configuration;
-import com.rouesvm.servback.item.ContainerItem;
-import com.rouesvm.servback.utils.cosmetic.BackHolder;
-import com.rouesvm.servback.utils.cosmetic.CosmeticManager;
+import com.rouesvm.servback.content.item.BundleGuiItem;
+import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.cosmetic.BackHolder;
+import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import dev.emi.trinkets.api.*;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.entity.LivingEntity;
@@ -17,44 +17,46 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
-import java.util.Map;
 import java.util.Optional;
 
 public class BackpackTrinket implements Trinket {
     public static void initialize() {
         UseBlockCallback.EVENT.register(BackpackTrinket::tryPlaceBackpack);
         Registries.ITEM.stream()
-                .filter(item -> item instanceof ContainerItem)
+                .filter(item -> item instanceof BundleGuiItem)
                 .forEach(item -> TrinketsApi.registerTrinket(item, new BackpackTrinket()));
     }
 
     @Override
     public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (!Configuration.getInstance().display_back) return;
+        if (!Configuration.instance().display_back) return;
 
         if (entity instanceof ServerPlayerEntity player) {
-            if (CosmeticManager.getManager().getInstance(player) == null)
-                CosmeticManager.getManager().getOrCreateInstance(player, stack);
+            CosmeticManager manager = CosmeticManager.manager();
+            if (manager.getInstance(player).isEmpty())
+                manager.getOrCreateInstance(player, stack);
         }
     }
 
     @Override
     public void onEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (!Configuration.getInstance().display_back) return;
+        if (!Configuration.instance().display_back) return;
 
         if (entity instanceof ServerPlayerEntity player) {
-            CosmeticManager.getManager().getOrCreateInstance(player, stack);
+            CosmeticManager.manager().getOrCreateInstance(player, stack);
         }
     }
 
     @Override
     public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        if (!Configuration.getInstance().display_back) return;
+        if (!Configuration.instance().display_back) return;
 
         if (entity instanceof ServerPlayerEntity player) {
-            BackHolder holder = CosmeticManager.getManager().getOrCreateInstance(player, stack);
+            CosmeticManager manager = CosmeticManager.manager();
+
+            BackHolder holder = manager.getOrCreateInstance(player, stack);
             holder.destroy();
-            CosmeticManager.getManager().removeInstance(player);
+            manager.removeInstance(player);
         }
     }
 
@@ -66,7 +68,7 @@ public class BackpackTrinket implements Trinket {
                     && player.getMainHandStack().isEmpty()
                     && player.getOffHandStack().isEmpty())
             {
-                ContainerItem item = (ContainerItem) stack.getItem();
+                BundleGuiItem item = (BundleGuiItem) stack.getItem();
                 ItemPlacementContext context = new ItemPlacementContext(player, hand, stack, blockHitResult);
                 item.place(context);
                 return ActionResult.SUCCESS;
@@ -80,32 +82,26 @@ public class BackpackTrinket implements Trinket {
         TrinketItem.equipItem(player, stack);
     }
 
-    public static boolean hasStackInBackSlot(PlayerEntity player) {
+    public static boolean isStackEmptyInBackSlot(PlayerEntity player) {
         Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent(player);
-        if (optional.isPresent()) {
-            ItemStack stack = getStackInBackSlot(player);
-            return !stack.isEmpty();
-        }
-
-        return false;
+        if (optional.isPresent())
+            return getStackInBackSlot(player).isEmpty();
+        else return true;
     }
 
     public static ItemStack getStackInBackSlot(PlayerEntity player) {
-        Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent(player);
-        if (optional.isPresent()) {
-            TrinketComponent component = optional.get();
-            for(Map<String, TrinketInventory> group : component.getInventory().values()) {
-                for(TrinketInventory inv : group.values()) {
-                    for(int i = 0; i < inv.size(); ++i) {
-                        ItemStack stack = inv.getStack(i);
-                        if (!stack.isEmpty() && stack.getItem() instanceof ContainerItem) {
-                            return stack;
+        return TrinketsApi.getTrinketComponent(player).map(component -> {
+                    for (var group : component.getInventory().values()) {
+                        for (var inv : group.values()) {
+                            for (int i = 0; i < inv.size(); i++) {
+                                ItemStack stack = inv.getStack(i);
+                                if (!stack.isEmpty() && stack.getItem() instanceof BundleGuiItem) {
+                                    return stack;
+                                }
+                            }
                         }
                     }
-                }
-            }
-        }
-
-        return ItemStack.EMPTY;
+                    return ItemStack.EMPTY;
+                }).orElse(ItemStack.EMPTY);
     }
 }

@@ -14,6 +14,7 @@
   "item.serverbackpacks.white_small" : "White Small Backpack",
   "item.serverbackpacks.light_gray_small" : "Light Gray Small Backpack",
   "item.serverbackpacks.black_small": "Black Small Backpack",
+  "item.serverbackpacks.gray_small": "Gray Small Backpack",
 
   "item.serverbackpacks.medium" : "Medium Backpack",
   "item.serverbackpacks.red_medium" : "Red Medium Backpack",
@@ -30,6 +31,7 @@
   "item.serverbackpacks.white_medium" : "White Medium Backpack",
   "item.serverbackpacks.light_gray_medium" : "Light Gray Medium Backpack",
   "item.serverbackpacks.black_medium": "Black Medium Backpack",
+  "item.serverbackpacks.gray_medium": "Gray Medium Backpack",
 
   "item.serverbackpacks.large" : "Large Backpack",
   "item.serverbackpacks.red_large" : "Red Large Backpack",
@@ -46,18 +48,25 @@
   "item.serverbackpacks.white_large" : "White Large Backpack",
   "item.serverbackpacks.light_gray_large" : "Light Gray Large Backpack",
   "item.serverbackpacks.black_large": "Black Large Backpack",
+  "item.serverbackpacks.gray_large": "Gray Large Backpack",
 
   "item.serverbackpacks.global" : "GlobalPack",
   "item.serverbackpacks.ender" : "EnderPack",
 
   "item.serverbackpacks.gui_backpacks" : "Backpacks",
   "item.serverbackpacks.gui_backpack" : "Backpack",
-  "item.serverbackpacks.gui_ender" : "Ender Backpack",
-  "item.serverbackpacks.gui_global" : "Global Backpack",
+
+  "block.serverbackpacks.backpack" : "Backpack",
+  "block.serverbackpacks.global_backpack" : "GlobalPack",
+  "block.serverbackpacks.ender_backpack" : "EnderPack",
 
   "enchantment.serverbackpacks.capacity" : "Capacity",
 
   "command.serverbackpacks.empty": "The provided value is empty!",
   "command.serverbackpacks.incorrect_uuid": "UUID does not exist or is invalid!",
-  "command.serverbackpacks.list": "Current backpack instances:"
+  "command.serverbackpacks.list": "Current backpack instances:",
+
+  "command.serverbackpacks.reset": "Config has been reset!",
+  "command.serverbackpacks.reload": "Config has been reloaded!",
+  "command.serverbackpacks.save": "Config has been saved!"
 }

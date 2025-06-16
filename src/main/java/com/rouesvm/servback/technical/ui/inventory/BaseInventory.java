@@ -4,8 +4,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.util.collection.DefaultedList;
 
 public class BaseInventory implements Inventory, RecipeInputProvider {
@@ -87,13 +87,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         this.markDirty();
     }
 
-    @Override
-    public void provideRecipeInputs(RecipeFinder finder) {
-        for(ItemStack itemStack : this.heldStacks) {
-            finder.addInput(itemStack);
-        }
-    }
-
     public String toString() {
         return (this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).toList()).toString();
     }
@@ -173,6 +166,13 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
             target.increment(j);
             source.decrement(j);
             inventory.markDirty();
+        }
+    }
+
+    @Override
+    public void provideRecipeInputs(RecipeMatcher finder) {
+        for(ItemStack itemStack : this.heldStacks) {
+            finder.addInput(itemStack);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.rouesvm.servback.datagen;
 
-import com.rouesvm.servback.item.ContainerItem;
-import com.rouesvm.servback.registry.BackpackItemRegistry;
+import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.data.server.recipe.RecipeExporter;
@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.rouesvm.servback.Main.MOD_ID;
+import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 import static com.rouesvm.servback.datagen.ModItemTags.*;
 
 public class ModRecipeProvider extends FabricRecipeProvider {

@@ -22,13 +22,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
-
-import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 
 public class BundleGuiItem extends BasicPolymerBlockItem  {
     public BundleGuiItem(String name, Block block) {
@@ -66,8 +65,8 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                             blockEntity.setItem(this);
                             blockEntity.setSize(BackpackUtils.getExtendedSlots(context.getStack()));
 
-                            if (itemStack.getCustomName() != null) {
-                                blockEntity.setCustomName(itemStack.getCustomName());
+                            if (itemStack.getName() != null) {
+                                blockEntity.setCustomName(itemStack.getName());
                             }
                         }
 
@@ -90,20 +89,20 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
         var cast = player.raycast(5,0,false);
         if (!(player instanceof ServerPlayerEntity serverPlayer))
-            return ActionResult.PASS;
+            return TypedActionResult.pass(stack);
         if (player.isSneaking())
-            return ActionResult.PASS;
+            return TypedActionResult.pass(stack);
         if (cast.getType() == HitResult.Type.BLOCK)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return TypedActionResult.pass(stack);
 
         onOpenGui(serverPlayer, stack);
         player.swingHand(hand, true);
-        return ActionResult.SUCCESS;
+        return TypedActionResult.success(stack);
     }
 
     @Override
@@ -150,31 +149,27 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
     @Override
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
-        if (clickType == ClickType.LEFT && otherStack.isEmpty()) {
-            setSelectedStackIndex(stack, -1);
-        } else {
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            Inventory inventory = getInventory(serverPlayer, stack);
+        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+        Inventory inventory = getInventory(serverPlayer, stack);
 
-            if (!otherStack.getItem().canBeNested()) return false;
+        if (!otherStack.getItem().canBeNested()) return false;
 
-            if (clickType == ClickType.RIGHT) {
-                onOpenGui(serverPlayer, stack);
+        if (clickType == ClickType.RIGHT) {
+            onOpenGui(serverPlayer, stack);
+            return true;
+        }
+
+        if (inventory != null) {
+            if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
+                if (BaseInventory.canInsert(otherStack, inventory)) {
+                    otherStack = BaseInventory.addStack(otherStack, inventory);
+                    ContainerItem.playInsertSound(serverPlayer, 0.8F);
+                } else ContainerItem.playInsertFailSound(serverPlayer);
+
+                cursorStackReference.set(otherStack);
+                afterChanged(stack, inventory);
+                onContentChanged(player);
                 return true;
-            }
-
-            if (inventory != null) {
-                if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
-                    if (BaseInventory.canInsert(otherStack, inventory)) {
-                        otherStack = BaseInventory.addStack(otherStack, inventory);
-                        ContainerItem.playInsertSound(serverPlayer, 0.8F);
-                    } else ContainerItem.playInsertFailSound(serverPlayer);
-
-                    cursorStackReference.set(otherStack);
-                    afterChanged(stack, inventory);
-                    onContentChanged(player);
-                    return true;
-                } else setSelectedStackIndex(stack, -1);
             }
         }
         return false;

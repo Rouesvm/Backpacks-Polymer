@@ -1,6 +1,5 @@
 package com.rouesvm.servback.technical.ui;
 
-import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -37,10 +36,6 @@ public class BasicGui extends SimpleGui {
                     .append(" (")
                     .append(stack.getName())
                     .append(")");
-        }
-
-        if (ServerBackpacks.BEDROCK_PLAYERS.contains(player) && (this.slots != 9*3 && this.slots != 9*6)) {
-            title = title.copy().append("chest.row." + this.slots/9);
         }
 
         this.setTitle(Text.of(title));

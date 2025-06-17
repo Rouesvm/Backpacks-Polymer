@@ -48,13 +48,13 @@ public class BackpackUtils {
         NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
         NbtCompound compound = component.copyNbt();
         if (compound.contains("level"))
-            return 9 * compound.getInt("level", 0);
+            return 9 * compound.getInt("level");
         else return 0;
     }
 
     public static int addCustomData(ServerWorld world, ItemStack stack) {
         DynamicRegistryManager registryManager = world.getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
+        RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
 
         int level = stack.getEnchantments().getLevel(capacity);
 

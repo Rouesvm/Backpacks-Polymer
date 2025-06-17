@@ -34,7 +34,7 @@ public class BasicBlockEntity extends BlockEntity {
 
         if (item != null) {
             if (item instanceof ContainerItem containerItem)
-                nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
+                nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getId());
             else nbt.putString("item", item.toString());
         } else nbt.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
     }
@@ -43,17 +43,15 @@ public class BasicBlockEntity extends BlockEntity {
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.readNbt(nbt, registries);
 
-        size = nbt.getInt("size", 9);
+        size = nbt.getInt("size");
 
-        nbt.getInt("dye").ifPresent(integer ->
-                item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9));
+        if (nbt.contains("dye")) item = ContainerItem.getColoredBackpack(DyeColor.byId(nbt.getInt("dye")), size / 9);
 
         if (item == null) {
-            if (nbt.getString("item").isPresent())
-                item = Registries.ITEM.get(Identifier.of(nbt.getString("item").get()));
-            else item = Registries.ITEM.get(
-                        nbt.getInt("item", Registries.ITEM.getRawId(
-                                ContainerItem.getDefaultBackpack(1))));
+            if (nbt.contains("item"))
+                item = Registries.ITEM.get(Identifier.of(nbt.getString("item")));
+            else item = Registries.ITEM.get(Registries.ITEM.getRawId(
+                    ContainerItem.getDefaultBackpack(1)));
         }
     }
 

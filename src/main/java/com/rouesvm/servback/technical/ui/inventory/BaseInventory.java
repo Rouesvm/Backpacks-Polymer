@@ -149,11 +149,13 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
 
         if (!stack.getItem().canBeNested()) return false;
 
-        for(ItemStack itemStack : inventory) {
+        for (int i=0; i < inventory.size(); i++) {
+            ItemStack itemStack = inventory.getStack(i);
             if (itemStack.isEmpty()  || ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() < itemStack.getMaxCount()) {
                 bl = true;
                 break;
             }
+
         }
 
         return bl;

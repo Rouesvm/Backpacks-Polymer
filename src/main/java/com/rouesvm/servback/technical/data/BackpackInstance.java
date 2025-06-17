@@ -1,10 +1,8 @@
 package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.collection.DefaultedList;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -38,10 +36,6 @@ public class BackpackInstance {
 
     public BackpackInventory inventory() {
         return inventory;
-    }
-
-    public DefaultedList<ItemStack> heldInventory() {
-        return inventory.heldStacks();
     }
 
     public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {

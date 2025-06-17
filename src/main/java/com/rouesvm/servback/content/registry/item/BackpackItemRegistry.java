@@ -48,7 +48,7 @@ public class BackpackItemRegistry {
                .filter(entry -> entry.getValue().equals(item))
                .map(Map.Entry::getKey)
                .findFirst()
-                .map(DyeColor::byIndex)
+                .map(DyeColor::byId)
                .orElse(defaultDye);
     }
 
@@ -56,7 +56,7 @@ public class BackpackItemRegistry {
         var defaultMap = BACKPACKS.get(1);
         return BACKPACKS
                 .getOrDefault(order, defaultMap)
-                .getOrDefault(color.getIndex(), defaultMap.get(defaultDye.getIndex()));
+                .getOrDefault(color.getId(), defaultMap.get(defaultDye.getId()));
     }
 
     public static void create(Map<Integer, Item> itemMap, Integer order, String name, int slots) {
@@ -68,7 +68,7 @@ public class BackpackItemRegistry {
 
         if (instance.types_of_backpacks == null) {
             Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
-            create(sizeMap, defaultDye.getIndex(), "small", 9);
+            create(sizeMap, defaultDye.getId(), "small", 9);
             BACKPACKS.put(1, sizeMap);
 
             return;
@@ -90,11 +90,11 @@ public class BackpackItemRegistry {
                     String name = color.name().toLowerCase() + "_";
                     if (color == DyeColor.BROWN) name = "";
 
-                    create(sizeMap, color.getIndex(), name + backpackString, backpackSlots);
+                    create(sizeMap, color.getId(), name + backpackString, backpackSlots);
                     registeredSize++;
                 }
             } else {
-                create(sizeMap, defaultDye.getIndex(), backpackString, backpackSlots);
+                create(sizeMap, defaultDye.getId(), backpackString, backpackSlots);
                 registeredSize++;
             }
 

@@ -1,7 +1,10 @@
 package com.rouesvm.servback.technical.ui.inventory;
 
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 
 public class BackpackInventory extends BaseInventory {
@@ -49,6 +52,18 @@ public class BackpackInventory extends BaseInventory {
 
             setInventoryDirectly(copy);
         }
+    }
+
+    public NbtCompound save(RegistryWrapper.WrapperLookup registryLookup) {
+        NbtCompound nbtCompound = new NbtCompound();
+        return Inventories.writeNbt(nbtCompound, heldStacks(), registryLookup);
+    }
+
+    public static BackpackInventory load(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
+        DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
+        Inventories.readNbt(nbtCompound, itemStacks, registryLookup);
+
+        return new BackpackInventory(itemStacks);
     }
 
     public void setEntity(BlockEntity entity) {

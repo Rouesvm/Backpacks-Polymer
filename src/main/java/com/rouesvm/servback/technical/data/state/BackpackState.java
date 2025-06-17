@@ -1,9 +1,9 @@
-package com.rouesvm.servback.state;
+package com.rouesvm.servback.technical.data.state;
 
-import com.rouesvm.servback.Main;
-import com.rouesvm.servback.ui.inventory.BackpackInventory;
-import com.rouesvm.servback.utils.BackpackInstance;
-import com.rouesvm.servback.utils.BackpackManager;
+import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
@@ -41,7 +41,7 @@ public class BackpackState extends PersistentState {
     public static BackpackState getServerState(MinecraftServer server) {
         PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
 
-        BackpackState state = persistentStateManager.getOrCreate(type, Main.MOD_ID);
+        BackpackState state = persistentStateManager.getOrCreate(type, ServerBackpacks.MOD_ID);
         state.markDirty();
 
         return state;

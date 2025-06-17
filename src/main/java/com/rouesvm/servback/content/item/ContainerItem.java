@@ -22,12 +22,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -56,12 +54,12 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, @Nullable ServerPlayerEntity player) {
-        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(polymerStack);
+        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(stack);
 
         if (itemList.isEmpty()) return;
 
         if (ServerBackpacks.isDevEnvironment)
-            tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
+            tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(stack)));
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
@@ -122,8 +120,8 @@ public class ContainerItem extends BundleGuiItem {
 
                             blockEntity.setStorage();
 
-                            if (itemStack.getCustomName() != null) {
-                                blockEntity.setCustomName(itemStack.getCustomName());
+                            if (itemStack.getName() != null) {
+                                blockEntity.setCustomName(itemStack.getName());
                             }
 
                             blockEntity.markDirty();

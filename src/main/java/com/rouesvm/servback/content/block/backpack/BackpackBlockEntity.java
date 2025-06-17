@@ -50,8 +50,8 @@ public class BackpackBlockEntity extends BasicBlockEntity {
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.readNbt(nbt, registries);
-        extraSize = nbt.getInt("extraSize", 0);
-        uuid = UUID.fromString(nbt.getString("uuid", BackpackManager.generateUniqueUUID().toString()));
+        extraSize = nbt.getInt("extraSize");
+        uuid = UUID.fromString(nbt.getString("uuid"));
 
         setStorage();
     }
@@ -60,7 +60,7 @@ public class BackpackBlockEntity extends BasicBlockEntity {
         if (uuid == null) return super.getDefaultStack();
 
         DynamicRegistryManager registryManager = this.getWorld().getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
+        RegistryEntry.Reference<Enchantment> capacity = registryManager.get(RegistryKeys.ENCHANTMENT).entryOf(CAPACITY);
 
         ItemStack stack = super.getDefaultStack().copy();
         stack.addEnchantment(capacity, extraSize / 9);

@@ -3,11 +3,13 @@ package com.rouesvm.servback.technical.data;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
-import com.rouesvm.servback.technical.data.state.BackpackDataSaver;
+import com.rouesvm.servback.technical.data.state.BackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -42,11 +44,9 @@ public class BackpackManager {
     }
 
     public static void save(MinecraftServer server) {
-        BackpackDataSaver.setStoredInventories(instance.getBackpackInstances());
-        BackpackDataSaver.save(server);
-
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
-        globalBackpackState.globalInventory = instance.globalInventory;
+        BackpackState state = BackpackState.getServerState(server);
+        state.globalInventory = instance.globalInventory;
+        state.storedInventories = instance.getBackpackInstances();
     }
 
     public void load(Set<BackpackInstance> instances) {
@@ -54,27 +54,12 @@ public class BackpackManager {
     }
 
     public static void load(MinecraftServer server) {
-        com.rouesvm.servback.state.BackpackState state = com.rouesvm.servback.state.BackpackState.getServerState(server);
+        BackpackState state = BackpackState.getServerState(server);
 
         if (!loaded) {
-            BackpackDataSaver.onServerStarting(server);
-
-            Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
-            if (dataInstances != null && !dataInstances.isEmpty()) {
-                instance.load(dataInstances);
-                loaded = true;
-            }
-        }
-
-        if (!loaded && state != null) {
-            Set<BackpackInstance> stateInstances = state.getBackpackInstances();
+            Set<BackpackInstance> stateInstances = state.storedInventories;
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 instance.load(stateInstances);
-
-                BackpackDataSaver.setStoredInventories(stateInstances);
-                state.clearBackpackInstances();
-                state.markDirty();
-
                 loaded = true;
             }
         }
@@ -83,8 +68,25 @@ public class BackpackManager {
     public static void loadOnServerStarted(MinecraftServer server) {
         load(server);
 
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
-        instance.globalInventory.setInventoryDirectly(globalBackpackState.globalInventory.heldStacks());
+        BackpackState state = BackpackState.getServerState(server);
+        instance.globalInventory.setInventoryDirectly(state.globalInventory.heldStacks());
+    }
+
+    //
+    // NBT
+    //
+
+    public static void loadNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        nbt.getList("backpackContents", NbtCompound.COMPOUND_TYPE).forEach(element ->
+                instances.add(BackpackInstance.load((NbtCompound) element, registryLookup)));
+    }
+
+    public static void saveNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        if (!instances.isEmpty()) {
+            NbtList nbtList = new NbtList();
+            instances.forEach(instance -> nbtList.add(instance.save(registryLookup)));
+            nbt.put("backpackContents", nbtList);
+        }
     }
 
     //
@@ -176,10 +178,6 @@ public class BackpackManager {
     //
     // GENERAL
     //
-
-    public static void setGlobalInventory(DefaultedList<ItemStack> stacks) {
-        instance.globalInventory.setInventoryDirectly(stacks);
-    }
 
     public static BackpackInventory getGlobalInventory() {
         return instance.globalInventory;

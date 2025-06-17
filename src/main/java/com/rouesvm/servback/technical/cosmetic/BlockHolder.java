@@ -1,19 +1,15 @@
 package com.rouesvm.servback.technical.cosmetic;
 
-import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBlockEntity;
 import com.rouesvm.servback.content.block.BasicPolymerBlock;
+import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.List;
 
 public class BlockHolder extends ElementHolder {
     public final ItemDisplayElement main;
@@ -24,7 +20,7 @@ public class BlockHolder extends ElementHolder {
 
     public BlockHolder(ServerWorld world, BlockState state, BlockPos pos) {
         this.main = new ItemDisplayElement();
-        this.main.setYaw(state.get(BasicPolymerBlock.FACING).getPositiveHorizontalDegrees());
+        this.main.setYaw(state.get(BasicPolymerBlock.FACING).asRotation());
         this.main.ignorePositionUpdates();
         this.addElement(main);
 
@@ -38,18 +34,10 @@ public class BlockHolder extends ElementHolder {
         if (!alreadySetItem & world != null) {
             BasicBlockEntity blockEntity = (BasicBlockEntity) world.getBlockEntity(pos);
             if (blockEntity != null) {
-                this.setMain(blockEntity.getDefaultStack());
+                this.setMain(blockEntity.getDefaultStack().getItem());
                 alreadySetItem = true;
             }
         }
-    }
-
-    @Override
-    public boolean startWatching(ServerPlayNetworkHandler player) {
-        if (ServerBackpacks.BEDROCK_PLAYERS.contains(player.getPlayer())) {
-            return false;
-        }
-        return super.startWatching(player);
     }
 
     public void setMain(Item item) {

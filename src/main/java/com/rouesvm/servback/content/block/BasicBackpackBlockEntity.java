@@ -1,6 +1,7 @@
 package com.rouesvm.servback.content.block;
 
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,14 +17,18 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
-public class BasicBlockEntity extends BlockEntity {
+public class BasicBackpackBlockEntity extends BlockEntity {
     private int size = 9;
     private Text customName;
 
     private Item item;
 
-    public BasicBlockEntity(BlockEntityType<?> entityType, BlockPos pos, BlockState state) {
+    public BasicBackpackBlockEntity(BlockEntityType<?> entityType, BlockPos pos, BlockState state) {
         super(entityType, pos, state);
+    }
+
+    public BasicBackpackBlockEntity(BlockPos pos, BlockState state) {
+        super(BackpackBlockEntityRegistry.BASIC_BACKPACK_BLOCK_ENTITY, pos, state);
     }
 
     @Override

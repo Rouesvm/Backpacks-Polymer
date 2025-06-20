@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.cosmetic;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.content.block.BasicBlockEntity;
+import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.block.BasicPolymerBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
@@ -36,7 +36,7 @@ public class BlockHolder extends ElementHolder {
     @Override
     protected void onTick() {
         if (!alreadySetItem & world != null) {
-            BasicBlockEntity blockEntity = (BasicBlockEntity) world.getBlockEntity(pos);
+            BasicBackpackBlockEntity blockEntity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
             if (blockEntity != null) {
                 this.setMain(blockEntity.getDefaultStack());
                 alreadySetItem = true;

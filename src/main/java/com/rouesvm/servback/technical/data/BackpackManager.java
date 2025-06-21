@@ -21,7 +21,7 @@ public class BackpackManager {
     public final BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
-    private static boolean loaded = false;
+    private boolean loaded = false;
 
     public static void setup(MinecraftServer server) {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.setup();
@@ -60,17 +60,17 @@ public class BackpackManager {
         BackpackDataFixer.onWorldLoading(server);
         BackpackState state = BackpackState.getServerState(server);
 
-        if (!loaded) {
+        if (!instance.loaded) {
             BackpackDataSaver.onServerStarting(server);
 
             Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {
                 instance.load(dataInstances);
-                loaded = true;
+                instance.loaded = true;
             }
         }
 
-        if (!loaded && state != null) {
+        if (!instance.loaded && state != null) {
             Set<BackpackInstance> stateInstances = state.getBackpackInstances();
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 instance.load(stateInstances);
@@ -79,7 +79,7 @@ public class BackpackManager {
                 state.clearBackpackInstances();
                 state.markDirty();
 
-                loaded = true;
+                instance.loaded = true;
             }
         }
     }

@@ -35,7 +35,7 @@ public class BackpackDataSaver {
 
             try {
                 var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), NbtIo.readCompound(new DataInputStream(
-                        new FileInputStream(path.toFile()))));
+                        new FileInputStream(savePath.toFile()))));
                 data.result().ifPresentOrElse(result ->
                         storedInventories = result.getFirst(),
                         () -> storedInventories = new ArrayList<>()

@@ -66,7 +66,7 @@ public class BackpackItemRegistry {
     public static void initialize() {
         Configuration.Instance instance = Configuration.instance();
 
-        if (instance.types_of_backpacks == null) {
+        if (instance.types_of_backpacks.isEmpty()) {
             Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
             create(sizeMap, defaultDye.getIndex(), "small", 9);
             BACKPACKS.put(1, sizeMap);

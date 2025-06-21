@@ -42,6 +42,11 @@ public class ModRecipeProvider extends FabricRecipeProvider {
         };
     }
 
+    @Override
+    protected Identifier getRecipeIdentifier(Identifier identifier) {
+        return Identifier.of(MOD_ID, identifier.getPath());
+    }
+
     private void itemRecipes(RegistryWrapper.WrapperLookup wrapperLookup, RecipeExporter exporter) {
         RegistryWrapper.Impl<Item> itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 

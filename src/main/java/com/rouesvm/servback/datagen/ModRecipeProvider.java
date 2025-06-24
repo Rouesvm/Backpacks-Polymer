@@ -109,7 +109,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     private void createTransmuteRecipe(RecipeExporter exporter, RegistryEntryList<Item> backpack, Item dyeColor, Item result, int tier, String name) {
-        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.ofTag(backpack), Ingredient.ofItem(dyeColor), result)
+        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.fromTag(backpack), Ingredient.ofItem(dyeColor), result)
                 .group(tier + "_dyedbackpacks")
                 .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(ContainerItem.getDefaultBackpack(tier)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));

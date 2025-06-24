@@ -9,9 +9,9 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
@@ -32,29 +32,29 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        view.putInt("size", size);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        nbt.putInt("size", size);
 
         if (item != null) {
             if (item instanceof ContainerItem containerItem)
-                view.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
-            else view.putString("item", item.toString());
-        } else view.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
+                nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
+            else nbt.putString("item", item.toString());
+        } else nbt.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
     }
 
     @Override
-    protected void readData(ReadView view) {
-        size = view.getInt("size", 9);
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        size = nbt.getInt("size", 9);
 
-        view.getOptionalInt("dye").ifPresent(integer ->
+        nbt.getInt("dye").ifPresent(integer ->
                 item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9));
 
         if (item == null) {
-            if (view.getOptionalString("item").isPresent()) {
-                item = Registries.ITEM.get(Identifier.of(view.getOptionalString("item").get()));
+            if (nbt.getString("item").isPresent()) {
+                item = Registries.ITEM.get(Identifier.of(nbt.getString("item").get()));
             } else {
                 item = Registries.ITEM.get(
-                        view.getInt("item", Registries.ITEM.getRawId(
+                        nbt.getInt("item", Registries.ITEM.getRawId(
                                 ContainerItem.getDefaultBackpack(1)
                         )));
             }

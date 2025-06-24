@@ -13,12 +13,12 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
@@ -40,17 +40,17 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
-        view.putInt("extraSize", extraSize);
-        if (uuid != null) view.putString("uuid", uuid.toString());
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        super.writeNbt(nbt, registries);
+        nbt.putInt("extraSize", extraSize);
+        if (uuid != null) nbt.putString("uuid", uuid.toString());
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
-        extraSize = view.getInt("extraSize", 0);
-        uuid = UUID.fromString(view.getString("uuid", BackpackManager.generateUniqueUUID().toString()));
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
+        super.readNbt(nbt, registries);
+        extraSize = nbt.getInt("extraSize", 0);
+        uuid = UUID.fromString(nbt.getString("uuid", BackpackManager.generateUniqueUUID().toString()));
 
         setStorage();
     }

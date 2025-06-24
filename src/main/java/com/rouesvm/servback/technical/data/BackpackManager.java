@@ -134,7 +134,7 @@ public class BackpackManager {
     }
 
     public static UUID createNewUUID(ItemStack stack) {
-        UUID uuid = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
+        UUID uuid = getStackUUID(stack);
         if (uuid == null) {
             uuid = generateUniqueUUID();
             stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);

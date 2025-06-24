@@ -3,6 +3,7 @@ package com.rouesvm.servback.content.block;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BlockHolder;
 import com.rouesvm.servback.technical.data.BackpackUtils;
@@ -67,7 +68,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         if (!world.isClient()) {
-            BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
+            BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
             if (entity != null) {
                 ItemStack stack = entity.getDefaultStack();
                 return stack.getItem().getDefaultStack();
@@ -84,7 +85,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
 
     @Override
     protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
-        BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
+        BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
         if (entity != null) {
             ItemStack stack = entity.getDefaultStack().copy();
             BackpackUtils.addCustomData(world, stack);
@@ -95,7 +96,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!world.isClient) {
-            BasicBlockEntity entity = (BasicBlockEntity) world.getBlockEntity(pos);
+            BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
             if (entity != null) {
                 if (ServerBackpacks.hasTrinketLoaded
                         && player.isSneaking()
@@ -110,7 +111,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         return ActionResult.PASS;
     }
 
-    public boolean trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
+    public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
         if (BackpackTrinket.isStackEmptyInBackSlot(player)) {
             ItemStack stack = entity.getDefaultStack().copy();
             BackpackTrinket.equipStack(player, stack);
@@ -137,6 +138,6 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     @ApiStatus.OverrideOnly
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return null;
+        return BackpackBlockEntityRegistry.BASIC_BACKPACK_BLOCK_ENTITY.instantiate(pos, state);
     }
 }

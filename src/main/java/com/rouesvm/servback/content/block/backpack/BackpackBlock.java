@@ -2,7 +2,7 @@ package com.rouesvm.servback.content.block.backpack;
 
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
-import com.rouesvm.servback.content.block.BasicBlockEntity;
+import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
@@ -64,7 +64,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     }
 
     @Override
-    public boolean trinketInteraction(BasicBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
+    public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
         if (BackpackTrinket.isStackEmptyInBackSlot(player)) {
             BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 
@@ -83,7 +83,6 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
             BackpackInstance instance = backpackBlockEntity.getInstance();
             resize(player, backpackBlockEntity.getUuid(), instance.inventory(),
                     backpackBlockEntity.getSize() + backpackBlockEntity.getExtraSize());
-
             new BackpackGui(player, instance);
         }
     }

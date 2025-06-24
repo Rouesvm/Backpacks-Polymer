@@ -1,6 +1,6 @@
 package com.rouesvm.servback.content.item;
 
-import com.rouesvm.servback.content.block.BasicBlockEntity;
+import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
@@ -61,7 +61,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                         this.postPlacement(blockPos, world, playerEntity, itemStack, blockState2);
                         blockState2.getBlock().onPlaced(world, blockPos, blockState2, playerEntity, itemStack);
 
-                        if (world.getBlockEntity(blockPos) instanceof BasicBlockEntity blockEntity) {
+                        if (world.getBlockEntity(blockPos) instanceof BasicBackpackBlockEntity blockEntity) {
                             blockEntity.setItem(this);
                             blockEntity.setSize(BackpackUtils.getExtendedSlots(context.getStack()));
 

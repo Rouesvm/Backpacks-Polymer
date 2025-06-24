@@ -1,6 +1,6 @@
 package com.rouesvm.servback.content.block.backpack;
 
-import com.rouesvm.servback.content.block.BasicBlockEntity;
+import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.technical.data.BackpackInstance;
@@ -27,7 +27,7 @@ import java.util.UUID;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
 
-public class BackpackBlockEntity extends BasicBlockEntity {
+public class BackpackBlockEntity extends BasicBackpackBlockEntity {
     private UUID uuid;
 
     private int extraSize = 0;

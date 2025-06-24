@@ -125,13 +125,13 @@ public class BackpackManager {
                 stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
                 stack.remove(BackpackDataComponentTypes.UUID_TYPE);
             }
-        } else uuid = createNewUUID(stack);
+        }
 
         return uuid;
     }
 
     public static UUID createNewUUID(ItemStack stack) {
-        UUID uuid = stack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
+        UUID uuid = getStackUUID(stack);
         if (uuid == null) {
             uuid = generateUniqueUUID();
             stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
@@ -177,6 +177,10 @@ public class BackpackManager {
     //
     // GENERAL
     //
+
+    public static void setGlobalInventory(DefaultedList<ItemStack> stacks) {
+        instance.globalInventory.setInventoryDirectly(stacks);
+    }
 
     public static BackpackInventory getGlobalInventory() {
         return instance.globalInventory;

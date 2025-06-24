@@ -115,7 +115,7 @@ public class ContainerItem extends BundleGuiItem {
                             blockEntity.setSize(slots);
 
                             UUID uuid = BackpackManager.getStackUUID(context.getStack());
-                            if (uuid == null) uuid = BackpackManager.getStackUUID(context.getStack());
+                            if (uuid == null) uuid = BackpackManager.createNewUUID(context.getStack());
                             blockEntity.setUuid(uuid);
 
                             blockEntity.setStorage();
@@ -152,6 +152,7 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
+        BackpackManager.createNewUUID(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
 
         Optional<BackpackInstance> instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));

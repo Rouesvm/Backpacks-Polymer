@@ -2,6 +2,7 @@ package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.technical.crafting.BackpackRecipeJsonBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
@@ -70,13 +71,32 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_eye", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ContainerItem.getDefaultBackpack(1), 1)
+        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, ContainerItem.getDefaultBackpack(1), 1)
                 .pattern("#S#")
                 .pattern("SCS")
                 .pattern(" # ")
                 .input('#', Items.LEATHER).input('S', Items.STRING).input('C', Items.CHEST)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .offerTo(exporter);
+
+        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemRegistry.getBackpack(DyeColor.BROWN, 2))
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
+                .pattern("iLi")
+                .pattern("S0S")
+                .pattern(" O ")
+                .input('L', Items.LEATHER).input('S', Items.STRING)
+                .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
+                .input('0', Ingredient.fromTag(itemWrap.getOrThrow(SMALL_BACKPACKS)))
+                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack")));
+
+        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemRegistry.getBackpack(DyeColor.BROWN, 3))
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
+                .pattern("ZiZ")
+                .pattern("S0S")
+                .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
+                .input('S', Items.SHULKER_SHELL)
+                .input('0', Ingredient.fromTag(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
+                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "large_backpack")));
 
         dyedBackpackRecipes(itemWrap, exporter);
     }
@@ -98,12 +118,6 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
                 String transmuteId = String.format("%s_%s_%d", dyeName, baseBackpack.getIdentifier().getPath(), i);
                 createTransmuteRecipe(exporter, matchingBackpacks, dye, dyedBackpack, i, transmuteId);
-
-                if (i < 3) {
-                    ContainerItem upgraded = (ContainerItem) ContainerItem.getColoredBackpack(color, i + 1);
-                    String upgradeId = String.format("%s_%s", dyeName, upgraded.getIdentifier().getPath());
-                    createUpgradeRecipe(itemWrap, exporter, dyedBackpack, upgraded, i + 1, upgradeId);
-                }
             }
         }
     }
@@ -113,31 +127,6 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .group(tier + "_dyedbackpacks")
                 .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(ContainerItem.getDefaultBackpack(tier)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
-    }
-
-    private void createUpgradeRecipe(RegistryWrapper.Impl<Item> itemWrap, RecipeExporter exporter,
-                                     Item backpack, Item upgraded, int tier, String name) {
-        ShapedRecipeJsonBuilder builder = ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, upgraded)
-                .group(tier + "_upgraded")
-                .criterion("has_backpack", InventoryChangedCriterion.Conditions.items(backpack));
-
-        switch (tier) {
-            case 2 -> builder
-                    .pattern("iLi")
-                    .pattern("SES")
-                    .pattern(" O ")
-                    .input('L', Items.LEATHER).input('S', Items.STRING)
-                    .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
-                    .input('E', backpack)
-                    .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
-            case 3 -> builder
-                    .pattern("ZiZ")
-                    .pattern("SLS")
-                    .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
-                    .input('S', Items.SHULKER_SHELL)
-                    .input('L', backpack)
-                    .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
-        }
     }
 
     @Override

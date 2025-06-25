@@ -9,6 +9,7 @@ import com.rouesvm.servback.content.registry.item.BackpackItemGroup;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
+import com.rouesvm.servback.technical.crafting.BackpackRecipe;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
@@ -16,6 +17,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -60,6 +63,8 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackItemGroup.initialize();
 
 		BackpackCommands.initialize();
+
+		Registry.register(Registries.RECIPE_SERIALIZER, Identifier.of(MOD_ID, "backpack_crafting"), BackpackRecipe.BACKPACK_CRAFTING);
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
 		if (hasTrinketLoaded) BackpackTrinket.initialize();

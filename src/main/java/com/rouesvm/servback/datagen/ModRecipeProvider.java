@@ -86,7 +86,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .pattern(" O ")
                 .input('L', Items.LEATHER).input('S', Items.STRING)
                 .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
-                .input('0', Ingredient.fromTag(itemWrap.getOrThrow(SMALL_BACKPACKS)))
+                .input('0', Ingredient.ofTag(itemWrap.getOrThrow(SMALL_BACKPACKS)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack")));
 
         BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemRegistry.getBackpack(DyeColor.BROWN, 3))
@@ -95,7 +95,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .pattern("S0S")
                 .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
                 .input('S', Items.SHULKER_SHELL)
-                .input('0', Ingredient.fromTag(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
+                .input('0', Ingredient.ofTag(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "large_backpack")));
 
         dyedBackpackRecipes(itemWrap, exporter);

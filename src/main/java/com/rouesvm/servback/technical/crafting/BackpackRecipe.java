@@ -61,11 +61,11 @@ public class BackpackRecipe extends ShapedRecipe {
     public static class Serializer implements RecipeSerializer<BackpackRecipe> {
         public static final MapCodec<BackpackRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 (instance) ->
-                        instance.group(Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+                        instance.group(Codec.STRING.optionalFieldOf("group", "").forGetter(BackpackRecipe::getGroup),
                                 CraftingRecipeCategory.CODEC.fieldOf("category").orElse(CraftingRecipeCategory.MISC).forGetter(BackpackRecipe::getCategory),
                                 RawShapedRecipe.CODEC.forGetter(BackpackRecipe::getRaw),
                                 ItemStack.VALIDATED_CODEC.fieldOf("result").forGetter(BackpackRecipe::getResult),
-                                Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(ShapedRecipe::showNotification))
+                                Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(BackpackRecipe::showNotification))
                                 .apply(instance, BackpackRecipe::new));
 
         public static final PacketCodec<RegistryByteBuf, BackpackRecipe> PACKET_CODEC = PacketCodec.ofStatic(BackpackRecipe.Serializer::write, BackpackRecipe.Serializer::read);

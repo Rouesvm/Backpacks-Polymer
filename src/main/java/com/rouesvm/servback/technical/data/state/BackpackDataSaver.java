@@ -50,6 +50,8 @@ public class BackpackDataSaver {
     }
 
     public static void save(MinecraftServer server) {
+        if (savePath == null) return;
+
         var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE), List.copyOf(storedInventories));
         if (data.isSuccess()) {
             try {

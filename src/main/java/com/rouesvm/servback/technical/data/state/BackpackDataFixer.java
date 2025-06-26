@@ -41,8 +41,6 @@ public class BackpackDataFixer {
             instances.forEach(backpackInstance ->
                     BackpackManager.instance.storedInstances.put(backpackInstance.getUuid(), backpackInstance));
 
-            BackpackManager.save(server);
-
             try {
                 Files.delete(path);
             } catch (IOException e) {

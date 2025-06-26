@@ -32,7 +32,6 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
@@ -151,7 +150,6 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
         return null;
     }
 
-    @ApiStatus.OverrideOnly
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return BackpackBlockEntityRegistry.BASIC_BACKPACK_BLOCK_ENTITY.instantiate(pos, state);

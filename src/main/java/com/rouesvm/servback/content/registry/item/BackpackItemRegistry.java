@@ -38,7 +38,7 @@ public class BackpackItemRegistry {
 
     private static final DyeColor defaultDye = DyeColor.BROWN;
 
-    public static Item register(BasicPolymerBlockItem item) {
+    public static <T extends BasicPolymerBlockItem> T register(T item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 

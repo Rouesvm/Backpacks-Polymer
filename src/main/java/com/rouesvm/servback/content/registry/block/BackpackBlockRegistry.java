@@ -2,7 +2,6 @@ package com.rouesvm.servback.content.registry.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
-import com.rouesvm.servback.content.block.BasicPolymerBlock;
 import com.rouesvm.servback.content.block.backpack.BackpackBlock;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.block.Block;
@@ -30,8 +29,8 @@ public class BackpackBlockRegistry {
         }
     });
 
-    public static Block register(String name, BasicPolymerBlock block) {
-        return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, name), block);
+    public static <T extends Block> T register(String id, T block) {
+        return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, id), block);
     }
 
     @SuppressWarnings("EmptyMethod")

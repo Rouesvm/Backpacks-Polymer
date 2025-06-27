@@ -108,7 +108,6 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
                 rawShapedRecipe,
                 new ItemStack(this.output, this.count), this.showNotification
         );
-        System.out.println("WHAT");
         exporter.accept(recipeKey, shapedRecipe, builder.build(recipeKey.getValue().withPrefixedPath("recipes/" + this.category.getName() + "/")));
     }
 

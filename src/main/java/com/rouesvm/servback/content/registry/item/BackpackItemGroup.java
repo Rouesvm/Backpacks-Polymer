@@ -11,7 +11,6 @@ import net.minecraft.util.Identifier;
 
 public class BackpackItemGroup {
     public static final DyeColor[] dyeColors = {
-            DyeColor.BROWN,
             DyeColor.BLACK,
             DyeColor.GRAY,
             DyeColor.LIGHT_GRAY,
@@ -30,6 +29,10 @@ public class BackpackItemGroup {
     };
 
     public static void addItems(Entries entries) {
+        entries.add(BackpackItemRegistry.getBackpack(0, 1));
+        entries.add(BackpackItemRegistry.getBackpack(0, 2));
+        entries.add(BackpackItemRegistry.getBackpack(0, 3));
+
         for (DyeColor color : dyeColors) {
             for (int i = 1; i <= Configuration.instance().types_of_backpacks.size(); i++) {
                 entries.add(BackpackItemRegistry.getBackpack(color, i));

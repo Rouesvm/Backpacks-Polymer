@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
@@ -66,8 +67,11 @@ public class Configuration {
             if (loaded != null) {
                 instance = loaded;
 
-                instance.types_of_backpacks.replaceAll((key, value) -> value.slots > maxSlots
-                        ? defaultInstance.types_of_backpacks.getOrDefault(key, new BackpackType(value.name, 9, true))
+                instance.types_of_backpacks.replaceAll((key, value) ->
+                        value.slots > maxSlots |
+                                value.backpacks == null |
+                                value.dyeBlacklist == null
+                        ? defaultInstance.types_of_backpacks.getOrDefault(key, new BackpackType(key * 9, true, value.backpacks, List.of("brown")))
                         : value);
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
@@ -77,7 +81,7 @@ public class Configuration {
         return new LinkedHashMap<>(map);
     }
 
-    public record BackpackType(String name, int slots, boolean dyeable) {}
+    public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist) {}
 
     public static class Instance {
         @SerializedName("breaks_with_flow")
@@ -88,9 +92,24 @@ public class Configuration {
 
         @SerializedName("types_of_backpacks")
         public final Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
-                1, new BackpackType("small", 9, true),
-                2, new BackpackType("medium", 18, true),
-                3, new BackpackType("large", 27, true)
+                1, new BackpackType(
+                        9,
+                        true,
+                        List.of("small"),
+                        List.of("brown")
+                ),
+                2, new BackpackType(
+                        18,
+                        true,
+                        List.of("medium"),
+                        List.of("brown")
+                ),
+                3, new BackpackType(
+                        27,
+                        true,
+                        List.of("large"),
+                        List.of("brown")
+                )
         ));
 
         @SerializedName("back_positions")

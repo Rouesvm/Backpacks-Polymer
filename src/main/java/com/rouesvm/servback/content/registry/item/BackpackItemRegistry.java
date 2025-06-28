@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BackpackItemRegistry {
@@ -36,8 +37,6 @@ public class BackpackItemRegistry {
         }
     });
 
-    private static final DyeColor defaultDye = DyeColor.BROWN;
-
     public static <T extends BasicPolymerBlockItem> T register(T item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
@@ -49,14 +48,18 @@ public class BackpackItemRegistry {
                .map(Map.Entry::getKey)
                .findFirst()
                 .map(DyeColor::byIndex)
-               .orElse(defaultDye);
+               .orElse(DyeColor.WHITE);
     }
 
     public static Item getBackpack(@NotNull DyeColor color, int order) {
+        return getBackpack(color.getIndex() + 1, order);
+    }
+
+    public static Item getBackpack(int id, int order) {
         var defaultMap = BACKPACKS.get(1);
         return BACKPACKS
                 .getOrDefault(order, defaultMap)
-                .getOrDefault(color.getIndex(), defaultMap.get(defaultDye.getIndex()));
+                .getOrDefault(id, defaultMap.get(0));
     }
 
     public static void create(Map<Integer, Item> itemMap, Integer order, String name, int slots) {
@@ -68,7 +71,7 @@ public class BackpackItemRegistry {
 
         if (instance.types_of_backpacks.isEmpty()) {
             Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
-            create(sizeMap, defaultDye.getIndex(), "small", 9);
+            create(sizeMap, 0, "small", 9);
             BACKPACKS.put(1, sizeMap);
 
             return;
@@ -81,21 +84,30 @@ public class BackpackItemRegistry {
             Configuration.BackpackType backpackType = entry.getValue();
 
             int backpackSlots = backpackType.slots();
-            String backpackString = backpackType.name();
+            List<String> backpackStrings = backpackType.backpacks();
+            List<String> blacklistedDyes = backpackType.dyeBlacklist();
 
             Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
 
-            if (backpackType.dyeable()) {
-                for (DyeColor color : DyeColor.values()) {
-                    String name = color.name().toLowerCase() + "_";
-                    if (color == DyeColor.BROWN) name = "";
+            String defaultName = backpackStrings != null ? backpackStrings.getFirst() : entry.getKey() + "_backpack";
 
-                    create(sizeMap, color.getIndex(), name + backpackString, backpackSlots);
+            if (backpackStrings != null) {
+                if (backpackType.dyeable()) {
+                    for (String backpackName : backpackStrings) {
+                        create(sizeMap, 0, backpackName, backpackSlots);
+
+                        for (DyeColor color : DyeColor.values()) {
+                            String dyeColor = color.name().toLowerCase();
+                            String name = dyeColor + "_";
+                            if (blacklistedDyes != null && blacklistedDyes.contains(dyeColor)) continue;
+                            create(sizeMap, color.getIndex() + 1, name + backpackName, backpackSlots);
+                            registeredSize++;
+                        }
+                    }
+                } else {
+                    create(sizeMap, 1, defaultName, backpackSlots);
                     registeredSize++;
                 }
-            } else {
-                create(sizeMap, defaultDye.getIndex(), backpackString, backpackSlots);
-                registeredSize++;
             }
 
             BACKPACKS.put(order, sizeMap);

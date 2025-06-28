@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
@@ -25,6 +26,8 @@ public class BackpackCommands {
     }
 
     public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
+        if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
+
         dispatcher.register(literal("backpacks")
                 .executes(context -> {
                     context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);

@@ -87,12 +87,12 @@ public class BackpackDataSaver {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
         String formattedDeathTime = deathTime.format(formatter);
 
-        backupPath = backupPath.resolve("serverbackpacks-backup-" + formattedDeathTime + ".data");
+        Path backupFile = backupPath.resolve("serverbackpacks-backup-" + formattedDeathTime + ".data");
 
         var data = SAVE_CODEC.encodeStart(NbtOps.INSTANCE, List.copyOf(storedInventories));
         if (data.isSuccess()) {
             try {
-                NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(backupPath.toFile())));
+                NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(backupFile.toFile())));
             } catch (IOException e) {
                 ServerBackpacks.LOGGER.error("Failed to backup Server Backpack's data.");
             }

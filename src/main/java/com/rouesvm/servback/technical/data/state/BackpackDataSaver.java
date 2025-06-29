@@ -34,7 +34,7 @@ public class BackpackDataSaver {
             ServerBackpacks.LOGGER.info("Loading Server Backpacks's data!");
 
             try {
-                var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), NbtIo.readCompound(new DataInputStream(
+                var data = SAVE_CODEC.decode(NbtOps.INSTANCE, NbtIo.readCompound(new DataInputStream(
                         new FileInputStream(savePath.toFile()))));
                 data.result().ifPresentOrElse(result ->
                         storedInventories = result.getFirst(),
@@ -45,14 +45,14 @@ public class BackpackDataSaver {
                ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
             }
         } else {
-            save(server);
+            save();
         }
     }
 
-    public static void save(MinecraftServer server) {
+    public static void save() {
         if (savePath == null) return;
 
-        var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE), List.copyOf(storedInventories));
+        var data = SAVE_CODEC.encodeStart(NbtOps.INSTANCE, List.copyOf(storedInventories));
         if (data.isSuccess()) {
             try {
                 NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(savePath.toFile())));

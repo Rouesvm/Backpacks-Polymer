@@ -46,7 +46,7 @@ public class BackpackManager {
 
     public static void save(MinecraftServer server) {
         BackpackDataSaver.setStoredInventories(instance.getBackpackInstances());
-        BackpackDataSaver.save(server);
+        BackpackDataSaver.save();
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         globalBackpackState.globalInventory = instance.globalInventory;

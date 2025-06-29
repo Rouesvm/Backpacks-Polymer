@@ -16,6 +16,7 @@ public class BackpackItemJsonRegistry {
     public static final Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
 
     public static final Map<Integer, Integer> SIZE_TO_ORDER = new HashMap<>();
+    public static final Map<Integer, Integer> ORDER_OFFSET = new HashMap<>();
     public static final Map<Item, DyeColor> ITEM_TO_COLOR = new HashMap<>();
 
     public static @Nullable DyeColor getBackpackDyeColor(ContainerItem item) {
@@ -63,9 +64,18 @@ public class BackpackItemJsonRegistry {
         return item;
     }
 
-    private static int registerDyeableBackpack(Map<Integer, Item> sizeMap, List<String> strings, List<String> blacklistedDyes, int size) {
+    private static int registerBackpacks(Configuration.BackpackType type, Map<Integer, Item> sizeMap, int size) {
+        List<String> strings = type.backpacks();
+
         int registeredSize = 0;
         for (String backpackName : strings) {
+            create(sizeMap, 0, backpackName, size);
+            registeredSize++;
+
+            if (!type.dyeable()) continue;
+
+            List<String> blacklistedDyes = type.dyeBlacklist();
+
             for (DyeColor color : DyeColor.values()) {
                 String dyeColor = color.name().toLowerCase();
                 if (blacklistedDyes != null && blacklistedDyes.contains(dyeColor)) continue;
@@ -77,15 +87,7 @@ public class BackpackItemJsonRegistry {
             }
         }
         return registeredSize;
-    }
 
-    private static int registerBackpack(Map<Integer, Item> sizeMap, List<String> strings, int size) {
-        int registeredSize = 0;
-        for (String backpackName : strings) {
-            create(sizeMap, 0, backpackName, size);
-            registeredSize++;
-        }
-        return registeredSize;
     }
 
     public static void initialize() {
@@ -103,19 +105,11 @@ public class BackpackItemJsonRegistry {
 
             int size = type.slots();
             List<String> strings = type.backpacks();
+            if (strings == null || strings.isEmpty()) continue;
 
             var sizeMap = new HashMap<Integer, Item>(DyeColor.values().length);
 
-            if (strings != null) {
-                registeredSize += registerBackpack(sizeMap, strings, size);
-                if (type.dyeable()) {
-                    var blacklistedDyes = type.dyeBlacklist();
-                    registeredSize += registerDyeableBackpack(sizeMap, strings, blacklistedDyes, size);
-                }
-            } else {
-                create(sizeMap, 0, upgradeOrder + "_backpack", size);
-                registeredSize++;
-            }
+            registeredSize += registerBackpacks(type, sizeMap, size);
 
             SIZE_TO_ORDER.put(size, upgradeOrder);
             BACKPACKS.put(upgradeOrder, sizeMap);

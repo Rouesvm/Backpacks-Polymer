@@ -56,10 +56,7 @@ public class BackpackItemJsonRegistry {
     }
 
     public static Item getBackpackBySize(int id, int size) {
-        var defaultMap = BACKPACKS.get(1);
-        return BACKPACKS
-                .getOrDefault(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size), defaultMap)
-                .getOrDefault(id, defaultMap.get(0));
+        return getBackpackByOrder(id, BackpackItemJsonRegistry.getBackpackUpgradeOrder(size));
     }
 
     private static ContainerItem create(Map<Integer, Item> itemMap, Integer id, String name, int slots) {

@@ -33,9 +33,9 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     protected void writeData(WriteView view) {
         view.putInt("size", size);
 
-        if (item != null) {
+        if (item != null)
             view.putString("item", item.toString());
-        } else view.putString("item", BackpackItemJsonRegistry.getBackpackBySize(size).toString());
+        else view.putString("item", BackpackItemJsonRegistry.getBackpackBySize(size).toString());
     }
 
     @Override
@@ -43,9 +43,8 @@ public class BasicBackpackBlockEntity extends BlockEntity {
         size = view.getInt("size", 9);
 
         view.getOptionalInt("dye").ifPresent(integer ->
-                item = BackpackItemJsonRegistry.getBackpackBySize(integer +
-                        BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)),
-                        size
+                item = BackpackItemJsonRegistry.getBackpackBySize(
+                        integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)), size
                 ));
 
         if (item == null) {

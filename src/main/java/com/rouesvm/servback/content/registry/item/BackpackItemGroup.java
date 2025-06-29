@@ -1,7 +1,6 @@
 package com.rouesvm.servback.content.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.config.Configuration;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import net.minecraft.item.ItemGroup.Entries;
 import net.minecraft.item.ItemStack;
@@ -10,32 +9,13 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class BackpackItemGroup {
-    public static final DyeColor[] dyeColors = {
-            DyeColor.BLACK,
-            DyeColor.GRAY,
-            DyeColor.LIGHT_GRAY,
-            DyeColor.LIGHT_BLUE,
-            DyeColor.BLUE,
-            DyeColor.CYAN,
-            DyeColor.PURPLE,
-            DyeColor.MAGENTA,
-            DyeColor.PINK,
-            DyeColor.RED,
-            DyeColor.ORANGE,
-            DyeColor.YELLOW,
-            DyeColor.GREEN,
-            DyeColor.LIME,
-            DyeColor.WHITE
-    };
-
     public static void addItems(Entries entries) {
-        entries.add(BackpackItemRegistry.getBackpack(0, 1));
-        entries.add(BackpackItemRegistry.getBackpack(0, 2));
-        entries.add(BackpackItemRegistry.getBackpack(0, 3));
+        var entrySet = BackpackItemJsonRegistry.BACKPACKS.entrySet();
 
-        for (DyeColor color : dyeColors) {
-            for (int i = 1; i <= Configuration.instance().types_of_backpacks.size(); i++) {
-                entries.add(BackpackItemRegistry.getBackpack(color, i));
+        for (int i = 0; i < DyeColor.values().length + 1; i++) {
+            for (var entry : entrySet) {
+                var item = entry.getValue().get(i);
+                if (item != null) entries.add(item);
             }
         }
 

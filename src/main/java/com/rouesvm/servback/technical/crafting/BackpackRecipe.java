@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -17,7 +17,6 @@ import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.DyeColor;
 
 public class BackpackRecipe extends ShapedRecipe {
     public final RawShapedRecipe raw;
@@ -41,10 +40,16 @@ public class BackpackRecipe extends ShapedRecipe {
 
         ItemStack stack = craftingRecipeInput.getStackInSlot(4);
         if (stack.getItem() instanceof ContainerItem containerItem) {
-            DyeColor color = BackpackItemRegistry.getBackpackDyeColor(containerItem);
-            resultStack = BackpackItemRegistry.getBackpack(color, containerItem.getSize() + 1).getDefaultStack().copy();
-            resultStack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, BackpackManager.getStackUUID(stack));
-            resultStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
+
+            int id = BackpackItemJsonRegistry.getBackpackId(containerItem);
+            int order = BackpackItemJsonRegistry.getBackpackUpgradeOrder(containerItem.getSize());
+
+            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackByOrder(id, order + 1).getDefaultStack();
+            upgradeStack.copy();
+            upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, BackpackManager.getStackUUID(stack));
+            upgradeStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
+
+            resultStack = upgradeStack;
         }
 
         return resultStack;

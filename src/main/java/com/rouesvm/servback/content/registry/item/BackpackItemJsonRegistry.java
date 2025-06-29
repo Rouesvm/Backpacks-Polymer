@@ -1,0 +1,126 @@
+package com.rouesvm.servback.content.registry.item;
+
+import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.technical.config.Configuration;
+import net.minecraft.item.Item;
+import net.minecraft.util.DyeColor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class BackpackItemJsonRegistry {
+    public static final Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
+
+    public static final Map<Integer, Integer> SIZE_TO_ORDER = new HashMap<>();
+    public static final Map<Item, DyeColor> ITEM_TO_COLOR = new HashMap<>();
+
+    public static @Nullable DyeColor getBackpackDyeColor(ContainerItem item) {
+        return ITEM_TO_COLOR.getOrDefault(item, null);
+    }
+
+    public static int getBackpackId(ContainerItem item) {
+        DyeColor color = ITEM_TO_COLOR.get(item);
+        return color != null ? color.getIndex() + 1 : 0;
+    }
+
+    public static int getBackpackUpgradeOrder(int size) {
+        return SIZE_TO_ORDER.getOrDefault(size, 1);
+    }
+
+    public static Item getBackpackByOrder(@NotNull DyeColor color, int order) {
+        return getBackpackByOrder(color.getIndex() + 1, order);
+    }
+
+    public static Item getBackpackByOrder(int order) {
+        return getBackpackByOrder(0, order);
+    }
+
+    public static Item getBackpackByOrder(int id, int order) {
+        var defaultMap = BACKPACKS.get(order);
+        return BACKPACKS
+                .getOrDefault(order, BACKPACKS.get(1))
+                .getOrDefault(id, defaultMap.get(0));
+    }
+
+    public static Item getBackpackBySize(int size) {
+        return getBackpackBySize(0, size);
+    }
+
+    public static Item getBackpackBySize(int id, int size) {
+        var defaultMap = BACKPACKS.get(1);
+        return BACKPACKS
+                .getOrDefault(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size), defaultMap)
+                .getOrDefault(id, defaultMap.get(0));
+    }
+
+    private static ContainerItem create(Map<Integer, Item> itemMap, Integer id, String name, int slots) {
+        ContainerItem item = BackpackItemRegistry.register(new ContainerItem(name, slots));
+        itemMap.put(id, item);
+        return item;
+    }
+
+    private static int registerDyeableBackpack(Map<Integer, Item> sizeMap, List<String> strings, List<String> blacklistedDyes, int size) {
+        int registeredSize = 0;
+        for (String backpackName : strings) {
+            for (DyeColor color : DyeColor.values()) {
+                String dyeColor = color.name().toLowerCase();
+                if (blacklistedDyes != null && blacklistedDyes.contains(dyeColor)) continue;
+
+                ContainerItem item = create(sizeMap, color.getIndex() + 1, dyeColor + "_" + backpackName, size);
+                ITEM_TO_COLOR.put(item, color);
+
+                registeredSize++;
+            }
+        }
+        return registeredSize;
+    }
+
+    private static int registerBackpack(Map<Integer, Item> sizeMap, List<String> strings, int size) {
+        int registeredSize = 0;
+        for (String backpackName : strings) {
+            create(sizeMap, 0, backpackName, size);
+            registeredSize++;
+        }
+        return registeredSize;
+    }
+
+    public static void initialize() {
+        Configuration.Instance instance = Configuration.instance();
+        Map<Integer, Configuration.BackpackType> types = instance.types_of_backpacks;
+        Map<Integer, Configuration.BackpackType> effectiveTypes = types.isEmpty()
+                ? Configuration.defaultInstance.types_of_backpacks
+                : types;
+
+        int registeredSize = 0;
+
+        for (Map.Entry<Integer, Configuration.BackpackType> entry : effectiveTypes.entrySet()) {
+            int upgradeOrder = entry.getKey();
+            Configuration.BackpackType type = entry.getValue();
+
+            int size = type.slots();
+            List<String> strings = type.backpacks();
+
+            var sizeMap = new HashMap<Integer, Item>(DyeColor.values().length);
+
+            if (strings != null) {
+                registeredSize += registerBackpack(sizeMap, strings, size);
+                if (type.dyeable()) {
+                    var blacklistedDyes = type.dyeBlacklist();
+                    registeredSize += registerDyeableBackpack(sizeMap, strings, blacklistedDyes, size);
+                }
+            } else {
+                create(sizeMap, 0, upgradeOrder + "_backpack", size);
+                registeredSize++;
+            }
+
+            SIZE_TO_ORDER.put(size, upgradeOrder);
+            BACKPACKS.put(upgradeOrder, sizeMap);
+        }
+
+        ServerBackpacks.LOGGER.info("Finished registering {} items.", registeredSize);
+    }
+}

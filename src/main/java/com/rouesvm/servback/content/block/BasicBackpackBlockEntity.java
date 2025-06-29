@@ -1,8 +1,7 @@
 package com.rouesvm.servback.content.block;
 
-import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
-import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -13,7 +12,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
@@ -36,10 +34,8 @@ public class BasicBackpackBlockEntity extends BlockEntity {
         view.putInt("size", size);
 
         if (item != null) {
-            if (item instanceof ContainerItem containerItem)
-                view.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getIndex());
-            else view.putString("item", item.toString());
-        } else view.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
+            view.putString("item", item.toString());
+        } else view.putString("item", BackpackItemJsonRegistry.getBackpackBySize(size).toString());
     }
 
     @Override
@@ -47,7 +43,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
         size = view.getInt("size", 9);
 
         view.getOptionalInt("dye").ifPresent(integer ->
-                item = ContainerItem.getColoredBackpack(DyeColor.byIndex(integer), size / 9));
+                item = BackpackItemJsonRegistry.getBackpackBySize(integer + 1, size));
 
         if (item == null) {
             if (view.getOptionalString("item").isPresent()) {
@@ -55,14 +51,15 @@ public class BasicBackpackBlockEntity extends BlockEntity {
             } else {
                 item = Registries.ITEM.get(
                         view.getInt("item", Registries.ITEM.getRawId(
-                                ContainerItem.getDefaultBackpack(1)
+                                BackpackItemJsonRegistry.getBackpackBySize(size)
                         )));
             }
         }
     }
 
     public ItemStack getDefaultStack() {
-        ItemStack stack = item != null ? item.getDefaultStack() : ContainerItem.getDefaultBackpack(size / 9).getDefaultStack();
+        ItemStack stack = item != null ? item.getDefaultStack()
+                : BackpackItemJsonRegistry.getBackpackBySize(size).getDefaultStack();
         if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
         return stack;
     }

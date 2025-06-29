@@ -7,6 +7,7 @@ import com.rouesvm.servback.content.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemGroup;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
@@ -57,6 +58,7 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackBlockEntityRegistry.initialize();
 		BackpackBlockRegistry.initialize();
 
+		BackpackItemJsonRegistry.initialize();
 		BackpackItemRegistry.initialize();
 		BackpackItemGroup.initialize();
 

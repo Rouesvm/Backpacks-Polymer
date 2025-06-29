@@ -132,15 +132,7 @@
       "textures": "textures/serverbackpacks/block/medium/magenta_medium"
     },
     "serverbackpacks:magenta_3": {
-      "textures": "textures/serverbackpacks/block/large/magenta_large"    "serverbackpacks:red_1": {
-      "textures": "textures/serverbackpacks/block/small/red_small"
-    },
-    "serverbackpacks:red_2": {
-      "textures": "textures/serverbackpacks/block/medium/red_medium"
-    },
-    "serverbackpacks:red_3": {
-      "textures": "textures/serverbackpacks/block/large/red_large"
-    }
+      "textures": "textures/serverbackpacks/block/large/magenta_large"
     },
     "serverbackpacks:pink_1": {
       "textures": "textures/serverbackpacks/block/small/pink_small"

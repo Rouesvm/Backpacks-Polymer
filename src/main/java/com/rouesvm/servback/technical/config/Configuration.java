@@ -85,7 +85,7 @@ public class Configuration {
 
     public static class Instance {
         @SerializedName("types_of_backpacks")
-        public final Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
+        public Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
                 1, new BackpackType(
                         9,
                         true,
@@ -106,28 +106,34 @@ public class Configuration {
                 )
         ));
 
+        @SerializedName("enable_globalpack")
+        public boolean enable_globalpack = true;
+
+        @SerializedName("enable_enderpack")
+        public boolean enable_enderpack = true;
+
         @SerializedName("breaks_with_flow")
-        public final boolean breaks_with_flow = true;
+        public boolean breaks_with_flow = true;
 
         @SerializedName("display_back")
-        public final boolean display_back = true;
+        public boolean display_back = true;
 
         @SerializedName("back_positions")
-        public final Map<Integer, Vector3f> back_positions = createMap(Map.of(
+        public Map<Integer, Vector3f> back_positions = createMap(Map.of(
                 1, new Vector3f(0, -0.45f, 0.280f),
                 2, new Vector3f(0, -0.65f, 0.280f),
                 3, new Vector3f(0, -0.65f, 0.280f)
         ));
 
         @SerializedName("back_yaw")
-        public final Map<Integer, Integer> back_yaw = createMap(Map.of(
+        public Map<Integer, Integer> back_yaw = createMap(Map.of(
                 1, 180,
                 2, 180,
                 3, 180
         ));
 
         @SerializedName("back_pitch_when_sneaking")
-        public final Map<Integer, Integer> back_pitch_when_sneaking = createMap(Map.of(
+        public Map<Integer, Integer> back_pitch_when_sneaking = createMap(Map.of(
                 1, -25,
                 2, -25,
                 3, -25

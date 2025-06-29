@@ -43,7 +43,10 @@ public class BasicBackpackBlockEntity extends BlockEntity {
         size = view.getInt("size", 9);
 
         view.getOptionalInt("dye").ifPresent(integer ->
-                item = BackpackItemJsonRegistry.getBackpackBySize(integer + 1, size));
+                item = BackpackItemJsonRegistry.getBackpackBySize(integer +
+                        BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)),
+                        size
+                ));
 
         if (item == null) {
             if (view.getOptionalString("item").isPresent()) {

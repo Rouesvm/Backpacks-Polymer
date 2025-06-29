@@ -15,17 +15,21 @@ import java.util.Map;
 public class BackpackItemJsonRegistry {
     public static final Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
 
-    public static final Map<Integer, Integer> SIZE_TO_ORDER = new HashMap<>();
-    public static final Map<Integer, Integer> ORDER_OFFSET = new HashMap<>();
-    public static final Map<Item, DyeColor> ITEM_TO_COLOR = new HashMap<>();
+    private static final Map<Integer, Integer> SIZE_TO_ORDER = new HashMap<>();
+    private static final Map<Integer, Integer> ORDER_OFFSET = new HashMap<>();
+    private static final Map<Item, DyeColor> ITEM_TO_COLOR = new HashMap<>();
 
     public static @Nullable DyeColor getBackpackDyeColor(ContainerItem item) {
         return ITEM_TO_COLOR.getOrDefault(item, null);
     }
 
+    public static int getOffset(int order) {
+        return ORDER_OFFSET.get(order);
+    }
+
     public static int getBackpackId(ContainerItem item) {
         DyeColor color = ITEM_TO_COLOR.get(item);
-        return color != null ? color.getIndex() + 1 : 0;
+        return color != null ? color.getIndex() + getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(item.getSize())) : 0;
     }
 
     public static int getBackpackUpgradeOrder(int size) {
@@ -33,7 +37,7 @@ public class BackpackItemJsonRegistry {
     }
 
     public static Item getBackpackByOrder(@NotNull DyeColor color, int order) {
-        return getBackpackByOrder(color.getIndex() + 1, order);
+        return getBackpackByOrder(color.getIndex() + getOffset(order), order);
     }
 
     public static Item getBackpackByOrder(int order) {
@@ -64,12 +68,13 @@ public class BackpackItemJsonRegistry {
         return item;
     }
 
-    private static int registerBackpacks(Configuration.BackpackType type, Map<Integer, Item> sizeMap, int size) {
+    private static int registerBackpacks(Configuration.BackpackType type, Map<Integer, Item> sizeMap, int size, int order) {
         List<String> strings = type.backpacks();
 
+        int offset = 0;
         int registeredSize = 0;
         for (String backpackName : strings) {
-            create(sizeMap, 0, backpackName, size);
+            create(sizeMap, offset++, backpackName, size);
             registeredSize++;
 
             if (!type.dyeable()) continue;
@@ -80,14 +85,15 @@ public class BackpackItemJsonRegistry {
                 String dyeColor = color.name().toLowerCase();
                 if (blacklistedDyes != null && blacklistedDyes.contains(dyeColor)) continue;
 
-                ContainerItem item = create(sizeMap, color.getIndex() + 1, dyeColor + "_" + backpackName, size);
+                ContainerItem item = create(sizeMap, color.getIndex() + offset, dyeColor + "_" + backpackName, size);
                 ITEM_TO_COLOR.put(item, color);
 
                 registeredSize++;
             }
         }
-        return registeredSize;
 
+        ORDER_OFFSET.put(order, offset);
+        return registeredSize;
     }
 
     public static void initialize() {
@@ -109,7 +115,7 @@ public class BackpackItemJsonRegistry {
 
             var sizeMap = new HashMap<Integer, Item>(DyeColor.values().length);
 
-            registeredSize += registerBackpacks(type, sizeMap, size);
+            registeredSize += registerBackpacks(type, sizeMap, size, upgradeOrder);
 
             SIZE_TO_ORDER.put(size, upgradeOrder);
             BACKPACKS.put(upgradeOrder, sizeMap);

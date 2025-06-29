@@ -84,12 +84,6 @@ public class Configuration {
     public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist) {}
 
     public static class Instance {
-        @SerializedName("breaks_with_flow")
-        public final boolean breaks_with_flow = true;
-
-        @SerializedName("display_back")
-        public final boolean display_back = true;
-
         @SerializedName("types_of_backpacks")
         public final Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
                 1, new BackpackType(
@@ -111,6 +105,12 @@ public class Configuration {
                         List.of("brown")
                 )
         ));
+
+        @SerializedName("breaks_with_flow")
+        public final boolean breaks_with_flow = true;
+
+        @SerializedName("display_back")
+        public final boolean display_back = true;
 
         @SerializedName("back_positions")
         public final Map<Integer, Vector3f> back_positions = createMap(Map.of(

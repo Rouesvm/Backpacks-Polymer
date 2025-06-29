@@ -17,12 +17,11 @@ import net.minecraft.util.DyeColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BackpackItemRegistry {
     public static final Map<Integer, Map<Integer, Item>> BACKPACKS = new HashMap<>();
+    public static final Map<Integer, Set<Item>> BACKPACKS_UPGRADE_ORDER = new HashMap<>();
 
     public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
         @Override
@@ -51,6 +50,15 @@ public class BackpackItemRegistry {
                .orElse(DyeColor.WHITE);
     }
 
+    public static int getBackpackUpgradeOrder(ContainerItem item) {
+        for (var entry : BACKPACKS_UPGRADE_ORDER.entrySet()) {
+            if (entry.getValue().contains(item)) {
+                return entry.getKey();
+            }
+        }
+        return 1;
+    }
+
     public static Item getBackpack(@NotNull DyeColor color, int order) {
         return getBackpack(color.getIndex() + 1, order);
     }
@@ -62,55 +70,65 @@ public class BackpackItemRegistry {
                 .getOrDefault(id, defaultMap.get(0));
     }
 
-    public static void create(Map<Integer, Item> itemMap, Integer order, String name, int slots) {
-        itemMap.put(order, register(new ContainerItem(name, slots)));
+    private static ContainerItem create(Map<Integer, Item> itemMap, Integer id, String name, int slots) {
+        ContainerItem item = register(new ContainerItem(name, slots));
+        itemMap.put(id, item);
+        return item;
+    }
+
+    private static int registerDyeableBackpack(Map<Integer, Item> sizeMap,
+                                               List<String> strings,
+                                               List<String> blacklistedDyes,
+                                               Set<Item> items,
+                                               int size
+    ) {
+        int registeredSize = 0;
+        for (String backpackName : strings) {
+            items.add(create(sizeMap, 0, backpackName, size));
+            registeredSize++;
+
+            for (DyeColor color : DyeColor.values()) {
+                String dyeColor = color.name().toLowerCase();
+                if (blacklistedDyes != null && blacklistedDyes.contains(dyeColor)) continue;
+                items.add(create(sizeMap, color.getIndex() + 1, dyeColor + "_" + backpackName, size));
+                registeredSize++;
+            }
+        }
+
+        return registeredSize;
     }
 
     public static void initialize() {
         Configuration.Instance instance = Configuration.instance();
-
-        if (instance.types_of_backpacks.isEmpty()) {
-            Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
-            create(sizeMap, 0, "small", 9);
-            BACKPACKS.put(1, sizeMap);
-
-            return;
-        }
+        Map<Integer, Configuration.BackpackType> types = instance.types_of_backpacks;
+        Map<Integer, Configuration.BackpackType> effectiveTypes = types.isEmpty()
+                ? Configuration.defaultInstance.types_of_backpacks
+                : types;
 
         int registeredSize = 0;
 
-        for (Map.Entry<Integer, Configuration.BackpackType> entry : instance.types_of_backpacks.entrySet()) {
-            int order = entry.getKey();
-            Configuration.BackpackType backpackType = entry.getValue();
+        for (Map.Entry<Integer, Configuration.BackpackType> entry : effectiveTypes.entrySet()) {
+            int upgradeOrder = entry.getKey();
+            Configuration.BackpackType type = entry.getValue();
 
-            int backpackSlots = backpackType.slots();
-            List<String> backpackStrings = backpackType.backpacks();
-            List<String> blacklistedDyes = backpackType.dyeBlacklist();
+            int size = type.slots();
+            List<String> strings = type.backpacks();
 
-            Map<Integer, Item> sizeMap = new HashMap<>(DyeColor.values().length);
+            var sizeMap = new HashMap<Integer, Item>(DyeColor.values().length);
+            var items = new HashSet<Item>();
 
-            String defaultName = backpackStrings != null ? backpackStrings.getFirst() : entry.getKey() + "_backpack";
+            var defaultName = (strings != null && !strings.isEmpty()) ? strings.getFirst() : upgradeOrder + "_backpack";
 
-            if (backpackStrings != null) {
-                if (backpackType.dyeable()) {
-                    for (String backpackName : backpackStrings) {
-                        create(sizeMap, 0, backpackName, backpackSlots);
-
-                        for (DyeColor color : DyeColor.values()) {
-                            String dyeColor = color.name().toLowerCase();
-                            String name = dyeColor + "_";
-                            if (blacklistedDyes != null && blacklistedDyes.contains(dyeColor)) continue;
-                            create(sizeMap, color.getIndex() + 1, name + backpackName, backpackSlots);
-                            registeredSize++;
-                        }
-                    }
-                } else {
-                    create(sizeMap, 1, defaultName, backpackSlots);
-                    registeredSize++;
-                }
+            if (strings != null && type.dyeable()) {
+                var blacklistedDyes = type.dyeBlacklist();
+                registeredSize += registerDyeableBackpack(sizeMap, strings, blacklistedDyes, items, size);
+            } else {
+                items.add(create(sizeMap, 0, defaultName, size));
+                registeredSize++;
             }
 
-            BACKPACKS.put(order, sizeMap);
+            BACKPACKS_UPGRADE_ORDER.put(upgradeOrder, items);
+            BACKPACKS.put(upgradeOrder, sizeMap);
         }
 
         ServerBackpacks.LOGGER.info("Finished registering {} items.", registeredSize);

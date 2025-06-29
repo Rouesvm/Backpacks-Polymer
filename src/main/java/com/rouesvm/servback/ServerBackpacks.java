@@ -11,6 +11,7 @@ import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
+import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
@@ -88,7 +89,10 @@ public class ServerBackpacks implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 
 		ServerLifecycleEvents.BEFORE_SAVE.register((minecraftServer, b, b1) -> {
-			if (BackpackManager.instance != null) BackpackManager.save(minecraftServer);
+			if (BackpackManager.instance != null) {
+				BackpackManager.save(minecraftServer);
+				BackpackDataSaver.createBackup();
+			};
 		});
 	}
 

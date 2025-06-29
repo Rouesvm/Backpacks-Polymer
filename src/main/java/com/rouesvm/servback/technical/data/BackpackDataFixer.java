@@ -1,8 +1,6 @@
-package com.rouesvm.servback.technical.data.state;
+package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;

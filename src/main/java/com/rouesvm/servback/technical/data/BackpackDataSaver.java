@@ -2,6 +2,7 @@ package com.rouesvm.servback.technical.data;
 
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.state.codecs.BackpackData;
 import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
 import com.rouesvm.servback.technical.data.state.codecs.SlotData;
@@ -82,6 +83,7 @@ public class BackpackDataSaver {
 
     public static void createBackup() {
         if (backupPath == null) return;
+        if (!Configuration.instance().allow_backups) return;
 
         LocalDateTime deathTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");

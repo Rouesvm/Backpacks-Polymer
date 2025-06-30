@@ -112,6 +112,9 @@ public class Configuration {
         @SerializedName("enable_enderpack")
         public boolean enable_enderpack = true;
 
+        @SerializedName("allow_backups")
+        public boolean allow_backups = true;
+
         @SerializedName("breaks_with_flow")
         public boolean breaks_with_flow = true;
 

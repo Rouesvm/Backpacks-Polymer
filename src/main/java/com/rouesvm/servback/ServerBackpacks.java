@@ -7,9 +7,11 @@ import com.rouesvm.servback.content.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemGroup;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
+import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
@@ -57,6 +59,7 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackBlockEntityRegistry.initialize();
 		BackpackBlockRegistry.initialize();
 
+		BackpackItemJsonRegistry.initialize();
 		BackpackItemRegistry.initialize();
 		BackpackItemGroup.initialize();
 
@@ -83,10 +86,13 @@ public class ServerBackpacks implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::loadOnServerStarted);
 
-		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
+		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 
-		ServerLifecycleEvents.AFTER_SAVE.register((minecraftServer, b, b1) -> {
-			if (BackpackManager.instance != null) BackpackManager.save(minecraftServer);
+		ServerLifecycleEvents.BEFORE_SAVE.register((minecraftServer, b, b1) -> {
+			if (BackpackManager.instance != null) {
+				BackpackManager.save(minecraftServer);
+				BackpackDataSaver.createBackup();
+			};
 		});
 	}
 

@@ -6,7 +6,7 @@ import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
-import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.data.BackpackUtils;
@@ -43,9 +43,10 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     @Override
     public BlockState getPlacementState(ItemPlacementContext context) {
         ContainerItem item = (ContainerItem) context.getStack().getItem();
+        DyeColor color = BackpackItemJsonRegistry.getBackpackDyeColor(item);
         return super.getPlacementState(context)
-                .with(DYE_COLOR, BackpackItemRegistry.getBackpackDyeColor(item))
-                .with(SLOTS, item.getSize());
+                .with(DYE_COLOR, color != null ? color : DyeColor.BROWN)
+                .with(SLOTS, item.getSize() / 9);
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {

@@ -54,7 +54,7 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public BackpackRecipeJsonBuilder input(Character c, TagKey<Item> tag) {
-        return this.input(c, Ingredient.fromTag(this.registryLookup.getOrThrow(tag)));
+        return this.input(c, Ingredient.ofTag(this.registryLookup.getOrThrow(tag)));
     }
 
     public BackpackRecipeJsonBuilder input(Character c, ItemConvertible item) {

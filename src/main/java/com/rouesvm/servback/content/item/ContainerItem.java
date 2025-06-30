@@ -3,7 +3,6 @@ package com.rouesvm.servback.content.item;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
-import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.data.BackpackUtils;
@@ -15,7 +14,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,7 +21,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -45,7 +42,7 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public int getSize() {
-        return slots / 9;
+        return slots;
     }
 
     @Override
@@ -171,16 +168,6 @@ public class ContainerItem extends BundleGuiItem {
         DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots, ItemStack.EMPTY);
         stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
         return list;
-    }
-
-    // It's 1-9 (If you have slots = (9 * (order)) you do (slots / 9))
-    public static Item getColoredBackpack(DyeColor color, int order) {
-        return color != null ? BackpackItemRegistry.getBackpack(color, order) : getDefaultBackpack(order);
-    }
-
-    public static Item getDefaultBackpack(int order) {
-        Item item = BackpackItemRegistry.getBackpack(DyeColor.BROWN, order);
-        return item != null ? item : BackpackItemRegistry.getBackpack(DyeColor.BROWN, 1);
     }
 
     public static void playOpenSound(ServerPlayerEntity player) {

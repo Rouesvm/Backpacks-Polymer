@@ -151,15 +151,6 @@
     },
     "serverbackpacks:purple_3": {
       "textures": "textures/serverbackpacks/block/large/purple_large"
-    },
-    "serverbackpacks:red_1": {
-      "textures": "textures/serverbackpacks/block/small/red_small"
-    },
-    "serverbackpacks:red_2": {
-      "textures": "textures/serverbackpacks/block/medium/red_medium"
-    },
-    "serverbackpacks:red_3": {
-      "textures": "textures/serverbackpacks/block/large/red_large"
     }
   }
 }

@@ -87,29 +87,10 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .pattern(" O ")
                 .input('L', Items.LEATHER).input('S', Items.STRING)
                 .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
-                .input('0', Ingredient.ofTag(itemWrap.getOrThrow(SMALL_BACKPACKS)))
-                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack")));
-
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(3), 1)
-                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
-                .pattern("ZiZ")
-                .pattern("S0S")
-                .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
-                .input('S', Items.SHULKER_SHELL)
-                .input('0', Ingredient.ofTag(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
-                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "large_backpack")));
-
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemRegistry.getBackpack(DyeColor.BROWN, 2))
-                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
-                .pattern("iLi")
-                .pattern("S0S")
-                .pattern(" O ")
-                .input('L', Items.LEATHER).input('S', Items.STRING)
-                .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
                 .input('0', Ingredient.fromTag(itemWrap.getOrThrow(SMALL_BACKPACKS)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack")));
 
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemRegistry.getBackpack(DyeColor.BROWN, 3))
+        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(3), 1)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .pattern("ZiZ")
                 .pattern("S0S")

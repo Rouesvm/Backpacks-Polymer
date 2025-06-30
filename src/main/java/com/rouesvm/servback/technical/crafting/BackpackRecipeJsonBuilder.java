@@ -54,7 +54,7 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public BackpackRecipeJsonBuilder input(Character c, TagKey<Item> tag) {
-        return this.input(c, Ingredient.ofTag(this.registryLookup.getOrThrow(tag)));
+        return this.input(c, Ingredient.fromTag(this.registryLookup.getOrThrow(tag)));
     }
 
     public BackpackRecipeJsonBuilder input(Character c, ItemConvertible item) {
@@ -73,7 +73,7 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public BackpackRecipeJsonBuilder pattern(String patternStr) {
-        if (!this.pattern.isEmpty() && patternStr.length() != ((String)this.pattern.get(0)).length()) {
+        if (!this.pattern.isEmpty() && patternStr.length() != this.pattern.getFirst().length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
         } else {
             this.pattern.add(patternStr);

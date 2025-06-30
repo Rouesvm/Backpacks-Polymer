@@ -42,7 +42,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         size = nbt.getInt("size", 9);
 
-        view.getInt("dye").ifPresent(integer ->
+        nbt.getInt("dye").ifPresent(integer ->
                 item = BackpackItemJsonRegistry.getBackpackBySize(
                         integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)), size
                 ));

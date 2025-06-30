@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
+import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -50,6 +51,8 @@ public class BackpackRecipe extends ShapedRecipe {
             upgradeStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
 
             resultStack = upgradeStack;
+
+            BackpackDataSaver.createBackup();
         }
 
         return resultStack;

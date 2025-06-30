@@ -68,5 +68,6 @@
 
   "command.serverbackpacks.reset": "Config has been reset!",
   "command.serverbackpacks.reload": "Config has been reloaded!",
-  "command.serverbackpacks.save": "Config has been saved!"
+  "command.serverbackpacks.save": "Config has been saved!",
+  "command.serverbackpacks.backup": "Backup created."
 }

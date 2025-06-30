@@ -15,6 +15,7 @@ import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -92,8 +93,15 @@ public class ServerBackpacks implements ModInitializer {
 			if (BackpackManager.instance != null) {
 				BackpackManager.save(minecraftServer);
 				BackpackDataSaver.createBackup();
-			};
+			}
 		});
+
+		backupEvents();
+	}
+
+	private static void backupEvents() {
+		ServerPlayerEvents.LEAVE.register((p0) -> BackpackDataSaver.createBackup());
+		ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackDataSaver.createBackup());
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

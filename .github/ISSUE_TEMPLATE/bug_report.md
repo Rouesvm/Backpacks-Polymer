@@ -1,7 +1,7 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: "[BUG]"
+about: Create a report to help us improve. Please provide a title. Bug reports without one may be ignored.
+title: "[BUG] Title"
 labels: ''
 assignees: ''
 
@@ -26,6 +26,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Provide a log file**
+This is required if your bug can't be reproduced on other systems. 
+Still, it's recommended to include it regardless, as it can be helpful for mod authors.
 
 **Additional context**
 Add any other context about the problem here.

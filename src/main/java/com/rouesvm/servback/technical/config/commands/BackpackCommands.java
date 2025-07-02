@@ -10,6 +10,7 @@ import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -30,6 +31,7 @@ public class BackpackCommands {
         if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
 
         dispatcher.register(literal("backpacks")
+                .requires(source -> Permissions.check(source, "serverbackpacks.command", 4))
                 .executes(context -> {
                     context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);
                     return 1;

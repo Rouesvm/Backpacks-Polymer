@@ -92,12 +92,14 @@ public class BackpackManager {
         }
 
         if (!instance.loaded) ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
+        else ServerBackpacks.LOGGER.error("Server Backpack's data is already loaded!");
     }
 
     public static void loadOnServerStarted(MinecraftServer server) {
-        ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor.");
-
-        load(server);
+        if (!instance.loaded) {
+            ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
+            load(server);
+        }
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         instance.globalInventory.setInventoryDirectly(globalBackpackState.globalInventory.heldStacks());

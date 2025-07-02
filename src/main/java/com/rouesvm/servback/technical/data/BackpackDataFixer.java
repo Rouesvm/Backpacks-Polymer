@@ -25,9 +25,9 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 public class BackpackDataFixer {
-    public static void onWorldLoading(MinecraftServer server) {
+    public static boolean onWorldLoading(MinecraftServer server) {
         Path path = server.getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
-        if (!path.toFile().exists()) return;
+        if (!path.toFile().exists()) return false;
 
         NbtCompound oldData = null;
 
@@ -46,7 +46,11 @@ public class BackpackDataFixer {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+            return true;
         }
+
+        return false;
     }
 
     public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {

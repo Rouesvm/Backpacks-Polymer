@@ -30,12 +30,10 @@ public class BackpackDataSaver {
 
     private static final Codec<List<BackpackData>> SAVE_CODEC = BackpackData.CODEC.listOf().fieldOf("backpackContents").codec();
 
-    public static void onServerStarting(MinecraftServer server) {
+    public static boolean onServerStarting(MinecraftServer server) {
         savePath = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 
         if (Files.exists(savePath)) {
-            ServerBackpacks.LOGGER.info("Loading Server Backpacks's data!");
-
             try {
                 var data = SAVE_CODEC.decode(NbtOps.INSTANCE, NbtIo.readCompound(new DataInputStream(
                         new FileInputStream(savePath.toFile()))));
@@ -44,6 +42,7 @@ public class BackpackDataSaver {
                         () -> storedInventories = new ArrayList<>()
                 );
 
+                if (!storedInventories.isEmpty()) return true;
             } catch (Throwable e) {
                ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
             }
@@ -52,6 +51,8 @@ public class BackpackDataSaver {
         }
 
         setupBackup(server);
+
+        return false;
     }
 
     public static void setupBackup(MinecraftServer server) {

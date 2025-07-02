@@ -25,6 +25,8 @@ public class BackpackManager {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.setup();
         instance = new BackpackManager();
         load(server);
+
+        ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
     }
 
     public static void destroy(MinecraftServer server) {
@@ -57,16 +59,15 @@ public class BackpackManager {
     }
 
     public static void load(MinecraftServer server) {
-        BackpackDataFixer.onWorldLoading(server);
         BackpackState state = BackpackState.getServerState(server);
 
         if (!instance.loaded) {
-            BackpackDataSaver.onServerStarting(server);
+            instance.loaded = BackpackDataSaver.onServerStarting(server);
 
             Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {
                 instance.load(dataInstances);
-                instance.loaded = true;
+                ServerBackpacks.LOGGER.info("Loaded Server Backpack's new format.");
             }
         }
 
@@ -80,11 +81,22 @@ public class BackpackManager {
                 state.markDirty();
 
                 instance.loaded = true;
+
+                ServerBackpacks.LOGGER.info("Loaded Server Backpack's semi-new format.");
             }
         }
+
+        if (!instance.loaded) {
+            instance.loaded = BackpackDataFixer.onWorldLoading(server);
+            if (instance.loaded) ServerBackpacks.LOGGER.info("Loaded Server Backpack's old format.");
+        }
+
+        if (!instance.loaded) ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
     }
 
     public static void loadOnServerStarted(MinecraftServer server) {
+        ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor.");
+
         load(server);
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);

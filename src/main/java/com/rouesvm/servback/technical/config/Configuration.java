@@ -68,11 +68,19 @@ public class Configuration {
                 instance = loaded;
 
                 instance.types_of_backpacks.replaceAll((key, value) ->
-                        value.slots > maxSlots |
-                                value.backpacks == null |
+                        value.slots > maxSlots ||
+                                value.backpacks == null ||
                                 value.dyeBlacklist == null
-                        ? defaultInstance.types_of_backpacks.getOrDefault(key, new BackpackType(key * 9, true, value.backpacks, List.of("brown")))
-                        : value);
+                                ? defaultInstance.types_of_backpacks.getOrDefault(
+                                key,
+                                new BackpackType(
+                                        key * 9,
+                                        true,
+                                        value.backpacks != null ? value.backpacks : List.of("unknown"),
+                                        List.of("brown")
+                                )
+                        ) : value
+                );
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
     }

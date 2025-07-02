@@ -26,7 +26,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Provide a log file**
-This is necessary if your bug is not possible to replicate in other systems.
+This is required if your bug can't be reproduced on other systems. 
+Still, it's recommended to include it regardless, as it can be helpful for mod authors.
 
 **Additional context**
 Add any other context about the problem here.

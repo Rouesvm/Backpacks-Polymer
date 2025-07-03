@@ -33,11 +33,7 @@ public class BackpackDataSaver {
     public static boolean onServerStarting(MinecraftServer server) {
         savePath = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 
-        System.out.println(savePath);
-
         if (Files.exists(savePath)) {
-            ServerBackpacks.LOGGER.info("Loading...");
-
             try {
                 var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), NbtIo.readCompound(new DataInputStream(
                         new FileInputStream(savePath.toFile()))));

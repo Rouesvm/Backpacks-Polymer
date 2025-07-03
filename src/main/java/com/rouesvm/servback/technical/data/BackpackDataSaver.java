@@ -33,21 +33,28 @@ public class BackpackDataSaver {
     public static boolean onServerStarting(MinecraftServer server) {
         savePath = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 
+        System.out.println(savePath);
+
         if (Files.exists(savePath)) {
+            ServerBackpacks.LOGGER.info("Loading...");
+
             try {
-                var data = SAVE_CODEC.decode(NbtOps.INSTANCE, NbtIo.readCompound(new DataInputStream(
+                var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), NbtIo.readCompound(new DataInputStream(
                         new FileInputStream(savePath.toFile()))));
+
+                System.out.println(data);
+
                 data.result().ifPresentOrElse(result ->
                         storedInventories = result.getFirst(),
                         () -> storedInventories = new ArrayList<>()
                 );
 
                 if (!storedInventories.isEmpty()) return true;
-            } catch (Throwable e) {
-               ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
+            } catch (IOException e) {
+                ServerBackpacks.LOGGER.error("Failed to load Server Backpack's new data. {}", e.getMessage());
             }
         } else {
-            save();
+            save(server);
         }
 
         setupBackup(server);
@@ -66,13 +73,13 @@ public class BackpackDataSaver {
             }
         }
 
-        createBackup();
+        createBackup(server);
     }
 
-    public static void save() {
+    public static void save(MinecraftServer server) {
         if (savePath == null) return;
 
-        var data = SAVE_CODEC.encodeStart(NbtOps.INSTANCE, List.copyOf(storedInventories));
+        var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE), List.copyOf(storedInventories));
         if (data.isSuccess()) {
             try {
                 NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(savePath.toFile())));
@@ -82,7 +89,7 @@ public class BackpackDataSaver {
         }
     }
 
-    public static void createBackup() {
+    public static void createBackup(MinecraftServer server) {
         if (backupPath == null) return;
         if (!Configuration.instance().allow_backups) return;
 
@@ -92,7 +99,7 @@ public class BackpackDataSaver {
 
         Path backupFile = backupPath.resolve("serverbackpacks-backup-" + formattedDeathTime + ".data");
 
-        var data = SAVE_CODEC.encodeStart(NbtOps.INSTANCE, List.copyOf(storedInventories));
+        var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE), List.copyOf(storedInventories));
         if (data.isSuccess()) {
             try {
                 NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(backupFile.toFile())));

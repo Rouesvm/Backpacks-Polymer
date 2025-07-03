@@ -37,7 +37,7 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
             save(server);
-            BackpackDataSaver.createBackup();
+            BackpackDataSaver.createBackup(server);
 
             instance = null;
         }
@@ -49,7 +49,7 @@ public class BackpackManager {
 
     public static void save(MinecraftServer server) {
         BackpackDataSaver.setStoredInventories(instance.getBackpackInstances());
-        BackpackDataSaver.save();
+        BackpackDataSaver.save(server);
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         globalBackpackState.globalInventory = instance.globalInventory;

@@ -49,7 +49,7 @@ public class BackpackGui extends BasicGui {
             String before = BackpackUtils.hashBackpackContents(frozenInstance.heldInventory());
             String after = BackpackUtils.hashBackpackContents(instance.heldInventory());
 
-            if (!before.equals(after)) BackpackDataSaver.createBackup();
+            if (!before.equals(after)) BackpackDataSaver.createBackup(player.getServer());
         }
 
         if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);

@@ -73,6 +73,6 @@ Resource pack will be located in your server folder as polymer-resourcepack.zip 
 ## Credits
 Fork based on [Server Backpacks](https://modrinth.com/mod/servback) by [Octal](https://modrinth.com/user/Octal), although most of the code has been rewritten.
 
-Taken code from and what code:
+Referenced code from and what code:
 * Cosmetic code from ([Filament](https://modrinth.com/mod/filament))
 * Bedrock blockstate registry code from ([Hydraulic](https://github.com/GeyserMC/Hydraulic))

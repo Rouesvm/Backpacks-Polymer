@@ -3,8 +3,6 @@ package com.rouesvm.servback.technical.data;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
-import com.rouesvm.servback.technical.data.state.BackpackDataFixer;
-import com.rouesvm.servback.technical.data.state.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.state.BackpackState;
 import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
@@ -27,6 +25,8 @@ public class BackpackManager {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.setup();
         instance = new BackpackManager();
         load(server);
+
+        ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
     }
 
     public static void destroy(MinecraftServer server) {
@@ -36,6 +36,8 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
             save(server);
+            BackpackDataSaver.createBackup(server);
+
             instance = null;
         }
     }
@@ -57,16 +59,15 @@ public class BackpackManager {
     }
 
     public static void load(MinecraftServer server) {
-        BackpackDataFixer.onWorldLoading(server);
         BackpackState state = BackpackState.getServerState(server);
 
         if (!instance.loaded) {
-            BackpackDataSaver.onServerStarting(server);
+            instance.loaded = BackpackDataSaver.onServerStarting(server);
 
             Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {
                 instance.load(dataInstances);
-                instance.loaded = true;
+                ServerBackpacks.LOGGER.info("Loaded Server Backpack's new format.");
             }
         }
 
@@ -80,12 +81,24 @@ public class BackpackManager {
                 state.markDirty();
 
                 instance.loaded = true;
+
+                ServerBackpacks.LOGGER.info("Loaded Server Backpack's semi-new format.");
             }
         }
+
+        if (!instance.loaded) {
+            instance.loaded = BackpackDataFixer.onWorldLoading(server);
+            if (instance.loaded) ServerBackpacks.LOGGER.info("Loaded Server Backpack's old format.");
+        }
+
+        if (!instance.loaded) ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
     }
 
     public static void loadOnServerStarted(MinecraftServer server) {
-        load(server);
+        if (!instance.loaded) {
+            ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
+            load(server);
+        }
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         instance.globalInventory.setInventoryDirectly(globalBackpackState.globalInventory.heldStacks());

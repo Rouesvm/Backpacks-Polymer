@@ -2,6 +2,7 @@ package com.rouesvm.servback.datagen;
 
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -32,7 +33,7 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
         for (int i = 1; i <= 3; i++) {
             for (DyeColor color : DyeColor.values()) {
-                ContainerItem item = (ContainerItem) ContainerItem.getColoredBackpack(color, i);
+                ContainerItem item = (ContainerItem) BackpackItemJsonRegistry.getBackpackByOrder(color, i);
                 Identifier itemID = item.getIdentifier();
                 switch (i) {
                     case 1 -> this.getTagBuilder(SMALL_BACKPACKS).addOptional(itemID);

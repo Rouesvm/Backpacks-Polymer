@@ -1,7 +1,9 @@
 package com.rouesvm.servback.content.upgrade.impl;
 
+import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.upgrade.BaseUpgrade;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.inventory.StackWithSlot;
 import net.minecraft.item.Item;
@@ -13,9 +15,14 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.Box;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class MagnetUpgrade extends BaseUpgrade {
+    public int tickCounter = 0;
+
+    public final Queue<ItemEntity> queue = new LinkedList<>();
     public List<Item> list = new ArrayList<>();
 
     public MagnetUpgrade() {
@@ -50,19 +57,39 @@ public class MagnetUpgrade extends BaseUpgrade {
     @Override
     public void tick(ServerPlayerEntity player, BackpackInventory inventory) {
         ServerWorld world = player.getWorld();
-        Box area = new Box(player.getPos().add(-2), player.getPos().add(2));
 
-        List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area,
-                item -> item.isAlive() && (!world.isClient || item.timeUntilRegen > 1) && !item.cannotPickup());
+        if (queue.isEmpty()) {
+            Box area = new Box(player.getPos().add(-5), player.getPos().add(5));
+            List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area,
+                    Entity::isAlive);
 
-        if (!items.isEmpty()) {
-            items.forEach(itemEntity -> {
-                ItemStack stack = itemEntity.getStack();
+            for (ItemEntity item : items) {
+                if (inventory.canInsert(item.getStack())) {
+                    queue.add(item);
+                    item.setPickupDelayInfinite();
+                }
+            }
+        } else {
+            tickCounter++;
 
-                inventory.addStack(stack);
-                itemEntity.setDespawnImmediately();
-                itemEntity.setPickupDelayInfinite();
-            });
+            if (tickCounter % 5 == 0) {
+                ItemEntity next = queue.poll();
+
+                if (next == null) return;
+                if (!next.isAlive()) return;
+                if (next.distanceTo(player) > 10) return;
+
+                ItemStack stack = next.getStack();
+                if (inventory.canInsert(stack)) {
+                    stack = inventory.addStack(stack);
+                    if (stack.getCount() > 0)
+                        next.setStack(stack);
+                    else next.discard();
+                    ContainerItem.playInsertSound(player, 1);
+                } else next.setPickupDelay(0);
+            } else if (tickCounter % 2 == 0) queue.forEach(itemEntity ->
+                    itemEntity.setPos(player.getX(), player.getY(), player.getZ())
+            );
         }
     }
 }

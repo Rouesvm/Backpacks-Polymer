@@ -1,4 +1,4 @@
-package com.rouesvm.servback.content.registry;
+package com.rouesvm.servback.registry;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.polymer.core.api.other.PolymerComponent;

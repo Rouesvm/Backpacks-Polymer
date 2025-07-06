@@ -1,4 +1,4 @@
-package com.rouesvm.servback.content.registry.item;
+package com.rouesvm.servback.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;

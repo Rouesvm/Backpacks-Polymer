@@ -1,8 +1,8 @@
-package com.rouesvm.servback.content.registry.item;
+package com.rouesvm.servback.registry.item;
 
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
-import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
+import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.inventory.Inventory;
@@ -16,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 public class BackpackItemRegistry {
     public static Item ENDER_BACKPACK;
     public static Item GLOBAL_BACKPACK;
+
+    public static Item MAGNET_UPGRADE;
 
     public static <T extends BasicPolymerBlockItem> T register(T item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);

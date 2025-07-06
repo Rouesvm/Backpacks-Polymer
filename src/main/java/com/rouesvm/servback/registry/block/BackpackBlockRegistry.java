@@ -1,4 +1,4 @@
-package com.rouesvm.servback.content.registry.block;
+package com.rouesvm.servback.registry.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;

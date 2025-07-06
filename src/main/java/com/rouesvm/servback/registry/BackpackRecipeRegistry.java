@@ -1,4 +1,4 @@
-package com.rouesvm.servback.content.registry;
+package com.rouesvm.servback.registry;
 
 import com.rouesvm.servback.technical.crafting.BackpackRecipe;
 import net.minecraft.recipe.Recipe;

@@ -1,4 +1,4 @@
-package com.rouesvm.servback.technical.crafting;
+package com.rouesvm.servback.technical.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;

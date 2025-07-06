@@ -1,6 +1,6 @@
 package com.rouesvm.servback.registry;
 
-import com.rouesvm.servback.technical.crafting.BackpackRecipe;
+import com.rouesvm.servback.technical.recipe.BackpackRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.input.RecipeInput;

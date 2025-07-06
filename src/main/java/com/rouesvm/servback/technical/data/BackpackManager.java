@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.state.BackpackState;
 import com.rouesvm.servback.technical.data.state.GlobalBackpackState;

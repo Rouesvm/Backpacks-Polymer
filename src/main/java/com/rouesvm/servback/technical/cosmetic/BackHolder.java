@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.cosmetic;
 
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
+import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;

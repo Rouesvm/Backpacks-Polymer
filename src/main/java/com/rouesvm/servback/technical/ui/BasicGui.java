@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.ui;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.inventory.Inventory;

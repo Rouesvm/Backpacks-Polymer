@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.block;
 
-import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
-import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
+import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
+import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;

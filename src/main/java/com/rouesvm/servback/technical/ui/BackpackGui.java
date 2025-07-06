@@ -1,6 +1,6 @@
 package com.rouesvm.servback.technical.ui;
 
-import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;

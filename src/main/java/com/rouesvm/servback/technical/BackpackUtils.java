@@ -1,6 +1,8 @@
-package com.rouesvm.servback.technical.data;
+package com.rouesvm.servback.technical;
 
 import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;

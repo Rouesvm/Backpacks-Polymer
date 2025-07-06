@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
-import com.rouesvm.servback.technical.data.BackpackUtils;
+import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
 import net.minecraft.advancement.criterion.Criteria;

@@ -1,10 +1,10 @@
 package com.rouesvm.servback.technical.ui;
 
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
-import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;

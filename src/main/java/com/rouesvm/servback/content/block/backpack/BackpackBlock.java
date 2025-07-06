@@ -7,9 +7,9 @@ import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
+import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
-import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import net.minecraft.block.Block;
@@ -29,7 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import static com.rouesvm.servback.technical.data.BackpackUtils.resize;
+import static com.rouesvm.servback.technical.BackpackUtils.resize;
 
 public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
     public static final EnumProperty<DyeColor> DYE_COLOR = EnumProperty.of("dye_color", DyeColor.class);

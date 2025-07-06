@@ -1,6 +1,7 @@
 package com.rouesvm.servback.registry;
 
 import com.mojang.serialization.Codec;
+import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
 import net.minecraft.component.ComponentType;
 import net.minecraft.network.codec.PacketCodecs;
@@ -14,19 +15,24 @@ import java.util.UUID;
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class BackpackDataComponentTypes {
-    public static final ComponentType<Boolean> BOOLEAN_TYPE = register(
-            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN).build(),
-            "boolean"
-    );
-
     public static final ComponentType<UUID> BACKPACK_UUID_TYPE = register(
             ComponentType.<UUID>builder().codec(Uuids.CODEC).packetCodec(Uuids.PACKET_CODEC).build(),
             "backpack_uuid"
     );
 
+    public static final ComponentType<UpgradeContainerComponent> UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE = register(
+            ComponentType.<UpgradeContainerComponent>builder().codec(UpgradeContainerComponent.CODEC).packetCodec(UpgradeContainerComponent.PACKET_CODEC).build(),
+            "upgrade_container"
+    );
+
     public static final ComponentType<String> UUID_TYPE = register(
             ComponentType.<String>builder().codec(Codec.STRING).packetCodec(PacketCodecs.STRING).build(),
             "uuid"
+    );
+
+    public static final ComponentType<Boolean> BOOLEAN_TYPE = register(
+            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN).build(),
+            "boolean"
     );
 
     private static <T> ComponentType<T> register(ComponentType<T> type, String name) {
@@ -35,6 +41,5 @@ public class BackpackDataComponentTypes {
         return registry;
     }
 
-    @SuppressWarnings("EmptyMethod")
     public static void initialize() {}
 }

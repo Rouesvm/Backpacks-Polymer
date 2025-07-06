@@ -20,7 +20,10 @@ public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, Pol
     private final Item vanillaItem;
 
     public BasicPolymerBlockItem(String name, Item vanillaItem, Block block) {
-        super(block, new Settings().maxCount(1).registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name))));
+        super(block, new Settings()
+                .maxCount(1)
+                .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name)))
+        );
         this.id = Identifier.of(ServerBackpacks.MOD_ID, name);
         this.vanillaItem = vanillaItem;
     }

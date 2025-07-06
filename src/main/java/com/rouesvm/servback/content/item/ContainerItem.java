@@ -2,21 +2,26 @@ package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
-import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
+import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
+import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
-import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -75,6 +80,16 @@ public class ContainerItem extends BundleGuiItem {
 
         if (capacityAmount - capacityMaxShow > 0) {
             tooltip.add(Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow).formatted(Formatting.ITALIC).formatted(Formatting.GOLD));
+        }
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
+        if (entity instanceof ServerPlayerEntity player) {
+            UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE);
+            if (component != null) {
+                component.baseUpgrades.forEach((upgrade) -> upgrade.tick(player, (BackpackInventory) getInventory(player, stack)));
+            }
         }
     }
 

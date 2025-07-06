@@ -20,10 +20,13 @@ public class BackpackManager {
     public final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
     private boolean loaded = false;
+    public MinecraftServer server;
 
     public static void setup(MinecraftServer server) {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.setup();
         instance = new BackpackManager();
+        instance.server = server;
+
         load(server);
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");

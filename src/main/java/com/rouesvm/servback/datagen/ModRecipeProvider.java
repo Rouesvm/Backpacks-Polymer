@@ -4,6 +4,7 @@ import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.recipe.BackpackRecipeJsonBuilder;
+import com.rouesvm.servback.technical.recipe.BackpackUpgradeRecipeJsonBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
@@ -98,6 +99,14 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('S', Items.SHULKER_SHELL)
                 .input('0', Ingredient.ofTag(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "large_backpack")));
+
+        BackpackUpgradeRecipeJsonBuilder.create(
+                Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
+                Ingredient.ofItem(BackpackItemRegistry.MAGNET_UPGRADE),
+                RecipeCategory.TOOLS,
+                BackpackItemJsonRegistry.getBackpackByOrder(1))
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
+                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "upgrade_backpack")));
 
         dyedBackpackRecipes(itemWrap, exporter);
     }

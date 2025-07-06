@@ -22,7 +22,7 @@ public class BackpackRecipe extends ShapedRecipe {
     public final RawShapedRecipe raw;
     public final ItemStack result;
 
-    public static Serializer BACKPACK_CRAFTING = new Serializer();
+    public static Serializer SERIALIZER = new Serializer();
 
     public BackpackRecipe(String group, CraftingRecipeCategory category, RawShapedRecipe raw, ItemStack result, boolean showNotification) {
         super(group, category, raw, result, showNotification);
@@ -31,7 +31,7 @@ public class BackpackRecipe extends ShapedRecipe {
     }
 
     public RecipeSerializer<? extends ShapedRecipe> getSerializer() {
-        return BACKPACK_CRAFTING;
+        return SERIALIZER;
     }
 
     @Override

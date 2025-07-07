@@ -18,19 +18,17 @@ public class BackpackGeyserItem {
                     Identifier identifier = entry.getKey().getValue();
                     String stringIdentifier = identifier.toString();
 
-                    NonVanillaCustomItemData customItemData = NonVanillaCustomItemData.builder()
+                    NonVanillaCustomItemData.Builder customItemData = NonVanillaCustomItemData.builder()
                             .displayName(Text.translatable(item.getTranslationKey()).getString())
                             .name(identifier.getPath())
                             .javaId(id)
-                            .stackSize(1)
                             .identifier(stringIdentifier)
                             .allowOffhand(true)
                             .displayHandheld(true)
                             .icon(stringIdentifier)
-                            .creativeCategory(3)
-                            .build();
+                            .creativeCategory(3);
 
-                    event.register(customItemData);
+                    event.register(customItemData.build());
                 });
     }
 }

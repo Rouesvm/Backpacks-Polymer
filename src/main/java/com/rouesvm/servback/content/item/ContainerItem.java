@@ -3,6 +3,7 @@ package com.rouesvm.servback.content.item;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.upgrade.BaseUpgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
@@ -57,12 +58,33 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
-        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(polymerStack);
+        UUID uuid = polymerStack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
+        if (ServerBackpacks.isDevEnvironment)
+            if (uuid != null) tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
 
+        addUpgradeTooltip(tooltip, polymerStack);
+        addInventoryTooltip(tooltip, polymerStack);
+    }
+
+    public static void addUpgradeTooltip(List<Text> tooltip, ItemStack stack) {
+        UpgradeContainerComponent upgradeContainer = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE);
+        if (upgradeContainer == null) return;
+        if (upgradeContainer.baseUpgrades.isEmpty()) return;
+
+        tooltip.add(Text.translatable("tooltip.serverbackpacks.upgrades").append(":").formatted(Formatting.GRAY));
+
+        for (BaseUpgrade upgrade : upgradeContainer.baseUpgrades) {
+            tooltip.add(Text.literal(" ").append(upgrade.toTranslationKey())
+                    .formatted(Formatting.DARK_GREEN)
+            );
+        }
+    }
+
+    public static void addInventoryTooltip(List<Text> tooltip, ItemStack stack) {
+        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(stack);
         if (itemList.isEmpty()) return;
 
-        if (ServerBackpacks.isDevEnvironment)
-            tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
+        tooltip.add(Text.translatable("tooltip.serverbackpacks.contains").append(":").formatted(Formatting.GRAY));
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;
@@ -74,12 +96,19 @@ public class ContainerItem extends BundleGuiItem {
 
             if (capacityMaxShow <= 4) {
                 capacityMaxShow++;
-                tooltip.add(Text.translatable("item.container.item_count", itemStack.getName(), itemStack.getCount()).formatted(Formatting.GOLD));
+                tooltip.add(Text.literal(" ")
+                        .append(Text.translatable(
+                                "item.container.item_count",
+                                itemStack.getName(),
+                                itemStack.getCount()
+                        )).formatted(Formatting.DARK_AQUA)
+                );
             }
         }
 
         if (capacityAmount - capacityMaxShow > 0) {
-            tooltip.add(Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow).formatted(Formatting.ITALIC).formatted(Formatting.GOLD));
+            tooltip.add(Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
+                    .formatted(Formatting.ITALIC).formatted(Formatting.DARK_AQUA));
         }
     }
 

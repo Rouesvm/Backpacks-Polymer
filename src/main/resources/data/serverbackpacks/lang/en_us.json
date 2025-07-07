@@ -69,5 +69,10 @@
   "command.serverbackpacks.reset": "Config has been reset!",
   "command.serverbackpacks.reload": "Config has been reloaded!",
   "command.serverbackpacks.save": "Config has been saved!",
-  "command.serverbackpacks.backup": "Backup created."
+  "command.serverbackpacks.backup": "Backup created.",
+
+  "tooltip.serverbackpacks.upgrades": "Upgrades",
+  "tooltip.serverbackpacks.contains": "Contains",
+
+  "upgrade.serverbackpacks.magnet": "Magnet"
 }

@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.component.DataComponentTypes;
@@ -31,7 +32,7 @@ public class BackpackRecipe extends ShapedRecipe {
     }
 
     public RecipeSerializer<? extends ShapedRecipe> getSerializer() {
-        return SERIALIZER;
+        return BackpackRecipeRegistry.BACKPACK_CRAFTING_RECIPE;
     }
 
     @Override

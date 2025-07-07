@@ -6,6 +6,7 @@ import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.item.UpgradeBaseItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.RegistryByteBuf;
@@ -76,7 +77,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     }
 
     public RecipeSerializer<BackpackUpgradeRecipe> getSerializer() {
-        return SERIALIZER;
+        return BackpackRecipeRegistry.BACKPACK_UPGRADE_RECIPE;
     }
 
     public IngredientPlacement getIngredientPlacement() {

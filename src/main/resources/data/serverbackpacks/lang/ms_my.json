@@ -14,6 +14,7 @@
   "item.serverbackpacks.white_small": "Beg Putih Kecil",
   "item.serverbackpacks.light_gray_small": "Beg Kelabu Muda Kecil",
   "item.serverbackpacks.black_small": "Beg Hitam Kecil",
+  "item.serverbackpacks.gray_small": "Beg Kelabu Kecil",
 
   "item.serverbackpacks.medium" : "Beg Sederhana",
   "item.serverbackpacks.red_medium": "Beg Merah Sederhana",
@@ -30,6 +31,7 @@
   "item.serverbackpacks.white_medium": "Beg Putih Sederhana",
   "item.serverbackpacks.light_gray_medium": "Beg Kelabu Muda Sederhana",
   "item.serverbackpacks.black_medium": "Beg Hitam Sederhana",
+  "item.serverbackpacks.gray_medium": "Beg Kelabu Sederhana",
 
   "item.serverbackpacks.large" : "Beg Besar",
   "item.serverbackpacks.red_large": "Beg Merah Besar",
@@ -46,6 +48,7 @@
   "item.serverbackpacks.white_large": "Beg Putih Besar",
   "item.serverbackpacks.light_gray_large": "Beg Kelabu Muda Besar",
   "item.serverbackpacks.black_large": "Beg Hitam Besar",
+  "item.serverbackpacks.gray_large": "Beg Kelabu Besar",
 
   "item.serverbackpacks.global" : "Beg Global",
   "item.serverbackpacks.ender" : "Beg Ender",
@@ -53,5 +56,22 @@
   "item.serverbackpacks.gui_backpacks" : "Beg",
   "item.serverbackpacks.gui_backpack" : "Beg",
 
-  "enchantment.serverbackpacks.capacity" : "Kapasiti"
+  "enchantment.serverbackpacks.capacity" : "Kapasiti",
+
+  "block.serverbackpacks.backpack": "Beg",
+  "block.serverbackpacks.global_backpack": "Beg Global",
+  "block.serverbackpacks.ender_backpack": "Beg Ender",
+
+  "command.serverbackpacks.empty": "Nilai yang dimasukkan adalah kosong!",
+  "command.serverbackpacks.incorrect_uuid": "UUID tidak wujud atau tidak ditemui!",
+  "command.serverbackpacks.list": "Senarai instance backpack yang disimpan:",
+  "command.serverbackpacks.reset": "Konfig telah ditetapkan semula!",
+  "command.serverbackpacks.reload": "Konfig telah dimuat semula!",
+  "command.serverbackpacks.save": "Konfig telah disimpan!",
+  "command.serverbackpacks.backup": "Sandaran berjaya dibuat.",
+
+  "tooltip.serverbackpacks.upgrades": "Naik Taraf",
+  "tooltip.serverbackpacks.contains": "Kandungan",
+
+  "upgrade.serverbackpacks.magnet": "Magnet"
 }

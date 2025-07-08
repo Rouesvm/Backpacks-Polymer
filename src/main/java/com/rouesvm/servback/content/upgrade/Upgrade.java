@@ -1,16 +1,17 @@
 package com.rouesvm.servback.content.upgrade;
 
 import com.rouesvm.servback.ServerBackpacks;
+import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class BaseUpgrade implements TickingUpgrade {
+public class Upgrade implements TickingUpgrade {
     public Identifier id;
 
-    public BaseUpgrade(String name) {
+    public Upgrade(String name) {
         this.id = Identifier.of(ServerBackpacks.MOD_ID, name);
     }
 
@@ -23,11 +24,9 @@ public class BaseUpgrade implements TickingUpgrade {
         return id.toString();
     }
 
-    public void readView(ReadView data) {
+    public void readView(ReadView data) {}
 
-    }
+    public void writeView(WriteView data) {}
 
-    public void writeView(WriteView data) {
-
-    }
+    public SimpleGui openGui() {return null;}
 }

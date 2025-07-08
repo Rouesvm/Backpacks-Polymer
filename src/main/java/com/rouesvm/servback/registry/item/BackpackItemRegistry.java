@@ -3,7 +3,7 @@ package com.rouesvm.servback.registry.item;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
-import com.rouesvm.servback.content.item.UpgradeBaseItem;
+import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
@@ -23,7 +23,7 @@ public class BackpackItemRegistry {
     public static Item ENDER_BACKPACK;
     public static Item GLOBAL_BACKPACK;
 
-    public static Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeBaseItem(new Item.Settings()
+    public static Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(new Item.Settings()
             .maxCount(1)
             .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, "magnet_upgrade"))
             ), BackpackUpgradeRegistry.MAGNET_UPGRADE)

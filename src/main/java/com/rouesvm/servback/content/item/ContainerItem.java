@@ -3,7 +3,7 @@ package com.rouesvm.servback.content.item;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
-import com.rouesvm.servback.content.upgrade.BaseUpgrade;
+import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
@@ -76,7 +76,7 @@ public class ContainerItem extends BundleGuiItem {
                 .formatted(Formatting.GRAY)
         );
 
-        for (BaseUpgrade upgrade : upgradeContainer.baseUpgrades) {
+        for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
             tooltip.add(Text.literal(" ")
                     .append(upgrade.toTranslationKey())
                     .formatted(Formatting.DARK_GREEN)

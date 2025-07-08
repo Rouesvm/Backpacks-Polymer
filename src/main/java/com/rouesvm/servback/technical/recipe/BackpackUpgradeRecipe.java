@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.content.item.UpgradeBaseItem;
+import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import net.minecraft.item.ItemStack;
@@ -44,7 +44,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
         ItemStack base = smithingRecipeInput.base();
         ItemStack addition = smithingRecipeInput.addition();
         if (base.getItem() instanceof ContainerItem) {
-            if (addition.getItem() instanceof UpgradeBaseItem upgradeBaseItem) {
+            if (addition.getItem() instanceof UpgradeItem upgradeBaseItem) {
                 UpgradeContainerComponent component = base.getOrDefault(
                         BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE,
                         UpgradeContainerComponent.of(new ArrayList<>())

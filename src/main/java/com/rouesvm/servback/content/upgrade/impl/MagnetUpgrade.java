@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.upgrade.impl;
 
 import com.rouesvm.servback.content.item.ContainerItem;
-import com.rouesvm.servback.content.upgrade.BaseUpgrade;
+import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class MagnetUpgrade extends BaseUpgrade {
+public class MagnetUpgrade extends Upgrade {
     public int tickCounter = 0;
 
     public final Queue<ItemEntity> queue = new LinkedList<>();

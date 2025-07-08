@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.component;
 
 import com.mojang.serialization.Codec;
-import com.rouesvm.servback.content.upgrade.BaseUpgrade;
+import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import io.netty.buffer.ByteBuf;
@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 public class UpgradeContainerComponent {
-    public List<BaseUpgrade> baseUpgrades;
+    public List<Upgrade> baseUpgrades;
 
-    public UpgradeContainerComponent(List<BaseUpgrade> baseUpgrades) {
+    public UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
         this.baseUpgrades = baseUpgrades;
     }
 
-    public static UpgradeContainerComponent of(List<BaseUpgrade> baseUpgrades) {
+    public static UpgradeContainerComponent of(List<Upgrade> baseUpgrades) {
         return new UpgradeContainerComponent(baseUpgrades);
     }
 
@@ -33,7 +33,7 @@ public class UpgradeContainerComponent {
         @Override
         public void encode(ByteBuf buf, UpgradeContainerComponent value) {
             buf.writeInt(value.baseUpgrades.size());
-            for (BaseUpgrade upgrade : value.baseUpgrades) {
+            for (Upgrade upgrade : value.baseUpgrades) {
                 Identifier id = upgrade.id;
                 NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
                 upgrade.writeView(data);
@@ -47,9 +47,9 @@ public class UpgradeContainerComponent {
         @Override
         public UpgradeContainerComponent decode(ByteBuf buf) {
             int size = buf.readInt();
-            List<BaseUpgrade> upgrades = new ArrayList<>();
+            List<Upgrade> upgrades = new ArrayList<>();
             for (int i = 0; i < size; i++) {
-                BaseUpgrade upgrade = BackpackUpgradeRegistry.UPGRADES.get(readIdentifier(buf));
+                Upgrade upgrade = BackpackUpgradeRegistry.UPGRADES.get(readIdentifier(buf));
                 NbtCompound data = readView(buf);
                 if (upgrade != null) {
                     upgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
@@ -63,12 +63,12 @@ public class UpgradeContainerComponent {
     public static final Codec<UpgradeContainerComponent> CODEC =
             Codec.unboundedMap(Codec.STRING, NbtCompound.CODEC).xmap(
                     map -> {
-                        List<BaseUpgrade> upgrades = new ArrayList<>();
+                        List<Upgrade> upgrades = new ArrayList<>();
                         for (Map.Entry<String, NbtCompound> entry : map.entrySet()) {
                             Identifier id = Identifier.tryParse(entry.getKey());
                             NbtCompound data = entry.getValue();
                             if (id != null && data != null) {
-                                BaseUpgrade upgrade = BackpackUpgradeRegistry.UPGRADES.get(id);
+                                Upgrade upgrade = BackpackUpgradeRegistry.UPGRADES.get(id);
                                 if (upgrade != null) {
                                     upgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
                                     upgrades.add(upgrade);
@@ -79,7 +79,7 @@ public class UpgradeContainerComponent {
                     },
                     upgradeContainer -> {
                         Map<String, NbtCompound> out = new HashMap<>();
-                        for (BaseUpgrade upgrade : upgradeContainer.baseUpgrades) {
+                        for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
                             NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
                             upgrade.writeView(data);
                             out.put(upgrade.id.toString(), data.getNbt());

@@ -41,7 +41,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     public ItemStack craft(SmithingRecipeInput smithingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup) {
         ItemStack resultStack = this.result.apply(smithingRecipeInput.base());
 
-        ItemStack base = smithingRecipeInput.base();
+        ItemStack base = smithingRecipeInput.base().copy();
         ItemStack addition = smithingRecipeInput.addition();
         if (base.getItem() instanceof ContainerItem) {
             if (addition.getItem() instanceof UpgradeItem upgradeBaseItem) {
@@ -53,7 +53,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
                 component.baseUpgrades.add(upgradeBaseItem.getUpgrade());
                 base.set(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE, component);
 
-                resultStack = base.copy();
+                resultStack = base;
             }
         }
 

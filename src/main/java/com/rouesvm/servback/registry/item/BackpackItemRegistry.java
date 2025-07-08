@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ public class BackpackItemRegistry {
 
     public static Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeBaseItem(new Item.Settings()
             .maxCount(1)
-            .registryKey(RegistryKey.of(Registries.ITEM.getKey(), Identifier.of(ServerBackpacks.MOD_ID, "magnet_upgrade"))
+            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, "magnet_upgrade"))
             ), BackpackUpgradeRegistry.MAGNET_UPGRADE)
     );
 

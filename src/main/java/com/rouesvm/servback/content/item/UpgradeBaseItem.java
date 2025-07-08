@@ -8,7 +8,7 @@ public class UpgradeBaseItem extends SimplePolymerItem {
     public BaseUpgrade upgrade;
 
     public UpgradeBaseItem(Settings settings, BaseUpgrade upgrade) {
-        super(settings, Items.POISONOUS_POTATO);
+        super(settings, Items.POISONOUS_POTATO, true);
         this.upgrade = upgrade;
     }
 

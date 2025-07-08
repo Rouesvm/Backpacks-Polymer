@@ -71,10 +71,14 @@ public class ContainerItem extends BundleGuiItem {
         if (upgradeContainer == null) return;
         if (upgradeContainer.baseUpgrades.isEmpty()) return;
 
-        tooltip.add(Text.translatable("tooltip.serverbackpacks.upgrades").append(":").formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("tooltip.serverbackpacks.upgrades")
+                .append(":")
+                .formatted(Formatting.GRAY)
+        );
 
         for (BaseUpgrade upgrade : upgradeContainer.baseUpgrades) {
-            tooltip.add(Text.literal(" ").append(upgrade.toTranslationKey())
+            tooltip.add(Text.literal(" ")
+                    .append(upgrade.toTranslationKey())
                     .formatted(Formatting.DARK_GREEN)
             );
         }
@@ -84,7 +88,10 @@ public class ContainerItem extends BundleGuiItem {
         DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(stack);
         if (itemList.isEmpty()) return;
 
-        tooltip.add(Text.translatable("tooltip.serverbackpacks.contains").append(":").formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("tooltip.serverbackpacks.contains")
+                .append(":")
+                .formatted(Formatting.GRAY)
+        );
 
         int capacityMaxShow = 0;
         int capacityAmount = 0;

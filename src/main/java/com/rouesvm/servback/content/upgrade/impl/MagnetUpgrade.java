@@ -57,7 +57,6 @@ public class MagnetUpgrade extends Upgrade {
     @Override
     public void tick(ServerPlayerEntity player, BackpackInventory inventory) {
         if (inventory == null) return;
-        if (inventory.isEmpty()) return;
 
         ServerWorld world = player.getWorld();
 

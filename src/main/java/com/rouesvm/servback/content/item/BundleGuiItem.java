@@ -1,8 +1,9 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.BackpackUtils;
-import com.rouesvm.servback.technical.ui.BasicGui;
+import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
@@ -97,8 +98,14 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         var cast = player.raycast(5,0,false);
         if (!(player instanceof ServerPlayerEntity serverPlayer))
             return ActionResult.PASS;
-        if (player.isSneaking())
+
+        if (player.isSneaking()) {
+            if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null) {
+
+            }
             return ActionResult.PASS;
+        }
+
         if (cast.getType() == HitResult.Type.BLOCK)
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
@@ -203,6 +210,6 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        new BasicGui(player, stack, getInventory(player, stack));
+        new BasicInventoryGui(player, stack, getInventory(player, stack));
     }
 }

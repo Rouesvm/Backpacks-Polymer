@@ -47,7 +47,7 @@ public class BackpackRecipe extends ShapedRecipe {
 
             ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackByOrder(id, order + 1).getDefaultStack();
             upgradeStack = upgradeStack.copy();
-            upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, BackpackManager.getStackUUID(stack));
+            upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackManager.getStackUUID(stack));
             upgradeStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
 
             resultStack = upgradeStack;

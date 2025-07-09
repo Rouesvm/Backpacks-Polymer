@@ -14,7 +14,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -30,6 +32,7 @@ public class MagnetUpgrade extends Upgrade {
     private final Queue<ItemEntity> queue = new LinkedList<>();
 
     public List<Item> list = new ArrayList<>(MAX_SIZE);
+    public MODE mode = MODE.BLACKLIST;
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);
@@ -40,10 +43,26 @@ public class MagnetUpgrade extends Upgrade {
     }
 
     @Override
-    public void addTooltip(List<Text> tooltip, ItemStack stack) {
+    public void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
         if (stack.isOf(MAGNET_UPGRADE)) {
+            tooltip.add(Text.translatable("tooltip.serverbackpacks.mode")
+                    .append(": ")
+                    .formatted(Formatting.GRAY)
+                    .append(Text.of(mode.toString())
+                            .copy()
+                            .formatted(Formatting.GREEN)
+                    )
+            );
+
             if (this.list.isEmpty()) return;
-            for (Item item : this.list) tooltip.add(item.getName());
+
+            tooltip.add(Text.translatable("tooltip.serverbackpacks.contains").formatted(Formatting.GRAY));
+            for (Item item : this.list) tooltip.add(
+                    Text.literal(" ")
+                            .append(item.getName())
+                            .copy()
+                            .formatted(Formatting.DARK_AQUA)
+            );
         }
     }
 
@@ -106,5 +125,10 @@ public class MagnetUpgrade extends Upgrade {
                 item.setPickupDelay(20);
             }
         }
+    }
+
+    public enum MODE {
+        BLACKLIST,
+        WHITELIST
     }
 }

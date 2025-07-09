@@ -8,7 +8,7 @@ import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BlockHolder;
-import com.rouesvm.servback.technical.ui.BasicGui;
+import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.BlockEntityProvider;
@@ -143,7 +143,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     }
 
     public void openGui(ServerPlayerEntity player, BlockEntity entity) {
-        new BasicGui(player, null, getInventory(player, entity));
+        new BasicInventoryGui(player, null, getInventory(player, entity));
     }
 
     public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {

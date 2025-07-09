@@ -63,7 +63,7 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
 
         ItemStack stack = super.getDefaultStack().copy();
         stack.addEnchantment(capacity, extraSize / 9);
-        stack.set(BackpackDataComponentTypes.BACKPACK_UUID_TYPE, uuid);
+        stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
 
         BackpackUtils.addCustomData((ServerWorld) world, stack);
 

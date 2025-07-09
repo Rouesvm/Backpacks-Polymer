@@ -87,7 +87,7 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
         upgrade.setList(uniqueItems);
 
         UpgradeContainerComponent component = new UpgradeContainerComponent(List.of(upgrade));
-        result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE, component);
+        result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
 
         return result;
     }

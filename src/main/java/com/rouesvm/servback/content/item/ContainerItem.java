@@ -58,7 +58,7 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
-        UUID uuid = polymerStack.get(BackpackDataComponentTypes.BACKPACK_UUID_TYPE);
+        UUID uuid = polymerStack.get(BackpackDataComponentTypes.BACKPACK_UUID);
         if (ServerBackpacks.isDevEnvironment)
             if (uuid != null) tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
 
@@ -67,7 +67,7 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public static void addUpgradeTooltip(List<Text> tooltip, ItemStack stack) {
-        UpgradeContainerComponent upgradeContainer = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE);
+        UpgradeContainerComponent upgradeContainer = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
         if (upgradeContainer == null) return;
         if (upgradeContainer.baseUpgrades.isEmpty()) return;
 
@@ -122,7 +122,7 @@ public class ContainerItem extends BundleGuiItem {
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
         if (entity instanceof ServerPlayerEntity player) {
-            UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE);
+            UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) {
                 component.baseUpgrades.forEach((upgrade) -> upgrade.tick(player, (BackpackInventory) getInventory(player, stack)));
             }

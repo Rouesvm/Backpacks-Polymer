@@ -7,6 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -20,5 +21,5 @@ public interface FunctionalUpgrade {
 
     default void tick(ServerPlayerEntity player, BackpackInventory inventory) {};
 
-    default void addTooltip(List<Text> tooltip, ItemStack stack) {}
+    default void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {}
 }

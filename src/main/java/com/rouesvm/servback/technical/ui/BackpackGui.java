@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class BackpackGui extends BasicGui {
+public class BackpackGui extends BasicInventoryGui {
     private boolean markDirty = false;
     protected final BackpackInstance instance;
     protected BackpackInstance frozenInstance;
@@ -52,7 +52,7 @@ public class BackpackGui extends BasicGui {
             if (!before.equals(after)) BackpackDataSaver.createBackup(player.getServer());
         }
 
-        if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);
+        if (stack != null) stack.set(BackpackDataComponentTypes.IS_OPENED, false);
 
         ScreenHandler handler = getPlayer().currentScreenHandler;
         handler.enableSyncing();

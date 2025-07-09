@@ -15,22 +15,22 @@ import java.util.UUID;
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class BackpackDataComponentTypes {
-    public static final ComponentType<UUID> BACKPACK_UUID_TYPE = register(
-            ComponentType.<UUID>builder().codec(Uuids.CODEC).packetCodec(Uuids.PACKET_CODEC).build(),
-            "backpack_uuid"
-    );
-
-    public static final ComponentType<UpgradeContainerComponent> UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE = register(
+    public static final ComponentType<UpgradeContainerComponent> UPGRADE_CONTAINER = register(
             ComponentType.<UpgradeContainerComponent>builder().codec(UpgradeContainerComponent.CODEC).packetCodec(UpgradeContainerComponent.PACKET_CODEC).build(),
             "upgrade_container"
     );
 
-    public static final ComponentType<String> UUID_TYPE = register(
+    public static final ComponentType<UUID> BACKPACK_UUID = register(
+            ComponentType.<UUID>builder().codec(Uuids.CODEC).packetCodec(Uuids.PACKET_CODEC).build(),
+            "backpack_uuid"
+    );
+
+    public static final ComponentType<String> STRING_UUID = register(
             ComponentType.<String>builder().codec(Codec.STRING).packetCodec(PacketCodecs.STRING).build(),
             "uuid"
     );
 
-    public static final ComponentType<Boolean> BOOLEAN_TYPE = register(
+    public static final ComponentType<Boolean> IS_OPENED = register(
             ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN).build(),
             "boolean"
     );

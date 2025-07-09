@@ -73,6 +73,7 @@
 
   "tooltip.serverbackpacks.upgrades": "Upgrades",
   "tooltip.serverbackpacks.contains": "Contains",
+  "tooltip.serverbackpacks.mode": "Mode",
 
   "upgrade.serverbackpacks.magnet": "Magnet"
 }

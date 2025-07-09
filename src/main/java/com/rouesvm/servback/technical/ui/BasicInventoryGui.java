@@ -12,7 +12,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-public class BasicGui extends SimpleGui {
+public class BasicInventoryGui extends SimpleGui {
     protected final ItemStack stack;
     protected final Inventory inventory;
 
@@ -21,7 +21,7 @@ public class BasicGui extends SimpleGui {
 
     private final int slots;
 
-    public BasicGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
+    public BasicInventoryGui(ServerPlayerEntity player, ItemStack stack, Inventory inventory) {
         super(getHandler(inventory.size()), player, false);
 
         this.stack = stack;
@@ -32,7 +32,7 @@ public class BasicGui extends SimpleGui {
         Text title = Text.translatable("item.serverbackpacks.gui_backpack");
 
         if (this.stack != null) {
-            stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, true);
+            stack.set(BackpackDataComponentTypes.IS_OPENED, true);
             title = title.copy()
                     .append(" (")
                     .append(stack.getName())

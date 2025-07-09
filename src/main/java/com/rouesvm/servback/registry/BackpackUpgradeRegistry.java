@@ -12,7 +12,7 @@ import java.util.Map;
 public class BackpackUpgradeRegistry {
     private static final Map<Identifier, UpgradeType<?>> REGISTRY = new HashMap<>();
 
-    public static final UpgradeType<MagnetUpgrade> MAGNET = register("magnet", MagnetUpgrade::new);;
+    public static final UpgradeType<MagnetUpgrade> MAGNET = register("magnet", MagnetUpgrade::new);
 
     public static <T extends Upgrade> UpgradeType<T> register(String name, UpgradeType.UpgradeFactory<T> factory) {
         Identifier id = Identifier.of(ServerBackpacks.MOD_ID, name);

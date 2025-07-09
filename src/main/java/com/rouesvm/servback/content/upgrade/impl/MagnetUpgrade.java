@@ -33,8 +33,8 @@ public class MagnetUpgrade extends Upgrade {
     private int tickCounter = 0;
     private final Queue<ItemEntity> queue = new LinkedList<>();
 
-    public List<Item> list = new ArrayList<>(MAX_SIZE);
-    public MODE mode = MODE.BLACKLIST;
+    private List<Item> list = new ArrayList<>(MAX_SIZE);
+    private MODE mode = MODE.BLACKLIST;
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);
@@ -42,6 +42,14 @@ public class MagnetUpgrade extends Upgrade {
 
     public void setList(List<Item> list) {
         this.list = list;
+    }
+
+    public MODE getMode() {
+        return mode;
+    }
+
+    public void setMode(MODE mode) {
+        this.mode = mode;
     }
 
     @Override

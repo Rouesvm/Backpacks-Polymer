@@ -17,10 +17,13 @@ import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
     public static final RecipeSerializer<MagnetFilterUpgradeRecipe> SERIALIZER = new MagnetFilterUpgradeRecipe.Serializer(MagnetFilterUpgradeRecipe::new);
@@ -31,52 +34,76 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
 
     @Override
     public boolean matches(CraftingRecipeInput input, World world) {
-        if (input.getStackCount() == 0) return false;
+        if (input.isEmpty()) return false;
+        if (input.getStackCount() > MagnetUpgrade.MAX_SIZE + 1) return false;
 
         int magnetCount = 0;
-        int count = 0;
-        for (int i = 0; i < input.getStackCount(); i++) {
-            ItemStack stack = input.getStackInSlot(i);
-            if (stack.getItem() instanceof UpgradeItem) magnetCount++;
-            if (!stack.isEmpty()) count++;
+        Set<Item> seenItems = new HashSet<>();
+
+        for (ItemStack stack : input.getStacks()) {
+            if (stack.isEmpty()) continue;
+
+            Item item = stack.getItem();
+
+            if (item instanceof UpgradeItem) {
+                magnetCount++;
+                continue;
+            }
+
+            if (!seenItems.add(item)) return false;
         }
 
-        return count > 0 && count <= 4 && magnetCount == 1;
+        int totalItems = seenItems.size();
+
+        return totalItems > 0
+                && totalItems <= MagnetUpgrade.MAX_SIZE
+                && magnetCount == 1;
     }
 
     @Override
     public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
         ItemStack center = ItemStack.EMPTY;
-        ItemStack result = ItemStack.EMPTY;
+        List<Item> uniqueItems = new ArrayList<>();
 
-        List<Item> list = new ArrayList<>();
-
-        int size = 0;
-        for (int i = 0; i < input.getStackCount() && size < 4; i++) {
-            ItemStack stack = input.getStackInSlot(i);
+        for (ItemStack stack : input.getStacks()) {
+            if (uniqueItems.size() > MagnetUpgrade.MAX_SIZE) break;
 
             if (stack.isEmpty()) continue;
+
             if (stack.isOf(BackpackItemRegistry.MAGNET_UPGRADE)) {
                 center = stack;
                 continue;
             }
 
-            list.add(stack.getItem());
-            size++;
+            Item item = stack.getItem();
+            if (!uniqueItems.contains(item)) uniqueItems.add(item);
         }
 
-        if (size != 0) {
-            result = center.copy();
-            MagnetUpgrade newUpgrade = BackpackUpgradeRegistry.MAGNET.create();
-            newUpgrade.setList(list);;
-            UpgradeContainerComponent component = new UpgradeContainerComponent(List.of(newUpgrade));
+        if (uniqueItems.isEmpty() || center.isEmpty()) return ItemStack.EMPTY;
 
-            result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE, component);
+        ItemStack result = center.copy();
 
-            return result;
-        }
+        MagnetUpgrade upgrade = BackpackUpgradeRegistry.MAGNET.create();
+        upgrade.setList(uniqueItems);
+
+        UpgradeContainerComponent component = new UpgradeContainerComponent(List.of(upgrade));
+        result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE, component);
 
         return result;
+    }
+
+    @Override
+    public DefaultedList<ItemStack> getRecipeRemainders(CraftingRecipeInput input) {
+        DefaultedList<ItemStack> remainders = DefaultedList.ofSize(input.size(), ItemStack.EMPTY);
+
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getStackInSlot(i);
+            if (stack.isOf(BackpackItemRegistry.MAGNET_UPGRADE)) continue;
+
+            remainders.set(i, stack.copy());
+        }
+
+        return remainders;
     }
 
     @Override

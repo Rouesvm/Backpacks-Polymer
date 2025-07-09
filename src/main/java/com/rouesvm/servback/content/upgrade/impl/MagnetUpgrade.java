@@ -24,10 +24,12 @@ import java.util.Queue;
 import static com.rouesvm.servback.registry.item.BackpackItemRegistry.MAGNET_UPGRADE;
 
 public class MagnetUpgrade extends Upgrade {
+    public static final int MAX_SIZE = 5;
+
     private int tickCounter = 0;
     private final Queue<ItemEntity> queue = new LinkedList<>();
 
-    public List<Item> list = new ArrayList<>();
+    public List<Item> list = new ArrayList<>(MAX_SIZE);
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);
@@ -59,7 +61,6 @@ public class MagnetUpgrade extends Upgrade {
         for(int i = 0; i < list.size(); ++i) {
             ItemStack itemStack = list.get(i).getDefaultStack();
             if (!itemStack.isEmpty()) {
-                System.out.println(list);
                 listAppender.add(new StackWithSlot(i, itemStack));
             }
         }

@@ -20,8 +20,19 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class BackpackItemRegistry {
-    public static Item ENDER_BACKPACK;
-    public static Item GLOBAL_BACKPACK;
+    public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
+        @Override
+        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
+            return player != null ? player.getEnderChestInventory() : null;
+        }
+    });
+
+    public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.GLOBAL_BACKPACK) {
+        @Override
+        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
+            return BackpackManager.getGlobalInventory();
+        }
+    });;
 
     public static final Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(new Item.Settings()
             .maxCount(1)
@@ -30,6 +41,17 @@ public class BackpackItemRegistry {
     );
 
     public static <T extends Item> T register(String name, T item) {
+        if (Configuration.instance().disabled_backpacks.contains(name)
+        ) return null;
+
+        return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
+    }
+
+    public static UpgradeItem register(String name, UpgradeItem item) {
+        if (!Configuration.instance().enable_upgrades
+                || Configuration.instance().disabled_upgrades.contains(name)
+        ) return null;
+
         return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
     }
 
@@ -37,25 +59,5 @@ public class BackpackItemRegistry {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 
-    public static void initialize() {
-        Configuration.Instance config = Configuration.instance();
-
-        if (config.enable_globalpack) {
-            ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
-                @Override
-                public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-                    return player != null ? player.getEnderChestInventory() : null;
-                }
-            });
-        }
-
-        if (config.enable_globalpack) {
-            GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.GLOBAL_BACKPACK) {
-                @Override
-                public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-                    return BackpackManager.getGlobalInventory();
-                }
-            });
-        }
-    }
+    public static void initialize() {}
 }

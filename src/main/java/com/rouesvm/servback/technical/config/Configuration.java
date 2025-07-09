@@ -1,9 +1,6 @@
 package com.rouesvm.servback.technical.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -63,26 +60,39 @@ public class Configuration {
 
     public void load() {
         try (FileReader reader = new FileReader(configFile)) {
-            Instance loaded = GSON.fromJson(reader, Instance.class);
+            JsonElement rawJson = JsonParser.parseReader(reader);
+            JsonObject jsonObject = rawJson.getAsJsonObject();
+
+            Instance loaded = GSON.fromJson(rawJson, Instance.class);
             if (loaded != null) {
                 instance = loaded;
-
-                instance.types_of_backpacks.replaceAll((key, value) ->
-                        value.slots > maxSlots ||
-                                value.backpacks == null ||
-                                value.dyeBlacklist == null
-                                ? defaultInstance.types_of_backpacks.getOrDefault(
-                                key,
-                                new BackpackType(
-                                        key * 9,
-                                        true,
-                                        value.backpacks != null ? value.backpacks : List.of("unknown"),
-                                        List.of("brown")
-                                )
-                        ) : value
-                );
+                oldFormatConvertor(jsonObject);
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
+    }
+
+    public void oldFormatConvertor(JsonObject jsonObject) {
+        if (jsonObject.has("enable_globalpack") && !jsonObject.get("enable_globalpack").getAsBoolean()) {
+            instance.disabled_backpacks.add("serverbackpacks:global");
+        }
+
+        if (jsonObject.has("enable_enderpack") && !jsonObject.get("enable_enderpack").getAsBoolean()) {
+            instance.disabled_backpacks.add("serverbackpacks:ender");
+        }
+
+        instance.types_of_backpacks.replaceAll((key, value) -> {
+            boolean invalid = value.slots > maxSlots || value.backpacks == null || value.dyeBlacklist == null;
+            if (invalid) return defaultInstance.types_of_backpacks.getOrDefault(
+                        key,
+                        new BackpackType(
+                                key * 9,
+                                true,
+                                value.backpacks != null ? value.backpacks : List.of("unknown"),
+                                List.of("brown")
+                        )
+                );
+            else return value;
+        });
     }
 
     public static <K, V> LinkedHashMap<K, V> createMap(Map<K, V> map) {
@@ -114,11 +124,15 @@ public class Configuration {
                 )
         ));
 
-        @SerializedName("enable_globalpack")
-        public boolean enable_globalpack = true;
+        @SerializedName("disabled_backpacks")
+        public List<String> disabled_backpacks = List.of();
 
-        @SerializedName("enable_enderpack")
-        public boolean enable_enderpack = true;
+        @SerializedName("enable_upgrades")
+        public boolean enable_upgrades = true;
+
+        @SerializedName("disabled_upgrades")
+        public List<String> disabled_upgrades = List.of();
+
 
         @SerializedName("allow_backups")
         public boolean allow_backups = true;

@@ -68,7 +68,7 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackCommands.initialize();
 
 		BackpackRecipeRegistry.initialize();
-		BackpackUpgradeRegistry.initialize();
+		if (Configuration.instance().enable_upgrades) BackpackUpgradeRegistry.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
 		if (hasTrinketLoaded) BackpackTrinket.initialize();

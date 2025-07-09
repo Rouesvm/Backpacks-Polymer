@@ -2,11 +2,11 @@ package com.rouesvm.servback.content.component;
 
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.content.upgrade.Upgrade;
+import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.NbtWriteView;
@@ -29,36 +29,7 @@ public class UpgradeContainerComponent {
         return new UpgradeContainerComponent(baseUpgrades);
     }
 
-    public static PacketCodec<ByteBuf, UpgradeContainerComponent> PACKET_CODEC = new PacketCodec<>() {
-        @Override
-        public void encode(ByteBuf buf, UpgradeContainerComponent value) {
-            buf.writeInt(value.baseUpgrades.size());
-            for (Upgrade upgrade : value.baseUpgrades) {
-                Identifier id = upgrade.id;
-                NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
-                upgrade.writeView(data);
-
-                if (id == null) throw new IllegalArgumentException("Unknown upgrade: " + upgrade);
-                writeIdentifier(buf, id);
-                writeView(buf, data.getNbt());
-            }
-        }
-
-        @Override
-        public UpgradeContainerComponent decode(ByteBuf buf) {
-            int size = buf.readInt();
-            List<Upgrade> upgrades = new ArrayList<>();
-            for (int i = 0; i < size; i++) {
-                Upgrade upgrade = BackpackUpgradeRegistry.UPGRADES.get(readIdentifier(buf));
-                NbtCompound data = readView(buf);
-                if (upgrade != null) {
-                    upgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
-                    upgrades.add(upgrade);
-                }
-            }
-            return of(upgrades);
-        }
-    };
+    public static PacketCodec<ByteBuf, UpgradeContainerComponent> PACKET_CODEC = null;
 
     public static final Codec<UpgradeContainerComponent> CODEC =
             Codec.unboundedMap(Codec.STRING, NbtCompound.CODEC).xmap(
@@ -67,13 +38,14 @@ public class UpgradeContainerComponent {
                         for (Map.Entry<String, NbtCompound> entry : map.entrySet()) {
                             Identifier id = Identifier.tryParse(entry.getKey());
                             NbtCompound data = entry.getValue();
-                            if (id != null && data != null) {
-                                Upgrade upgrade = BackpackUpgradeRegistry.UPGRADES.get(id);
-                                if (upgrade != null) {
-                                    upgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
-                                    upgrades.add(upgrade);
-                                }
-                            }
+                            if (id == null || data == null) continue;
+
+                            UpgradeType<? extends Upgrade> upgradeType = BackpackUpgradeRegistry.get(id);
+                            if (upgradeType == null) continue;
+
+                            Upgrade upgrade = upgradeType.create();
+                            upgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
+                            upgrades.add(upgrade);
                         }
                         return UpgradeContainerComponent.of(upgrades);
                     },
@@ -82,29 +54,9 @@ public class UpgradeContainerComponent {
                         for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
                             NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
                             upgrade.writeView(data);
-                            out.put(upgrade.id.toString(), data.getNbt());
+                            out.put(upgrade.getType().getId().toString(), data.getNbt());
                         }
                         return out;
                     }
             );
-
-    private static void writeView(ByteBuf buf, NbtCompound compound) {
-        PacketByteBuf packetBuf = new PacketByteBuf(buf);
-        packetBuf.writeNbt(compound);
-    }
-
-    private static NbtCompound readView(ByteBuf buf) {
-        PacketByteBuf packetBuf = new PacketByteBuf(buf);
-        return packetBuf.readNbt();
-    }
-
-    private static void writeIdentifier(ByteBuf buf, Identifier id) {
-        PacketByteBuf packetBuf = new PacketByteBuf(buf);
-        packetBuf.writeIdentifier(id);
-    }
-
-    private static Identifier readIdentifier(ByteBuf buf) {
-        PacketByteBuf packetBuf = new PacketByteBuf(buf);
-        return packetBuf.readIdentifier();
-    }
 }

@@ -26,7 +26,7 @@ public class BackpackItemRegistry {
     public static Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(new Item.Settings()
             .maxCount(1)
             .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, "magnet_upgrade"))
-            ), BackpackUpgradeRegistry.MAGNET_UPGRADE)
+            ), BackpackUpgradeRegistry.MAGNET)
     );
 
     public static <T extends Item> T register(String name, T item) {

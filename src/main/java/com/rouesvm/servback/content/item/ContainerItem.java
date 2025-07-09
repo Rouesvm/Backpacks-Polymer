@@ -78,7 +78,7 @@ public class ContainerItem extends BundleGuiItem {
 
         for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
             tooltip.add(Text.literal(" ")
-                    .append(upgrade.toTranslationKey())
+                    .append(upgrade.getType().getTranslationKey())
                     .formatted(Formatting.DARK_GREEN)
             );
         }

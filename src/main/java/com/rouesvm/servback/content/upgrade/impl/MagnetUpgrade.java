@@ -2,6 +2,7 @@ package com.rouesvm.servback.content.upgrade.impl;
 
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
+import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -12,6 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 
 import java.util.ArrayList;
@@ -19,14 +21,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class MagnetUpgrade extends Upgrade {
-    public int tickCounter = 0;
+import static com.rouesvm.servback.registry.item.BackpackItemRegistry.MAGNET_UPGRADE;
 
-    public final Queue<ItemEntity> queue = new LinkedList<>();
+public class MagnetUpgrade extends Upgrade {
+    private int tickCounter = 0;
+    private final Queue<ItemEntity> queue = new LinkedList<>();
+
     public List<Item> list = new ArrayList<>();
 
     public MagnetUpgrade() {
-        super("magnet");
+        super(BackpackUpgradeRegistry.MAGNET);
+    }
+
+    public void setList(List<Item> list) {
+        this.list = list;
+    }
+
+    @Override
+    public void addTooltip(List<Text> tooltip, ItemStack stack) {
+        if (stack.isOf(MAGNET_UPGRADE)) {
+            if (this.list.isEmpty()) return;
+            for (Item item : this.list) tooltip.add(item.getName());
+        }
     }
 
     @Override

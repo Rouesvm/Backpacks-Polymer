@@ -50,7 +50,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
                         UpgradeContainerComponent.of(new ArrayList<>())
                 );
 
-                component.baseUpgrades.add(upgradeBaseItem.getUpgrade());
+                component.baseUpgrades.addAll(upgradeBaseItem.getUpgradeList(addition));
                 base.set(BackpackDataComponentTypes.UPGRADE_CONTAINER_COMPONENT_COMPONENT_TYPE, component);
 
                 resultStack = base;

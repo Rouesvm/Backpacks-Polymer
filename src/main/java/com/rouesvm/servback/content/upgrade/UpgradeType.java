@@ -1,22 +1,21 @@
 package com.rouesvm.servback.content.upgrade;
 
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class UpgradeType<T extends Upgrade> {
     private final Identifier id;
-    private final Item upgradeItem;
     private final UpgradeFactory<T> factory;
 
-    public UpgradeType(Identifier id, Item upgradeItem, UpgradeFactory<T> factory) {
+    public UpgradeType(Identifier id, UpgradeFactory<T> factory) {
         this.id = id;
-        this.upgradeItem = upgradeItem;
         this.factory = factory;
     }
 
     public Item getItem() {
-        return upgradeItem;
+        return Registries.ITEM.get(Identifier.of(id.getNamespace(), id.getPath() + "_upgrade"));
     }
 
     public T create() {

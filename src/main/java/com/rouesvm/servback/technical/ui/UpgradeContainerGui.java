@@ -2,6 +2,7 @@ package com.rouesvm.servback.technical.ui;
 
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.upgrade.Upgrade;
+import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.Item;
@@ -27,9 +28,13 @@ public class UpgradeContainerGui extends SimpleGui {
 
         int i=0;
         for (Upgrade upgrade : upgradeList) {
-            Item item = upgrade.getType().getItem();
+            UpgradeType<? extends Upgrade> upgradeType = upgrade.getType();
+            if (upgradeType == null || upgradeType.getItem() == null) continue;
+
+            Item item = upgradeType.getItem();
             ItemStack upgradeStack = item.getDefaultStack();
             upgradeStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(List.of(upgrade)));
+
             this.setSlot(i, upgradeStack);
             i++;
         }

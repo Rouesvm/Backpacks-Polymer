@@ -103,6 +103,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         if (player.isSneaking()) {
             if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null) {
                 new UpgradeContainerGui(serverPlayer, stack);
+                return ActionResult.SUCCESS;
             } else return ActionResult.PASS;
         }
 

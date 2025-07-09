@@ -34,7 +34,6 @@ public class UpgradeItem extends SimplePolymerItem {
 
     @Override
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
-
         return super.use(world, user, hand);
     }
 

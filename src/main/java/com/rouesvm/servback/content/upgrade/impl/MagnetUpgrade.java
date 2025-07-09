@@ -48,9 +48,7 @@ public class MagnetUpgrade extends Upgrade {
     @Override
     public void readView(ReadView data) {
         for(StackWithSlot stackWithSlot : data.getTypedListView("Items", StackWithSlot.CODEC)) {
-            if (stackWithSlot.isValidSlot(list.size())) {
-                list.set(stackWithSlot.slot(), stackWithSlot.stack().getItem());
-            }
+            list.add(stackWithSlot.stack().getItem());
         }
     }
 
@@ -61,6 +59,7 @@ public class MagnetUpgrade extends Upgrade {
         for(int i = 0; i < list.size(); ++i) {
             ItemStack itemStack = list.get(i).getDefaultStack();
             if (!itemStack.isEmpty()) {
+                System.out.println(list);
                 listAppender.add(new StackWithSlot(i, itemStack));
             }
         }

@@ -30,7 +30,7 @@ import static com.rouesvm.servback.registry.item.BackpackItemRegistry.MAGNET_UPG
 public class MagnetUpgrade extends Upgrade {
     public static final int MAX_SIZE = 5;
 
-    private int tickCounter = 0;
+    private int tick = 0;
     private final Queue<ItemEntity> queue = new LinkedList<>();
 
     private List<Item> list = new ArrayList<>(MAX_SIZE);
@@ -135,9 +135,9 @@ public class MagnetUpgrade extends Upgrade {
     public boolean pickUpItems(ServerPlayerEntity player, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
-        tickCounter++;
+        tick++;
 
-        if (tickCounter % 5 == 0) {
+        if (tick % 5 == 0) {
             ItemEntity next = queue.poll();
             if (next == null || !next.isAlive() || next.distanceTo(player) > 10) return false;
 
@@ -158,7 +158,7 @@ public class MagnetUpgrade extends Upgrade {
             next.setStack(remainder);
         }
 
-        if (tickCounter % 2 == 0) {
+        if (tick % 2 == 0) {
             queue.forEach(item ->
                     item.setPos(player.getX(), player.getY(), player.getZ())
             );

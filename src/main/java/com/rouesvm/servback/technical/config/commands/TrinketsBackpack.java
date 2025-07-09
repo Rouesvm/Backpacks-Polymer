@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.config.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import dev.emi.trinkets.api.TrinketComponent;
 import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.server.command.ServerCommandSource;

@@ -1,8 +1,9 @@
-package com.rouesvm.servback.content.item;
+package com.rouesvm.servback.content.item.impl;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
+import com.rouesvm.servback.content.block.impl.BackpackBlockEntity;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;

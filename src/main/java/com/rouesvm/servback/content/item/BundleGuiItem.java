@@ -1,6 +1,7 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicInventoryGui;

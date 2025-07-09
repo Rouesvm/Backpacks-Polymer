@@ -3,7 +3,7 @@ package com.rouesvm.servback.content.block;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
-import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;

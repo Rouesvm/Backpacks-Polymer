@@ -2,7 +2,7 @@ package com.rouesvm.servback.registry.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
-import com.rouesvm.servback.content.block.backpack.BackpackBlock;
+import com.rouesvm.servback.content.block.impl.BackpackBlock;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.block.Block;

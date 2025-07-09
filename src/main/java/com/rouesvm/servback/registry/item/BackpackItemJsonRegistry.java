@@ -1,7 +1,7 @@
 package com.rouesvm.servback.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.technical.config.Configuration;
 import net.minecraft.item.Item;
 import net.minecraft.util.DyeColor;

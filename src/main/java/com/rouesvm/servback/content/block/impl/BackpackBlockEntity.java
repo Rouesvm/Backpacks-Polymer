@@ -1,4 +1,4 @@
-package com.rouesvm.servback.content.block.backpack;
+package com.rouesvm.servback.content.block.impl;
 
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;

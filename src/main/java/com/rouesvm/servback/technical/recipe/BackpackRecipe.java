@@ -3,7 +3,7 @@ package com.rouesvm.servback.technical.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;

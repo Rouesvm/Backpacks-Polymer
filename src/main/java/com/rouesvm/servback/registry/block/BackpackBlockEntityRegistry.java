@@ -2,7 +2,7 @@ package com.rouesvm.servback.registry.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
-import com.rouesvm.servback.content.block.backpack.BackpackBlockEntity;
+import com.rouesvm.servback.content.block.impl.BackpackBlockEntity;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;

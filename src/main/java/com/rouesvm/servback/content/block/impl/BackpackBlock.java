@@ -1,10 +1,10 @@
-package com.rouesvm.servback.content.block.backpack;
+package com.rouesvm.servback.content.block.impl;
 
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
-import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;

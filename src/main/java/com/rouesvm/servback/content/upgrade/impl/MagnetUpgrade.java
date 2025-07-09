@@ -1,6 +1,6 @@
 package com.rouesvm.servback.content.upgrade.impl;
 
-import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;

@@ -1,6 +1,6 @@
 package com.rouesvm.servback.datagen;
 
-import com.rouesvm.servback.content.item.ContainerItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.recipe.builder.BackpackRecipeJsonBuilder;

@@ -53,6 +53,8 @@
   "item.serverbackpacks.global" : "GlobalPack",
   "item.serverbackpacks.ender" : "EnderPack",
 
+  "item.serverbackpacks.magnet_upgrade" : "Magnet Upgrade",
+
   "item.serverbackpacks.gui_backpacks" : "Backpacks",
   "item.serverbackpacks.gui_backpack" : "Backpack",
 
@@ -71,9 +73,10 @@
   "command.serverbackpacks.save": "Config has been saved!",
   "command.serverbackpacks.backup": "Backup created.",
 
-  "tooltip.serverbackpacks.upgrades": "Upgrades",
-  "tooltip.serverbackpacks.contains": "Contains",
-  "tooltip.serverbackpacks.mode": "Mode",
+  "info.serverbackpacks.empty": "Empty",
+  "info.serverbackpacks.upgrades": "Upgrades",
+  "info.serverbackpacks.contains": "Contains",
+  "info.serverbackpacks.mode": "Mode",
 
   "upgrade.serverbackpacks.magnet": "Magnet"
 }

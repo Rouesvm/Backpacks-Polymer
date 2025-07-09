@@ -53,6 +53,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     private void itemRecipes(RegistryWrapper.WrapperLookup wrapperLookup, RecipeExporter exporter) {
         RegistryWrapper.Impl<Item> itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.MAGNET_UPGRADE, 1)
+                .pattern("#S#")
+                .pattern("LEL")
+                .pattern("#S#")
+                .input('#', Items.IRON_INGOT).input('S', Items.STRING)
+                .input('L', Items.LEATHER).input('E', Items.ENDER_PEARL)
+                .criterion("get_leather", InventoryChangedCriterion.Conditions.items(Items.LEATHER))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.ENDER_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")

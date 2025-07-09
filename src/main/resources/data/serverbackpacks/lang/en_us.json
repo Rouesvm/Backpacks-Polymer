@@ -53,7 +53,7 @@
   "item.serverbackpacks.global" : "GlobalPack",
   "item.serverbackpacks.ender" : "EnderPack",
 
-  "item.serverbackpacks.magnet_upgrade" : "Magnet Module",
+  "item.serverbackpacks.magnet_upgrade" : "Vacuum Module",
 
   "item.serverbackpacks.gui_backpacks" : "Backpacks",
   "item.serverbackpacks.gui_backpack" : "Backpack",
@@ -78,5 +78,5 @@
   "info.serverbackpacks.contains": "Contains",
   "info.serverbackpacks.mode": "Mode",
 
-  "upgrade.serverbackpacks.magnet": "Magnet"
+  "upgrade.serverbackpacks.magnet": "Vacuum Module"
 }

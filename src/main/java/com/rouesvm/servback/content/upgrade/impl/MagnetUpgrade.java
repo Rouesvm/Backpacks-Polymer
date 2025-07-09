@@ -49,7 +49,7 @@ public class MagnetUpgrade extends Upgrade {
 
     @Override
     public void readView(ReadView data) {
-        for(StackWithSlot stackWithSlot : data.getTypedListView("Items", StackWithSlot.CODEC)) {
+        for (StackWithSlot stackWithSlot : data.getTypedListView("Items", StackWithSlot.CODEC)) {
             list.add(stackWithSlot.stack().getItem());
         }
     }
@@ -58,7 +58,7 @@ public class MagnetUpgrade extends Upgrade {
     public void writeView(WriteView data) {
         WriteView.ListAppender<StackWithSlot> listAppender = data.getListAppender("Items", StackWithSlot.CODEC);
 
-        for(int i = 0; i < list.size(); ++i) {
+        for (int i = 0; i < list.size(); ++i) {
             ItemStack itemStack = list.get(i).getDefaultStack();
             if (!itemStack.isEmpty()) {
                 listAppender.add(new StackWithSlot(i, itemStack));
@@ -72,42 +72,39 @@ public class MagnetUpgrade extends Upgrade {
 
     @Override
     public void tick(ServerPlayerEntity player, BackpackInventory inventory) {
-        if (inventory == null) return;
+        if (inventory == null || !(player.getWorld() instanceof ServerWorld world)) return;
 
-        ServerWorld world = player.getWorld();
-
-        if (queue.isEmpty()) {
-            Box area = new Box(player.getPos().add(-5), player.getPos().add(5));
-            List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area,
-                    Entity::isAlive);
-
-            for (ItemEntity item : items) {
-                if (inventory.canInsert(item.getStack())) {
-                    queue.add(item);
-                    item.setPickupDelayInfinite();
-                }
-            }
-        } else {
+        if (!queue.isEmpty()) {
             tickCounter++;
 
             if (tickCounter % 5 == 0) {
                 ItemEntity next = queue.poll();
 
-                if (next == null) return;
-                if (!next.isAlive()) return;
-                if (next.distanceTo(player) > 10) return;
+                if (next == null || !next.isAlive() || next.distanceTo(player) > 10) return;
 
                 ItemStack stack = next.getStack();
                 if (inventory.canInsert(stack)) {
-                    stack = inventory.addStack(stack);
-                    if (stack.getCount() > 0)
-                        next.setStack(stack);
-                    else next.discard();
+                    ItemStack remainder = inventory.addStack(stack);
+                    if (remainder.isEmpty())
+                        next.discard();
+                    else next.setStack(remainder);
                     ContainerItem.playInsertSound(player, 1);
                 } else next.setPickupDelay(0);
-            } else if (tickCounter % 2 == 0) queue.forEach(itemEntity ->
-                    itemEntity.setPos(player.getX(), player.getY(), player.getZ())
+            } else if (tickCounter % 2 == 0) queue.forEach(item ->
+                    item.setPos(player.getX(), player.getY(), player.getZ())
             );
+
+            return;
+        }
+
+        Box area = new Box(player.getPos().add(-5, -5, -5), player.getPos().add(5, 5, 5));
+        List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area, Entity::isAlive);
+
+        for (ItemEntity item : items) {
+            if (inventory.canInsert(item.getStack())) {
+                queue.add(item);
+                item.setPickupDelay(20);
+            }
         }
     }
 }

@@ -53,6 +53,8 @@
   "item.serverbackpacks.global" : "Beg Global",
   "item.serverbackpacks.ender" : "Beg Ender",
 
+  "item.serverbackpacks.magnet_upgrade" : "Modul Magnet",
+
   "item.serverbackpacks.gui_backpacks" : "Beg",
   "item.serverbackpacks.gui_backpack" : "Beg",
 
@@ -70,8 +72,10 @@
   "command.serverbackpacks.save": "Konfig telah disimpan!",
   "command.serverbackpacks.backup": "Sandaran berjaya dibuat.",
 
-  "tooltip.serverbackpacks.upgrades": "Naik Taraf",
-  "tooltip.serverbackpacks.contains": "Kandungan",
+  "info.serverbackpacks.empty": "Kosong",
+  "info.serverbackpacks.upgrades": "Modul",
+  "info.serverbackpacks.contains": "Kandungan",
+  "info.serverbackpacks.mode": "Mod",
 
   "upgrade.serverbackpacks.magnet": "Magnet"
 }

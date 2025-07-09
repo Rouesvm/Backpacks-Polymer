@@ -53,7 +53,7 @@
   "item.serverbackpacks.global" : "GlobalPack",
   "item.serverbackpacks.ender" : "EnderPack",
 
-  "item.serverbackpacks.magnet_upgrade" : "Magnet Upgrade",
+  "item.serverbackpacks.magnet_upgrade" : "Magnet Module",
 
   "item.serverbackpacks.gui_backpacks" : "Backpacks",
   "item.serverbackpacks.gui_backpack" : "Backpack",
@@ -74,7 +74,7 @@
   "command.serverbackpacks.backup": "Backup created.",
 
   "info.serverbackpacks.empty": "Empty",
-  "info.serverbackpacks.upgrades": "Upgrades",
+  "info.serverbackpacks.upgrades": "Modules",
   "info.serverbackpacks.contains": "Contains",
   "info.serverbackpacks.mode": "Mode",
 

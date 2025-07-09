@@ -1,14 +1,18 @@
 package com.rouesvm.servback.technical.ui;
 
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -17,16 +21,19 @@ import java.util.List;
 
 public class UpgradeContainerGui extends SimpleGui {
     protected List<Upgrade> upgradeList;
+    protected final ItemStack backpackStack;
 
     public UpgradeContainerGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.HOPPER, player, false);
+
+        this.backpackStack = stack;
 
         UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
         if (component == null) return;
 
         this.upgradeList = component.baseUpgrades;
 
-        this.setTitle(Text.translatable("tooltip.serverbackpacks.upgrades"));
+        this.setTitle(Text.translatable("info.serverbackpacks.upgrades"));
 
         int i=0;
         for (Upgrade upgrade : upgradeList) {
@@ -41,12 +48,44 @@ public class UpgradeContainerGui extends SimpleGui {
             i++;
         }
 
+        ItemStack barrier = Items.BARRIER.getDefaultStack();
+        barrier.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.empty"));
+
+        for (int index = i; index < getSize(); index++) {
+            this.setSlot(index, barrier);
+        }
+
         open();
     }
 
+
     @Override
     public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+        if (index < 0 || index >= this.size) return true;
+        Slot slot = this.screenHandler.getSlot(index);
+        if (!slot.hasStack()) return true;
 
-        return super.onAnyClick(index, type, action);
+        ItemStack stack = slot.getStack();
+        if (!(stack.getItem() instanceof UpgradeItem item)) return true;
+
+        this.screenHandler.setCursorStack(stack.copyAndEmpty());
+
+        Upgrade upgrade = item.getUpgradeList(stack).getFirst();
+
+        ItemStack barrier = Items.BARRIER.getDefaultStack();
+        barrier.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.empty"));
+
+        slot.setStack(barrier);
+        this.screenHandler.setSlot(index, slot);
+
+        upgradeList.remove(upgrade);
+        backpackStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(upgradeList));
+
+        if (upgradeList.isEmpty()) {
+            backpackStack.remove(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+            close();
+        }
+
+        return true;
     }
 }

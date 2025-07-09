@@ -46,6 +46,8 @@ public class MagnetUpgrade extends Upgrade {
 
     @Override
     public void readView(ReadView data) {
+        this.mode = MODE.values()[data.getInt("mode", 0)];
+
         for (StackWithSlot stackWithSlot : data.getTypedListView("Items", StackWithSlot.CODEC)) {
             list.add(stackWithSlot.stack().getItem());
         }
@@ -53,6 +55,8 @@ public class MagnetUpgrade extends Upgrade {
 
     @Override
     public void writeView(WriteView data) {
+        data.putInt("mode", mode.ordinal());
+
         WriteView.ListAppender<StackWithSlot> listAppender = data.getListAppender("Items", StackWithSlot.CODEC);
 
         for (int i = 0; i < list.size(); ++i) {
@@ -70,7 +74,7 @@ public class MagnetUpgrade extends Upgrade {
     @Override
     public void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
         if (stack.isOf(MAGNET_UPGRADE)) {
-            tooltip.add(Text.translatable("tooltip.serverbackpacks.mode")
+            tooltip.add(Text.translatable("info.serverbackpacks.mode")
                     .append(": ")
                     .formatted(Formatting.GRAY)
                     .append(Text.of(mode.toString())
@@ -81,7 +85,7 @@ public class MagnetUpgrade extends Upgrade {
 
             if (this.list.isEmpty()) return;
 
-            tooltip.add(Text.translatable("tooltip.serverbackpacks.contains").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
             for (Item item : this.list) tooltip.add(
                     Text.literal(" ")
                             .append(item.getName())
@@ -101,7 +105,7 @@ public class MagnetUpgrade extends Upgrade {
 
         if (mode == prevMode) return false;
 
-        player.sendMessage(Text.translatable("tooltip.serverbackpacks.mode")
+        player.sendMessage(Text.translatable("info.serverbackpacks.mode")
                 .append(": ")
                 .formatted(Formatting.GRAY)
                 .append(Text.of(mode.toString())

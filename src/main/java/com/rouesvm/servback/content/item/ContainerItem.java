@@ -71,7 +71,7 @@ public class ContainerItem extends BundleGuiItem {
         if (upgradeContainer == null) return;
         if (upgradeContainer.baseUpgrades.isEmpty()) return;
 
-        tooltip.add(Text.translatable("tooltip.serverbackpacks.upgrades")
+        tooltip.add(Text.translatable("info.serverbackpacks.upgrades")
                 .append(":")
                 .formatted(Formatting.GRAY)
         );
@@ -88,7 +88,7 @@ public class ContainerItem extends BundleGuiItem {
         DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(stack);
         if (itemList.isEmpty()) return;
 
-        tooltip.add(Text.translatable("tooltip.serverbackpacks.contains")
+        tooltip.add(Text.translatable("info.serverbackpacks.contains")
                 .append(":")
                 .formatted(Formatting.GRAY)
         );

@@ -4,6 +4,7 @@ import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicInventoryGui;
+import com.rouesvm.servback.technical.ui.UpgradeContainerGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
@@ -101,9 +102,8 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
         if (player.isSneaking()) {
             if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null) {
-
-            }
-            return ActionResult.PASS;
+                new UpgradeContainerGui(serverPlayer, stack);
+            } else return ActionResult.PASS;
         }
 
         if (cast.getType() == HitResult.Type.BLOCK)

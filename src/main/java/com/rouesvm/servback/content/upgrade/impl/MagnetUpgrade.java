@@ -4,18 +4,20 @@ import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.inventory.StackWithSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.ArrayList;
@@ -40,6 +42,24 @@ public class MagnetUpgrade extends Upgrade {
 
     public void setList(List<Item> list) {
         this.list = list;
+    }
+
+    @Override
+    public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
+        MODE[] modes = MODE.values();
+        MODE prevMode = mode;
+
+        int nextOrdinal = (mode.ordinal() + 1) % modes.length;
+        mode = modes[nextOrdinal];
+
+        if (mode != prevMode) {
+            player.sendMessage(Text.translatable("tooltip.serverbackpacks.mode")
+                    .append(": ")
+                    .append(mode.toString())
+            , true);
+            player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
+            return true;
+        } else return false;
     }
 
     @Override
@@ -92,43 +112,68 @@ public class MagnetUpgrade extends Upgrade {
     @Override
     public void tick(ServerPlayerEntity player, BackpackInventory inventory) {
         if (inventory == null || !(player.getWorld() instanceof ServerWorld world)) return;
+        if (!pickUpItems(player, inventory)) checkForItems(world, player, inventory);
+    }
 
-        if (!queue.isEmpty()) {
-            tickCounter++;
+    public boolean pickUpItems(ServerPlayerEntity player, BackpackInventory inventory) {
+        if (queue.isEmpty()) return false;
 
-            if (tickCounter % 5 == 0) {
-                ItemEntity next = queue.poll();
+        tickCounter++;
 
-                if (next == null || !next.isAlive() || next.distanceTo(player) > 10) return;
+        if (tickCounter % 5 == 0) {
+            ItemEntity next = queue.poll();
+            if (next == null || !next.isAlive() || next.distanceTo(player) > 10) return false;
 
-                ItemStack stack = next.getStack();
-                if (inventory.canInsert(stack)) {
-                    ItemStack remainder = inventory.addStack(stack);
-                    if (remainder.isEmpty())
-                        next.discard();
-                    else next.setStack(remainder);
-                    ContainerItem.playInsertSound(player, 1);
-                } else next.setPickupDelay(0);
-            } else if (tickCounter % 2 == 0) queue.forEach(item ->
-                    item.setPos(player.getX(), player.getY(), player.getZ())
-            );
+            ItemStack stack = next.getStack();
+            if (!inventory.canInsert(stack)) {
+                next.setPickupDelay(0);
+                return true;
+            }
 
-            return;
+            ItemStack remainder = inventory.addStack(stack);
+            ContainerItem.playInsertSound(player, 1);
+
+            if (remainder.isEmpty()) {
+                next.discard();
+                return true;
+            }
+
+            next.setStack(remainder);
         }
 
+        if (tickCounter % 2 == 0) {
+            queue.forEach(item ->
+                    item.setPos(player.getX(), player.getY(), player.getZ())
+            );
+        }
+
+        return true;
+    }
+
+    public void checkForItems(ServerWorld world, ServerPlayerEntity player, BackpackInventory inventory) {
         Box area = new Box(player.getPos().add(-5, -5, -5), player.getPos().add(5, 5, 5));
-        List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area, Entity::isAlive);
+        List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area, itemEntity -> {
+            if (!itemEntity.isAlive()) return false;
+            Item item = itemEntity.getStack().getItem();
+
+            return switch (mode) {
+                case BLACKLIST -> !list.contains(item);
+                case WHITELIST -> list.contains(item);
+                case PICKUP    -> true;
+            };
+        });
 
         for (ItemEntity item : items) {
-            if (inventory.canInsert(item.getStack())) {
-                queue.add(item);
-                item.setPickupDelay(20);
-            }
+            if (!inventory.canInsert(item.getStack())) continue;
+
+            queue.add(item);
+            item.setPickupDelay(20);
         }
     }
 
     public enum MODE {
         BLACKLIST,
-        WHITELIST
+        WHITELIST,
+        PICKUP
     }
 }

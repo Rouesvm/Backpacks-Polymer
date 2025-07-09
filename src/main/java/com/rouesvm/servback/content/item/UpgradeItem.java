@@ -5,9 +5,13 @@ import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -34,7 +38,24 @@ public class UpgradeItem extends SimplePolymerItem {
 
     @Override
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        return super.use(world, user, hand);
+        ItemStack stack = user.getStackInHand(hand);
+        UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
+
+        List<Upgrade> upgrades = upgradeItem.getUpgradeList(stack);
+        Upgrade upgrade = upgrades.getFirst();
+
+        boolean successful = false;
+        if (upgrade != null) successful = upgrade.onUsed(world, (ServerPlayerEntity) user, stack);
+
+        if (successful) {
+            NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
+            NbtCompound compound = component.copyNbt();
+            compound.putBoolean("update", !compound.getBoolean("update", false));
+
+            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
+
+            return ActionResult.SUCCESS_SERVER;
+        } else return super.use(world, user, hand);
     }
 
     @Override

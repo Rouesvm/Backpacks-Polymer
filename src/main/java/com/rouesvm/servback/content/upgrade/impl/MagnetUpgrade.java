@@ -45,21 +45,26 @@ public class MagnetUpgrade extends Upgrade {
     }
 
     @Override
-    public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
-        MODE[] modes = MODE.values();
-        MODE prevMode = mode;
+    public void readView(ReadView data) {
+        for (StackWithSlot stackWithSlot : data.getTypedListView("Items", StackWithSlot.CODEC)) {
+            list.add(stackWithSlot.stack().getItem());
+        }
+    }
 
-        int nextOrdinal = (mode.ordinal() + 1) % modes.length;
-        mode = modes[nextOrdinal];
+    @Override
+    public void writeView(WriteView data) {
+        WriteView.ListAppender<StackWithSlot> listAppender = data.getListAppender("Items", StackWithSlot.CODEC);
 
-        if (mode != prevMode) {
-            player.sendMessage(Text.translatable("tooltip.serverbackpacks.mode")
-                    .append(": ")
-                    .append(mode.toString())
-            , true);
-            player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
-            return true;
-        } else return false;
+        for (int i = 0; i < list.size(); ++i) {
+            ItemStack itemStack = list.get(i).getDefaultStack();
+            if (!itemStack.isEmpty()) {
+                listAppender.add(new StackWithSlot(i, itemStack));
+            }
+        }
+
+        if (listAppender.isEmpty()) {
+            data.remove("Items");
+        }
     }
 
     @Override
@@ -87,26 +92,26 @@ public class MagnetUpgrade extends Upgrade {
     }
 
     @Override
-    public void readView(ReadView data) {
-        for (StackWithSlot stackWithSlot : data.getTypedListView("Items", StackWithSlot.CODEC)) {
-            list.add(stackWithSlot.stack().getItem());
-        }
-    }
+    public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
+        MODE[] modes = MODE.values();
+        MODE prevMode = mode;
 
-    @Override
-    public void writeView(WriteView data) {
-        WriteView.ListAppender<StackWithSlot> listAppender = data.getListAppender("Items", StackWithSlot.CODEC);
+        int nextOrdinal = (mode.ordinal() + 1) % modes.length;
+        mode = modes[nextOrdinal];
 
-        for (int i = 0; i < list.size(); ++i) {
-            ItemStack itemStack = list.get(i).getDefaultStack();
-            if (!itemStack.isEmpty()) {
-                listAppender.add(new StackWithSlot(i, itemStack));
-            }
-        }
+        if (mode == prevMode) return false;
 
-        if (listAppender.isEmpty()) {
-            data.remove("Items");
-        }
+        player.sendMessage(Text.translatable("tooltip.serverbackpacks.mode")
+                .append(": ")
+                .formatted(Formatting.GRAY)
+                .append(Text.of(mode.toString())
+                        .copy()
+                        .formatted(Formatting.GREEN)
+                ), true);
+
+        player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
+
+        return true;
     }
 
     @Override

@@ -4,10 +4,12 @@ import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -40,5 +42,11 @@ public class UpgradeContainerGui extends SimpleGui {
         }
 
         open();
+    }
+
+    @Override
+    public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+
+        return super.onAnyClick(index, type, action);
     }
 }

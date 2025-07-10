@@ -135,9 +135,6 @@ public class ContainerItem extends BundleGuiItem {
             blockEntity.setSize(this.slots);
             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(stack));
 
-            System.out.println(blockEntity.getExtraSize());
-            System.out.println(blockEntity.getSize());
-
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) {
                 blockEntity.setUpgradeList(component.baseUpgrades);
@@ -158,7 +155,7 @@ public class ContainerItem extends BundleGuiItem {
             blockEntity.markDirty();
         }
 
-        return super.postPlacement(pos, world, player, stack, state);
+        return writeNbtToBlockEntity(world, player, pos, stack);
     }
 
     @Override

@@ -75,8 +75,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
             BackpackTrinket.equipStack(player, stack);
             world.breakBlock(pos, false);
             return true;
-        }
-        return false;
+        } else return false;
     }
 
     @Override

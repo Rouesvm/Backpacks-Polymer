@@ -45,7 +45,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             }
         }
 
-        return super.postPlacement(pos, world, player, stack, state);
+        return writeNbtToBlockEntity(world, player, pos, stack);
     }
 
 

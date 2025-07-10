@@ -1,13 +1,17 @@
 package com.rouesvm.servback.content.upgrade.impl;
 
+import com.mojang.serialization.Codec;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.inventory.StackWithSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -16,6 +20,7 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -33,15 +38,15 @@ public class MagnetUpgrade extends Upgrade {
     private int tick = 0;
     private final Queue<ItemEntity> queue = new LinkedList<>();
 
-    private List<Item> list = new ArrayList<>(MAX_SIZE);
+    private final List<String> list = new ArrayList<>(MAX_SIZE);
     private MODE mode = MODE.BLACKLIST;
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);
     }
 
-    public void setList(List<Item> list) {
-        this.list = list;
+    public void addAllToList(List<String> list) {
+        this.list.addAll(list);
     }
 
     public MODE getMode() {
@@ -56,8 +61,8 @@ public class MagnetUpgrade extends Upgrade {
     public void readView(ReadView data) {
         this.mode = MODE.values()[data.getInt("mode", 0)];
 
-        for (StackWithSlot stackWithSlot : data.getTypedListView("Items", StackWithSlot.CODEC)) {
-            list.add(stackWithSlot.stack().getItem());
+        for (String string : data.getTypedListView("Items", Codec.STRING)) {
+            list.add(string);
         }
     }
 
@@ -65,18 +70,13 @@ public class MagnetUpgrade extends Upgrade {
     public void writeView(WriteView data) {
         data.putInt("mode", mode.ordinal());
 
-        WriteView.ListAppender<StackWithSlot> listAppender = data.getListAppender("Items", StackWithSlot.CODEC);
+        WriteView.ListAppender<String> listAppender = data.getListAppender("Items", Codec.STRING);
 
-        for (int i = 0; i < list.size(); ++i) {
-            ItemStack itemStack = list.get(i).getDefaultStack();
-            if (!itemStack.isEmpty()) {
-                listAppender.add(new StackWithSlot(i, itemStack));
-            }
+        for (String string : list) {
+            if (!string.isEmpty()) listAppender.add(string);
         }
 
-        if (listAppender.isEmpty()) {
-            data.remove("Items");
-        }
+        if (listAppender.isEmpty()) data.remove("Items");
     }
 
     @Override
@@ -94,12 +94,10 @@ public class MagnetUpgrade extends Upgrade {
             if (this.list.isEmpty()) return;
 
             tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
-            for (Item item : this.list) tooltip.add(
-                    Text.literal(" ")
-                            .append(item.getName())
-                            .copy()
-                            .formatted(Formatting.DARK_AQUA)
-            );
+            for (String string : this.list) tooltip.add(
+                        Text.literal(" ")
+                                .append(string).copy()
+                                .formatted(Formatting.DARK_AQUA));
         }
     }
 
@@ -171,11 +169,11 @@ public class MagnetUpgrade extends Upgrade {
         Box area = new Box(player.getPos().add(-5, -5, -5), player.getPos().add(5, 5, 5));
         List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area, itemEntity -> {
             if (!itemEntity.isAlive()) return false;
-            Item item = itemEntity.getStack().getItem();
+            ItemStack stack = itemEntity.getStack();
 
             return switch (mode) {
-                case BLACKLIST -> !list.contains(item);
-                case WHITELIST -> list.contains(item);
+                case BLACKLIST -> !checkList(stack);
+                case WHITELIST -> checkList(stack);
                 case PICKUP    -> true;
             };
         });
@@ -186,6 +184,32 @@ public class MagnetUpgrade extends Upgrade {
             queue.add(item);
             item.setPickupDelay(20);
         }
+    }
+
+    public boolean checkList(ItemStack stack) {
+        boolean matched = false;
+        Item item = stack.getItem();
+        RegistryEntry<Item> entry = Registries.ITEM.getEntry(item);
+
+        for (String s : list) {
+            if (s.startsWith("#")) {
+                Identifier tagId = Identifier.tryParse(s.substring(1));
+                TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagId);
+
+                if (entry.isIn(tag)) {
+                    matched = true;
+                    break;
+                }
+            } else {
+                Identifier itemId = Registries.ITEM.getId(item);
+                if (itemId.toString().equals(s)) {
+                    matched = true;
+                    break;
+                }
+            }
+        }
+
+        return matched;
     }
 
     public enum MODE {

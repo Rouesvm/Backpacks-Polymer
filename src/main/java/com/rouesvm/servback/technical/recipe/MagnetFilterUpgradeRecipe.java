@@ -10,13 +10,18 @@ import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import eu.pb4.polymer.core.api.utils.PolymerObject;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
@@ -38,7 +43,7 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
         if (input.getStackCount() > MagnetUpgrade.MAX_SIZE + 1) return false;
 
         int magnetCount = 0;
-        Set<Item> seenItems = new HashSet<>();
+        Set<String> seenItems = new HashSet<>();
 
         for (ItemStack stack : input.getStacks()) {
             if (stack.isEmpty()) continue;
@@ -50,7 +55,22 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
                 continue;
             }
 
-            if (!seenItems.add(item)) return false;
+            if (isSpecialNameTag(stack)) {
+                String tagId = stack.getName().getString();
+
+                if (!tagId.startsWith("#")) continue;
+
+                Identifier tagIdentifier = Identifier.tryParse(tagId.substring(1));
+                if (tagIdentifier == null) continue;
+
+                TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagIdentifier);
+                if (Registries.ITEM.getOptional(tag).isEmpty()) continue;
+
+                if (!seenItems.add(tagId)) return false;
+                continue;
+            }
+
+            if (!seenItems.add(item.toString())) return false;
         }
 
         int totalItems = seenItems.size();
@@ -63,20 +83,15 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
     @Override
     public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
         ItemStack center = ItemStack.EMPTY;
-        List<Item> uniqueItems = new ArrayList<>();
+
+        List<String> uniqueItems = getFilter(input);
 
         for (ItemStack stack : input.getStacks()) {
-            if (uniqueItems.size() > MagnetUpgrade.MAX_SIZE) break;
-
             if (stack.isEmpty()) continue;
-
             if (stack.isOf(BackpackItemRegistry.MAGNET_UPGRADE)) {
                 center = stack;
-                continue;
+                break;
             }
-
-            Item item = stack.getItem();
-            if (!uniqueItems.contains(item)) uniqueItems.add(item);
         }
 
         if (uniqueItems.isEmpty() || center.isEmpty()) return ItemStack.EMPTY;
@@ -89,12 +104,44 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
         UpgradeContainerComponent oldComponent = center.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, defaultComponent);
         MagnetUpgrade oldUpgrade = (MagnetUpgrade) oldComponent.baseUpgrades.getFirst();
 
-        upgrade.setList(uniqueItems);
+        upgrade.addAllToList(uniqueItems);
         upgrade.setMode(oldUpgrade.getMode());
 
         result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, new UpgradeContainerComponent(List.of(upgrade)));
 
         return result;
+    }
+
+    public List<String> getFilter(CraftingRecipeInput input) {
+        List<String> uniqueItems = new ArrayList<>();
+
+        for (ItemStack stack : input.getStacks()) {
+            if (uniqueItems.size() >= MagnetUpgrade.MAX_SIZE) break;
+            if (stack.isEmpty()) continue;
+            if (stack.isOf(BackpackItemRegistry.MAGNET_UPGRADE)) continue;
+
+            String itemKey;
+
+            if (isSpecialNameTag(stack)) {
+                itemKey = stack.getName().getString();
+                if (!itemKey.startsWith("#")) continue;
+
+                Identifier tagId = Identifier.tryParse(itemKey.substring(1));
+                if (tagId == null) continue;
+
+                TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagId);
+                if (Registries.ITEM.getOptional(tag).isEmpty()) continue;
+
+            } else itemKey = Registries.ITEM.getId(stack.getItem()).toString();
+
+            if (!uniqueItems.contains(itemKey)) uniqueItems.add(itemKey);
+        }
+
+        return uniqueItems;
+    }
+
+    private boolean isSpecialNameTag(ItemStack stack) {
+        return stack.isOf(Items.NAME_TAG) && stack.getCustomName() != null;
     }
 
     @Override
@@ -105,7 +152,7 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
             ItemStack stack = input.getStackInSlot(i);
             if (stack.isOf(BackpackItemRegistry.MAGNET_UPGRADE)) continue;
 
-            remainders.set(i, stack.copy());
+            remainders.set(i, stack.copyAndEmpty());
         }
 
         return remainders;

@@ -75,8 +75,7 @@ public class UpgradeContainerGui extends SimpleGui {
         ItemStack barrier = Items.BARRIER.getDefaultStack();
         barrier.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.empty"));
 
-        slot.setStack(barrier);
-        this.screenHandler.setSlot(index, slot);
+        this.setSlot(index, barrier);
 
         upgradeList.remove(upgrade);
         backpackStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(upgradeList));

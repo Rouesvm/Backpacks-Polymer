@@ -39,7 +39,7 @@ public class MagnetUpgrade extends Upgrade {
     private final Queue<ItemEntity> queue = new LinkedList<>();
 
     private final List<String> list = new ArrayList<>(MAX_SIZE);
-    private MODE mode = MODE.BLACKLIST;
+    private MODE mode = MODE.PICKUP;
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);

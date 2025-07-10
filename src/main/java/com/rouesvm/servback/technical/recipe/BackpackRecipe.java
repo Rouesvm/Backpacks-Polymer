@@ -41,7 +41,6 @@ public class BackpackRecipe extends ShapedRecipe {
 
         ItemStack stack = craftingRecipeInput.getStackInSlot(4);
         if (stack.getItem() instanceof ContainerItem containerItem) {
-
             int id = BackpackItemJsonRegistry.getBackpackId(containerItem);
             int order = BackpackItemJsonRegistry.getBackpackUpgradeOrder(containerItem.getSize());
 

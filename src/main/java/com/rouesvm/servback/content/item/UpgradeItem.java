@@ -62,14 +62,14 @@ public class UpgradeItem extends SimplePolymerItem {
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
 
-        UpgradeContainerComponent component = new UpgradeContainerComponent(List.of(upgradeType.create()));
+        UpgradeContainerComponent component = UpgradeContainerComponent.of(List.of(upgradeType.create()));
         stack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
 
         return stack;
     }
 
     public List<Upgrade> getUpgradeList(ItemStack stack) {
-        UpgradeContainerComponent component = new UpgradeContainerComponent(List.of(upgradeType.create()));
+        UpgradeContainerComponent component = UpgradeContainerComponent.of(List.of(upgradeType.create()));
         UpgradeContainerComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
         return stackComponent.baseUpgrades;
     }

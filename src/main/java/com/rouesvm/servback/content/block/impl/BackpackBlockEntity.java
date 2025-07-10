@@ -1,6 +1,8 @@
 package com.rouesvm.servback.content.block.impl;
 
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
+import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
@@ -23,6 +25,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
@@ -35,6 +38,8 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
     private BackpackInstance instance = null;
     private SlottedStorage<ItemVariant> storage;
 
+    private List<Upgrade> upgradeList;
+
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
     }
@@ -44,6 +49,7 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
         super.writeData(view);
         view.putInt("extraSize", extraSize);
         if (uuid != null) view.putString("uuid", uuid.toString());
+        if (upgradeList != null) view.getListAppender("upgrade", UpgradeContainerComponent.CODEC).add(UpgradeContainerComponent.of(upgradeList));
     }
 
     @Override
@@ -51,6 +57,11 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
         super.readData(view);
         extraSize = view.getInt("extraSize", 0);
         uuid = UUID.fromString(view.getString("uuid", BackpackManager.generateUniqueUUID().toString()));
+
+        var upgradeContainer = view.getTypedListView("upgrade", UpgradeContainerComponent.CODEC);
+        for (UpgradeContainerComponent upgradeContainerComponent : upgradeContainer) {
+            upgradeList = upgradeContainerComponent.baseUpgrades;
+        }
 
         setStorage();
     }
@@ -65,9 +76,16 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
         stack.addEnchantment(capacity, extraSize / 9);
         stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
 
-        BackpackUtils.addCustomData((ServerWorld) world, stack);
+        if (upgradeList != null) {
+            stack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(upgradeList));
+        }
 
+        BackpackUtils.addCustomData((ServerWorld) world, stack);
         return stack;
+    }
+
+    public void setUpgradeList(List<Upgrade> upgradeList) {
+        this.upgradeList = upgradeList;
     }
 
     public void setStorage() {

@@ -3,8 +3,9 @@ package com.rouesvm.servback.technical.recipe;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
-import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.item.UpgradeItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import net.minecraft.item.ItemStack;
@@ -43,16 +44,19 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
 
         ItemStack base = smithingRecipeInput.base().copy();
         ItemStack addition = smithingRecipeInput.addition();
-        if (base.getItem() instanceof ContainerItem) {
-            if (addition.getItem() instanceof UpgradeItem upgradeBaseItem) {
-                UpgradeContainerComponent component = base.getOrDefault(
-                        BackpackDataComponentTypes.UPGRADE_CONTAINER,
-                        UpgradeContainerComponent.of(new ArrayList<>())
-                );
+        if (base.getItem() instanceof ContainerItem
+                && addition.getItem() instanceof UpgradeItem upgradeBaseItem
+        ) {
+            UpgradeContainerComponent component = base.getOrDefault(
+                    BackpackDataComponentTypes.UPGRADE_CONTAINER,
+                    UpgradeContainerComponent.of(new ArrayList<>())
+            );
 
-                component.baseUpgrades.addAll(upgradeBaseItem.getUpgradeList(addition));
+            Upgrade upgrade = upgradeBaseItem.getUpgradeList(addition).getFirst();
+
+            if (!component.baseUpgrades.contains(upgrade)) {
+                component.baseUpgrades.add(upgradeBaseItem.getUpgradeList(addition).getFirst());
                 base.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
-
                 resultStack = base;
             }
         }

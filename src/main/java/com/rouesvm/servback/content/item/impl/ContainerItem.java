@@ -12,7 +12,6 @@ import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
@@ -20,19 +19,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -131,69 +127,38 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    public ActionResult place(ItemPlacementContext context) {
-        if (!this.getBlock().isEnabled(context.getWorld().getEnabledFeatures())) {
-            return ActionResult.FAIL;
-        } else if (!context.canPlace()) {
-            return ActionResult.FAIL;
-        } else {
-            ItemPlacementContext itemPlacementContext = this.getPlacementContext(context);
-            if (itemPlacementContext == null) {
-                return ActionResult.FAIL;
-            } else {
-                BlockState blockState = this.getPlacementState(itemPlacementContext);
+    protected boolean postPlacement(BlockPos pos, World world, @Nullable PlayerEntity player, ItemStack stack, BlockState state) {
+        if (world.getBlockEntity(pos) instanceof BackpackBlockEntity blockEntity) {
+            BackpackUtils.resizeIfIncorrectSize((ServerPlayerEntity) player, stack, this.slots);
 
-                if (blockState == null) {
-                    return ActionResult.FAIL;
-                } else if (!this.place(itemPlacementContext, blockState)) {
-                    return ActionResult.FAIL;
-                } else {
-                    BlockPos blockPos = itemPlacementContext.getBlockPos();
-                    World world = itemPlacementContext.getWorld();
-                    PlayerEntity playerEntity = itemPlacementContext.getPlayer();
-                    ItemStack itemStack = itemPlacementContext.getStack();
-                    BlockState blockState2 = world.getBlockState(blockPos);
+            blockEntity.setItem(this);
+            blockEntity.setSize(this.slots);
+            blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(stack));
 
-                    if (blockState2.isOf(blockState.getBlock())) {
-                        this.postPlacement(blockPos, world, playerEntity, itemStack, blockState2);
-                        blockState2.getBlock().onPlaced(world, blockPos, blockState2, playerEntity, itemStack);
+            System.out.println(blockEntity.getExtraSize());
+            System.out.println(blockEntity.getSize());
 
-                        if (world.getBlockEntity(blockPos) instanceof BackpackBlockEntity blockEntity) {
-                            BackpackUtils.resizeIfIncorrectSize((ServerPlayerEntity) playerEntity, itemStack, this.slots);
-
-                            blockEntity.setItem(this);
-                            blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(context.getStack()));
-                            blockEntity.setSize(slots);
-
-                            UUID uuid = BackpackManager.getStackUUID(context.getStack());
-                            if (uuid == null) uuid = BackpackManager.createNewUUID(context.getStack());
-                            blockEntity.setUuid(uuid);
-
-                            blockEntity.setStorage();
-
-                            if (itemStack.getCustomName() != null) {
-                                blockEntity.setCustomName(itemStack.getCustomName());
-                            }
-
-                            blockEntity.markDirty();
-                        }
-
-                        if (playerEntity instanceof ServerPlayerEntity) {
-                            Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)playerEntity, blockPos, itemStack);
-                        }
-                    }
-
-                    if (playerEntity != null)
-                        playerEntity.playSoundToPlayer(SoundEvents.BLOCK_WOOL_PLACE, SoundCategory.BLOCKS,
-                                1,
-                                0.5F * context.getWorld().getRandom().nextFloat() * 0.8F);
-
-                    world.emitGameEvent(GameEvent.BLOCK_PLACE, blockPos, GameEvent.Emitter.of(playerEntity, blockState2));
-                    itemStack.decrementUnlessCreative(1, playerEntity);
-                    return ActionResult.SUCCESS;
-                }
+            UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+            if (component != null) {
+                blockEntity.setUpgradeList(component.baseUpgrades);
             }
+
+            UUID uuid = BackpackManager.getStackUUID(stack);
+            if (uuid == null) {
+                uuid = BackpackManager.createNewUUID(stack);
+            }
+
+            blockEntity.setUuid(uuid);
+            blockEntity.setStorage();
+
+            if (stack.getCustomName() != null) {
+                blockEntity.setCustomName(stack.getCustomName());
+            }
+
+            blockEntity.markDirty();
         }
+
+        return super.postPlacement(pos, world, player, stack, state);
     }
 
     @Override

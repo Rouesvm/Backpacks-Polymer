@@ -21,7 +21,7 @@ import java.util.Map;
 public class UpgradeContainerComponent {
     public List<Upgrade> baseUpgrades;
 
-    public UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
+    private UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
         this.baseUpgrades = baseUpgrades;
     }
 

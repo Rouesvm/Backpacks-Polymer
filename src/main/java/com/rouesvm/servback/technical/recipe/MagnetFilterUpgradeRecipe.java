@@ -99,7 +99,7 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
         ItemStack result = center.copy();
 
         MagnetUpgrade upgrade = BackpackUpgradeRegistry.MAGNET.create();
-        UpgradeContainerComponent defaultComponent = new UpgradeContainerComponent(List.of(upgrade));
+        UpgradeContainerComponent defaultComponent = UpgradeContainerComponent.of(List.of(upgrade));
 
         UpgradeContainerComponent oldComponent = center.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, defaultComponent);
         MagnetUpgrade oldUpgrade = (MagnetUpgrade) oldComponent.baseUpgrades.getFirst();
@@ -107,7 +107,7 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
         upgrade.addAllToList(uniqueItems);
         upgrade.setMode(oldUpgrade.getMode());
 
-        result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, new UpgradeContainerComponent(List.of(upgrade)));
+        result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(List.of(upgrade)));
 
         return result;
     }

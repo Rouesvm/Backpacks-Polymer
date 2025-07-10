@@ -27,12 +27,7 @@ public class BackpackGui extends BasicInventoryGui {
     }
 
     public BackpackGui(ServerPlayerEntity player, BackpackInstance instance) {
-        super(player, null, instance.inventory());
-
-        this.frozenInstance = instance.copy();
-
-        this.instance = instance;
-        this.instance.setLastAccessed();
+        this(player, null, instance);
     }
 
     @Override

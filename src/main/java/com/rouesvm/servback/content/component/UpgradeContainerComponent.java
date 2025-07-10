@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UpgradeContainerComponent {
-    public List<Upgrade> baseUpgrades;
+    public final List<Upgrade> baseUpgrades;
 
     private UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
         this.baseUpgrades = baseUpgrades;
@@ -29,7 +29,7 @@ public class UpgradeContainerComponent {
         return new UpgradeContainerComponent(baseUpgrades);
     }
 
-    public static PacketCodec<ByteBuf, UpgradeContainerComponent> PACKET_CODEC = null;
+    public static final PacketCodec<ByteBuf, UpgradeContainerComponent> PACKET_CODEC = null;
 
     public static final Codec<UpgradeContainerComponent> CODEC =
             Codec.unboundedMap(Codec.STRING, NbtCompound.CODEC).xmap(

@@ -31,7 +31,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     @Nullable
     private IngredientPlacement ingredientPlacement;
 
-    public static BackpackUpgradeRecipe.Serializer SERIALIZER = new BackpackUpgradeRecipe.Serializer();
+    public static final BackpackUpgradeRecipe.Serializer SERIALIZER = new BackpackUpgradeRecipe.Serializer();
 
     public BackpackUpgradeRecipe(Ingredient base, Optional<Ingredient> addition, TransmuteRecipeResult result) {
         this.base = base;

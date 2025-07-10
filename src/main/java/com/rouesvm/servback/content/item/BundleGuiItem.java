@@ -57,15 +57,15 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         if (!(player instanceof ServerPlayerEntity serverPlayer))
             return ActionResult.PASS;
 
+        if (cast.getType() == HitResult.Type.BLOCK)
+            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+
         if (player.isSneaking()) {
             if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null) {
                 new UpgradeContainerGui(serverPlayer, stack);
                 return ActionResult.SUCCESS;
             } else return ActionResult.PASS;
         }
-
-        if (cast.getType() == HitResult.Type.BLOCK)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
         onOpenGui(serverPlayer, stack);
         player.swingHand(hand, true);

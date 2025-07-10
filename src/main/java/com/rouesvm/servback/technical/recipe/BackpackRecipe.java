@@ -23,7 +23,7 @@ public class BackpackRecipe extends ShapedRecipe {
     public final RawShapedRecipe raw;
     public final ItemStack result;
 
-    public static Serializer SERIALIZER = new Serializer();
+    public static final Serializer SERIALIZER = new Serializer();
 
     public BackpackRecipe(String group, CraftingRecipeCategory category, RawShapedRecipe raw, ItemStack result, boolean showNotification) {
         super(group, category, raw, result, showNotification);

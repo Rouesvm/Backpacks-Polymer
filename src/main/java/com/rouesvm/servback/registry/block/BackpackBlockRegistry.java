@@ -15,14 +15,14 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class BackpackBlockRegistry {
-    public static Block ENDER_BACKPACK = register("ender_backpack", new BasicBackpackBlock("ender_backpack") {
+    public static final Block ENDER_BACKPACK = register("ender_backpack", new BasicBackpackBlock("ender_backpack") {
         @Override
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
             return player != null ? player.getEnderChestInventory() : null;
         }
     });
 
-    public static Block GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
+    public static final Block GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
         @Override
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
             return BackpackManager.getGlobalInventory();

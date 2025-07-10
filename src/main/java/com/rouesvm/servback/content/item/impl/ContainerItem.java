@@ -97,32 +97,30 @@ public class ContainerItem extends BundleGuiItem {
             if (itemStack.isEmpty()) continue;
 
             capacityAmount++;
+            if (capacityMaxShow > 4) continue;
 
-            if (capacityMaxShow <= 4) {
-                capacityMaxShow++;
-                tooltip.add(Text.literal(" ")
-                        .append(Text.translatable(
-                                "item.container.item_count",
-                                itemStack.getName(),
-                                itemStack.getCount()
-                        )).formatted(Formatting.DARK_AQUA)
-                );
-            }
+            capacityMaxShow++;
+            tooltip.add(Text.literal(" ")
+                    .append(Text.translatable(
+                            "item.container.item_count",
+                            itemStack.getName(),
+                            itemStack.getCount()
+                    )).formatted(Formatting.DARK_AQUA)
+            );
         }
 
-        if (capacityAmount - capacityMaxShow > 0) {
-            tooltip.add(Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
+        if (capacityAmount - capacityMaxShow > 0) tooltip.add(
+                Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
                     .formatted(Formatting.ITALIC).formatted(Formatting.DARK_AQUA));
-        }
     }
 
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
         if (entity instanceof ServerPlayerEntity player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            if (component != null) {
-                component.baseUpgrades.forEach((upgrade) -> upgrade.tick(player, (BackpackInventory) getInventory(player, stack)));
-            }
+            if (component != null) component.baseUpgrades.forEach((upgrade) ->
+                    upgrade.tick(player, (BackpackInventory) getInventory(player, stack))
+            );
         }
     }
 
@@ -168,7 +166,9 @@ public class ContainerItem extends BundleGuiItem {
         BackpackManager.createNewUUID(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
 
-        Optional<BackpackInstance> instance = BackpackManager.getInstance(BackpackManager.getStackUUID(stack), this.slots + BackpackUtils.getExtendedSlots(stack));
+        Optional<BackpackInstance> instance = BackpackManager.getInstance(
+                BackpackManager.getStackUUID(stack),
+                this.slots + BackpackUtils.getExtendedSlots(stack));
         instance.ifPresent(backpackInstance -> new BackpackGui(player, stack, backpackInstance));
     }
 

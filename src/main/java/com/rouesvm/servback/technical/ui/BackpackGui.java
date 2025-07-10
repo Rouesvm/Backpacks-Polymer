@@ -13,7 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class BackpackGui extends BasicInventoryGui {
     private boolean markDirty = false;
     protected final BackpackInstance instance;
-    protected BackpackInstance frozenInstance;
+    protected final BackpackInstance frozenInstance;
 
     public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
         super(player, stack, instance.inventory());

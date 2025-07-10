@@ -74,7 +74,7 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public BackpackRecipeJsonBuilder pattern(String patternStr) {
-        if (!this.pattern.isEmpty() && patternStr.length() != ((String)this.pattern.get(0)).length()) {
+        if (!this.pattern.isEmpty() && patternStr.length() != this.pattern.getFirst().length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
         } else {
             this.pattern.add(patternStr);

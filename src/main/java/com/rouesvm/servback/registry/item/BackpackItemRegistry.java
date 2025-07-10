@@ -32,7 +32,7 @@ public class BackpackItemRegistry {
         public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
             return BackpackManager.getGlobalInventory();
         }
-    });;
+    });
 
     public static final Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(new Item.Settings()
             .maxCount(1)

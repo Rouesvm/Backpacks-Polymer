@@ -21,7 +21,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.List;
 
 public class UpgradeItem extends SimplePolymerItem {
-    public UpgradeType<? extends Upgrade> upgradeType;
+    private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
         super(settings, Items.POISONOUS_POTATO, true);

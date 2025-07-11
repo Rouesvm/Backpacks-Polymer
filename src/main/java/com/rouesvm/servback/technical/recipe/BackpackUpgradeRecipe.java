@@ -18,6 +18,7 @@ import net.minecraft.recipe.display.SlotDisplay;
 import net.minecraft.recipe.display.SmithingRecipeDisplay;
 import net.minecraft.recipe.input.SmithingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -37,6 +38,29 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
         this.base = base;
         this.addition = addition;
         this.result = result;
+    }
+
+    @Override
+    public boolean matches(SmithingRecipeInput input, World world) {
+        boolean baseMatch = Ingredient.matches(this.template(), input.template())
+                && this.base().test(input.base())
+                && Ingredient.matches(this.addition(), input.addition());
+
+        if (!baseMatch) return false;
+
+        ItemStack base = input.base();
+        ItemStack addition = input.addition();
+
+        if (base.getItem() instanceof ContainerItem
+                && addition.getItem() instanceof UpgradeItem upgradeBaseItem
+        ) {
+            UpgradeContainerComponent component = base.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+            Upgrade upgrade = upgradeBaseItem.getUpgradeList(addition).getFirst();
+
+            return component == null || !component.baseUpgrades.contains(upgrade);
+        }
+
+        return true;
     }
 
     public ItemStack craft(SmithingRecipeInput smithingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup) {

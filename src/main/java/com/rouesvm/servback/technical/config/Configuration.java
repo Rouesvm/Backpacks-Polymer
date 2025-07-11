@@ -65,13 +65,13 @@ public class Configuration {
 
             Instance loaded = GSON.fromJson(rawJson, Instance.class);
             if (loaded != null) {
+                sanitizeConfig(jsonObject);
                 instance = loaded;
-                oldFormatConvertor(jsonObject);
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
     }
 
-    public void oldFormatConvertor(JsonObject jsonObject) {
+    public void sanitizeConfig(JsonObject jsonObject) {
         if (jsonObject.has("enable_globalpack") && !jsonObject.get("enable_globalpack").getAsBoolean()) {
             instance.disabled_backpacks.add("serverbackpacks:global");
         }

@@ -78,5 +78,9 @@
   "info.serverbackpacks.contains": "Contains",
   "info.serverbackpacks.mode": "Mode",
 
+  "info.serverbackpacks.mode.blacklist": "Blacklist",
+  "info.serverbackpacks.mode.whitelist": "Whitelist",
+  "info.serverbackpacks.mode.pickup": "Pickup",
+
   "upgrade.serverbackpacks.magnet": "Vacuum"
 }

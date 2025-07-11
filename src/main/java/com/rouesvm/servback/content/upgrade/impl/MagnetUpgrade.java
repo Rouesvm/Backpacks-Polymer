@@ -10,7 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -61,9 +60,8 @@ public class MagnetUpgrade extends Upgrade {
     public void readView(ReadView data) {
         this.mode = MODE.values()[data.getInt("mode", 0)];
 
-        for (String string : data.getTypedListView("Items", Codec.STRING)) {
-            list.add(string);
-        }
+        ReadView.TypedListReadView<String> listReadView = data.getTypedListView("Items", Codec.STRING);
+        listReadView.forEach(list::add);
     }
 
     @Override
@@ -71,10 +69,9 @@ public class MagnetUpgrade extends Upgrade {
         data.putInt("mode", mode.ordinal());
 
         WriteView.ListAppender<String> listAppender = data.getListAppender("Items", Codec.STRING);
-
-        for (String string : list) {
-            if (!string.isEmpty()) listAppender.add(string);
-        }
+        list.stream()
+                .filter((string) -> !string.isEmpty())
+                .forEach(listAppender::add);
 
         if (listAppender.isEmpty()) data.remove("Items");
     }
@@ -85,7 +82,7 @@ public class MagnetUpgrade extends Upgrade {
             tooltip.add(Text.translatable("info.serverbackpacks.mode")
                     .append(": ")
                     .formatted(Formatting.GRAY)
-                    .append(Text.of(mode.toString())
+                    .append(Text.translatable("info.serverbackpacks.mode" + "." + mode.toString().toLowerCase())
                             .copy()
                             .formatted(Formatting.GREEN)
                     )
@@ -104,17 +101,14 @@ public class MagnetUpgrade extends Upgrade {
     @Override
     public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
         MODE[] modes = MODE.values();
-        MODE prevMode = mode;
 
         int nextOrdinal = (mode.ordinal() + 1) % modes.length;
         mode = modes[nextOrdinal];
 
-        if (mode == prevMode) return false;
-
         player.sendMessage(Text.translatable("info.serverbackpacks.mode")
                 .append(": ")
                 .formatted(Formatting.GRAY)
-                .append(Text.of(mode.toString())
+                .append(Text.translatable("info.serverbackpacks.mode" + "." + mode.toString().toLowerCase())
                         .copy()
                         .formatted(Formatting.GREEN)
                 ), true);
@@ -127,7 +121,8 @@ public class MagnetUpgrade extends Upgrade {
     @Override
     public void tick(ServerPlayerEntity player, BackpackInventory inventory) {
         if (inventory == null || !(player.getWorld() instanceof ServerWorld world)) return;
-        if (!pickUpItems(player, inventory)) checkForItems(world, player, inventory);
+        if (!pickUpItems(player, inventory))
+            checkForItems(world, player, inventory);
     }
 
     public boolean pickUpItems(ServerPlayerEntity player, BackpackInventory inventory) {
@@ -136,6 +131,8 @@ public class MagnetUpgrade extends Upgrade {
         tick++;
 
         if (tick % 5 == 0) {
+            tick = 0;
+
             ItemEntity next = queue.poll();
             if (next == null || !next.isAlive() || next.distanceTo(player) > 10) return false;
 
@@ -156,60 +153,53 @@ public class MagnetUpgrade extends Upgrade {
             next.setStack(remainder);
         }
 
-        if (tick % 2 == 0) {
-            queue.forEach(item ->
-                    item.setPos(player.getX(), player.getY(), player.getZ())
-            );
-        }
+        if (tick % 2 == 0) queue.forEach(item ->
+                item.setPos(player.getX(), player.getY(), player.getZ())
+        );
 
         return true;
     }
 
     public void checkForItems(ServerWorld world, ServerPlayerEntity player, BackpackInventory inventory) {
         Box area = new Box(player.getPos().add(-5, -5, -5), player.getPos().add(5, 5, 5));
-        List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, area, itemEntity -> {
-            if (!itemEntity.isAlive()) return false;
-            ItemStack stack = itemEntity.getStack();
 
-            return switch (mode) {
-                case BLACKLIST -> !checkList(stack);
-                case WHITELIST -> checkList(stack);
-                case PICKUP    -> true;
-            };
-        });
+        world.getEntitiesByClass(ItemEntity.class, area, this::filterForItem)
+                .stream()
+                .filter(item -> !inventory.canInsert(item.getStack()))
+                .forEach(item -> {
+                    queue.add(item);
+                    item.setPickupDelay(20);
+                });
+    }
 
-        for (ItemEntity item : items) {
-            if (!inventory.canInsert(item.getStack())) continue;
+    private boolean filterForItem(ItemEntity entity) {
+        if (!entity.isAlive()) return false;
+        ItemStack stack = entity.getStack();
 
-            queue.add(item);
-            item.setPickupDelay(20);
-        }
+        return switch (mode) {
+            case BLACKLIST -> !checkList(stack);
+            case WHITELIST -> checkList(stack);
+            case PICKUP    -> true;
+        };
     }
 
     public boolean checkList(ItemStack stack) {
-        boolean matched = false;
-        Item item = stack.getItem();
-        RegistryEntry<Item> entry = Registries.ITEM.getEntry(item);
+        return list.stream().anyMatch(filterID ->
+                        matchesFilter(filterID, stack.getItem())
+                );
+    }
 
-        for (String s : list) {
-            if (s.startsWith("#")) {
-                Identifier tagId = Identifier.tryParse(s.substring(1));
-                TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagId);
+    public static boolean matchesFilter(String filterID, Item item) {
+        if (filterID.startsWith("#")) {
+            Identifier tagId = Identifier.tryParse(filterID.substring(1));
+            if (tagId == null) return false;
 
-                if (entry.isIn(tag)) {
-                    matched = true;
-                    break;
-                }
-            } else {
-                Identifier itemId = Registries.ITEM.getId(item);
-                if (itemId.toString().equals(s)) {
-                    matched = true;
-                    break;
-                }
-            }
+            TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagId);
+            return Registries.ITEM.getEntry(item).isIn(tag);
+        } else {
+            Identifier itemId = Registries.ITEM.getId(item);
+            return itemId.toString().equals(filterID);
         }
-
-        return matched;
     }
 
     public enum MODE {

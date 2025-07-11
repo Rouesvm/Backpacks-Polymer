@@ -151,6 +151,8 @@ public class ContainerItem extends BundleGuiItem {
             }
 
             blockEntity.markDirty();
+
+            ContainerItem.playOpenSound((ServerPlayerEntity) player);
         }
 
         return writeNbtToBlockEntity(world, player, pos, stack);

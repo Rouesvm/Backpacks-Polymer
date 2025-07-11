@@ -43,6 +43,10 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             if (stack.getCustomName() != null) {
                 blockEntity.setCustomName(stack.getCustomName());
             }
+
+            blockEntity.markDirty();
+
+            ContainerItem.playOpenSound((ServerPlayerEntity) player);
         }
 
         return writeNbtToBlockEntity(world, player, pos, stack);

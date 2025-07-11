@@ -60,7 +60,7 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
 
         var upgradeContainer = view.getTypedListView("upgrade", UpgradeContainerComponent.CODEC);
         for (UpgradeContainerComponent upgradeContainerComponent : upgradeContainer) {
-            upgradeList = upgradeContainerComponent.baseUpgrades;
+            upgradeList = upgradeContainerComponent.getBaseUpgrades();
         }
 
         setStorage();

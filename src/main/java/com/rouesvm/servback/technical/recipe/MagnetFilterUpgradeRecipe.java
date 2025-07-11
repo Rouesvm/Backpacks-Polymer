@@ -102,7 +102,7 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
         UpgradeContainerComponent defaultComponent = UpgradeContainerComponent.of(List.of(upgrade));
 
         UpgradeContainerComponent oldComponent = center.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, defaultComponent);
-        MagnetUpgrade oldUpgrade = (MagnetUpgrade) oldComponent.baseUpgrades.getFirst();
+        MagnetUpgrade oldUpgrade = (MagnetUpgrade) oldComponent.getBaseUpgrades().getFirst();
 
         upgrade.addAllToList(uniqueItems);
         upgrade.setMode(oldUpgrade.getMode());

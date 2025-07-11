@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UpgradeContainerComponent {
-    public final List<Upgrade> baseUpgrades;
+    private final List<Upgrade> baseUpgrades;
 
     private UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
         this.baseUpgrades = baseUpgrades;
@@ -27,6 +27,14 @@ public class UpgradeContainerComponent {
 
     public static UpgradeContainerComponent of(List<Upgrade> baseUpgrades) {
         return new UpgradeContainerComponent(baseUpgrades);
+    }
+
+    public List<Upgrade> getBaseUpgrades() {
+        return baseUpgrades;
+    }
+
+    public void add(Upgrade upgrade) {
+        baseUpgrades.add(upgrade);
     }
 
     public static final PacketCodec<ByteBuf, UpgradeContainerComponent> PACKET_CODEC = null;

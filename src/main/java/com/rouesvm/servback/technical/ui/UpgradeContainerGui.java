@@ -31,7 +31,7 @@ public class UpgradeContainerGui extends SimpleGui {
         UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
         if (component == null) return;
 
-        this.upgradeList = component.baseUpgrades;
+        this.upgradeList = component.getBaseUpgrades();
 
         this.setTitle(Text.translatable("info.serverbackpacks.upgrades"));
 

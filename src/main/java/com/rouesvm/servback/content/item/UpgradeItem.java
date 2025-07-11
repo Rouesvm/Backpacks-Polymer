@@ -71,6 +71,6 @@ public class UpgradeItem extends SimplePolymerItem {
     public List<Upgrade> getUpgradeList(ItemStack stack) {
         UpgradeContainerComponent component = UpgradeContainerComponent.of(List.of(upgradeType.create()));
         UpgradeContainerComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
-        return stackComponent.baseUpgrades;
+        return stackComponent.getBaseUpgrades();
     }
 }

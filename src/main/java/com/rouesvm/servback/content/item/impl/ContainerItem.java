@@ -73,7 +73,7 @@ public class ContainerItem extends BundleGuiItem {
                 .formatted(Formatting.GRAY)
         );
 
-        for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
+        for (Upgrade upgrade : upgradeContainer.getBaseUpgrades()) {
             tooltip.add(Text.literal(" ")
                     .append(upgrade.getType().getTranslationKey())
                     .formatted(Formatting.DARK_GREEN)
@@ -118,7 +118,7 @@ public class ContainerItem extends BundleGuiItem {
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
         if (entity instanceof ServerPlayerEntity player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            if (component != null) component.baseUpgrades.forEach((upgrade) ->
+            if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
                     upgrade.tick(player, (BackpackInventory) getInventory(player, stack))
             );
         }
@@ -135,7 +135,7 @@ public class ContainerItem extends BundleGuiItem {
 
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) {
-                blockEntity.setUpgradeList(component.baseUpgrades);
+                blockEntity.setUpgradeList(component.getBaseUpgrades());
             }
 
             UUID uuid = BackpackManager.getStackUUID(stack);

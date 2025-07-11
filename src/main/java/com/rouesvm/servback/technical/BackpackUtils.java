@@ -30,10 +30,13 @@ public class BackpackUtils {
         Map<Item, Integer> contents = new HashMap<>();
 
         for (ItemStack stack : items) {
-            if (!stack.isEmpty()) {
-                contents.merge(stack.getItem(), stack.getCount() + stack.getComponents().hashCode(), Integer::sum);
-            }
+            if (!stack.isEmpty()) contents.merge(
+                        stack.getItem(),
+                        stack.getCount() + stack.getComponents().hashCode(),
+                        Integer::sum
+                );
         }
+
         return contents.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey(Comparator.comparing(Item::toString)))
                 .map(e -> e.getKey().toString() + ":" + e.getValue())
@@ -42,14 +45,19 @@ public class BackpackUtils {
 
     public static void convertComponentToBackpackData(BackpackInstance instance, ItemStack stack) {
         BackpackInventory inventory = instance.inventory();
-        if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {
-            DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
-            if (inventory.insertItems(itemStacks)) {
-                instance.setInventory(inventory);
-                BackpackManager.addBackpack(instance);
-            }
-            stack.set(DataComponentTypes.CONTAINER, null);
+
+        if (!(stack.getItem() instanceof ContainerItem item)) return;
+        if (!inventory.isEmpty()
+                && stack.get(DataComponentTypes.CONTAINER) == null
+        ) return;
+
+        DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
+        if (inventory.insertItems(itemStacks)) {
+            instance.setInventory(inventory);
+            BackpackManager.addBackpack(instance);
         }
+
+        stack.set(DataComponentTypes.CONTAINER, null);
     }
 
     public static DefaultedList<ItemStack> getItemList(ItemStack stack) {
@@ -68,9 +76,9 @@ public class BackpackUtils {
     public static int getExtendedSlots(ItemStack stack) {
         NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
         NbtCompound compound = component.copyNbt();
-        if (compound.contains("level"))
-            return 9 * compound.getInt("level", 0);
-        else return 0;
+
+        int level = compound.getInt("level", 0);
+        return 9 * level;
     }
 
     public static int addCustomData(ServerWorld world, ItemStack stack) {
@@ -89,10 +97,8 @@ public class BackpackUtils {
     public static void resizeIfIncorrectSize(ServerPlayerEntity player, ItemStack stack, int maxBackpackSlot) {
         UUID uuid = BackpackManager.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
-        if (inventory != null) {
-            resize(player, uuid, inventory,
+        if (inventory != null) resize(player, uuid, inventory,
                     maxBackpackSlot + addCustomData(player.getWorld(), stack));
-        }
     }
 
     public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory target, int totalSlots) {

@@ -41,9 +41,6 @@ public class BackpackItemRegistry {
     );
 
     public static <T extends Item> T register(String name, T item) {
-        if (Configuration.instance().disabled_backpacks.contains(name)
-        ) return null;
-
         return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
     }
 
@@ -52,10 +49,13 @@ public class BackpackItemRegistry {
                 || Configuration.instance().disabled_upgrades.contains(name)
         ) return null;
 
-        return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
+        return register(name, item);
     }
 
     public static <T extends BasicPolymerBlockItem> T register(T item) {
+        if (Configuration.instance().disabled_backpacks.contains(item.getIdentifier().getPath())
+        ) return null;
+
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 

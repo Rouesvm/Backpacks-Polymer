@@ -33,8 +33,7 @@ public class BackpackTrinket implements Trinket {
 
         if (entity instanceof ServerPlayerEntity player) {
             CosmeticManager manager = CosmeticManager.manager();
-            if (manager.getInstance(player).isEmpty())
-                manager.getOrCreateInstance(player, stack);
+            if (!manager.hasInstance(player)) manager.getOrCreateInstance(player, stack);
         }
     }
 
@@ -84,9 +83,8 @@ public class BackpackTrinket implements Trinket {
 
     public static boolean isStackEmptyInBackSlot(PlayerEntity player) {
         Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent(player);
-        if (optional.isPresent())
-            return getStackInBackSlot(player).isEmpty();
-        else return true;
+        if (optional.isEmpty()) return false;
+        return getStackInBackSlot(player).isEmpty();
     }
 
     public static ItemStack getStackInBackSlot(PlayerEntity player) {

@@ -9,7 +9,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -190,16 +189,19 @@ public class MagnetUpgrade extends Upgrade {
     }
 
     public static boolean matchesFilter(String filterID, Item item) {
+        var itemRegistry = Registries.ITEM;
+        var itemEntry = itemRegistry.getEntry(item);
+
         if (filterID.startsWith("#")) {
             Identifier tagId = Identifier.tryParse(filterID.substring(1));
             if (tagId == null) return false;
 
-            TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagId);
-            return Registries.ITEM.getEntry(item).isIn(tag);
-        } else {
-            Identifier itemId = Registries.ITEM.getId(item);
-            return itemId.toString().equals(filterID);
+            TagKey<Item> tag = TagKey.of(itemRegistry.getKey(), tagId);
+            return itemEntry.isIn(tag);
         }
+
+        String itemId = itemEntry.getIdAsString();
+        return itemId.equals(filterID);
     }
 
     public enum MODE {

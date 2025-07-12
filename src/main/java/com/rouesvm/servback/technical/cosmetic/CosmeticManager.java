@@ -31,6 +31,11 @@ public class CosmeticManager {
         }
     }
 
+
+    public boolean hasInstance(ServerPlayerEntity player) {
+        return manager.storedInstances.get(player.getUuid()) != null;
+    }
+
     public Optional<BackHolder> getInstance(ServerPlayerEntity player) {
         return Optional.ofNullable(manager.storedInstances.getOrDefault(player.getUuid(), null));
     }

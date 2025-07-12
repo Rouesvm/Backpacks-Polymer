@@ -67,30 +67,31 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
 
     @Override
     public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        if (BackpackTrinket.isStackEmptyInBackSlot(player)) {
-            BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
+        if (!BackpackTrinket.isStackEmptyInBackSlot(player)) return false;
 
-            ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
-            BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
-            BackpackTrinket.equipStack(player, stack);
-            world.breakBlock(pos, false);
-            return true;
-        } else return false;
+        BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
+
+        ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
+        BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
+        BackpackTrinket.equipStack(player, stack);
+        world.breakBlock(pos, false);
+        return true;
     }
 
     @Override
     public void openGui(ServerPlayerEntity player, BlockEntity entity) {
-        if (entity instanceof BackpackBlockEntity backpackBlockEntity) {
-            BackpackInstance instance = backpackBlockEntity.getInstance();
-            resize(player, backpackBlockEntity.getUuid(), instance.inventory(),
-                    backpackBlockEntity.getSize() + backpackBlockEntity.getExtraSize());
-            new BackpackGui(player, instance);
-        }
+        if (!(entity instanceof BackpackBlockEntity backpackBlockEntity)) return;
+
+        BackpackInstance instance = backpackBlockEntity.getInstance();
+        resize(player, backpackBlockEntity.getUuid(), instance.inventory(),
+                backpackBlockEntity.getSize() + backpackBlockEntity.getExtraSize());
+        new BackpackGui(player, instance);
     }
 
     @Override
     public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
         if (entity == null) return null;
+
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
         return BackpackManager.getInventory(backpackBlockEntity.getUuid());
     }

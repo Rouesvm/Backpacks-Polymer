@@ -13,6 +13,7 @@ import net.minecraft.state.property.Property;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import org.geysermc.geyser.api.block.custom.CustomBlockData;
 import org.geysermc.geyser.api.block.custom.CustomBlockPermutation;
 import org.geysermc.geyser.api.block.custom.CustomBlockState;
 import org.geysermc.geyser.api.block.custom.NonVanillaCustomBlockData;
@@ -52,34 +53,43 @@ public class BackpackGeyserBlock {
                     if (block instanceof BackpackBlock) customBlockData = registerBackpackBlock(block, location);
 
                     event.register(customBlockData);
-
-                    int blockId = Registries.BLOCK.getRawId(block);
-                    for (BlockState state : block.getStateManager().getStates()) {
-                        CustomBlockState.Builder stateBuilder = customBlockData.blockStateBuilder();
-                        for (Property<?> property : state.getProperties()) {
-                            switch (property) {
-                                case IntProperty intProperty ->
-                                        stateBuilder.intProperty(property.getName(), state.get(intProperty));
-                                case BooleanProperty booleanProperty ->
-                                        stateBuilder.booleanProperty(property.getName(), state.get(booleanProperty));
-                                case EnumProperty<?> enumProperty ->
-                                        stateBuilder.stringProperty(enumProperty.getName(), state.get(enumProperty).asString());
-                                default -> throw new IllegalArgumentException("Unknown property type: " + property.getClass().getName());
-                            }
-                        }
-
-                        JavaBlockState javaBlockState = JavaBlockState.builder()
-                                .identifier(location.toString())
-                                .blockHardness(block.getHardness())
-                                .canBreakWithHand(true)
-                                .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
-                                .javaId(Block.getRawIdFromState(state))
-                                .stateGroupId(blockId)
-                                .build();
-
-                        event.registerOverride(javaBlockState, stateBuilder.build());
-                    }
+                    registerForBlockState(event, customBlockData, block, location);
                 });
+    }
+
+    public static void registerForBlockState(GeyserDefineCustomBlocksEvent event, NonVanillaCustomBlockData customBlockData, Block block, Identifier location) {
+        int blockId = Registries.BLOCK.getRawId(block);
+        for (BlockState state : block.getStateManager().getStates()) {
+            CustomBlockState.Builder stateBuilder = blockStateBuilder(customBlockData, state);
+
+            JavaBlockState javaBlockState = JavaBlockState.builder()
+                    .identifier(location.toString())
+                    .blockHardness(block.getHardness())
+                    .canBreakWithHand(true)
+                    .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
+                    .javaId(Block.getRawIdFromState(state))
+                    .stateGroupId(blockId)
+                    .build();
+
+            event.registerOverride(javaBlockState, stateBuilder.build());
+        }
+    }
+
+    public static CustomBlockState.Builder blockStateBuilder(CustomBlockData customBlockData, BlockState state) {
+        CustomBlockState.Builder stateBuilder = customBlockData.blockStateBuilder();
+        for (Property<?> property : state.getProperties()) {
+            switch (property) {
+                case IntProperty intProperty ->
+                        stateBuilder.intProperty(property.getName(), state.get(intProperty));
+                case BooleanProperty booleanProperty ->
+                        stateBuilder.booleanProperty(property.getName(), state.get(booleanProperty));
+                case EnumProperty<?> enumProperty ->
+                        stateBuilder.stringProperty(enumProperty.getName(), state.get(enumProperty).asString());
+                default -> throw new IllegalArgumentException("Unknown property type: " + property.getClass().getName());
+            }
+        }
+
+        return stateBuilder;
     }
 
     private static NonVanillaCustomBlockData registerBackpackBlock(Block block, Identifier location) {

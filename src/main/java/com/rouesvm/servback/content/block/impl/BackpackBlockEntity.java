@@ -26,6 +26,7 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
@@ -59,8 +60,9 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
         uuid = UUID.fromString(view.getString("uuid", BackpackManager.generateUniqueUUID().toString()));
 
         var upgradeContainer = view.getTypedListView("upgrade", UpgradeContainerComponent.CODEC);
-        for (UpgradeContainerComponent upgradeContainerComponent : upgradeContainer) {
-            upgradeList = upgradeContainerComponent.getBaseUpgrades();
+        Optional<UpgradeContainerComponent> upgradeContainerComponent = upgradeContainer.stream().findFirst();
+        if (!upgradeContainer.isEmpty() && upgradeContainerComponent.isPresent()) {
+            upgradeList = upgradeContainerComponent.get().getBaseUpgrades();
         }
 
         setStorage();

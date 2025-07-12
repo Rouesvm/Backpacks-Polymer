@@ -80,16 +80,17 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
 
     @Override
     protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        ItemStack pickStack = super.getPickStack(world, pos, state, includeData);
         if (!world.isClient()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
-            if (entity != null) {
-                ItemStack stack = entity.getDefaultStack();
-                if (includeData)
-                    return stack.copy();
-                else return stack.getItem().getDefaultStack();
-            }
+            if (entity == null) return pickStack;
+
+            ItemStack stack = entity.getDefaultStack();
+            if (includeData)
+                return stack.copy();
+            else return stack.getItem().getDefaultStack();
         }
-        return super.getPickStack(world, pos, state, includeData);
+        return pickStack;
     }
 
     @Override
@@ -101,40 +102,38 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     @Override
     protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
         BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
-        if (entity != null) {
-            ItemStack stack = entity.getDefaultStack().copy();
-            BackpackUtils.addCustomData(world, stack);
-            dropStack(world, pos, stack);
-        }
+        if (entity == null) return;
+
+        ItemStack stack = entity.getDefaultStack().copy();
+        BackpackUtils.addCustomData(world, stack);
+        dropStack(world, pos, stack);
     }
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!world.isClient) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
-            if (entity != null) {
-                if (ServerBackpacks.hasTrinketLoaded
-                        && player.isSneaking()
-                        && !trinketInteraction(entity, (ServerPlayerEntity) player, world, pos))
-                    return ActionResult.SUCCESS;
+            if (entity == null) return ActionResult.PASS;
 
-                onOpenGui((ServerPlayerEntity) player, entity);
+            if (ServerBackpacks.hasTrinketLoaded
+                    && player.isSneaking()
+                    && !trinketInteraction(entity, (ServerPlayerEntity) player, world, pos))
                 return ActionResult.SUCCESS;
-            }
+
+            onOpenGui((ServerPlayerEntity) player, entity);
+            return ActionResult.SUCCESS;
         }
 
         return ActionResult.PASS;
     }
 
     public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        if (BackpackTrinket.isStackEmptyInBackSlot(player)) {
-            ItemStack stack = entity.getDefaultStack().copy();
-            BackpackTrinket.equipStack(player, stack);
-            world.breakBlock(pos, false);
-            return true;
-        }
+        if (!BackpackTrinket.isStackEmptyInBackSlot(player)) return false;
 
-        return false;
+        ItemStack stack = entity.getDefaultStack().copy();
+        BackpackTrinket.equipStack(player, stack);
+        world.breakBlock(pos, false);
+        return true;
     }
 
     public void onOpenGui(ServerPlayerEntity player, BlockEntity entity) {

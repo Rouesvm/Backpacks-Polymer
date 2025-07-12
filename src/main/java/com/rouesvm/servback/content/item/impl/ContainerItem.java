@@ -63,57 +63,6 @@ public class ContainerItem extends BundleGuiItem {
         addInventoryTooltip(tooltip, polymerStack);
     }
 
-    public static void addUpgradeTooltip(List<Text> tooltip, ItemStack stack) {
-        UpgradeContainerComponent upgradeContainer = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-        if (upgradeContainer == null) return;
-        if (upgradeContainer.baseUpgrades.isEmpty()) return;
-
-        tooltip.add(Text.translatable("info.serverbackpacks.upgrades")
-                .append(":")
-                .formatted(Formatting.GRAY)
-        );
-
-        for (Upgrade upgrade : upgradeContainer.getBaseUpgrades()) {
-            tooltip.add(Text.literal(" ")
-                    .append(upgrade.getType().getTranslationKey())
-                    .formatted(Formatting.DARK_GREEN)
-            );
-        }
-    }
-
-    public static void addInventoryTooltip(List<Text> tooltip, ItemStack stack) {
-        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(stack);
-        if (itemList.isEmpty()) return;
-
-        tooltip.add(Text.translatable("info.serverbackpacks.contains")
-                .append(":")
-                .formatted(Formatting.GRAY)
-        );
-
-        int capacityMaxShow = 0;
-        int capacityAmount = 0;
-
-        for (ItemStack itemStack : itemList) {
-            if (itemStack.isEmpty()) continue;
-
-            capacityAmount++;
-            if (capacityMaxShow > 4) continue;
-
-            capacityMaxShow++;
-            tooltip.add(Text.literal(" ")
-                    .append(Text.translatable(
-                            "item.container.item_count",
-                            itemStack.getName(),
-                            itemStack.getCount()
-                    )).formatted(Formatting.DARK_AQUA)
-            );
-        }
-
-        if (capacityAmount - capacityMaxShow > 0) tooltip.add(
-                Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
-                    .formatted(Formatting.ITALIC).formatted(Formatting.DARK_AQUA));
-    }
-
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
         if (entity instanceof ServerPlayerEntity player) {
@@ -184,6 +133,57 @@ public class ContainerItem extends BundleGuiItem {
         DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots, ItemStack.EMPTY);
         stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
         return list;
+    }
+
+    public static void addUpgradeTooltip(List<Text> tooltip, ItemStack stack) {
+        UpgradeContainerComponent upgradeContainer = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+        if (upgradeContainer == null) return;
+        if (upgradeContainer.getBaseUpgrades().isEmpty()) return;
+
+        tooltip.add(Text.translatable("info.serverbackpacks.upgrades")
+                .append(":")
+                .formatted(Formatting.GRAY)
+        );
+
+        for (Upgrade upgrade : upgradeContainer.getBaseUpgrades()) {
+            tooltip.add(Text.literal(" ")
+                    .append(upgrade.getType().getTranslationKey())
+                    .formatted(Formatting.DARK_GREEN)
+            );
+        }
+    }
+
+    public static void addInventoryTooltip(List<Text> tooltip, ItemStack stack) {
+        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(stack);
+        if (itemList.isEmpty()) return;
+
+        tooltip.add(Text.translatable("info.serverbackpacks.contains")
+                .append(":")
+                .formatted(Formatting.GRAY)
+        );
+
+        int capacityMaxShow = 0;
+        int capacityAmount = 0;
+
+        for (ItemStack itemStack : itemList) {
+            if (itemStack.isEmpty()) continue;
+
+            capacityAmount++;
+            if (capacityMaxShow > 4) continue;
+
+            capacityMaxShow++;
+            tooltip.add(Text.literal(" ")
+                    .append(Text.translatable(
+                            "item.container.item_count",
+                            itemStack.getName(),
+                            itemStack.getCount()
+                    )).formatted(Formatting.DARK_AQUA)
+            );
+        }
+
+        if (capacityAmount - capacityMaxShow > 0) tooltip.add(
+                Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
+                        .formatted(Formatting.ITALIC).formatted(Formatting.DARK_AQUA));
     }
 
     public static void playOpenSound(ServerPlayerEntity player) {

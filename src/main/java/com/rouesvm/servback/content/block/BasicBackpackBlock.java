@@ -128,7 +128,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
     }
 
     public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        if (!BackpackTrinket.isStackEmptyInBackSlot(player)) return false;
+        if (BackpackTrinket.isStackEmptyInBackSlot(player)) return false;
 
         ItemStack stack = entity.getDefaultStack().copy();
         BackpackTrinket.equipStack(player, stack);

@@ -33,14 +33,12 @@ public class BackpackItemRegistry {
     });
 
     public static final Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(
-            new Item.Settings()
-                    .maxCount(1),
+            new Item.Settings().maxCount(1),
             BackpackUpgradeRegistry.MAGNET
     ));
 
     public static final Item CRAFTING_UPGRADE = register("crafting_upgrade", new UpgradeItem(
-            new Item.Settings()
-                    .maxCount(1),
+            new Item.Settings().maxCount(1),
             BackpackUpgradeRegistry.CRAFTING
     ));
 

@@ -23,28 +23,26 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 import static com.rouesvm.servback.registry.item.BackpackItemRegistry.MAGNET_UPGRADE;
 
 public class MagnetUpgrade extends Upgrade {
     public static final int MAX_SIZE = 5;
+    public static final int MAX_RANGE = 3;
 
     private int tick = 0;
-    private final Queue<ItemEntity> queue = new LinkedList<>();
-
-    private final List<String> list = new ArrayList<>(MAX_SIZE);
     private MODE mode = MODE.PICKUP;
+
+    private final Set<ItemEntity> queue = new HashSet<>();
+    private final List<String> filterList = new ArrayList<>(MAX_SIZE);
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);
     }
 
     public void addAllToList(List<String> list) {
-        this.list.addAll(list);
+        this.filterList.addAll(list);
     }
 
     public MODE getMode() {
@@ -60,7 +58,7 @@ public class MagnetUpgrade extends Upgrade {
         this.mode = MODE.values()[data.getInt("mode", 0)];
 
         ReadView.TypedListReadView<String> listReadView = data.getTypedListView("Items", Codec.STRING);
-        listReadView.forEach(list::add);
+        listReadView.forEach(filterList::add);
     }
 
     @Override
@@ -68,7 +66,7 @@ public class MagnetUpgrade extends Upgrade {
         data.putInt("mode", mode.ordinal());
 
         WriteView.ListAppender<String> listAppender = data.getListAppender("Items", Codec.STRING);
-        list.stream()
+        filterList.stream()
                 .filter((string) -> !string.isEmpty())
                 .forEach(listAppender::add);
 
@@ -87,10 +85,10 @@ public class MagnetUpgrade extends Upgrade {
                     )
             );
 
-            if (this.list.isEmpty()) return;
+            if (this.filterList.isEmpty()) return;
 
             tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
-            for (String string : this.list) tooltip.add(
+            for (String string : this.filterList) tooltip.add(
                         Text.literal(" ")
                                 .append(string).copy()
                                 .formatted(Formatting.DARK_AQUA));
@@ -120,25 +118,41 @@ public class MagnetUpgrade extends Upgrade {
     @Override
     public void tick(ServerPlayerEntity player, BackpackInventory inventory) {
         if (inventory == null || !(player.getWorld() instanceof ServerWorld world)) return;
-        if (!pickUpItems(player, inventory))
-            checkForItems(world, player, inventory);
+        if (pickUpItems(player, inventory)) return;
+
+        checkForItems(world, player, inventory);
     }
 
     public boolean pickUpItems(ServerPlayerEntity player, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
+        if (BackpackInventory.isFull(inventory)) {
+            tick = 0;
+            for (ItemEntity item : queue) {
+                item.setPickupDelay(0);
+            }
+            return false;
+        }
+
         tick++;
 
-        if (tick % 5 == 0) {
+        if (tick % 4 == 0) {
             tick = 0;
 
-            ItemEntity next = queue.poll();
-            if (next == null || !next.isAlive() || next.distanceTo(player) > 10) return false;
+            Iterator<ItemEntity> iterator = queue.iterator();
+            if (!iterator.hasNext()) return false;
+
+            ItemEntity next = iterator.next();
+            if (next == null || !next.isAlive() || next.distanceTo(player) > MAX_RANGE) {
+                iterator.remove();
+                return false;
+            }
 
             ItemStack stack = next.getStack();
             if (!inventory.canInsert(stack)) {
                 next.setPickupDelay(0);
-                return true;
+                iterator.remove();
+                return iterator.hasNext();
             }
 
             ItemStack remainder = inventory.addStack(stack);
@@ -146,32 +160,33 @@ public class MagnetUpgrade extends Upgrade {
 
             if (remainder.isEmpty()) {
                 next.discard();
+                iterator.remove();
                 return true;
-            }
-
-            next.setStack(remainder);
+            } else next.setStack(remainder);
         }
 
-        if (tick % 2 == 0) queue.forEach(item ->
-                item.setPos(player.getX(), player.getY(), player.getZ())
-        );
+        if (tick % 2 == 0) queue.forEach(item -> {
+            item.setPos(player.getX(), player.getY(), player.getZ());
+            item.setPickupDelay(100);
+        });
 
         return true;
     }
 
     public void checkForItems(ServerWorld world, ServerPlayerEntity player, BackpackInventory inventory) {
-        Box area = new Box(player.getPos().add(-3, -3, -3), player.getPos().add(3, 3, 3));
+        Box area = new Box(player.getPos().add(-((double) (MAX_RANGE / 2) * 3)), player.getPos().add((double) (MAX_RANGE / 2) * 3));
 
-        world.getEntitiesByClass(ItemEntity.class, area, this::filterForItem)
-                .stream()
-                .filter(item -> inventory.canInsert(item.getStack()))
-                .forEach(item -> {
+        world.getEntitiesByClass(ItemEntity.class, area, (entity ->
+                !queue.contains(entity)
+                        && inventory.canInsert(entity.getStack())
+                        && checkFilterForItem(entity))
+                ).forEach(item -> {
                     queue.add(item);
-                    item.setPickupDelay(20);
+                    item.setPickupDelay(100);
                 });
     }
 
-    private boolean filterForItem(ItemEntity entity) {
+    private boolean checkFilterForItem(ItemEntity entity) {
         if (!entity.isAlive()) return false;
         ItemStack stack = entity.getStack();
 
@@ -183,9 +198,8 @@ public class MagnetUpgrade extends Upgrade {
     }
 
     public boolean checkList(ItemStack stack) {
-        return list.stream().anyMatch(filterID ->
-                        matchesFilter(filterID, stack.getItem())
-                );
+        return filterList.stream().anyMatch(filterID ->
+                        matchesFilter(filterID, stack.getItem()));
     }
 
     public static boolean matchesFilter(String filterID, Item item) {

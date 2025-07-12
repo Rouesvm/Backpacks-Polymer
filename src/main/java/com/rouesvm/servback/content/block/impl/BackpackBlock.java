@@ -67,7 +67,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
 
     @Override
     public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
-        if (!BackpackTrinket.isStackEmptyInBackSlot(player)) return false;
+        if (BackpackTrinket.isStackEmptyInBackSlot(player)) return false;
 
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 

@@ -15,7 +15,7 @@ public class UpgradeType<T extends Upgrade> {
     }
 
     public Item getItem() {
-        return Registries.ITEM.get(Identifier.of(id.getNamespace(), id.getPath() + "_upgrade"));
+        return Registries.ITEM.get(id.withSuffixedPath("_upgrade"));
     }
 
     public T create() {

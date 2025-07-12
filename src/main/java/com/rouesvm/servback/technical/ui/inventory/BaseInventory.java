@@ -151,6 +151,15 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return canInsert(stack);
     }
 
+    public static boolean isFull(Inventory inventory) {
+        for (ItemStack stack : inventory) {
+            if (stack.isEmpty() || stack.getCount() < stack.getMaxCount()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean canInsert(ItemStack stack, Inventory inventory) {
         boolean bl = false;
 

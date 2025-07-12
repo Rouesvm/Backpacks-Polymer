@@ -30,7 +30,7 @@ public class UpgradeItem extends SimplePolymerItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
-        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId())), Items.POISONOUS_POTATO, true);
+        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId().withSuffixedPath("_upgrade"))), Items.POISONOUS_POTATO, true);
         this.upgradeType = upgradeType;
     }
 

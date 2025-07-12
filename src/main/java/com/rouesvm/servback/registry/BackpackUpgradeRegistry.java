@@ -11,7 +11,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
 public class BackpackUpgradeRegistry {
-    public static final RegistryKey<Registry<UpgradeType<?>>> SPELL_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades")) ;
+    public static final RegistryKey<Registry<UpgradeType<?>>> SPELL_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades"));
     private static final Registry<UpgradeType<?>> SPELLS = FabricRegistryBuilder.createSimple(
             SPELL_REGISTRY_KEY).buildAndRegister();
 

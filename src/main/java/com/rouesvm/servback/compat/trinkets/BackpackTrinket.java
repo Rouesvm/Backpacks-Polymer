@@ -1,9 +1,12 @@
 package com.rouesvm.servback.compat.trinkets;
 
+import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.BundleGuiItem;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BackHolder;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import dev.emi.trinkets.api.*;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.entity.LivingEntity;
@@ -18,6 +21,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class BackpackTrinket implements Trinket {
     public static void initialize() {
@@ -34,6 +38,14 @@ public class BackpackTrinket implements Trinket {
         if (entity instanceof ServerPlayerEntity player) {
             CosmeticManager manager = CosmeticManager.manager();
             if (!manager.hasInstance(player)) manager.getOrCreateInstance(player, stack);
+
+            UUID uuid = BackpackManager.getStackUUID(stack);
+
+            if (uuid == null) return;
+            UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+            if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
+                    upgrade.tick(player, BackpackManager.getInventory(uuid))
+            );
         }
     }
 
@@ -83,8 +95,8 @@ public class BackpackTrinket implements Trinket {
 
     public static boolean isStackEmptyInBackSlot(PlayerEntity player) {
         Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent(player);
-        if (optional.isEmpty()) return false;
-        return getStackInBackSlot(player).isEmpty();
+        if (optional.isEmpty()) return true;
+        return !getStackInBackSlot(player).isEmpty();
     }
 
     public static ItemStack getStackInBackSlot(PlayerEntity player) {

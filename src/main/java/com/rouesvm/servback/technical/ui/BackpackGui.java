@@ -73,10 +73,10 @@ public class BackpackGui extends BasicInventoryGui {
             }
 
             BackpackManager.save(this.getPlayer().getServer());
-        }
 
-        handler.enableSyncing();
-        handler.sendContentUpdates();
+            handler.enableSyncing();
+            handler.sendContentUpdates();
+        }
     }
 
     @Override

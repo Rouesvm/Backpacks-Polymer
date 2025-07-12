@@ -111,7 +111,7 @@ public class BackpackManager {
     // SAVING AND ADDING BACKPACKS
     //
 
-    public static void saveBackpack(BackpackInstance instance) {
+    public static void saveToBackpackInventory(BackpackInstance instance) {
         if (instance == null) return;
         if (instance.getUuid() != null && instance.inventory() != null) {
             addBackpack(instance).ifPresent(saved ->

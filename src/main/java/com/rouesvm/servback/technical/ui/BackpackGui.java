@@ -54,24 +54,27 @@ public class BackpackGui extends BasicInventoryGui {
 
     @Override
     public void slotUpdate() {
-        BackpackManager.saveBackpack(instance);
+        BackpackManager.saveToBackpackInventory(instance);
         markDirty = true;
     }
 
     @Override
     public void onClose() {
-        BackpackManager.save(this.getPlayer().getServer());
+        if (stack != null) stack.set(BackpackDataComponentTypes.IS_OPENED, false);
+
+        ScreenHandler handler = this.getPlayer().currentScreenHandler;
 
         if (markDirty) {
             String before = BackpackUtils.hashBackpackContents(frozenInstance.heldInventory());
             String after = BackpackUtils.hashBackpackContents(instance.heldInventory());
 
-            if (!before.equals(after)) BackpackDataSaver.createBackup(player.getServer());
+            if (!before.equals(after)) {
+                BackpackDataSaver.createBackup(player.getServer());
+            }
+
+            BackpackManager.save(this.getPlayer().getServer());
         }
 
-        if (stack != null) stack.set(BackpackDataComponentTypes.IS_OPENED, false);
-
-        ScreenHandler handler = getPlayer().currentScreenHandler;
         handler.enableSyncing();
         handler.sendContentUpdates();
     }

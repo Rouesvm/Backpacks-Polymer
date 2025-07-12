@@ -13,6 +13,8 @@ import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -28,7 +30,7 @@ public class UpgradeItem extends SimplePolymerItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
-        super(settings, Items.POISONOUS_POTATO, true);
+        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId())), Items.POISONOUS_POTATO, true);
         this.upgradeType = upgradeType;
     }
 
@@ -48,6 +50,7 @@ public class UpgradeItem extends SimplePolymerItem {
         Upgrade upgrade = upgrades.getFirst();
 
         if (upgrade instanceof ClickableUpgrade clickableUpgrade) {
+            if (cursorStackReference.get().isEmpty()) cursorStackReference.set(ItemStack.EMPTY);
             return clickableUpgrade.onClicked((ServerPlayerEntity) player, stack, slot, clickType);
         }
 

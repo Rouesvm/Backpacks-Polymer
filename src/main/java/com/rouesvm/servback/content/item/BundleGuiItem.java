@@ -98,8 +98,8 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         } else {
             ItemStack itemStack = slot.getStack();
 
-            if (!itemStack.getItem().canBeNested()) return false;
             if (slot instanceof CraftingResultSlot) return false;
+            if (!itemStack.getItem().canBeNested()) return false;
 
             if (clickType == ClickType.LEFT && !itemStack.isEmpty()) {
                 if (BaseInventory.canInsert(itemStack, inventory)) {
@@ -123,8 +123,8 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             Inventory inventory = getInventory(serverPlayer, stack);
 
-            if (!otherStack.getItem().canBeNested()) return false;
             if (slot instanceof CraftingResultSlot) return false;
+            if (!otherStack.getItem().canBeNested()) return false;
 
             if (clickType == ClickType.RIGHT) {
                 onOpenGui(serverPlayer, stack);

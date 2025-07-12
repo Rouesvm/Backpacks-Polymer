@@ -3,8 +3,8 @@ package com.rouesvm.servback.content.upgrade.impl;
 import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
+import com.rouesvm.servback.technical.ui.VirtualCraftingScreenHandler;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -21,7 +21,7 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
     public boolean onClicked(ServerPlayerEntity serverPlayer, ItemStack stack, Slot slot, ClickType clickType) {
         if (clickType == ClickType.RIGHT) {
             serverPlayer.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) ->
-                    new CraftingScreenHandler(syncId, inventory),
+                    new VirtualCraftingScreenHandler(syncId, inventory),
                     Text.translatable("container.crafting")
             ));
             return true;
@@ -34,13 +34,21 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
     public boolean onClicked(ServerPlayerEntity serverPlayer, ItemStack stack, Slot slot, eu.pb4.sgui.api.ClickType clickType) {
         if (clickType.isRight) {
             serverPlayer.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) ->
-                    new CraftingScreenHandler(syncId, inventory),
+                    new VirtualCraftingScreenHandler(syncId, inventory),
                     Text.translatable("container.crafting")
             ));
             return true;
         }
 
         return false;
+    }
+
+    public static boolean isRightClick(ClickType clickType) {
+        return clickType == ClickType.RIGHT;
+    }
+
+    public static boolean isRightClick(eu.pb4.sgui.api.ClickType clickType) {
+        return clickType.isRight;
     }
 
     @Override

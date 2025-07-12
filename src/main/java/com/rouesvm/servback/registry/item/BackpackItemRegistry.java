@@ -13,8 +13,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -34,17 +32,17 @@ public class BackpackItemRegistry {
         }
     });
 
-    public static final Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(new Item.Settings()
-            .maxCount(1)
-            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, "magnet_upgrade"))
-            ), BackpackUpgradeRegistry.MAGNET)
-    );
+    public static final Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(
+            new Item.Settings()
+                    .maxCount(1),
+            BackpackUpgradeRegistry.MAGNET
+    ));
 
-    public static final Item CRAFTING_UPGRADE = register("crafting_upgrade", new UpgradeItem(new Item.Settings()
-            .maxCount(1)
-            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, "crafting_upgrade"))
-            ), BackpackUpgradeRegistry.CRAFTING)
-    );
+    public static final Item CRAFTING_UPGRADE = register("crafting_upgrade", new UpgradeItem(
+            new Item.Settings()
+                    .maxCount(1),
+            BackpackUpgradeRegistry.CRAFTING
+    ));
 
     public static UpgradeItem register(String name, UpgradeItem item) {
         if (!Configuration.instance().enable_upgrades

@@ -1,13 +1,17 @@
 package com.rouesvm.servback.technical.ui;
 
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
+import eu.pb4.sgui.api.ClickType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class BackpackGui extends BasicInventoryGui {
@@ -28,6 +32,24 @@ public class BackpackGui extends BasicInventoryGui {
 
     public BackpackGui(ServerPlayerEntity player, BackpackInstance instance) {
         this(player, null, instance);
+    }
+
+    @Override
+    public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+        if (index < 0) return true;
+
+        Slot slot = this.screenHandler.getSlot(index);
+        if (slot.hasStack()
+                && slot.getStack().getItem() instanceof ContainerItem
+                && stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null
+                && type.shift
+                && type.isRight
+        ) {
+            new UpgradeContainerGui(this.getPlayer(), stack);
+            return false;
+        }
+
+        return true;
     }
 
     @Override

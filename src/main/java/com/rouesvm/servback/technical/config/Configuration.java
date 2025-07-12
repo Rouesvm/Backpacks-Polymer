@@ -66,6 +66,7 @@ public class Configuration {
             Instance loaded = GSON.fromJson(rawJson, Instance.class);
             if (loaded != null) {
                 sanitizeConfig(jsonObject);
+                replaceEntryIfInvalid();
                 instance = loaded;
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
@@ -80,17 +81,20 @@ public class Configuration {
             instance.disabled_backpacks.add("serverbackpacks:ender");
         }
 
+    }
+
+    public void replaceEntryIfInvalid() {
         instance.types_of_backpacks.replaceAll((key, value) -> {
             boolean invalid = value.slots > maxSlots || value.backpacks == null || value.dyeBlacklist == null;
             if (invalid) return defaultInstance.types_of_backpacks.getOrDefault(
-                        key,
-                        new BackpackType(
-                                key * 9,
-                                true,
-                                value.backpacks != null ? value.backpacks : List.of("unknown"),
-                                List.of("brown")
-                        )
-                );
+                    key,
+                    new BackpackType(
+                            key * 9,
+                            true,
+                            value.backpacks != null ? value.backpacks : List.of("unknown"),
+                            List.of("brown")
+                    )
+            );
             else return value;
         });
     }

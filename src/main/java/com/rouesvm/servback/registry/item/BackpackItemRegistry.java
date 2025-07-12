@@ -40,16 +40,12 @@ public class BackpackItemRegistry {
             ), BackpackUpgradeRegistry.MAGNET)
     );
 
-    public static <T extends Item> T register(String name, T item) {
-        return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
-    }
-
     public static UpgradeItem register(String name, UpgradeItem item) {
         if (!Configuration.instance().enable_upgrades
                 || Configuration.instance().disabled_upgrades.contains(name)
         ) return null;
 
-        return register(name, item);
+        return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
     }
 
     public static <T extends BasicPolymerBlockItem> T register(T item) {

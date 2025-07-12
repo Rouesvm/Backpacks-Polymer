@@ -43,14 +43,6 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
         return false;
     }
 
-    public static boolean isRightClick(ClickType clickType) {
-        return clickType == ClickType.RIGHT;
-    }
-
-    public static boolean isRightClick(eu.pb4.sgui.api.ClickType clickType) {
-        return clickType.isRight;
-    }
-
     @Override
     public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
         return super.onUsed(world, player, stack);

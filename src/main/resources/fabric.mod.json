@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Server Backpacks",
-  "description": "A configurable backpack mod for you server.",
+  "description": "A configurable backpack mod for your server.",
   "authors": [
     "Rouesvm",
     "Original Author: Oliver-makes-code"

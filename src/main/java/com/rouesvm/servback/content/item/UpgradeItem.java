@@ -1,6 +1,7 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
@@ -8,12 +9,15 @@ import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -37,15 +41,29 @@ public class UpgradeItem extends SimplePolymerItem {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        ItemStack stack = user.getStackInHand(hand);
+    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
+        UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
+
+        List<Upgrade> upgrades = upgradeItem.getUpgradeList(stack);
+        Upgrade upgrade = upgrades.getFirst();
+
+        if (upgrade instanceof ClickableUpgrade clickableUpgrade) {
+            return clickableUpgrade.onClicked((ServerPlayerEntity) player, stack, slot, clickType);
+        }
+
+        return false;
+    }
+
+    @Override
+    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
 
         List<Upgrade> upgrades = upgradeItem.getUpgradeList(stack);
         Upgrade upgrade = upgrades.getFirst();
 
         boolean successful = false;
-        if (upgrade != null) successful = upgrade.onUsed(world, (ServerPlayerEntity) user, stack);
+        if (upgrade != null) successful = upgrade.onUsed(world, (ServerPlayerEntity) player, stack);
 
         if (successful) {
             NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
@@ -55,7 +73,7 @@ public class UpgradeItem extends SimplePolymerItem {
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
 
             return ActionResult.SUCCESS_SERVER;
-        } else return super.use(world, user, hand);
+        } else return super.use(world, player, hand);
     }
 
     @Override

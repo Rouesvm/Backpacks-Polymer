@@ -115,7 +115,16 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 RecipeCategory.TOOLS,
                 BackpackItemJsonRegistry.getBackpackByOrder(1))
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
-                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "upgrade_backpack")));
+                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "magnet_upgrade_backpack")));
+
+        BackpackUpgradeRecipeJsonBuilder.create(
+                        Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
+                        Ingredient.ofItem(BackpackItemRegistry.CRAFTING_UPGRADE),
+                        RecipeCategory.TOOLS,
+                        BackpackItemJsonRegistry.getBackpackByOrder(1))
+                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
+                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "crafting_upgrade_backpack")));
+
 
         dyedBackpackRecipes(itemWrap, exporter);
     }

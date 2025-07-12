@@ -2,6 +2,7 @@ package com.rouesvm.servback.technical.ui;
 
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.UpgradeItem;
+import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
@@ -68,9 +69,15 @@ public class UpgradeContainerGui extends SimpleGui {
         ItemStack stack = slot.getStack();
         if (!(stack.getItem() instanceof UpgradeItem item)) return true;
 
-        this.screenHandler.setCursorStack(stack.copyAndEmpty());
-
         Upgrade upgrade = item.getUpgradeList(stack).getFirst();
+
+        if (type.isRight) {
+            if (upgrade instanceof ClickableUpgrade clickableUpgrade)
+                clickableUpgrade.onClicked(player, stack, slot, type);
+            return false;
+        }
+
+        this.screenHandler.setCursorStack(stack.copyAndEmpty());
 
         ItemStack barrier = Items.BARRIER.getDefaultStack();
         barrier.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.empty"));

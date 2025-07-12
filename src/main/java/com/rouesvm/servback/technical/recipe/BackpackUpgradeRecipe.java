@@ -57,7 +57,9 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
             UpgradeContainerComponent component = base.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             Upgrade upgrade = upgradeBaseItem.getUpgradeList(addition).getFirst();
 
-            return component == null || !component.getBaseUpgrades().contains(upgrade);
+            if (component == null)
+                return true;
+            else return !component.getBaseUpgrades().contains(upgrade);
         }
 
         return true;

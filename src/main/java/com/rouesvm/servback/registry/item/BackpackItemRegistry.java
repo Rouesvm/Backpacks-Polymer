@@ -40,6 +40,12 @@ public class BackpackItemRegistry {
             ), BackpackUpgradeRegistry.MAGNET)
     );
 
+    public static final Item CRAFTING_UPGRADE = register("crafting_upgrade", new UpgradeItem(new Item.Settings()
+            .maxCount(1)
+            .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, "crafting_upgrade"))
+            ), BackpackUpgradeRegistry.CRAFTING)
+    );
+
     public static UpgradeItem register(String name, UpgradeItem item) {
         if (!Configuration.instance().enable_upgrades
                 || Configuration.instance().disabled_upgrades.contains(name)

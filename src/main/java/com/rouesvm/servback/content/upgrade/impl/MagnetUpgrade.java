@@ -160,11 +160,11 @@ public class MagnetUpgrade extends Upgrade {
     }
 
     public void checkForItems(ServerWorld world, ServerPlayerEntity player, BackpackInventory inventory) {
-        Box area = new Box(player.getPos().add(-5, -5, -5), player.getPos().add(5, 5, 5));
+        Box area = new Box(player.getPos().add(-3, -3, -3), player.getPos().add(3, 3, 3));
 
         world.getEntitiesByClass(ItemEntity.class, area, this::filterForItem)
                 .stream()
-                .filter(item -> !inventory.canInsert(item.getStack()))
+                .filter(item -> inventory.canInsert(item.getStack()))
                 .forEach(item -> {
                     queue.add(item);
                     item.setPickupDelay(20);

@@ -14,6 +14,11 @@ public class Upgrade implements FunctionalUpgrade {
     }
 
     @Override
+    public String toString() {
+        return type.getId().toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 

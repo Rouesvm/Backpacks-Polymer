@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 
 public class BackpackUpgradeRegistry {
     public static final RegistryKey<Registry<UpgradeType<?>>> SPELL_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades"));
-    private static final Registry<UpgradeType<?>> SPELLS = FabricRegistryBuilder.createSimple(
+    public static final Registry<UpgradeType<?>> SPELLS = FabricRegistryBuilder.createSimple(
             SPELL_REGISTRY_KEY).buildAndRegister();
 
     public static final UpgradeType<MagnetUpgrade> MAGNET = register("magnet", MagnetUpgrade::new);

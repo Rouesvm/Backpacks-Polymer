@@ -55,7 +55,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
                 && addition.getItem() instanceof UpgradeItem upgradeBaseItem
         ) {
             UpgradeContainerComponent component = base.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            Upgrade upgrade = upgradeBaseItem.getUpgradeList(addition).getFirst();
+            Upgrade upgrade = upgradeBaseItem.getUpgrade(addition);
 
             if (component == null)
                 return true;
@@ -66,26 +66,27 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     }
 
     public ItemStack craft(SmithingRecipeInput smithingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup) {
-        ItemStack resultStack = this.result.apply(smithingRecipeInput.base());
-
-        ItemStack base = smithingRecipeInput.base().copy();
+        ItemStack base = smithingRecipeInput.base();
         ItemStack addition = smithingRecipeInput.addition();
-        if (base.getItem() instanceof ContainerItem
-                && addition.getItem() instanceof UpgradeItem upgradeBaseItem
-        ) {
-            UpgradeContainerComponent component = base.getOrDefault(
-                    BackpackDataComponentTypes.UPGRADE_CONTAINER,
-                    UpgradeContainerComponent.of(new ArrayList<>())
-            );
 
-            Upgrade upgrade = upgradeBaseItem.getUpgradeList(addition).getFirst();
+        ItemStack resultStack = base.copy();
 
-            if (!component.getBaseUpgrades().contains(upgrade)) {
-                component.add(upgradeBaseItem.getUpgradeList(addition).getFirst());
-                base.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
-                resultStack = base;
-            }
-        }
+        if (!(base.getItem() instanceof ContainerItem)
+                || !(addition.getItem() instanceof UpgradeItem upgradeBaseItem)
+        ) return resultStack;
+
+        UpgradeContainerComponent component = base.getOrDefault(
+                BackpackDataComponentTypes.UPGRADE_CONTAINER,
+                UpgradeContainerComponent.of(new ArrayList<>())
+        );
+
+        List<Upgrade> upgrades = new ArrayList<>(component.getBaseUpgrades());
+        Upgrade upgrade = upgradeBaseItem.getUpgrade(addition);
+
+        if (upgrades.contains(upgrade)) return resultStack;
+
+        upgrades.add(upgrade);
+        resultStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(upgrades));
 
         return resultStack;
     }

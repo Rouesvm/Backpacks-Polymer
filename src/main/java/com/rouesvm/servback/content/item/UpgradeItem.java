@@ -1,6 +1,6 @@
 package com.rouesvm.servback.content.item;
 
-import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.component.UpgradeComponent;
 import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
@@ -37,17 +37,15 @@ public class UpgradeItem extends SimplePolymerItem {
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
-        for (Upgrade upgrade : upgradeItem.getUpgradeList(stack)) {
-            upgrade.addTooltip(tooltip, stack, context);
-        }
+        Upgrade upgrade = upgradeItem.getUpgrade(stack);
+        if (upgrade != null) upgrade.addTooltip(tooltip, stack, context);
     }
 
     @Override
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
 
-        List<Upgrade> upgrades = upgradeItem.getUpgradeList(stack);
-        Upgrade upgrade = upgrades.getFirst();
+        Upgrade upgrade = upgradeItem.getUpgrade(stack);
 
         if (upgrade instanceof ClickableUpgrade clickableUpgrade) {
             if (cursorStackReference.get().isEmpty()) cursorStackReference.set(ItemStack.EMPTY);
@@ -62,8 +60,7 @@ public class UpgradeItem extends SimplePolymerItem {
         ItemStack stack = player.getStackInHand(hand);
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
 
-        List<Upgrade> upgrades = upgradeItem.getUpgradeList(stack);
-        Upgrade upgrade = upgrades.getFirst();
+        Upgrade upgrade = upgradeItem.getUpgrade(stack);
 
         boolean successful = false;
         if (upgrade != null) successful = upgrade.onUsed(world, (ServerPlayerEntity) player, stack);
@@ -83,15 +80,15 @@ public class UpgradeItem extends SimplePolymerItem {
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
 
-        UpgradeContainerComponent component = UpgradeContainerComponent.of(List.of(upgradeType.create()));
-        stack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
+        UpgradeComponent component = UpgradeComponent.of(upgradeType.create());
+        stack.set(BackpackDataComponentTypes.UPGRADE, component);
 
         return stack;
     }
 
-    public List<Upgrade> getUpgradeList(ItemStack stack) {
-        UpgradeContainerComponent component = UpgradeContainerComponent.of(List.of(upgradeType.create()));
-        UpgradeContainerComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, component);
-        return stackComponent.getBaseUpgrades();
+    public Upgrade getUpgrade(ItemStack stack) {
+        UpgradeComponent component = UpgradeComponent.of(upgradeType.create());
+        UpgradeComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE, component);
+        return stackComponent.getUpgrade();
     }
 }

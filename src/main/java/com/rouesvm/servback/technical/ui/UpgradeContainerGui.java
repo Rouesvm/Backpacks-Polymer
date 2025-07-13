@@ -69,7 +69,7 @@ public class UpgradeContainerGui extends SimpleGui {
         ItemStack stack = slot.getStack();
         if (!(stack.getItem() instanceof UpgradeItem item)) return true;
 
-        Upgrade upgrade = item.getUpgradeList(stack).getFirst();
+        Upgrade upgrade = item.getUpgrade(stack);
 
         if (type.isRight) {
             if (upgrade instanceof ClickableUpgrade clickableUpgrade)

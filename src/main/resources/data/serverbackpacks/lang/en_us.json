@@ -54,6 +54,7 @@
   "item.serverbackpacks.ender" : "EnderPack",
 
   "item.serverbackpacks.magnet_upgrade" : "Vacuum Module",
+  "item.serverbackpacks.crafting_upgrade" : "Crafting Module",
 
   "item.serverbackpacks.gui_backpacks" : "Backpacks",
   "item.serverbackpacks.gui_backpack" : "Backpack",

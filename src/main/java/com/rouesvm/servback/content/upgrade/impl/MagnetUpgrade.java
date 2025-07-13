@@ -1,15 +1,14 @@
 package com.rouesvm.servback.content.upgrade.impl;
 
-import com.mojang.serialization.Codec;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.content.upgrade.FilterableUpgrade;
+import com.rouesvm.servback.content.upgrade.SaveableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
+import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -18,96 +17,71 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.*;
 
-import static com.rouesvm.servback.registry.item.BackpackItemRegistry.MAGNET_UPGRADE;
-
-public class MagnetUpgrade extends Upgrade {
+public class MagnetUpgrade extends Upgrade implements SaveableUpgrade, FilterableUpgrade {
     public static final int MAX_SIZE = 5;
 
     public static final int MAX_RANGE = 3;
     private static final double SCANNING_RANGE = ((double) MAX_RANGE / 2) * 3;
 
     private int tick = 0;
-    private MODE mode = MODE.PICKUP;
 
     private final Set<ItemEntity> queue = new HashSet<>();
-    private final List<String> filterList = new ArrayList<>(MAX_SIZE);
+    private final ItemFilter itemFilter = new ItemFilter(ItemFilter.MODE.PICKUP, new ArrayList<>(MAX_RANGE));
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);
     }
 
-    public void addAllToList(List<String> list) {
-        this.filterList.addAll(list);
-    }
-
-    public MODE getMode() {
-        return mode;
-    }
-
-    public void setMode(MODE mode) {
-        this.mode = mode;
+    @Override
+    public ItemFilter getFilter() {
+        return itemFilter;
     }
 
     @Override
     public void readView(ReadView data) {
-        this.mode = MODE.values()[data.getInt("mode", 0)];
-
-        ReadView.TypedListReadView<String> listReadView = data.getTypedListView("Items", Codec.STRING);
-        listReadView.forEach(filterList::add);
+        itemFilter.readView(data);
     }
 
     @Override
     public void writeView(WriteView data) {
-        data.putInt("mode", mode.ordinal());
-
-        WriteView.ListAppender<String> listAppender = data.getListAppender("Items", Codec.STRING);
-        filterList.stream()
-                .filter((string) -> !string.isEmpty())
-                .forEach(listAppender::add);
-
-        if (listAppender.isEmpty()) data.remove("Items");
+        itemFilter.writeView(data);
     }
 
     @Override
     public void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
-        if (stack.isOf(MAGNET_UPGRADE)) {
-            tooltip.add(Text.translatable("info.serverbackpacks.mode")
-                    .append(": ")
-                    .formatted(Formatting.GRAY)
-                    .append(Text.translatable("info.serverbackpacks.mode" + "." + mode.toString().toLowerCase())
+        tooltip.add(Text.translatable("info.serverbackpacks.mode")
+                .append(": ")
+                .formatted(Formatting.GRAY)
+                .append(Text.translatable("info.serverbackpacks.mode" + "." + this.itemFilter.getMode().toString().toLowerCase())
                             .copy()
-                            .formatted(Formatting.GREEN)
-                    )
-            );
+                            .formatted(Formatting.GREEN)));
 
-            if (this.filterList.isEmpty()) return;
+        if (this.itemFilter.filterList().isEmpty()) return;
 
-            tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
-            for (String string : this.filterList) tooltip.add(
-                        Text.literal(" ")
-                                .append(string).copy()
-                                .formatted(Formatting.DARK_AQUA));
-        }
+        tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
+        for (String string : this.itemFilter.filterList()) tooltip.add(
+                Text.literal(" ")
+                        .append(string).copy()
+                        .formatted(Formatting.DARK_AQUA));
     }
 
     @Override
     public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
-        MODE[] modes = MODE.values();
+        ItemFilter.MODE[] modes = ItemFilter.MODE.values();
 
-        int nextOrdinal = (mode.ordinal() + 1) % modes.length;
-        mode = modes[nextOrdinal];
+        int nextOrdinal = (this.itemFilter.getMode().ordinal() + 1) % modes.length;
+        this.itemFilter.setMode(modes[nextOrdinal]);
 
         player.sendMessage(Text.translatable("info.serverbackpacks.mode")
                 .append(": ")
                 .formatted(Formatting.GRAY)
-                .append(Text.translatable("info.serverbackpacks.mode" + "." + mode.toString().toLowerCase())
+                .append(Text.translatable("info.serverbackpacks.mode" + "." + this.itemFilter.getMode().toString().toLowerCase())
                         .copy()
                         .formatted(Formatting.GREEN)
                 ), true);
@@ -192,37 +166,10 @@ public class MagnetUpgrade extends Upgrade {
         if (!entity.isAlive()) return false;
         ItemStack stack = entity.getStack();
 
-        return switch (mode) {
-            case BLACKLIST -> !checkList(stack);
-            case WHITELIST -> checkList(stack);
+        return switch (itemFilter.getMode()) {
+            case BLACKLIST -> !itemFilter.matches(stack);
+            case WHITELIST -> itemFilter.matches(stack);
             case PICKUP    -> true;
         };
-    }
-
-    public boolean checkList(ItemStack stack) {
-        return filterList.stream().anyMatch(filterID ->
-                        matchesFilter(filterID, stack.getItem()));
-    }
-
-    public static boolean matchesFilter(String filterID, Item item) {
-        var itemRegistry = Registries.ITEM;
-        var itemEntry = itemRegistry.getEntry(item);
-
-        if (filterID.startsWith("#")) {
-            Identifier tagId = Identifier.tryParse(filterID.substring(1));
-            if (tagId == null) return false;
-
-            TagKey<Item> tag = TagKey.of(itemRegistry.getKey(), tagId);
-            return itemEntry.isIn(tag);
-        }
-
-        String itemId = itemEntry.getIdAsString();
-        return itemId.equals(filterID);
-    }
-
-    public enum MODE {
-        BLACKLIST,
-        WHITELIST,
-        PICKUP
     }
 }

@@ -30,7 +30,10 @@ public class UpgradeItem extends SimplePolymerItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
-        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId().withSuffixedPath("_upgrade"))), Items.POISONOUS_POTATO, true);
+        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId().withSuffixedPath("_upgrade")))
+                        .component(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgradeType.create())),
+                Items.POISONOUS_POTATO, true
+        );
         this.upgradeType = upgradeType;
     }
 
@@ -74,16 +77,6 @@ public class UpgradeItem extends SimplePolymerItem {
 
             return ActionResult.SUCCESS_SERVER;
         } else return super.use(world, player, hand);
-    }
-
-    @Override
-    public ItemStack getDefaultStack() {
-        ItemStack stack = super.getDefaultStack();
-
-        UpgradeComponent component = UpgradeComponent.of(upgradeType.create());
-        stack.set(BackpackDataComponentTypes.UPGRADE, component);
-
-        return stack;
     }
 
     public Upgrade getUpgrade(ItemStack stack) {

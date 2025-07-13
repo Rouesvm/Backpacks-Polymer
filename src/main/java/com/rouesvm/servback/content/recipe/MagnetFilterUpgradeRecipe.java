@@ -1,11 +1,12 @@
 package com.rouesvm.servback.content.recipe;
 
-import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.component.UpgradeComponent;
 import com.rouesvm.servback.content.item.UpgradeItem;
+import com.rouesvm.servback.content.upgrade.FilterableUpgrade;
+import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
-import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -82,31 +83,33 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
     @Override
     public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
         ItemStack center = ItemStack.EMPTY;
-
         List<String> uniqueItems = getFilter(input);
 
         for (ItemStack stack : input.getStacks()) {
             if (stack.isEmpty()) continue;
-            if (stack.isOf(BackpackItemRegistry.MAGNET_UPGRADE)) {
+
+            UpgradeComponent component = stack.get(BackpackDataComponentTypes.UPGRADE);
+            if (component != null && component.getUpgrade() instanceof FilterableUpgrade) {
                 center = stack;
                 break;
             }
         }
 
-        if (uniqueItems.isEmpty() || center.isEmpty()) return ItemStack.EMPTY;
+        if (center.isEmpty() || uniqueItems.isEmpty()) return ItemStack.EMPTY;
+
+        UpgradeComponent oldComponent = center.get(BackpackDataComponentTypes.UPGRADE);
+        if (oldComponent == null) return ItemStack.EMPTY;
+
+        Upgrade upgrade = oldComponent.getUpgrade().getType().create();
+        if (!(upgrade instanceof FilterableUpgrade newUpgrade)) return ItemStack.EMPTY;
+
+        FilterableUpgrade oldUpgrade = (FilterableUpgrade) oldComponent.getUpgrade();
+
+        newUpgrade.getFilter().filterList().addAll(uniqueItems);
+        newUpgrade.getFilter().setMode(oldUpgrade.getFilter().getMode());
 
         ItemStack result = center.copy();
-
-        MagnetUpgrade upgrade = BackpackUpgradeRegistry.MAGNET.create();
-        UpgradeContainerComponent defaultComponent = UpgradeContainerComponent.of(List.of(upgrade));
-
-        UpgradeContainerComponent oldComponent = center.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, defaultComponent);
-        MagnetUpgrade oldUpgrade = (MagnetUpgrade) oldComponent.getBaseUpgrades().getFirst();
-
-        upgrade.addAllToList(uniqueItems);
-        upgrade.setMode(oldUpgrade.getMode());
-
-        result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(List.of(upgrade)));
+        result.set(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of((Upgrade) newUpgrade));
 
         return result;
     }

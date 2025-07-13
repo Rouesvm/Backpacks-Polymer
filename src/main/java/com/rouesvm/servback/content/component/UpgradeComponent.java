@@ -2,6 +2,7 @@ package com.rouesvm.servback.content.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.rouesvm.servback.content.upgrade.SaveableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
@@ -33,16 +34,23 @@ public class UpgradeComponent {
 
     public static final Codec<UpgradeComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Identifier.CODEC.fieldOf("id").forGetter(component ->
-                    BackpackUpgradeRegistry.SPELLS.getId(component.getUpgrade().getType())),
+                    BackpackUpgradeRegistry.UPGRADES.getId(component.getUpgrade().getType())),
             NbtCompound.CODEC.fieldOf("data").forGetter(component -> {
-                NbtWriteView view = NbtWriteView.create(ErrorReporter.EMPTY);
-                component.getUpgrade().writeView(view);
-                return view.getNbt();
+                NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
+                Upgrade upgrade = component.getUpgrade();
+                if (upgrade instanceof SaveableUpgrade saveableUpgrade) {
+                    saveableUpgrade.writeView(data);
+                }
+
+                return data.getNbt();
             })
             ).apply(instance, (id, data) -> {
                 UpgradeType<? extends Upgrade> type = BackpackUpgradeRegistry.get(id);
                 Upgrade upgrade = type.create();
-                upgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
+                if (upgrade instanceof SaveableUpgrade saveableUpgrade) {
+                    saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
+                }
+
                 return UpgradeComponent.of(upgrade);
             })
     );

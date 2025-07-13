@@ -11,20 +11,20 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
 public class BackpackUpgradeRegistry {
-    public static final RegistryKey<Registry<UpgradeType<?>>> SPELL_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades"));
-    public static final Registry<UpgradeType<?>> SPELLS = FabricRegistryBuilder.createSimple(
-            SPELL_REGISTRY_KEY).buildAndRegister();
+    public static final RegistryKey<Registry<UpgradeType<?>>> UPGRADES_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades"));
+    public static final Registry<UpgradeType<?>> UPGRADES = FabricRegistryBuilder.createSimple(
+            UPGRADES_REGISTRY_KEY).buildAndRegister();
 
     public static final UpgradeType<MagnetUpgrade> MAGNET = register("magnet", MagnetUpgrade::new);
     public static final UpgradeType<CraftingUpgrade> CRAFTING = register("crafting", CraftingUpgrade::new);
 
     public static <T extends Upgrade> UpgradeType<T> register(String name, UpgradeType.UpgradeFactory<T> factory) {
         Identifier id = Identifier.of(ServerBackpacks.MOD_ID, name);
-        return Registry.register(SPELLS, id, new UpgradeType<>(id, factory));
+        return Registry.register(UPGRADES, id, new UpgradeType<>(id, factory));
     }
 
     public static UpgradeType<?> get(Identifier id) {
-        return SPELLS.get(id);
+        return UPGRADES.get(id);
     }
 
     public static void initialize() {}

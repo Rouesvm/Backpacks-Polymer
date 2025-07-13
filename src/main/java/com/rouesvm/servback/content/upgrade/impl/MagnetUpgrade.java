@@ -29,7 +29,9 @@ import static com.rouesvm.servback.registry.item.BackpackItemRegistry.MAGNET_UPG
 
 public class MagnetUpgrade extends Upgrade {
     public static final int MAX_SIZE = 5;
+
     public static final int MAX_RANGE = 3;
+    private static final double SCANNING_RANGE = ((double) MAX_RANGE / 2) * 3;
 
     private int tick = 0;
     private MODE mode = MODE.PICKUP;
@@ -136,9 +138,14 @@ public class MagnetUpgrade extends Upgrade {
 
         tick++;
 
-        if (tick % 4 == 0) {
+        if (tick % 4 == 0) queue.forEach(item -> {
             tick = 0;
 
+            item.setPos(player.getX(), player.getY(), player.getZ());
+            item.setPickupDelay(100);
+        });
+
+        if (tick % 4 == 0) {
             Iterator<ItemEntity> iterator = queue.iterator();
             if (!iterator.hasNext()) return false;
 
@@ -165,16 +172,11 @@ public class MagnetUpgrade extends Upgrade {
             } else next.setStack(remainder);
         }
 
-        if (tick % 2 == 0) queue.forEach(item -> {
-            item.setPos(player.getX(), player.getY(), player.getZ());
-            item.setPickupDelay(100);
-        });
-
         return true;
     }
 
     public void checkForItems(ServerWorld world, ServerPlayerEntity player, BackpackInventory inventory) {
-        Box area = new Box(player.getPos().add(-((double) (MAX_RANGE / 2) * 3)), player.getPos().add((double) (MAX_RANGE / 2) * 3));
+        Box area = new Box(player.getPos().add(-SCANNING_RANGE), player.getPos().add(SCANNING_RANGE));
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)

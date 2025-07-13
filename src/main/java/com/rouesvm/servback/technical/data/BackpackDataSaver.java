@@ -47,9 +47,7 @@ public class BackpackDataSaver {
             } catch (IOException e) {
                 ServerBackpacks.LOGGER.error("Failed to load Server Backpack's new data. {}", e.getMessage());
             }
-        } else {
-            save(server);
-        }
+        } else save(server);
 
         setupBackup(server);
 

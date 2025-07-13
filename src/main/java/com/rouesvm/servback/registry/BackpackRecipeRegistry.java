@@ -1,8 +1,8 @@
 package com.rouesvm.servback.registry;
 
-import com.rouesvm.servback.technical.recipe.BackpackRecipe;
-import com.rouesvm.servback.technical.recipe.BackpackUpgradeRecipe;
-import com.rouesvm.servback.technical.recipe.MagnetFilterUpgradeRecipe;
+import com.rouesvm.servback.content.recipe.BackpackRecipe;
+import com.rouesvm.servback.content.recipe.BackpackUpgradeRecipe;
+import com.rouesvm.servback.content.recipe.MagnetFilterUpgradeRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.input.RecipeInput;

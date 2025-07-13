@@ -1,4 +1,4 @@
-package com.rouesvm.servback.technical.recipe;
+package com.rouesvm.servback.content.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

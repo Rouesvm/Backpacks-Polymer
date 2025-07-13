@@ -1,8 +1,8 @@
-package com.rouesvm.servback.technical.recipe.builder;
+package com.rouesvm.servback.content.recipe.builder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.rouesvm.servback.technical.recipe.BackpackRecipe;
+import com.rouesvm.servback.content.recipe.BackpackRecipe;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementRequirements;

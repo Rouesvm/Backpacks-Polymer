@@ -1,6 +1,6 @@
-package com.rouesvm.servback.technical.recipe.builder;
+package com.rouesvm.servback.content.recipe.builder;
 
-import com.rouesvm.servback.technical.recipe.BackpackUpgradeRecipe;
+import com.rouesvm.servback.content.recipe.BackpackUpgradeRecipe;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementRequirements;

@@ -1,4 +1,4 @@
-package com.rouesvm.servback.technical.recipe;
+package com.rouesvm.servback.content.recipe;
 
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.UpgradeItem;
@@ -7,7 +7,6 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
-import eu.pb4.polymer.core.api.utils.PolymerObject;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -168,7 +167,7 @@ public class MagnetFilterUpgradeRecipe extends SpecialCraftingRecipe {
         return CraftingRecipeCategory.MISC;
     }
 
-    public static class Serializer extends SpecialRecipeSerializer<MagnetFilterUpgradeRecipe> implements PolymerObject {
+    public static class Serializer extends SpecialRecipeSerializer<MagnetFilterUpgradeRecipe> {
         public Serializer(Factory<MagnetFilterUpgradeRecipe> factory) {
             super(factory);
         }

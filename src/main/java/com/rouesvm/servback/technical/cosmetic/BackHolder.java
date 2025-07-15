@@ -69,9 +69,7 @@ public class BackHolder extends ElementHolder {
 
     @Override
     protected void onTick() {
-        if (this.entity.isDead() || entity.isRemoved()) {
-            destroy();
-        }
+        if (this.entity.isDead() || entity.isRemoved()) destroy();
 
         if (this.entity.getFacing() == Direction.DOWN) {
             hideFromPlayer = true;

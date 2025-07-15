@@ -40,8 +40,8 @@ public class ServerBackpacks implements ModInitializer {
 
 	public static final List<ServerPlayerEntity> BEDROCK_PLAYERS = new ArrayList<>();
 
-	public static boolean hasTrinketLoaded;
 	public static boolean hasGeyserLoaded;
+	public static boolean hasTrinketLoaded;
 	public static boolean isDevEnvironment;
 
 	@Override

@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.upgrade.extension;
 
 import com.mojang.serialization.Codec;
-import com.rouesvm.servback.content.upgrade.SaveableUpgrade;
+import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.List;
 
-public class ItemFilter implements SaveableUpgrade {
+public class ItemFilter implements PersistentUpgrade {
     private MODE mode;
     private final List<String> filterList;
 

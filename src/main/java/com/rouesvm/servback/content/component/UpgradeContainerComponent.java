@@ -1,7 +1,7 @@
 package com.rouesvm.servback.content.component;
 
 import com.mojang.serialization.Codec;
-import com.rouesvm.servback.content.upgrade.SaveableUpgrade;
+import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
@@ -53,7 +53,7 @@ public class UpgradeContainerComponent {
                             if (upgradeType == null) continue;
 
                             Upgrade upgrade = upgradeType.create();
-                            if (upgrade instanceof SaveableUpgrade saveableUpgrade) {
+                            if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
                                 saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
                             }
                             upgrades.add(upgrade);
@@ -64,7 +64,7 @@ public class UpgradeContainerComponent {
                         Map<String, NbtCompound> out = new HashMap<>();
                         for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
                             NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
-                            if (upgrade instanceof SaveableUpgrade saveableUpgrade) {
+                            if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
                                 saveableUpgrade.writeView(data);
                             }
                             out.put(upgrade.getType().getId().toString(), data.getNbt());

@@ -2,7 +2,7 @@ package com.rouesvm.servback.content.upgrade.impl;
 
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.upgrade.FilterableUpgrade;
-import com.rouesvm.servback.content.upgrade.SaveableUpgrade;
+import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
@@ -25,7 +25,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.*;
 
-public class MagnetUpgrade extends Upgrade implements SaveableUpgrade, FilterableUpgrade {
+public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, FilterableUpgrade {
     public static final int MAX_SIZE = 5;
 
     public static final int MAX_RANGE = 3;

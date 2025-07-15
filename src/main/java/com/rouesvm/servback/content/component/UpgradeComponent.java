@@ -2,7 +2,7 @@ package com.rouesvm.servback.content.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.rouesvm.servback.content.upgrade.SaveableUpgrade;
+import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
@@ -38,7 +38,7 @@ public class UpgradeComponent {
             NbtCompound.CODEC.fieldOf("data").forGetter(component -> {
                 NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
                 Upgrade upgrade = component.getUpgrade();
-                if (upgrade instanceof SaveableUpgrade saveableUpgrade) {
+                if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
                     saveableUpgrade.writeView(data);
                 }
 
@@ -47,7 +47,7 @@ public class UpgradeComponent {
             ).apply(instance, (id, data) -> {
                 UpgradeType<? extends Upgrade> type = BackpackUpgradeRegistry.get(id);
                 Upgrade upgrade = type.create();
-                if (upgrade instanceof SaveableUpgrade saveableUpgrade) {
+                if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
                     saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance.server.getRegistryManager(), data));
                 }
 

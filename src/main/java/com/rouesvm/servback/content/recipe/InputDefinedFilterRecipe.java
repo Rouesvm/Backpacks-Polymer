@@ -54,11 +54,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
                 continue;
             }
 
-            Identifier identifier = Registries.ITEM.getId(item);
-            if (hasCustomName(stack)) {
-                String tagId = parseTagNameFromStack(stack);
-                if (tagId == null || !seenItems.add(tagId)) return false;
-            } else if (!seenItems.add(identifier.toString())) return false;
+            if (!seenItems.add(getItemKey(stack))) return false;
         }
 
         int totalItems = seenItems.size();
@@ -84,7 +80,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         return getResultStack(oldComponent, stack, uniqueItems);
     }
 
-    public ItemStack getResultStack(UpgradeComponent oldComponent, ItemStack center, List<String> uniqueItems) {
+    private ItemStack getResultStack(UpgradeComponent oldComponent, ItemStack center, List<String> uniqueItems) {
         Upgrade oldUpgrade = oldComponent.getUpgrade();
         Upgrade upgrade = oldUpgrade.getType().create();
         if (!(upgrade instanceof FilterableUpgrade newUpgrade)) return ItemStack.EMPTY;
@@ -99,7 +95,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         return result;
     }
 
-    public ItemStack findUpgradeStack(CraftingRecipeInput input) {
+    private ItemStack findUpgradeStack(CraftingRecipeInput input) {
         for (ItemStack stack : input.getStacks()) {
             if (stack.isEmpty()) continue;
 
@@ -112,7 +108,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         return ItemStack.EMPTY;
     }
 
-    public List<String> extractFilterKeysFromInput(ItemStack filterStack, CraftingRecipeInput input) {
+    private List<String> extractFilterKeysFromInput(ItemStack filterStack, CraftingRecipeInput input) {
         Set<String> uniqueItems = new HashSet<>(MagnetUpgrade.MAX_SIZE);
 
         for (ItemStack stack : input.getStacks()) {
@@ -120,20 +116,13 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
             if (stack.isEmpty()) continue;
             if (stack.isOf(filterStack.getItem())) continue;
 
-            String itemKey;
-
-            if (hasCustomName(stack)) {
-                itemKey = parseTagNameFromStack(stack);
-                if (itemKey == null) continue;
-            } else itemKey = Registries.ITEM.getId(stack.getItem()).toString();
-
-            uniqueItems.add(itemKey);
+            uniqueItems.add(getItemKey(stack));
         }
 
         return new ArrayList<>(uniqueItems);
     }
 
-    public String parseTagNameFromStack(ItemStack stack) {
+    private String parseTagNameFromStack(ItemStack stack) {
         String tagString = stack.getName().getString();
         if (!tagString.startsWith("#")) return null;
 
@@ -146,6 +135,13 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         if (!stack.isIn(tagKey.get())) return null;
 
         return tagString;
+    }
+
+    private String getItemKey(ItemStack stack) {
+        Identifier itemId = Registries.ITEM.getId(stack.getItem());
+        String itemKey = itemId.toString();
+        String tagKey = parseTagNameFromStack(stack);
+        return (hasCustomName(stack) && tagKey != null) ? tagKey : itemKey;
     }
 
     private boolean hasCustomName(ItemStack stack) {

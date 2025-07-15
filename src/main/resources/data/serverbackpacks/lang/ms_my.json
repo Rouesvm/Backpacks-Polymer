@@ -82,5 +82,6 @@
   "info.serverbackpacks.mode.whitelist": "Senarai Benar",
   "info.serverbackpacks.mode.pickup": "Ambil Semua",
 
-  "upgrade.serverbackpacks.magnet": "Serapan"
+  "upgrade.serverbackpacks.magnet": "Serapan",
+  "upgrade.serverbackpacks.crafting": "Pertukangan"
 }

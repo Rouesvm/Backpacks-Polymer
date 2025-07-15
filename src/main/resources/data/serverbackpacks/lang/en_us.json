@@ -83,5 +83,6 @@
   "info.serverbackpacks.mode.whitelist": "Whitelist",
   "info.serverbackpacks.mode.pickup": "Pickup",
 
-  "upgrade.serverbackpacks.magnet": "Vacuum"
+  "upgrade.serverbackpacks.magnet": "Vacuum",
+  "upgrade.serverbackpacks.crafting": "Crafting"
 }

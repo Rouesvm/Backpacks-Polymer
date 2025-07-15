@@ -92,7 +92,7 @@ public class BackpackTrinket implements Trinket {
         TrinketItem.equipItem(player, stack);
     }
 
-    public static boolean isStackEmptyInBackSlot(PlayerEntity player) {
+    public static boolean isBackSlotOccupied(PlayerEntity player) {
         return getStackInBackSlot(player).isEmpty();
     }
 

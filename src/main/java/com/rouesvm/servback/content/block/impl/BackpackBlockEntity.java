@@ -1,6 +1,7 @@
 package com.rouesvm.servback.content.block.impl;
 
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
+import com.rouesvm.servback.content.block.TickableBlockEntity;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
@@ -13,7 +14,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -33,7 +34,7 @@ import java.util.UUID;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
 
-public class BackpackBlockEntity extends BasicBackpackBlockEntity implements BlockEntityTicker<BackpackBlockEntity> {
+public class BackpackBlockEntity extends BasicBackpackBlockEntity implements TickableBlockEntity {
     private UUID uuid;
 
     private int extraSize = 0;
@@ -48,19 +49,19 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Blo
     }
 
     @Override
+    public void tick(World world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
+        if (uuid == null) return;
+        if (upgradeList != null && !upgradeList.isEmpty()) upgradeList.forEach((upgrade) ->
+                upgrade.tick(world, pos, instance.inventory())
+        );
+    }
+
+    @Override
     protected void writeData(WriteView view) {
         super.writeData(view);
         view.putInt("extraSize", extraSize);
         if (uuid != null) view.putString("uuid", uuid.toString());
         if (upgradeList != null) view.getListAppender("upgrade", UpgradeContainerComponent.CODEC).add(UpgradeContainerComponent.of(upgradeList));
-    }
-
-    @Override
-    public void tick(World world, BlockPos pos, BlockState state, BackpackBlockEntity blockEntity) {
-        if (uuid == null) return;
-        if (upgradeList != null && !upgradeList.isEmpty()) upgradeList.forEach((upgrade) ->
-                upgrade.tick(world, pos, BackpackManager.getInventory(uuid))
-        );
     }
 
     @Override
@@ -79,12 +80,12 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Blo
     }
 
     public ItemStack getDefaultStack() {
-        if (uuid == null) return super.getDefaultStack();
+        ItemStack stack = super.getDefaultStack();
+        if (uuid == null) return stack;
 
         DynamicRegistryManager registryManager = this.getWorld().getRegistryManager();
         RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
 
-        ItemStack stack = super.getDefaultStack().copy();
         stack.addEnchantment(capacity, extraSize / 9);
         stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
 

@@ -4,6 +4,7 @@ import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
+import com.rouesvm.servback.content.block.TickableBlockEntity;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
@@ -16,6 +17,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -38,6 +41,11 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     public BackpackBlock() {
         super("backpack");
         this.setDefaultState(super.stateManager.getDefaultState().with(DYE_COLOR, DyeColor.BROWN).with(SLOTS, 1));
+    }
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return TickableBlockEntity.getTicker(world);
     }
 
     @Override

@@ -165,31 +165,42 @@ public class BackpackGeyserBlock {
         List<CustomBlockPermutation> permutations = new ArrayList<>(createHorizontalBlockPermutations());
 
         for (int size : slots) {
-            for (String dyeColor : dye_colors) {
-                CustomBlockComponents customBlockComponents = CustomBlockComponents.builder()
-                        .materialInstance("*", MaterialInstance.builder()
-                                .texture("serverbackpacks:" + dyeColor + "_" + size)
-                                .renderMethod("opaque")
-                                .faceDimming(true)
-                                .ambientOcclusion(true)
-                                .build())
-                        .build();
-
-                permutations.add(new CustomBlockPermutation(customBlockComponents, String.format(STATE_CONDITION,
-                        BackpackBlock.SLOTS.getName(), size) + " && " + String.format(STATE_CONDITION,
-                        BackpackBlock.DYE_COLOR.getName(), "'" + dyeColor.toLowerCase() + "'")));
-            }
-
-            CustomBlockComponents customBlockComponents = CustomBlockComponents.builder()
-                    .geometry(GeometryComponent.builder()
-                            .identifier("geometry.backpack_" + size)
-                            .build())
-                    .build();
-
-            permutations.add(new CustomBlockPermutation(customBlockComponents, String.format(STATE_CONDITION,
-                    BackpackBlock.SLOTS.getName(), size)));
+            permutations.addAll(createDyePermutations(size));
+            permutations.add(createGeometryPermutation(size));
         }
 
         return permutations;
+    }
+
+    private static List<CustomBlockPermutation> createDyePermutations(int size) {
+        List<CustomBlockPermutation> dyePermutations = new ArrayList<>();
+
+        for (String dyeColor : dye_colors) {
+            CustomBlockComponents customBlockComponents = CustomBlockComponents.builder()
+                    .materialInstance("*", MaterialInstance.builder()
+                            .texture("serverbackpacks:" + dyeColor + "_" + size)
+                            .renderMethod("opaque")
+                            .faceDimming(true)
+                            .ambientOcclusion(true)
+                            .build())
+                    .build();
+
+            dyePermutations.add(new CustomBlockPermutation(customBlockComponents,
+                    String.format(STATE_CONDITION, BackpackBlock.SLOTS.getName(), size) + " && " +
+                            String.format(STATE_CONDITION, BackpackBlock.DYE_COLOR.getName(), "'" + dyeColor.toLowerCase() + "'")));
+        }
+
+        return dyePermutations;
+    }
+
+    private static CustomBlockPermutation createGeometryPermutation(int size) {
+        CustomBlockComponents customBlockComponents = CustomBlockComponents.builder()
+                .geometry(GeometryComponent.builder()
+                        .identifier("geometry.backpack_" + size)
+                        .build())
+                .build();
+
+        return new CustomBlockPermutation(customBlockComponents,
+                String.format(STATE_CONDITION, BackpackBlock.SLOTS.getName(), size));
     }
 }

@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -23,6 +24,7 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -31,7 +33,7 @@ import java.util.UUID;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
 
-public class BackpackBlockEntity extends BasicBackpackBlockEntity {
+public class BackpackBlockEntity extends BasicBackpackBlockEntity implements BlockEntityTicker<BackpackBlockEntity> {
     private UUID uuid;
 
     private int extraSize = 0;
@@ -51,6 +53,14 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity {
         view.putInt("extraSize", extraSize);
         if (uuid != null) view.putString("uuid", uuid.toString());
         if (upgradeList != null) view.getListAppender("upgrade", UpgradeContainerComponent.CODEC).add(UpgradeContainerComponent.of(upgradeList));
+    }
+
+    @Override
+    public void tick(World world, BlockPos pos, BlockState state, BackpackBlockEntity blockEntity) {
+        if (uuid == null) return;
+        if (upgradeList != null && !upgradeList.isEmpty()) upgradeList.forEach((upgrade) ->
+                upgrade.tick(world, pos, BackpackManager.getInventory(uuid))
+        );
     }
 
     @Override

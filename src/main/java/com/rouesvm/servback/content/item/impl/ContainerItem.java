@@ -68,7 +68,7 @@ public class ContainerItem extends BundleGuiItem {
         if (entity instanceof ServerPlayerEntity player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player, (BackpackInventory) getInventory(player, stack))
+                    upgrade.tick(player.getWorld(), player.getBlockPos(), (BackpackInventory) getInventory(player, stack))
             );
         }
     }
@@ -191,8 +191,12 @@ public class ContainerItem extends BundleGuiItem {
         player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
+    public static void playInsertSound(World world, BlockPos pos, float pitch) {
+        world.playSound(null, pos, SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.UI, 0.8F, pitch + world.getRandom().nextFloat() * 0.4F);
+    }
+
     public static void playInsertSound(ServerPlayerEntity player, float pitch) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, pitch + player.getWorld().getRandom().nextFloat() * 0.4F);
+        playInsertSound(player.getWorld(), player.getBlockPos(), pitch);
     }
 
     public static void playDropContentsSound(ServerPlayerEntity player, float pitch) {

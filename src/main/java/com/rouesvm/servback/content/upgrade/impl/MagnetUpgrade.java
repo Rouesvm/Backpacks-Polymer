@@ -17,7 +17,9 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -92,14 +94,14 @@ public class MagnetUpgrade extends Upgrade implements SaveableUpgrade, Filterabl
     }
 
     @Override
-    public void tick(ServerPlayerEntity player, BackpackInventory inventory) {
-        if (inventory == null || !(player.getWorld() instanceof ServerWorld world)) return;
-        if (pickUpItems(player, inventory)) return;
+    public void tick(World world, BlockPos pos, BackpackInventory inventory) {
+        if (inventory == null || !(world instanceof ServerWorld serverWorld)) return;
+        if (pickUpItems(serverWorld, pos, inventory)) return;
 
-        checkForItems(world, player, inventory);
+        checkForItems(serverWorld, pos, inventory);
     }
 
-    public boolean pickUpItems(ServerPlayerEntity player, BackpackInventory inventory) {
+    public boolean pickUpItems(ServerWorld world, BlockPos pos, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
         if (BackpackInventory.isFull(inventory)) {
@@ -115,7 +117,7 @@ public class MagnetUpgrade extends Upgrade implements SaveableUpgrade, Filterabl
         if (tick % 4 == 0) queue.forEach(item -> {
             tick = 0;
 
-            item.setPos(player.getX(), player.getY(), player.getZ());
+            item.setPosition(pos.toCenterPos());
             item.setPickupDelay(100);
         });
 
@@ -124,7 +126,7 @@ public class MagnetUpgrade extends Upgrade implements SaveableUpgrade, Filterabl
             if (!iterator.hasNext()) return false;
 
             ItemEntity next = iterator.next();
-            if (next == null || !next.isAlive() || next.distanceTo(player) > MAX_RANGE) {
+            if (next == null || !next.isAlive() || next.squaredDistanceTo(pos.toCenterPos()) > MAX_RANGE) {
                 iterator.remove();
                 return false;
             }
@@ -137,7 +139,7 @@ public class MagnetUpgrade extends Upgrade implements SaveableUpgrade, Filterabl
             }
 
             ItemStack remainder = inventory.addStack(stack);
-            ContainerItem.playInsertSound(player, 1);
+            ContainerItem.playInsertSound(world, pos, 1);
 
             if (remainder.isEmpty()) {
                 next.discard();
@@ -149,8 +151,9 @@ public class MagnetUpgrade extends Upgrade implements SaveableUpgrade, Filterabl
         return true;
     }
 
-    public void checkForItems(ServerWorld world, ServerPlayerEntity player, BackpackInventory inventory) {
-        Box area = new Box(player.getPos().add(-SCANNING_RANGE), player.getPos().add(SCANNING_RANGE));
+    public void checkForItems(ServerWorld world, BlockPos pos, BackpackInventory inventory) {
+        Vec3d vec3d = pos.toCenterPos();
+        Box area = new Box(vec3d.add(-SCANNING_RANGE), vec3d.add(SCANNING_RANGE));
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)

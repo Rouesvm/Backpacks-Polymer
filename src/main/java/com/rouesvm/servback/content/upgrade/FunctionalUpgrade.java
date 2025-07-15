@@ -4,6 +4,7 @@ import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -14,7 +15,7 @@ public interface FunctionalUpgrade {
         return false;
     }
 
-    default void tick(ServerPlayerEntity player, BackpackInventory inventory) {}
+    default void tick(World world, BlockPos pos, BackpackInventory inventory) {}
 
     default void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {}
 }

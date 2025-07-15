@@ -15,6 +15,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.Optional;
+
 public class BasicBackpackBlockEntity extends BlockEntity {
     private int size = 9;
     private Text customName;
@@ -42,20 +44,20 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     protected void readData(ReadView view) {
         size = view.getInt("size", 9);
 
-        view.getOptionalInt("dye").ifPresent(integer ->
-                item = BackpackItemJsonRegistry.getBackpackBySize(
-                        integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)), size
-                ));
+        Optional<Integer> dyeOrdinal = view.getOptionalInt("dye");
+        dyeOrdinal.ifPresent(integer -> item = BackpackItemJsonRegistry.getBackpackBySize(
+                integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)),
+                size
+        ));
 
         if (item == null) {
-            if (view.getOptionalString("item").isPresent()) {
-                item = Registries.ITEM.get(Identifier.of(view.getOptionalString("item").get()));
-            } else {
-                item = Registries.ITEM.get(
-                        view.getInt("item", Registries.ITEM.getRawId(
-                                BackpackItemJsonRegistry.getBackpackBySize(size)
-                        )));
-            }
+            Optional<String> itemString = view.getOptionalString("item");
+            item = itemString.map(Identifier::tryParse)
+                    .map(Registries.ITEM::get)
+                    .orElseGet(() -> {
+                        int rawId = view.getInt("item", Registries.ITEM.getRawId(BackpackItemJsonRegistry.getBackpackBySize(size)));
+                        return Registries.ITEM.get(rawId);
+                    });
         }
     }
 

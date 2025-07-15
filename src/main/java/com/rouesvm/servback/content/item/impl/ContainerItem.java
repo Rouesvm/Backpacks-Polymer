@@ -68,7 +68,7 @@ public class ContainerItem extends BundleGuiItem {
         if (entity instanceof ServerPlayerEntity player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player.getWorld(), player.getBlockPos(), (BackpackInventory) getInventory(player, stack))
+                    upgrade.tick(player.getWorld(), player.getPos(), (BackpackInventory) getInventory(player, stack))
             );
         }
     }

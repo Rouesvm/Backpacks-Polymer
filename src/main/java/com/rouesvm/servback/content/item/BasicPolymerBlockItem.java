@@ -29,8 +29,8 @@ public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, Pol
     }
 
     @Override
-    public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
-        if (ServerBackpacks.BEDROCK_PLAYERS.contains(packetContext.getPlayer()))
+    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
+        if (ServerBackpacks.isBedrock(context.getPlayer()))
             return this;
         return this.vanillaItem;
     }

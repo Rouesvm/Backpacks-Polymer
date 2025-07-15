@@ -8,6 +8,7 @@ import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
@@ -24,9 +25,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
@@ -42,7 +40,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         if (input.getStackCount() > MagnetUpgrade.MAX_SIZE + 1) return false;
 
         int magnetCount = 0;
-        Set<String> seenItems = new HashSet<>(MagnetUpgrade.MAX_SIZE);
+        Set<String> seenItems = new ObjectOpenHashSet<>(MagnetUpgrade.MAX_SIZE);
 
         for (ItemStack stack : input.getStacks()) {
             if (stack.isEmpty()) continue;
@@ -72,13 +70,13 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         UpgradeComponent oldComponent = stack.get(BackpackDataComponentTypes.UPGRADE);
         if (oldComponent == null) return ItemStack.EMPTY;
 
-        List<String> uniqueItems = extractFilterKeysFromInput(stack, input);
+        Set<String> uniqueItems = extractFilterKeysFromInput(stack, input);
         if (uniqueItems.isEmpty()) return ItemStack.EMPTY;
 
         return getResultStack(oldComponent, stack, uniqueItems);
     }
 
-    private ItemStack getResultStack(UpgradeComponent oldComponent, ItemStack center, List<String> uniqueItems) {
+    private ItemStack getResultStack(UpgradeComponent oldComponent, ItemStack center, Set<String> uniqueItems) {
         Upgrade oldUpgrade = oldComponent.getUpgrade();
         Upgrade upgrade = oldUpgrade.getType().create();
         if (!(upgrade instanceof FilterableUpgrade newUpgrade)) return ItemStack.EMPTY;
@@ -88,7 +86,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         filter.setMode(((FilterableUpgrade) oldUpgrade).getFilter().getMode());
 
         ItemStack result = center.copy();
-        result.set(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of((Upgrade) newUpgrade));
+        result.set(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgrade));
 
         return result;
     }
@@ -106,8 +104,8 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         return ItemStack.EMPTY;
     }
 
-    private List<String> extractFilterKeysFromInput(ItemStack filterStack, CraftingRecipeInput input) {
-        Set<String> uniqueItems = new HashSet<>(MagnetUpgrade.MAX_SIZE);
+    private Set<String> extractFilterKeysFromInput(ItemStack filterStack, CraftingRecipeInput input) {
+        Set<String> uniqueItems = new ObjectOpenHashSet<>(MagnetUpgrade.MAX_SIZE);
 
         for (ItemStack stack : input.getStacks()) {
             if (uniqueItems.size() >= MagnetUpgrade.MAX_SIZE) break;
@@ -117,7 +115,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
             uniqueItems.add(getItemKey(stack));
         }
 
-        return new ArrayList<>(uniqueItems);
+        return uniqueItems;
     }
 
     private String parseTagNameFromStack(ItemStack stack) {

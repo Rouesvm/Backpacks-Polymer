@@ -45,11 +45,8 @@ public class BlockHolder extends ElementHolder {
     }
 
     @Override
-    public boolean startWatching(ServerPlayNetworkHandler player) {
-        if (ServerBackpacks.BEDROCK_PLAYERS.contains(player.getPlayer())) {
-            return false;
-        }
-        return super.startWatching(player);
+    public boolean startWatching(ServerPlayNetworkHandler client) {
+        return !ServerBackpacks.isBedrock(client.getPlayer()) && super.startWatching(client);
     }
 
     public void setMain(ItemStack stack) {

@@ -13,6 +13,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public class BasicInventoryGui extends SimpleGui {
+    private static final String BEDROCK_ROW_MARKER = "chest.row.";
+
+    private static final int EXISTING_SMALL_CHEST_SIZE = 9*3;
+    private static final int EXISTING_LARGE_CHEST_SIZE = 9*6;
+
     protected final ItemStack stack;
     protected final Inventory inventory;
 
@@ -39,9 +44,10 @@ public class BasicInventoryGui extends SimpleGui {
                     .append(")");
         }
 
-        if (ServerBackpacks.BEDROCK_PLAYERS.contains(player) && (this.slots != 9*3 && this.slots != 9*6)) {
-            title = title.copy().append("chest.row." + this.slots/9);
-        }
+        if (ServerBackpacks.isBedrock(player) && (
+                this.slots != EXISTING_SMALL_CHEST_SIZE
+                && this.slots != EXISTING_LARGE_CHEST_SIZE
+        )) title = title.copy().append(BEDROCK_ROW_MARKER + this.slots/9);
 
         this.setTitle(Text.of(title));
 
@@ -55,8 +61,7 @@ public class BasicInventoryGui extends SimpleGui {
         return slots;
     }
 
-    public void slotUpdate() {
-    }
+    public void slotUpdate() {}
 
     public void afterOpened() {
         if (stack != null) this.lockSlot();

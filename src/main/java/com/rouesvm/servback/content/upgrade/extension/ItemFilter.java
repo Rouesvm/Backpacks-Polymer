@@ -10,13 +10,13 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
 
-import java.util.List;
+import java.util.Set;
 
 public class ItemFilter implements PersistentUpgrade {
     private MODE mode;
-    private final List<String> filterList;
+    private final Set<String> filterList;
 
-    public ItemFilter(MODE mode, List<String> filters) {
+    public ItemFilter(MODE mode, Set<String> filters) {
         this.mode = mode;
         this.filterList = filters;
     }
@@ -62,7 +62,7 @@ public class ItemFilter implements PersistentUpgrade {
         if (listAppender.isEmpty()) data.remove("Items");
     }
 
-    public List<String> filterList() {
+    public Set<String> filterList() {
         return filterList;
     }
 

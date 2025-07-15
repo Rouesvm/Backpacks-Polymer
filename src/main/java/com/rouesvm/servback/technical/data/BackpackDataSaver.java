@@ -11,8 +11,11 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -28,56 +31,79 @@ public class BackpackDataSaver {
 
     private static List<BackpackData> storedInventories = new ArrayList<>();
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
     private static final Codec<List<BackpackData>> SAVE_CODEC = BackpackData.CODEC.listOf().fieldOf("backpackContents").codec();
 
-    public static boolean onServerStarting(MinecraftServer server) {
+    public static boolean loadData(MinecraftServer server) {
         savePath = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
+
+        try {
+            Files.createDirectories(savePath.getParent());
+        } catch (IOException e) {
+            ServerBackpacks.LOGGER.error("Failed to create data directory", e);
+            return false;
+        }
 
         if (Files.exists(savePath)) {
             try {
-                var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), NbtIo.readCompound(new DataInputStream(
-                        new FileInputStream(savePath.toFile()))));
-
-                data.result().ifPresentOrElse(result ->
-                        storedInventories = result.getFirst(),
-                        () -> storedInventories = new ArrayList<>()
-                );
-
-                if (!storedInventories.isEmpty()) return true;
+                return loadExistingData(server);
             } catch (IOException e) {
-                ServerBackpacks.LOGGER.error("Failed to load Server Backpack's new data. {}", e.getMessage());
+                ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data", e);
             }
-        } else save(server);
+        } else {
+            save(null, server);
+        }
 
-        setupBackup(server);
-
+        createBackupDir(server);
         return false;
     }
 
-    public static void setupBackup(MinecraftServer server) {
+    private static boolean loadExistingData(MinecraftServer server) throws IOException {
+        try (DataInputStream dis = new DataInputStream(Files.newInputStream(savePath))) {
+            var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE),
+                    NbtIo.readCompound(dis));
+
+            data.result().ifPresentOrElse(result ->
+                            storedInventories = result.getFirst(),
+                    () -> storedInventories = new ArrayList<>()
+            );
+
+            return !storedInventories.isEmpty();
+        }
+    }
+
+    public static void createBackupDir(MinecraftServer server) {
         backupPath = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks-backups");
 
         if (!Files.exists(backupPath)) {
             try {
                 Files.createDirectories(backupPath);
             } catch (IOException e) {
-                ServerBackpacks.LOGGER.error("Failed to create backup directory.");
+                ServerBackpacks.LOGGER.error("Failed to create backup directory.", e);
             }
         }
 
         createBackup(server);
     }
 
-    public static void save(MinecraftServer server) {
-        if (savePath == null) return;
+    public static void save(@Nullable Path path, MinecraftServer server) {
+        if (path == null) path = savePath;
+        if (path == null) return;
 
-        var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE), List.copyOf(storedInventories));
+        var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE),
+                List.copyOf(storedInventories));
+
         if (data.isSuccess()) {
-            try {
-                NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(savePath.toFile())));
-            } catch (IOException e) {
-                ServerBackpacks.LOGGER.error("Failed to save Server Backpack's data.");
-            }
+            @Nullable Path finalPath = path;
+            data.result().ifPresent(nbtElement -> {
+                try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(finalPath))) {
+                    NbtIo.write(nbtElement, dos);
+                } catch (IOException e) {
+                    ServerBackpacks.LOGGER.error("Failed to save Server Backpack's data to {}", finalPath, e);
+                }
+            });
+        } else {
+            ServerBackpacks.LOGGER.error("Failed to encode Server Backpack's data: {}", data.error());
         }
     }
 
@@ -85,20 +111,12 @@ public class BackpackDataSaver {
         if (backupPath == null) return;
         if (!Configuration.instance().allow_backups) return;
 
-        LocalDateTime deathTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
-        String formattedDeathTime = deathTime.format(formatter);
+        BackpackDataSaver.setStoredInventories(BackpackManager.instance.getBackpackInstances());
 
-        Path backupFile = backupPath.resolve("serverbackpacks-backup-" + formattedDeathTime + ".data");
+        LocalDateTime currentTime = LocalDateTime.now();
+        String formattedCurrentTime = currentTime.format(formatter);
 
-        var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE), List.copyOf(storedInventories));
-        if (data.isSuccess()) {
-            try {
-                NbtIo.write(data.result().get(), new DataOutputStream(new FileOutputStream(backupFile.toFile())));
-            } catch (IOException e) {
-                ServerBackpacks.LOGGER.error("Failed to backup Server Backpack's data.");
-            }
-        }
+        save(backupPath.resolve("serverbackpacks-backup-" + formattedCurrentTime + ".data"), server);
     }
 
     public static Set<BackpackInstance> getBackpackInstances() {

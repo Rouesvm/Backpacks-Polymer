@@ -51,7 +51,7 @@ public class BackpackManager {
 
     public static void save(MinecraftServer server) {
         BackpackDataSaver.setStoredInventories(instance.getBackpackInstances());
-        BackpackDataSaver.save(server);
+        BackpackDataSaver.save(null, server);
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         globalBackpackState.globalInventory = instance.globalInventory;
@@ -65,7 +65,7 @@ public class BackpackManager {
         BackpackState state = BackpackState.getServerState(server);
 
         if (!instance.loaded) {
-            instance.loaded = BackpackDataSaver.onServerStarting(server);
+            instance.loaded = BackpackDataSaver.loadData(server);
 
             Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {

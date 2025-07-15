@@ -66,16 +66,14 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
 
     @Override
     public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
-        ItemStack center = ItemStack.EMPTY;
-
         ItemStack stack = findUpgradeStack(input);
-        if (stack.isEmpty()) return center;
+        if (stack.isEmpty()) return ItemStack.EMPTY;
 
         UpgradeComponent oldComponent = stack.get(BackpackDataComponentTypes.UPGRADE);
-        if (oldComponent == null) return center;
+        if (oldComponent == null) return ItemStack.EMPTY;
 
         List<String> uniqueItems = extractFilterKeysFromInput(stack, input);
-        if (uniqueItems.isEmpty()) return center;
+        if (uniqueItems.isEmpty()) return ItemStack.EMPTY;
 
         return getResultStack(oldComponent, stack, uniqueItems);
     }

@@ -20,7 +20,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public class BackpackTrinket implements Trinket {
@@ -94,24 +93,26 @@ public class BackpackTrinket implements Trinket {
     }
 
     public static boolean isStackEmptyInBackSlot(PlayerEntity player) {
-        Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent(player);
-        if (optional.isEmpty()) return true;
-        return !getStackInBackSlot(player).isEmpty();
+        return getStackInBackSlot(player).isEmpty();
     }
 
-    public static ItemStack getStackInBackSlot(PlayerEntity player) {
-        return TrinketsApi.getTrinketComponent(player).map(component -> {
-                    for (var group : component.getInventory().values()) {
-                        for (var inv : group.values()) {
-                            for (int i = 0; i < inv.size(); i++) {
-                                ItemStack stack = inv.getStack(i);
-                                if (!stack.isEmpty() && stack.getItem() instanceof BundleGuiItem) {
-                                    return stack;
-                                }
-                            }
-                        }
+    private static ItemStack getStackInBackSlot(PlayerEntity player) {
+        return TrinketsApi.getTrinketComponent(player)
+                .map(BackpackTrinket::findBundleItem)
+                .orElse(ItemStack.EMPTY);
+    }
+
+    private static ItemStack findBundleItem(TrinketComponent component) {
+        for (var group : component.getInventory().values()) {
+            for (var inv : group.values()) {
+                for (int i = 0; i < inv.size(); i++) {
+                    ItemStack stack = inv.getStack(i);
+                    if (!stack.isEmpty() && stack.getItem() instanceof BundleGuiItem) {
+                        return stack;
                     }
-                    return ItemStack.EMPTY;
-                }).orElse(ItemStack.EMPTY);
+                }
+            }
+        }
+        return ItemStack.EMPTY;
     }
 }

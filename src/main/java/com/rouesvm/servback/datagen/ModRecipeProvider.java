@@ -62,6 +62,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_leather", InventoryChangedCriterion.Conditions.items(Items.LEATHER))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.CRAFTING_UPGRADE, 1)
+                .pattern("#L#")
+                .pattern("LEL")
+                .pattern("#L#")
+                .input('#', ItemTags.PLANKS).input('L', Items.LEATHER)
+                .input('E', Items.CRAFTING_TABLE)
+                .criterion("get_leather", InventoryChangedCriterion.Conditions.items(Items.LEATHER))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.ENDER_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")

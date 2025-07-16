@@ -108,51 +108,44 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
 
         tick++;
 
-        if (pickUpItems(serverWorld, pos, inventory)) {
-            moveItemsToTarget(pos);
-            return;
+        moveItemsToTarget(pos);
+        if (!pickUpItems(serverWorld, pos, inventory)) {
+            checkForItems(serverWorld, pos, inventory);
         }
-
-        checkForItems(serverWorld, pos, inventory);
     }
 
     public void moveItemsToTarget(Vec3d pos) {
         if (queue.isEmpty()) return;
 
-        if (tick % 2 == 0) {
-            Vec3d target = new Vec3d(pos.toVector3f());
+        Vec3d target = new Vec3d(pos.toVector3f());
 
-            queue.forEach(item -> {
-                Vec3d current = item.getPos();
-                Vec3d delta = target.subtract(current);
+        queue.forEach(item -> {
+            Vec3d current = item.getPos();
+            Vec3d delta = target.subtract(current);
 
-                double distance = delta.length();
-                if (distance >= MAX_ITEM_ENTITY_DISTANCE_TO_PLAYER) {
-                    double speed = Math.min(0.6, distance * 0.6);
-                    Vec3d velocity = delta.normalize().multiply(speed);
+            double distance = delta.length();
+            if (distance >= MAX_ITEM_ENTITY_DISTANCE_TO_PLAYER) {
+                double speed = Math.min(0.6, distance * 0.6);
+                Vec3d velocity = delta.normalize().multiply(speed);
 
-                    Vec3d smooth = item.getVelocity().lerp(velocity, 0.4);
-                    item.setVelocity(smooth);
-                } else item.setVelocity(Vec3d.ZERO);
+                Vec3d smooth = item.getVelocity().lerp(velocity, 0.4);
+                item.setVelocity(smooth);
+            } else item.setVelocity(Vec3d.ZERO);
 
-                item.velocityModified = true;
-                item.setPickupDelay(100);
-            });
-        }
+            item.velocityModified = true;
+            item.setPickupDelay(100);
+        });
     }
 
     public boolean pickUpItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
         if (BackpackInventory.isFull(inventory)) {
-            tick = 0;
             queue.forEach(entity -> entity.setPickupDelay(0));
             return false;
         }
 
         if (tick % 4 == 0) {
-            tick = 0;
-
             Iterator<ItemEntity> iterator = queue.iterator();
             if (!iterator.hasNext()) return false;
 
@@ -162,7 +155,9 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
                 return false;
             }
 
-            if (next.squaredDistanceTo(pos) > MAX_DISTANCE_TO_PLAYER_SQUARED) return false;
+            if (next.squaredDistanceTo(pos) > MAX_DISTANCE_TO_PLAYER_SQUARED) {
+                return false;
+            }
 
             ItemStack stack = next.getStack();
             if (!inventory.canInsert(stack)) {

@@ -3,7 +3,7 @@ package com.rouesvm.servback.technical.data;
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.data.state.codecs.BackpackData;
+import com.rouesvm.servback.technical.data.state.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
 import com.rouesvm.servback.technical.data.state.codecs.SlotData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BackpackDataSaver {
+public class BackpackData {
     private static Path savePath;
     private static Path backupPath;
 
-    private static List<BackpackData> storedInventories = new ArrayList<>();
+    private static List<BackpackInstanceData> storedInventories = new ArrayList<>();
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
-    private static final Codec<List<BackpackData>> SAVE_CODEC = BackpackData.CODEC.listOf().fieldOf("backpackContents").codec();
+    private static final Codec<List<BackpackInstanceData>> SAVE_CODEC = BackpackInstanceData.CODEC.listOf().fieldOf("backpackContents").codec();
 
     public static boolean loadData(MinecraftServer server) {
         savePath = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
@@ -96,7 +96,7 @@ public class BackpackDataSaver {
         if (backupPath == null) return;
         if (!Configuration.instance().allow_backups) return;
 
-        BackpackDataSaver.setStoredInventories(BackpackManager.instance.getBackpackInstances());
+        BackpackData.setStoredInventories(BackpackManager.instance().getBackpackInstances());
 
         LocalDateTime currentTime = LocalDateTime.now();
         String formattedCurrentTime = currentTime.format(formatter);
@@ -130,7 +130,7 @@ public class BackpackDataSaver {
     public static void setStoredInventories(Set<BackpackInstance> backpackInstances) {
         storedInventories = new ArrayList<>();
         backpackInstances.forEach(instance -> {
-            BackpackData data = new BackpackData(
+            BackpackInstanceData data = new BackpackInstanceData(
                     instance.getUuid(),
                     new InventoryData(SlotData.writeToCodec(instance.heldInventory()))
             );

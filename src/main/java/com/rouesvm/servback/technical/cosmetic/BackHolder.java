@@ -33,6 +33,8 @@ public class BackHolder extends ElementHolder {
     private final LivingEntity entity;
     private final ItemDisplayElement element;
 
+    private final Vector3f position = new Vector3f();
+
     private Vector3f cosmeticPosition = new Vector3f(0f, -0.65f, 0.28f);
     private Integer cosmeticRotation = 180;
     private Integer cosmeticPitchWhenSneaking = -25;
@@ -59,9 +61,11 @@ public class BackHolder extends ElementHolder {
 
         if (this.element.getItem().getItem() instanceof ContainerItem item) {
             int order = BackpackItemJsonRegistry.getBackpackUpgradeOrder(item.getSize());
-            cosmeticPosition = Configuration.instance().back_positions.get(order);
-            cosmeticRotation = Configuration.instance().back_yaw.get(order);
-            cosmeticPitchWhenSneaking = Configuration.instance().back_pitch_when_sneaking.get(order);
+
+            Configuration.Instance instance = Configuration.instance();
+            cosmeticPosition = instance.back_positions.get(order);
+            cosmeticRotation = instance.back_yaw.get(order);
+            cosmeticPitchWhenSneaking = instance.back_pitch_when_sneaking.get(order);
         }
 
         this.addElement(this.element);
@@ -69,28 +73,30 @@ public class BackHolder extends ElementHolder {
 
     @Override
     protected void onTick() {
-        if (this.entity.isDead() || entity.isRemoved()) destroy();
-
-        if (this.entity.getFacing() == Direction.DOWN) {
-            hideFromPlayer = true;
-            if (entity instanceof ServerPlayerEntity player)
-                this.stopWatching(player);
-        } else {
-            if (hideFromPlayer && entity instanceof ServerPlayerEntity player) {
-                this.startWatching(player);
-                this.updatePosition();
-
-                var packet = VirtualEntityUtils.createRidePacket(entity.getId(), ((EntityExt)entity).polymerVE$getVirtualRidden());
-                this.sendPacket(packet);
-
-                hideFromPlayer = false;
-            }
+        if (entity.isDead() || entity.isRemoved()) {
+            destroy();
+            return;
         }
 
-        if (this.entity.getPose() == EntityPose.SWIMMING
-                || this.entity.getPose() == EntityPose.SLEEPING
-                || (this.entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.isSpectator()))
-        {
+        boolean facingDown = entity.getFacing() == Direction.DOWN;
+        boolean isSpectator = entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.isSpectator();
+
+        EntityPose pose = entity.getPose();
+        boolean isHiddenPose = pose == EntityPose.SWIMMING || pose == EntityPose.SLEEPING || isSpectator;
+
+        if (facingDown) {
+            if (!hideFromPlayer && entity instanceof ServerPlayerEntity player) {
+                stopWatching(player);
+                hideFromPlayer = true;
+            }
+        } else if (hideFromPlayer && entity instanceof ServerPlayerEntity player) {
+            startWatching(player);
+            updatePosition();
+            sendRidePacket();
+            hideFromPlayer = false;
+        }
+
+        if (isHiddenPose) {
             if (!hidden) {
                 hideForAll(this);
                 hidden = true;
@@ -98,30 +104,34 @@ public class BackHolder extends ElementHolder {
         } else {
             if (hidden) {
                 showForAll(this);
-                this.updatePosition();
-
-                var packet = VirtualEntityUtils.createRidePacket(entity.getId(), ((EntityExt)entity).polymerVE$getVirtualRidden());
-                this.sendPacket(packet);
-
+                updatePosition();
+                sendRidePacket();
                 hidden = false;
             }
 
-            boolean sneaking = this.entity.isSneaking();
+            boolean sneaking = entity.isSneaking();
 
             this.element.setYaw(entity.getBodyYaw() - cosmeticRotation);
             this.element.setPitch(sneaking ? cosmeticPitchWhenSneaking : 0);
 
-            float yTranslation = sneaking ? cosmeticPosition.y - 0.02f : cosmeticPosition.y;
-            float zTranslation;
+            float y = sneaking ? cosmeticPosition.y - 0.02f : cosmeticPosition.y;
+            float z = sneaking ? cosmeticPosition.z - 0.10f : cosmeticPosition.z;
 
-            zTranslation = sneaking ? (cosmeticPosition.z - 0.10f) : (cosmeticPosition.z);
-
-            if (entity.getEquippedStack(EquipmentSlot.CHEST) != ItemStack.EMPTY) {
-                zTranslation = zTranslation + 0.05f;
+            if (!entity.getEquippedStack(EquipmentSlot.CHEST).isEmpty()) {
+                z += 0.05f;
             }
 
-            this.element.setTranslation(new Vector3f(0, yTranslation, zTranslation));
+            position.set(0, y, z);
+            this.element.setTranslation(position);
         }
+    }
+
+    private void sendRidePacket() {
+        var packet = VirtualEntityUtils.createRidePacket(
+                entity.getId(),
+                ((EntityExt) entity).polymerVE$getVirtualRidden()
+        );
+        this.sendPacket(packet);
     }
 
     @Override

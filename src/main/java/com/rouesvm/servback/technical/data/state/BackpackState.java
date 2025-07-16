@@ -3,7 +3,7 @@ package com.rouesvm.servback.technical.data.state;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.state.codecs.BackpackData;
+import com.rouesvm.servback.technical.data.state.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class BackpackState extends PersistentState {
-    public final Set<BackpackData> storedInventories;
+    public final Set<BackpackInstanceData> storedInventories;
 
     private static final Codec<BackpackState> SAVE_CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
-                      BackpackData.CODEC.listOf().fieldOf("backpackContents").forGetter(BackpackState::getStoredInventories)
+                      BackpackInstanceData.CODEC.listOf().fieldOf("backpackContents").forGetter(BackpackState::getStoredInventories)
                     ).apply(instance, BackpackState::new));
 
     private static final PersistentStateType<BackpackState> type = new PersistentStateType<>(
@@ -32,7 +32,7 @@ public class BackpackState extends PersistentState {
             null
     );
 
-    public BackpackState(List<BackpackData> data) {
+    public BackpackState(List<BackpackInstanceData> data) {
         this.storedInventories = new HashSet<>();
         this.storedInventories.addAll(data);
     }
@@ -50,7 +50,7 @@ public class BackpackState extends PersistentState {
         return state;
    }
 
-    public List<BackpackData> getStoredInventories() {
+    public List<BackpackInstanceData> getStoredInventories() {
         return new ArrayList<>(this.storedInventories);
     }
 

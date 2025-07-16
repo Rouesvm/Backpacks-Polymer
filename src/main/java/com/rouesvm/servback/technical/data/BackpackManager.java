@@ -14,13 +14,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class BackpackManager {
-    public static BackpackManager instance;
+    private static BackpackManager instance;
 
     public final BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
     private boolean loaded = false;
-    public MinecraftServer server;
+    private MinecraftServer server;
 
     public static void setup(MinecraftServer server) {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.setup();
@@ -31,7 +31,7 @@ public class BackpackManager {
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
 
-        BackpackDataSaver.createBackupDir(server);
+        BackpackData.createBackupDir(server);
     }
 
     public static void destroy(MinecraftServer server) {
@@ -40,8 +40,8 @@ public class BackpackManager {
         if (instance != null) {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
-            save(server);
-            createBackup(server);
+            save();
+            createBackup();
 
             instance = null;
         }
@@ -51,16 +51,16 @@ public class BackpackManager {
         return new HashSet<>(this.storedInstances.values());
     }
 
-    public static void createBackup(MinecraftServer server) {
-        save(server);
-        BackpackDataSaver.createBackup(server);
+    public static void createBackup() {
+        save();
+        BackpackData.createBackup(getServer());
     }
 
-    public static void save(MinecraftServer server) {
-        BackpackDataSaver.setStoredInventories(instance.getBackpackInstances());
-        BackpackDataSaver.save(server);
+    public static void save() {
+        BackpackData.setStoredInventories(instance.getBackpackInstances());
+        BackpackData.save(getServer());
 
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
+        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(getServer());
         globalBackpackState.globalInventory = instance.globalInventory;
     }
 
@@ -72,9 +72,9 @@ public class BackpackManager {
         BackpackState state = BackpackState.getServerState(server);
 
         if (!instance.loaded) {
-            instance.loaded = BackpackDataSaver.loadData(server);
+            instance.loaded = BackpackData.loadData(server);
 
-            Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
+            Set<BackpackInstance> dataInstances = BackpackData.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {
                 instance.load(dataInstances);
                 ServerBackpacks.LOGGER.info("Loaded Server Backpack's new format.");
@@ -86,7 +86,7 @@ public class BackpackManager {
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 instance.load(stateInstances);
 
-                BackpackDataSaver.setStoredInventories(stateInstances);
+                BackpackData.setStoredInventories(stateInstances);
                 state.clearBackpackInstances();
                 state.markDirty();
 
@@ -202,8 +202,18 @@ public class BackpackManager {
     }
 
     //
+
+    public static BackpackManager instance() {
+        return instance;
+    }
+
+    //
     // GENERAL
     //
+
+    public static MinecraftServer getServer() {
+        return instance.server;
+    }
 
     public static void setGlobalInventory(DefaultedList<ItemStack> stacks) {
         instance.globalInventory.setInventoryDirectly(stacks);

@@ -35,13 +35,11 @@ public class BlockHolder extends ElementHolder {
     // wonky
     @Override
     protected void onTick() {
-        if (!alreadySetItem & world != null) {
-            BasicBackpackBlockEntity blockEntity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
-            if (blockEntity == null) return;
+        if (alreadySetItem || world == null) return;
+        if (!(world.getBlockEntity(pos) instanceof BasicBackpackBlockEntity blockEntity)) return;
 
-            this.setMain(blockEntity.getDefaultStack());
-            alreadySetItem = true;
-        }
+        this.setMain(blockEntity.getDefaultStack());
+        alreadySetItem = true;
     }
 
     @Override

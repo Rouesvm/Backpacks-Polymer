@@ -3,7 +3,6 @@ package com.rouesvm.servback.technical.ui;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.BackpackUtils;
-import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
@@ -69,7 +68,7 @@ public class BackpackGui extends BasicInventoryGui {
             String after = BackpackUtils.hashBackpackContents(instance.heldInventory());
 
             if (!before.equals(after)) {
-                BackpackDataSaver.createBackup(player.getServer());
+                BackpackManager.createBackup(player.getServer());
             }
 
             BackpackManager.save(this.getPlayer().getServer());

@@ -11,10 +11,12 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,11 +52,8 @@ public class BackpackDataSaver {
             } catch (IOException e) {
                 ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data", e);
             }
-        } else {
-            save(null, server);
-        }
+        } else save(server);
 
-        createBackupDir(server);
         return false;
     }
 
@@ -72,6 +71,39 @@ public class BackpackDataSaver {
         }
     }
 
+    public static void save(MinecraftServer server) {
+        writeToFile(savePath, server);
+    }
+
+    public static void writeToFile(@NonNull Path path, MinecraftServer server) {
+        var registry = server.getRegistryManager();
+        var data = SAVE_CODEC.encodeStart(registry.getOps(NbtOps.INSTANCE),
+                List.copyOf(storedInventories));
+
+        if (data.isSuccess()) {
+            @Nullable Path finalPath = path;
+            data.result().ifPresent(nbtElement -> {
+                try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(finalPath.toFile()))) {
+                    NbtIo.write(nbtElement, dos);
+                } catch (IOException e) {
+                    ServerBackpacks.LOGGER.error("Failed to save Server Backpack's data to {}", finalPath, e);
+                }
+            });
+        } else ServerBackpacks.LOGGER.error("Failed to encode Server Backpack's data: {}", data.error());
+    }
+
+    public static void createBackup(MinecraftServer server) {
+        if (backupPath == null) return;
+        if (!Configuration.instance().allow_backups) return;
+
+        BackpackDataSaver.setStoredInventories(BackpackManager.instance.getBackpackInstances());
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        String formattedCurrentTime = currentTime.format(formatter);
+
+        writeToFile(backupPath.resolve("serverbackpacks-backup-" + formattedCurrentTime + ".data"), server);
+    }
+
     public static void createBackupDir(MinecraftServer server) {
         backupPath = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks-backups");
 
@@ -84,39 +116,6 @@ public class BackpackDataSaver {
         }
 
         createBackup(server);
-    }
-
-    public static void save(@Nullable Path path, MinecraftServer server) {
-        if (path == null) path = savePath;
-        if (path == null) return;
-
-        var data = SAVE_CODEC.encodeStart(server.getRegistryManager().getOps(NbtOps.INSTANCE),
-                List.copyOf(storedInventories));
-
-        if (data.isSuccess()) {
-            @Nullable Path finalPath = path;
-            data.result().ifPresent(nbtElement -> {
-                try (DataOutputStream dos = new DataOutputStream(Files.newOutputStream(finalPath))) {
-                    NbtIo.write(nbtElement, dos);
-                } catch (IOException e) {
-                    ServerBackpacks.LOGGER.error("Failed to save Server Backpack's data to {}", finalPath, e);
-                }
-            });
-        } else {
-            ServerBackpacks.LOGGER.error("Failed to encode Server Backpack's data: {}", data.error());
-        }
-    }
-
-    public static void createBackup(MinecraftServer server) {
-        if (backupPath == null) return;
-        if (!Configuration.instance().allow_backups) return;
-
-        BackpackDataSaver.setStoredInventories(BackpackManager.instance.getBackpackInstances());
-
-        LocalDateTime currentTime = LocalDateTime.now();
-        String formattedCurrentTime = currentTime.format(formatter);
-
-        save(backupPath.resolve("serverbackpacks-backup-" + formattedCurrentTime + ".data"), server);
     }
 
     public static Set<BackpackInstance> getBackpackInstances() {

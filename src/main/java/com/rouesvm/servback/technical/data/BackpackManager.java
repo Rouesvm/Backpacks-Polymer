@@ -30,6 +30,8 @@ public class BackpackManager {
         load(server);
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
+
+        BackpackDataSaver.createBackupDir(server);
     }
 
     public static void destroy(MinecraftServer server) {
@@ -39,7 +41,7 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
             save(server);
-            BackpackDataSaver.createBackup(server);
+            createBackup(server);
 
             instance = null;
         }
@@ -49,9 +51,14 @@ public class BackpackManager {
         return new HashSet<>(this.storedInstances.values());
     }
 
+    public static void createBackup(MinecraftServer server) {
+        save(server);
+        BackpackDataSaver.createBackup(server);
+    }
+
     public static void save(MinecraftServer server) {
         BackpackDataSaver.setStoredInventories(instance.getBackpackInstances());
-        BackpackDataSaver.save(null, server);
+        BackpackDataSaver.save(server);
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         globalBackpackState.globalInventory = instance.globalInventory;

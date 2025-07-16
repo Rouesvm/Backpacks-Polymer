@@ -6,7 +6,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
@@ -37,7 +36,7 @@ public class BackpackCommands {
                     return 1;
                 }).then(literal("backup").executes(context -> {
                     context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.backup"), false);
-                    BackpackDataSaver.createBackup(context.getSource().getServer());
+                    BackpackManager.createBackup(context.getSource().getServer());
                     return 1;
                 })).then(literal("list").executes(context -> {
                     Set<UUID> instances = BackpackManager.instance.storedInstances.keySet();

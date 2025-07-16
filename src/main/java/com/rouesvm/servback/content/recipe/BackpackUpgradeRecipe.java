@@ -65,6 +65,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
         return true;
     }
 
+    @Override
     public ItemStack craft(SmithingRecipeInput smithingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup) {
         ItemStack base = smithingRecipeInput.base();
         ItemStack addition = smithingRecipeInput.addition();

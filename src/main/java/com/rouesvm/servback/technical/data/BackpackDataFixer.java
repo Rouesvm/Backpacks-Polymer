@@ -26,7 +26,8 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 public class BackpackDataFixer {
-    public static boolean onWorldLoading(MinecraftServer server) {
+    // The 1.21.1 way of loading data.
+    public static boolean isLegacyDataPresent(MinecraftServer server) {
         Path path = server.getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
         if (!path.toFile().exists()) return false;
 
@@ -54,14 +55,14 @@ public class BackpackDataFixer {
         return false;
     }
 
-    public static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
+    private static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
         return new BackpackInstance(
                 Uuids.toUuid(compound.getIntArray("uuid").get()),
                 loadInventory(compound.getCompound("contents").get(), registryLookup)
         );
     }
 
-    public static Set<BackpackInstance> convertToV2Format(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    private static Set<BackpackInstance> convertToV2Format(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         Set<BackpackInstance> instances = new HashSet<>();
 
         var data = nbt.get("data");
@@ -81,7 +82,7 @@ public class BackpackDataFixer {
         return instances;
     }
 
-    public static BackpackInventory loadInventory(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
+    private static BackpackInventory loadInventory(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
         DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
         Inventories.readData(NbtReadView.create(new ErrorReporter.Logging(ServerBackpacks.LOGGER), registryLookup, nbtCompound), itemStacks);
         return new BackpackInventory(itemStacks);

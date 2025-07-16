@@ -69,7 +69,7 @@ public class BackpackGui extends BasicInventoryGui {
 
             if (!before.equals(after)) BackpackManager.createBackup();
 
-            BackpackManager.save();
+            BackpackManager.saveData();
 
             handler.enableSyncing();
             handler.sendContentUpdates();

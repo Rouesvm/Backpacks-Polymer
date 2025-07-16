@@ -2,7 +2,10 @@ package com.rouesvm.servback.technical.data.state;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.data.state.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
@@ -39,6 +42,23 @@ public class BackpackState extends PersistentState {
 
     public BackpackState() {
         this(Collections.emptyList());
+    }
+
+    public static boolean loadOldData(BackpackState state) {
+        Set<BackpackInstance> stateInstances = state.getBackpackInstances();
+        if (stateInstances != null && !stateInstances.isEmpty()) {
+            BackpackManager.instance().loadData(stateInstances);
+
+            BackpackData.setStoredInventories(stateInstances);
+            state.clearBackpackInstances();
+            state.markDirty();
+
+            ServerBackpacks.LOGGER.info("Loaded Server Backpack's old format.");
+
+            return true;
+        }
+
+        return false;
     }
 
     public static BackpackState getServerState(MinecraftServer server) {

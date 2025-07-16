@@ -40,7 +40,7 @@ public class BackpackManager {
         if (instance != null) {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
-            save();
+            saveData();
             createBackup();
 
             instance = null;
@@ -52,11 +52,11 @@ public class BackpackManager {
     }
 
     public static void createBackup() {
-        save();
+        saveData();
         BackpackData.createBackup(getServer());
     }
 
-    public static void save() {
+    public static void saveData() {
         BackpackData.setStoredInventories(instance.getBackpackInstances());
         BackpackData.save(getServer());
 
@@ -64,7 +64,7 @@ public class BackpackManager {
         globalBackpackState.globalInventory = instance.globalInventory;
     }
 
-    public void load(Set<BackpackInstance> instances) {
+    public void loadData(Set<BackpackInstance> instances) {
         instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.getUuid(), backpackInstance));
     }
 
@@ -76,29 +76,18 @@ public class BackpackManager {
 
             Set<BackpackInstance> dataInstances = BackpackData.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {
-                instance.load(dataInstances);
+                instance.loadData(dataInstances);
                 ServerBackpacks.LOGGER.info("Loaded Server Backpack's new format.");
             }
         }
 
         if (!instance.loaded && state != null) {
-            Set<BackpackInstance> stateInstances = state.getBackpackInstances();
-            if (stateInstances != null && !stateInstances.isEmpty()) {
-                instance.load(stateInstances);
-
-                BackpackData.setStoredInventories(stateInstances);
-                state.clearBackpackInstances();
-                state.markDirty();
-
-                instance.loaded = true;
-
-                ServerBackpacks.LOGGER.info("Loaded Server Backpack's semi-new format.");
-            }
+            instance.loaded = BackpackState.loadOldData(state);
         }
 
         if (!instance.loaded) {
-            instance.loaded = BackpackDataFixer.onWorldLoading(server);
-            if (instance.loaded) ServerBackpacks.LOGGER.info("Loaded Server Backpack's old format.");
+            instance.loaded = BackpackDataFixer.isLegacyDataPresent(server);
+            if (instance.loaded) ServerBackpacks.LOGGER.info("Loaded Server Backpack's older format.");
         }
 
         if (!instance.loaded) ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
@@ -166,7 +155,7 @@ public class BackpackManager {
         return uuid;
     }
 
-    // It's near impossible to generate an uuid that is the same, but I'm just going to regenerate just in case.
+    // The cake is a lie.
     public static UUID generateUniqueUUID() {
         UUID uuid = UUID.randomUUID();
         if (instance != null && instance.hasBackpack(uuid)) {

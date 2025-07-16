@@ -114,7 +114,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         }
     }
 
-    public void moveItemsToTarget(Vec3d pos) {
+    private void moveItemsToTarget(Vec3d pos) {
         if (queue.isEmpty()) return;
 
         Vec3d target = new Vec3d(pos.toVector3f());
@@ -137,7 +137,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         });
     }
 
-    public boolean pickUpItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
+    private boolean pickUpItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
         if (BackpackInventory.isFull(inventory)) {
@@ -179,7 +179,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         return true;
     }
 
-    public void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
+    private void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
         Box area = new Box(pos.add(-SCANNING_RANGE), pos.add(SCANNING_RANGE));
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->

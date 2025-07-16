@@ -27,7 +27,7 @@ import java.util.zip.GZIPInputStream;
 
 public class BackpackDataFixer {
     // The 1.21.1 way of loading data.
-    public static boolean isLegacyDataPresent(MinecraftServer server) {
+    public static boolean isDataPresent(MinecraftServer server) {
         Path path = server.getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
         if (!path.toFile().exists()) return false;
 

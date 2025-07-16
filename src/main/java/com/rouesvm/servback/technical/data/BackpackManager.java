@@ -64,29 +64,32 @@ public class BackpackManager {
         globalBackpackState.globalInventory = instance.globalInventory;
     }
 
-    public void loadData(Set<BackpackInstance> instances) {
+    public void loadIntoStoredInstances(Set<BackpackInstance> instances) {
         instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.getUuid(), backpackInstance));
     }
 
     public static void load(MinecraftServer server) {
         BackpackState state = BackpackState.getServerState(server);
 
+        // Mod's own format (current default).
         if (!instance.loaded) {
             instance.loaded = BackpackData.loadData(server);
 
             Set<BackpackInstance> dataInstances = BackpackData.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {
-                instance.loadData(dataInstances);
+                instance.loadIntoStoredInstances(dataInstances);
                 ServerBackpacks.LOGGER.info("Loaded Server Backpack's new format.");
             }
         }
 
+        // "Minecraft's Persistent State" format.
         if (!instance.loaded && state != null) {
-            instance.loaded = BackpackState.loadOldData(state);
+            instance.loaded = BackpackState.loadData(state);
         }
 
+        // 1.21.1 format.
         if (!instance.loaded) {
-            instance.loaded = BackpackDataFixer.isLegacyDataPresent(server);
+            instance.loaded = BackpackDataFixer.isDataPresent(server);
             if (instance.loaded) ServerBackpacks.LOGGER.info("Loaded Server Backpack's older format.");
         }
 

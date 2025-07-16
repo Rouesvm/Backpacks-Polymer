@@ -44,10 +44,10 @@ public class BackpackState extends PersistentState {
         this(Collections.emptyList());
     }
 
-    public static boolean loadOldData(BackpackState state) {
+    public static boolean loadData(BackpackState state) {
         Set<BackpackInstance> stateInstances = state.getBackpackInstances();
         if (stateInstances != null && !stateInstances.isEmpty()) {
-            BackpackManager.instance().loadData(stateInstances);
+            BackpackManager.instance().loadIntoStoredInstances(stateInstances);
 
             BackpackData.setStoredInventories(stateInstances);
             state.clearBackpackInstances();

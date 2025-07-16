@@ -7,6 +7,7 @@ import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,18 +24,25 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, FilterableUpgrade {
     public static final int MAX_SIZE = 5;
 
     public static final int MAX_RANGE = 3;
+
+    public static final double MAX_ITEM_ENTITY_DISTANCE_TO_PLAYER = 0.75;
+    public static final double MAX_DISTANCE_TO_PLAYER_SQUARED = 1.25*1.25;
+
     private static final double SCANNING_RANGE = ((double) MAX_RANGE / 2) * 3;
 
     private int tick = 0;
 
     private final Set<ItemEntity> queue = new HashSet<>();
-    private final ItemFilter itemFilter = new ItemFilter(ItemFilter.MODE.PICKUP, new ArrayList<>(MAX_RANGE));
+    private final ItemFilter itemFilter = new ItemFilter(ItemFilter.MODE.PICKUP, new ObjectOpenHashSet<>(MAX_RANGE));
 
     public MagnetUpgrade() {
         super(BackpackUpgradeRegistry.MAGNET);
@@ -67,10 +75,11 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         if (this.itemFilter.filterList().isEmpty()) return;
 
         tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
-        for (String string : this.itemFilter.filterList()) tooltip.add(
-                Text.literal(" ")
-                        .append(string).copy()
-                        .formatted(Formatting.DARK_AQUA));
+        for (String string : this.itemFilter.filterList()) {
+            tooltip.add(Text.literal(" ")
+                            .append(string).copy()
+                            .formatted(Formatting.DARK_AQUA));
+        }
     }
 
     @Override
@@ -94,42 +103,66 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     }
 
     @Override
-    public void tick(World world, BlockPos pos, BackpackInventory inventory) {
+    public void tick(World world, Vec3d pos, BackpackInventory inventory) {
         if (inventory == null || !(world instanceof ServerWorld serverWorld)) return;
-        if (pickUpItems(serverWorld, pos, inventory)) return;
+
+        tick++;
+
+        if (pickUpItems(serverWorld, pos, inventory)) {
+            moveItemsToTarget(pos);
+            return;
+        }
 
         checkForItems(serverWorld, pos, inventory);
     }
 
-    public boolean pickUpItems(ServerWorld world, BlockPos pos, BackpackInventory inventory) {
+    public void moveItemsToTarget(Vec3d pos) {
+        if (queue.isEmpty()) return;
+
+        if (tick % 2 == 0) {
+            Vec3d target = new Vec3d(pos.toVector3f());
+
+            queue.forEach(item -> {
+                Vec3d current = item.getPos();
+                Vec3d delta = target.subtract(current);
+
+                double distance = delta.length();
+                if (distance >= MAX_ITEM_ENTITY_DISTANCE_TO_PLAYER) {
+                    double speed = Math.min(0.6, distance * 0.6);
+                    Vec3d velocity = delta.normalize().multiply(speed);
+
+                    Vec3d smooth = item.getVelocity().lerp(velocity, 0.4);
+                    item.setVelocity(smooth);
+                } else item.setVelocity(Vec3d.ZERO);
+
+                item.velocityModified = true;
+                item.setPickupDelay(100);
+            });
+        }
+    }
+
+    public boolean pickUpItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
         if (BackpackInventory.isFull(inventory)) {
             tick = 0;
-            for (ItemEntity item : queue) {
-                item.setPickupDelay(0);
-            }
+            queue.forEach(entity -> entity.setPickupDelay(0));
             return false;
         }
 
-        tick++;
-
-        if (tick % 4 == 0) queue.forEach(item -> {
+        if (tick % 4 == 0) {
             tick = 0;
 
-            item.setPosition(pos.toCenterPos());
-            item.setPickupDelay(100);
-        });
-
-        if (tick % 4 == 0) {
             Iterator<ItemEntity> iterator = queue.iterator();
             if (!iterator.hasNext()) return false;
 
             ItemEntity next = iterator.next();
-            if (next == null || !next.isAlive() || next.squaredDistanceTo(pos.toCenterPos()) > MAX_RANGE) {
+            if (next == null || !next.isAlive() || next.squaredDistanceTo(pos) > MAX_RANGE) {
                 iterator.remove();
                 return false;
             }
+
+            if (next.squaredDistanceTo(pos) > MAX_DISTANCE_TO_PLAYER_SQUARED) return false;
 
             ItemStack stack = next.getStack();
             if (!inventory.canInsert(stack)) {
@@ -139,7 +172,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
             }
 
             ItemStack remainder = inventory.addStack(stack);
-            ContainerItem.playInsertSound(world, pos, 1);
+            ContainerItem.playInsertSound(world, BlockPos.ofFloored(pos), 1);
 
             if (remainder.isEmpty()) {
                 next.discard();
@@ -151,9 +184,8 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         return true;
     }
 
-    public void checkForItems(ServerWorld world, BlockPos pos, BackpackInventory inventory) {
-        Vec3d vec3d = pos.toCenterPos();
-        Box area = new Box(vec3d.add(-SCANNING_RANGE), vec3d.add(SCANNING_RANGE));
+    public void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
+        Box area = new Box(pos.add(-SCANNING_RANGE), pos.add(SCANNING_RANGE));
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)

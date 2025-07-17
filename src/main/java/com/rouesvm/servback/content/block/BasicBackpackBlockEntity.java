@@ -46,20 +46,16 @@ public class BasicBackpackBlockEntity extends BlockEntity {
 
         size = nbt.getInt("size");
 
-        nbt.getOptionalInt("dye").ifPresent(integer ->
-                item = BackpackItemJsonRegistry.getBackpackBySize(
-                        integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)), size
-                ));
+        if (nbt.contains("dye")) {
+            int dye = nbt.getInt("dye");
+            item = BackpackItemJsonRegistry.getBackpackBySize(
+                    dye + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)), size);
+        }
 
         if (item == null) {
-            if (nbt.getOptionalString("item").isPresent()) {
-                item = Registries.ITEM.get(Identifier.of(nbt.getOptionalString("item").get()));
-            } else {
-                item = Registries.ITEM.get(
-                        view.getInt("item", Registries.ITEM.getRawId(
-                                BackpackItemJsonRegistry.getBackpackBySize(size)
-                        )));
-            }
+            if (nbt.contains("item"))
+                item = Registries.ITEM.get(Identifier.of(nbt.getString("item")));
+            else item = Registries.ITEM.get(nbt.getInt("item"));
         }
     }
 

@@ -29,7 +29,7 @@ public class BackpackItemJsonRegistry {
 
     public static int getBackpackId(ContainerItem item) {
         DyeColor color = ITEM_TO_COLOR.get(item);
-        return color != null ? color.getIndex() + getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(item.getSize())) : 0;
+        return color != null ? color.getId() + getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(item.getSize())) : 0;
     }
 
     public static int getBackpackUpgradeOrder(int size) {
@@ -37,7 +37,7 @@ public class BackpackItemJsonRegistry {
     }
 
     public static Item getBackpackByOrder(@NotNull DyeColor color, int order) {
-        return getBackpackByOrder(color.getIndex() + getOffset(order), order);
+        return getBackpackByOrder(color.getId() + getOffset(order), order);
     }
 
     public static Item getBackpackByOrder(int order) {
@@ -82,7 +82,7 @@ public class BackpackItemJsonRegistry {
                 String dyeColor = color.name().toLowerCase();
                 if (blacklistedDyes != null && blacklistedDyes.contains(dyeColor)) continue;
 
-                ContainerItem item = create(sizeMap, color.getIndex() + offset, dyeColor + "_" + backpackName, size);
+                ContainerItem item = create(sizeMap, color.getId() + offset, dyeColor + "_" + backpackName, size);
                 ITEM_TO_COLOR.put(item, color);
 
                 registeredSize++;

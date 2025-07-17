@@ -38,7 +38,7 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
             save(server);
-            BackpackDataSaver.createBackup(server);
+            //BackpackDataSaver.createBackup(server);
 
             instance = null;
         }

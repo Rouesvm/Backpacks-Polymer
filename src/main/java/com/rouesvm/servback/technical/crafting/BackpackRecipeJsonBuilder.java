@@ -7,18 +7,16 @@ import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
-import net.minecraft.data.recipe.CraftingRecipeJsonBuilder;
-import net.minecraft.data.recipe.RecipeExporter;
+import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
@@ -27,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
-    private final RegistryEntryLookup<Item> registryLookup;
     private final RecipeCategory category;
     private final Item output;
     private final int count;
@@ -38,27 +35,26 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     private String group;
     private boolean showNotification = true;
 
-    private BackpackRecipeJsonBuilder(RegistryEntryLookup<Item> registryLookup, RecipeCategory category, ItemConvertible output, int count) {
-        this.registryLookup = registryLookup;
+    private BackpackRecipeJsonBuilder(RecipeCategory category, ItemConvertible output, int count) {
         this.category = category;
         this.output = output.asItem();
         this.count = count;
     }
 
-    public static BackpackRecipeJsonBuilder create(RegistryEntryLookup<Item> registryLookup, RecipeCategory category, ItemConvertible output) {
-        return create(registryLookup, category, output, 1);
+    public static BackpackRecipeJsonBuilder create(RecipeCategory category, ItemConvertible output) {
+        return create(category, output, 1);
     }
 
-    public static BackpackRecipeJsonBuilder create(RegistryEntryLookup<Item> registryLookup, RecipeCategory category, ItemConvertible output, int count) {
-        return new BackpackRecipeJsonBuilder(registryLookup, category, output, count);
+    public static BackpackRecipeJsonBuilder create(RecipeCategory category, ItemConvertible output, int count) {
+        return new BackpackRecipeJsonBuilder(category, output, count);
     }
 
     public BackpackRecipeJsonBuilder input(Character c, TagKey<Item> tag) {
-        return this.input(c, Ingredient.ofTag(this.registryLookup.getOrThrow(tag)));
+        return this.input(c, Ingredient.fromTag(tag));
     }
 
     public BackpackRecipeJsonBuilder input(Character c, ItemConvertible item) {
-        return this.input(c, Ingredient.ofItem(item));
+        return this.input(c, Ingredient.ofItems(item));
     }
 
     public BackpackRecipeJsonBuilder input(Character c, Ingredient ingredient) {
@@ -73,7 +69,7 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public BackpackRecipeJsonBuilder pattern(String patternStr) {
-        if (!this.pattern.isEmpty() && patternStr.length() != ((String)this.pattern.get(0)).length()) {
+        if (!this.pattern.isEmpty() && patternStr.length() != this.pattern.getFirst().length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
         } else {
             this.pattern.add(patternStr);
@@ -97,10 +93,15 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     }
 
     @Override
-    public void offerTo(RecipeExporter exporter, RegistryKey<Recipe<?>> recipeKey) {
-        RawShapedRecipe rawShapedRecipe = this.validate(recipeKey);
-        Advancement.Builder builder = exporter.getAdvancementBuilder().criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeKey)).rewards(AdvancementRewards.Builder.recipe(recipeKey)).criteriaMerger(AdvancementRequirements.CriterionMerger.OR);
+    public void offerTo(RecipeExporter exporter, Identifier recipeId) {
+        RawShapedRecipe rawShapedRecipe = this.validate(recipeId);
+        Advancement.Builder builder = exporter.getAdvancementBuilder()
+                .criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
+                .rewards(AdvancementRewards.Builder.recipe(recipeId))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.OR);
+
         Objects.requireNonNull(builder);
+
         this.criteria.forEach(builder::criterion);
         BackpackRecipe shapedRecipe = new BackpackRecipe(
                 Objects.requireNonNullElse(this.group, ""),
@@ -108,14 +109,12 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
                 rawShapedRecipe,
                 new ItemStack(this.output, this.count), this.showNotification
         );
-        exporter.accept(recipeKey, shapedRecipe, builder.build(recipeKey.getValue().withPrefixedPath("recipes/" + this.category.getName() + "/")));
+        exporter.accept(recipeId, shapedRecipe, builder.build(recipeId.withPrefixedPath("recipes/" + this.category.getName() + "/")));
     }
 
-    private RawShapedRecipe validate(RegistryKey<Recipe<?>> recipeKey) {
-        if (this.criteria.isEmpty()) {
-            throw new IllegalStateException("No way of obtaining recipe " + recipeKey.getValue());
-        } else {
-            return RawShapedRecipe.create(this.inputs, this.pattern);
-        }
+    private RawShapedRecipe validate(Identifier recipeKey) {
+        if (this.criteria.isEmpty())
+            throw new IllegalStateException("No way of obtaining recipe " + recipeKey);
+        else return RawShapedRecipe.create(this.inputs, this.pattern);
     }
 }

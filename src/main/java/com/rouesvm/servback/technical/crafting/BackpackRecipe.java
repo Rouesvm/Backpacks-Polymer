@@ -8,6 +8,7 @@ import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
+import eu.pb4.polymer.core.api.utils.PolymerObject;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
@@ -72,7 +73,7 @@ public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
         return result;
     }
 
-    public static class Serializer implements RecipeSerializer<BackpackRecipe> {
+    public static class Serializer implements RecipeSerializer<BackpackRecipe>, PolymerObject {
         public static final MapCodec<BackpackRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 (instance) ->
                         instance.group(Codec.STRING.optionalFieldOf("group", "").forGetter(BackpackRecipe::getGroup),
@@ -89,7 +90,7 @@ public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
         }
 
         public PacketCodec<RegistryByteBuf, BackpackRecipe> packetCodec() {
-            return PACKET_CODEC;
+            return null;
         }
 
         private static BackpackRecipe read(RegistryByteBuf buf) {

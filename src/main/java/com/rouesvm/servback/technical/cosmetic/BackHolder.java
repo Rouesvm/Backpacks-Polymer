@@ -2,6 +2,7 @@ package com.rouesvm.servback.technical.cosmetic;
 
 import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
@@ -54,10 +55,10 @@ public class BackHolder extends ElementHolder {
         this.element.ignorePositionUpdates();
 
         if (this.element.getItem().getItem() instanceof ContainerItem item) {
-            int size = item.getSize();
-            cosmeticPosition = Configuration.instance().back_positions.get(size);
-            cosmeticRotation = Configuration.instance().back_yaw.get(size);
-            cosmeticPitchWhenSneaking = Configuration.instance().back_pitch_when_sneaking.get(size);
+            int order = BackpackItemJsonRegistry.getBackpackUpgradeOrder(item.getSize());
+            cosmeticPosition = Configuration.instance().back_positions.get(order);
+            cosmeticRotation = Configuration.instance().back_yaw.get(order);
+            cosmeticPitchWhenSneaking = Configuration.instance().back_pitch_when_sneaking.get(order);
         }
 
         this.addElement(this.element);

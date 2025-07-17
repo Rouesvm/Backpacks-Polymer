@@ -1,8 +1,7 @@
 package com.rouesvm.servback.content.block;
 
-import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
-import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -13,7 +12,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
@@ -37,11 +35,9 @@ public class BasicBackpackBlockEntity extends BlockEntity {
 
         nbt.putInt("size", size);
 
-        if (item != null) {
-            if (item instanceof ContainerItem containerItem)
-                nbt.putInt("dye", BackpackItemRegistry.getBackpackDyeColor(containerItem).getId());
-            else nbt.putString("item", item.toString());
-        } else nbt.putString("item", BackpackItemRegistry.getBackpack(DyeColor.BROWN, size / 9).toString());
+        if (item != null)
+            nbt.putString("item", item.toString());
+        else nbt.putString("item", BackpackItemJsonRegistry.getBackpackBySize(size).toString());
     }
 
     @Override
@@ -50,18 +46,26 @@ public class BasicBackpackBlockEntity extends BlockEntity {
 
         size = nbt.getInt("size");
 
-        if (nbt.contains("dye")) item = ContainerItem.getColoredBackpack(DyeColor.byId(nbt.getInt("dye")), size / 9);
+        nbt.getOptionalInt("dye").ifPresent(integer ->
+                item = BackpackItemJsonRegistry.getBackpackBySize(
+                        integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)), size
+                ));
 
         if (item == null) {
-            if (nbt.contains("item"))
-                item = Registries.ITEM.get(Identifier.of(nbt.getString("item")));
-            else item = Registries.ITEM.get(Registries.ITEM.getRawId(
-                    ContainerItem.getDefaultBackpack(1)));
+            if (nbt.getOptionalString("item").isPresent()) {
+                item = Registries.ITEM.get(Identifier.of(nbt.getOptionalString("item").get()));
+            } else {
+                item = Registries.ITEM.get(
+                        view.getInt("item", Registries.ITEM.getRawId(
+                                BackpackItemJsonRegistry.getBackpackBySize(size)
+                        )));
+            }
         }
     }
 
     public ItemStack getDefaultStack() {
-        ItemStack stack = item != null ? item.getDefaultStack() : ContainerItem.getDefaultBackpack(size / 9).getDefaultStack();
+        ItemStack stack = item != null ? item.getDefaultStack()
+                : BackpackItemJsonRegistry.getBackpackBySize(size).getDefaultStack();
         if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
         return stack;
     }

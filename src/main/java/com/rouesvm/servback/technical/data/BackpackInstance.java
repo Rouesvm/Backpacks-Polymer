@@ -55,6 +55,12 @@ public class BackpackInstance {
         return backpackInstance;
     }
 
+    public BackpackInstance copy() {
+        BackpackInventory target = new BackpackInventory(inventory.size());
+        inventory.copyTo(target);
+        return new BackpackInstance(this.uuid, target);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

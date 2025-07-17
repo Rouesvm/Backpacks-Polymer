@@ -6,9 +6,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -29,10 +31,15 @@ public class BackpackCommands {
         if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
 
         dispatcher.register(literal("backpacks")
+                .requires(source -> Permissions.check(source, "serverbackpacks.command", 4))
                 .executes(context -> {
                     context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);
                     return 1;
-                }).then(literal("list").executes(context -> {
+                }).then(literal("backup").executes(context -> {
+                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.backup"), false);
+                    BackpackDataSaver.createBackup(context.getSource().getServer());
+                    return 1;
+                })).then(literal("list").executes(context -> {
                     Set<UUID> instances = BackpackManager.instance.storedInstances.keySet();
                     context.getSource().sendFeedback(
                             () -> Text.translatable("command.serverbackpacks.list"), false);
@@ -60,8 +67,8 @@ public class BackpackCommands {
                                 CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
                                 Text.translatable("command.serverbackpacks.empty"));
                     return 1;
-                }))).then(configCommand())
-        );
+                })).then(configCommand())
+        ));
     }
 
     private static LiteralArgumentBuilder<ServerCommandSource> configCommand() {

@@ -26,6 +26,9 @@ public class BackpackManager {
     public static void setup(MinecraftServer server) {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.setup();
         instance = new BackpackManager();
+        load(server);
+
+        ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
     }
 
     public static void destroy(MinecraftServer server) {
@@ -35,6 +38,8 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
             save(server);
+            BackpackDataSaver.createBackup(server);
+
             instance = null;
         }
     }
@@ -61,12 +66,17 @@ public class BackpackManager {
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 instance.load(stateInstances);
                 instance.loaded = true;
+
+                ServerBackpacks.LOGGER.info("Loaded Server Backpack's semi-new format.");
             }
         }
     }
 
     public static void loadOnServerStarted(MinecraftServer server) {
-        load(server);
+        if (!instance.loaded) {
+            ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
+            load(server);
+        }
 
         BackpackState state = BackpackState.getServerState(server);
         instance.globalInventory.setInventoryDirectly(state.globalInventory.heldStacks());

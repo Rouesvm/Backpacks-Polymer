@@ -2,15 +2,18 @@ package com.rouesvm.servback;
 
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.content.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.content.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.content.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemGroup;
+import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -50,11 +53,15 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackBlockEntityRegistry.initialize();
 		BackpackBlockRegistry.initialize();
 
+		BackpackItemJsonRegistry.initialize();
 		BackpackItemRegistry.initialize();
 		BackpackItemGroup.initialize();
 
 		BackpackCommands.initialize();
 
+		BackpackRecipeRegistry.initialize();
+
+		if (hasGeyserLoaded) BackpackGeyser.initialize();
 		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		serverEvents();
@@ -64,10 +71,24 @@ public class ServerBackpacks implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::setup);
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::loadOnServerStarted);
 
-		ServerLifecycleEvents.SERVER_STOPPING.register(BackpackManager::destroy);
+		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 
         ServerLifecycleEvents.AFTER_SAVE.register((minecraftServer, b, b1) -> {
             if (BackpackManager.instance != null) BackpackManager.save(minecraftServer);
         });
     }
+		ServerLifecycleEvents.BEFORE_SAVE.register((minecraftServer, b, b1) -> {
+			if (BackpackManager.instance != null) {
+				BackpackManager.save(minecraftServer);
+				BackpackDataSaver.createBackup(minecraftServer);
+			}
+		});
+
+		backupEvents();
+	}
+
+	private static void backupEvents() {
+		ServerPlayerEvents.LEAVE.register((p0) -> BackpackDataSaver.createBackup(p0.getServer()));
+		ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackDataSaver.createBackup(p0.getServer()));
+	}
 }

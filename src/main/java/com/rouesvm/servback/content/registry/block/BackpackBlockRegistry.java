@@ -2,8 +2,8 @@ package com.rouesvm.servback.content.registry.block;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
-import com.rouesvm.servback.content.block.BasicPolymerBlock;
 import com.rouesvm.servback.content.block.backpack.BackpackBlock;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -15,25 +15,32 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class BackpackBlockRegistry {
+    public static Block ENDER_BACKPACK;
+    public static Block GLOBAL_BACKPACK;
+
     public static final Block BACKPACK = register("backpack", new BackpackBlock());
 
-    public static final Block ENDER_BACKPACK = register("ender_backpack", new BasicBackpackBlock("ender_backpack") {
-        @Override
-        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
-            return player != null ? player.getEnderChestInventory() : null;
-        }
-    });
-    public static final Block GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
-        @Override
-        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
-            return BackpackManager.getGlobalInventory();
-        }
-    });
-
-    public static Block register(String name, BasicPolymerBlock block) {
-        return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, name), block);
+    public static <T extends Block> T register(String id, T block) {
+        return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, id), block);
     }
 
-    @SuppressWarnings("EmptyMethod")
-    public static void initialize() {}
+    public static void initialize() {
+        if (Configuration.instance().enable_enderpack) {
+            ENDER_BACKPACK = register("ender_backpack", new BasicBackpackBlock("ender_backpack") {
+                @Override
+                public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
+                    return player != null ? player.getEnderChestInventory() : null;
+                }
+            });
+        }
+
+        if (Configuration.instance().enable_globalpack) {
+            GLOBAL_BACKPACK = register("global_backpack", new BasicBackpackBlock("global_backpack") {
+                @Override
+                public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
+                    return BackpackManager.getGlobalInventory();
+                }
+            });
+        }
+    }
 }

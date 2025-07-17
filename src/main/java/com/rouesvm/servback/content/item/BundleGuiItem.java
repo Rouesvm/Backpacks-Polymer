@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -128,6 +129,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             ItemStack itemStack = slot.getStack();
 
             if (!itemStack.getItem().canBeNested()) return false;
+            if (slot instanceof CraftingResultSlot) return false;
 
             if (clickType == ClickType.LEFT && !itemStack.isEmpty()) {
                 if (BaseInventory.canInsert(itemStack, inventory)) {
@@ -153,6 +155,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         Inventory inventory = getInventory(serverPlayer, stack);
 
         if (!otherStack.getItem().canBeNested()) return false;
+        if (slot instanceof CraftingResultSlot) return false;
 
         if (clickType == ClickType.RIGHT) {
             onOpenGui(serverPlayer, stack);

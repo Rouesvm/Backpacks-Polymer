@@ -5,6 +5,7 @@ import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -14,11 +15,29 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
 
 public class BackpackUtils {
+    public static String hashBackpackContents(DefaultedList<ItemStack> items) {
+        Map<Item, Integer> contents = new HashMap<>();
+
+        for (ItemStack stack : items) {
+            if (!stack.isEmpty()) {
+                contents.merge(stack.getItem(), stack.getCount() + stack.getComponents().hashCode(), Integer::sum);
+            }
+        }
+        return contents.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(Item::toString)))
+                .map(e -> e.getKey().toString() + ":" + e.getValue())
+                .collect(Collectors.joining(","));
+    }
+
     public static void convertComponentToBackpackData(BackpackInstance instance, ItemStack stack) {
         BackpackInventory inventory = instance.inventory();
         if (inventory.isEmpty() && stack.get(DataComponentTypes.CONTAINER) != null && stack.getItem() instanceof ContainerItem item) {

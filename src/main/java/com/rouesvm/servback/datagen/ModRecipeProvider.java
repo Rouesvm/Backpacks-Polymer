@@ -1,5 +1,6 @@
 package com.rouesvm.servback.datagen;
 
+import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.crafting.BackpackRecipeJsonBuilder;
@@ -8,16 +9,20 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
+import net.minecraft.item.DyeItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.DyeColor;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.rouesvm.servback.datagen.ModItemTags.MEDIUM_BACKPACKS;
-import static com.rouesvm.servback.datagen.ModItemTags.SMALL_BACKPACKS;
+import static com.rouesvm.servback.datagen.ModItemTags.*;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public ModRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
@@ -76,7 +81,40 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('S', Items.SHULKER_SHELL)
                 .input('0', Ingredient.fromTag(MEDIUM_BACKPACKS))
                 .offerTo(exporter, "large");
+
+        dyedBackpackRecipes(exporter);
     }
+
+    private void dyedBackpackRecipes(net.minecraft.data.server.recipe.RecipeExporter exporter) {
+        for (int i = 1; i <= 3; i++) {
+            ContainerItem baseBackpack = (ContainerItem) BackpackItemJsonRegistry.getBackpackByOrder(i);
+            TagKey<Item> matchingBackpacks = switch (i) {
+                case 1 -> SMALL_BACKPACKS;
+                case 2 -> MEDIUM_BACKPACKS;
+                case 3 -> LARGE_BACKPACKS;
+                default -> throw new IllegalStateException("Unexpected value: " + i);
+            };
+
+            for (DyeColor color : DyeColor.values()) {
+                ContainerItem dyedBackpack = (ContainerItem) BackpackItemJsonRegistry.getBackpackByOrder(color, i);
+                String dyeName = color.name().toLowerCase();
+                Item dye = DyeItem.byColor(color);
+
+                String transmuteId = String.format("%s_%s_%d", dyeName, baseBackpack.getIdentifier().getPath(), i);
+                createTransmuteRecipe(exporter, matchingBackpacks, dye, dyedBackpack, i, transmuteId);
+            }
+        }
+    }
+
+    private void createTransmuteRecipe(RecipeExporter exporter, TagKey<Item> backpack, Item dyeColor, Item result, int tier, String name) {
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, result)
+                .input(Ingredient.fromTag(backpack))
+                .input(Ingredient.ofItems(dyeColor))
+                .group(tier + "_dyedbackpacks")
+                .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(BackpackItemJsonRegistry.getBackpackByOrder(tier)))
+                .offerTo(exporter, name);
+    }
+
 
     @Override
     public String getName() {

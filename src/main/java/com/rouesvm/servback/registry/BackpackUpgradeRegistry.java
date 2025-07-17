@@ -5,6 +5,7 @@ import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.content.upgrade.impl.CraftingUpgrade;
 import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
+import com.rouesvm.servback.content.upgrade.impl.VoidUpgrade;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -15,6 +16,7 @@ public class BackpackUpgradeRegistry {
     public static final Registry<UpgradeType<?>> UPGRADES = FabricRegistryBuilder.createSimple(
             UPGRADES_REGISTRY_KEY).buildAndRegister();
 
+    public static final UpgradeType<VoidUpgrade> VOID = register("void", VoidUpgrade::new);
     public static final UpgradeType<MagnetUpgrade> MAGNET = register("magnet", MagnetUpgrade::new);
     public static final UpgradeType<CraftingUpgrade> CRAFTING = register("crafting", CraftingUpgrade::new);
 

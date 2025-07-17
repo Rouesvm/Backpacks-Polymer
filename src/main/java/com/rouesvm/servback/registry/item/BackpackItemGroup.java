@@ -22,7 +22,9 @@ public class BackpackItemGroup {
         entries.add(BackpackItemRegistry.GLOBAL_BACKPACK);
         entries.add(BackpackItemRegistry.ENDER_BACKPACK);
 
+        entries.add(BackpackItemRegistry.VOID_UPGRADE);
         entries.add(BackpackItemRegistry.MAGNET_UPGRADE);
+        entries.add(BackpackItemRegistry.CRAFTING_UPGRADE);
     }
 
     public static void initialize() {

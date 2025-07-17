@@ -32,6 +32,11 @@ public class BackpackItemRegistry {
         }
     });
 
+    public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
+            new Item.Settings().maxCount(1),
+            BackpackUpgradeRegistry.VOID
+    ));
+
     public static final Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(
             new Item.Settings().maxCount(1),
             BackpackUpgradeRegistry.MAGNET

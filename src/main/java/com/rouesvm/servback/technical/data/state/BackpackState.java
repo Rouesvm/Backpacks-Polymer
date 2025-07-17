@@ -39,6 +39,8 @@ public class BackpackState extends PersistentState {
     }
 
     public static BackpackState getServerState(MinecraftServer server) {
+        if (server.getWorld(World.OVERWORLD) == null) return null;
+
         PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
 
         BackpackState state = persistentStateManager.getOrCreate(type, ServerBackpacks.MOD_ID);

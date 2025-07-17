@@ -11,15 +11,11 @@ import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 import static com.rouesvm.servback.datagen.ModItemTags.MEDIUM_BACKPACKS;
 import static com.rouesvm.servback.datagen.ModItemTags.SMALL_BACKPACKS;
 
@@ -62,14 +58,6 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion(FabricRecipeProvider.hasItem(Items.CHEST), FabricRecipeProvider.conditionsFromItem(Items.CHEST))
                 .offerTo(exporter);
 
-        BackpackRecipeJsonBuilder.create(RecipeCategory.MISC, BackpackItemJsonRegistry.getBackpackByOrder(1), 1)
-                .pattern("#S#")
-                .pattern("SCS")
-                .pattern(" # ")
-                .input('#', Items.LEATHER).input('S', Items.STRING).input('C', Items.CHEST)
-                .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
-                .offerTo(exporter);
-
         BackpackRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(2), 1)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .pattern("iLi")
@@ -78,7 +66,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('L', Items.LEATHER).input('S', Items.STRING)
                 .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
                 .input('0', Ingredient.fromTag(SMALL_BACKPACKS))
-                .offerTo(exporter, String.valueOf(RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack"))));
+                .offerTo(exporter, "medium");
 
         BackpackRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(3), 1)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
@@ -87,7 +75,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
                 .input('S', Items.SHULKER_SHELL)
                 .input('0', Ingredient.fromTag(MEDIUM_BACKPACKS))
-                .offerTo(exporter, String.valueOf(RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "large_backpack"))));
+                .offerTo(exporter, "large");
     }
 
     @Override

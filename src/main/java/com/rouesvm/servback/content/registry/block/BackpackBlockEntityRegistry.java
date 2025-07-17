@@ -17,9 +17,7 @@ public class BackpackBlockEntityRegistry {
             "backpack_block_entity",
             FabricBlockEntityTypeBuilder.create(BackpackBlockEntity::new, BackpackBlockRegistry.BACKPACK).build());
 
-    public static final BlockEntityType<BasicBackpackBlockEntity> BASIC_BACKPACK_BLOCK_ENTITY = register(
-            "basic_backpack_block_entity",
-            FabricBlockEntityTypeBuilder.create(BasicBackpackBlockEntity::new).addBlocks(BackpackBlockRegistry.ENDER_BACKPACK, BackpackBlockRegistry.GLOBAL_BACKPACK).build());
+    public static BlockEntityType<BasicBackpackBlockEntity> BASIC_BACKPACK_BLOCK_ENTITY;
 
     private static <T extends BlockEntity> BlockEntityType<T> register(String name, BlockEntityType<T> blockEntityType) {
         var entity = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ServerBackpacks.MOD_ID, name), blockEntityType);
@@ -29,5 +27,10 @@ public class BackpackBlockEntityRegistry {
 
     public static void initialize() {
         ItemStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getInventoryProvider, BACKPACK_BLOCK_ENTITY);
+
+        BlockEntityType.Builder<BasicBackpackBlockEntity> basicBackpackBuilder = BlockEntityType.Builder
+                .create(BasicBackpackBlockEntity::new, BackpackBlockRegistry.ENDER_BACKPACK, BackpackBlockRegistry.GLOBAL_BACKPACK);
+
+        BASIC_BACKPACK_BLOCK_ENTITY = register("basic_backpack_block_entity", basicBackpackBuilder.build());
     }
 }

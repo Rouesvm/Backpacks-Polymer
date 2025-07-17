@@ -61,7 +61,7 @@ public class BackpackManager {
     public static void load(MinecraftServer server) {
         BackpackState state = BackpackState.getServerState(server);
 
-        if (!instance.loaded) {
+        if (!instance.loaded && state != null) {
             Set<BackpackInstance> stateInstances = state.storedInventories;
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 instance.load(stateInstances);

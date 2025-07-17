@@ -44,8 +44,8 @@ public class ServerBackpacks implements ModInitializer {
 
 		BackpackDataComponentTypes.initialize();
 
-		BackpackBlockEntityRegistry.initialize();
 		BackpackBlockRegistry.initialize();
+		BackpackBlockEntityRegistry.initialize();
 
 		BackpackItemJsonRegistry.initialize();
 		BackpackItemRegistry.initialize();

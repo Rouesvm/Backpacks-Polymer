@@ -7,18 +7,22 @@ import com.rouesvm.servback.content.item.ContainerItem;
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.data.BackpackManager;
+import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.RawShapedRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
 
-public class BackpackRecipe extends ShapedRecipe {
+public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
     public final RawShapedRecipe raw;
     public final ItemStack result;
 
@@ -53,6 +57,11 @@ public class BackpackRecipe extends ShapedRecipe {
         }
 
         return resultStack;
+    }
+
+    @Override
+    public @Nullable Recipe<?> getPolymerReplacement(ServerPlayerEntity player) {
+        return PolymerRecipe.createCraftingRecipe(this);
     }
 
     public RawShapedRecipe getRaw() {

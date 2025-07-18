@@ -1,6 +1,7 @@
 package com.rouesvm.servback.technical.ui;
 
 import com.rouesvm.servback.content.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.data.BackpackUtils;
@@ -48,7 +49,7 @@ public class BackpackGui extends BasicGui {
             String before = BackpackUtils.hashBackpackContents(frozenInstance.inventory().heldStacks());
             String after = BackpackUtils.hashBackpackContents(instance.inventory().heldStacks());
 
-            //if (!before.equals(after)) BackpackDataSaver.createBackup(player.getServer());
+            if (!before.equals(after)) BackpackDataSaver.createBackup(player.getServer());
         }
 
         if (stack != null) stack.set(BackpackDataComponentTypes.BOOLEAN_TYPE, false);

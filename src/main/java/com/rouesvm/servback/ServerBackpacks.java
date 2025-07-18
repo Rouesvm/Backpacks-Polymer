@@ -10,10 +10,13 @@ import com.rouesvm.servback.content.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
+import com.rouesvm.servback.technical.data.BackpackDataSaver;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKey;
@@ -73,7 +76,7 @@ public class ServerBackpacks implements ModInitializer {
 		ServerLifecycleEvents.BEFORE_SAVE.register((minecraftServer, b, b1) -> {
 			if (BackpackManager.instance != null) {
 				BackpackManager.save(minecraftServer);
-				// BackpackDataSaver.createBackup(minecraftServer);
+				BackpackDataSaver.createBackup(minecraftServer);
 			}
 		});
 
@@ -81,7 +84,7 @@ public class ServerBackpacks implements ModInitializer {
 	}
 
 	private static void backupEvents() {
-		// ServerPlayerEvents.LEAVE.register((p0) -> BackpackDataSaver.createBackup(p0.getServer()));
-		// ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackDataSaver.createBackup(p0.getServer()));
+		ServerPlayConnectionEvents.DISCONNECT.register((p0, p1) -> BackpackDataSaver.createBackup(p1));
+		ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackDataSaver.createBackup(p0.getServer()));
 	}
 }

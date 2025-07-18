@@ -6,9 +6,6 @@ import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.state.BackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +35,7 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
 
             save(server);
-            //BackpackDataSaver.createBackup(server);
+            BackpackDataSaver.createBackup(server);
 
             instance = null;
         }
@@ -49,9 +46,11 @@ public class BackpackManager {
     }
 
     public static void save(MinecraftServer server) {
+        BackpackDataSaver.setStoredInventories(instance.getBackpackInstances());
+        BackpackDataSaver.save(server);
+
         BackpackState state = BackpackState.getServerState(server);
-        state.globalInventory = instance.globalInventory;
-        state.storedInventories = instance.getBackpackInstances();
+        if (state != null) state.globalInventory = instance.globalInventory;
     }
 
     public void load(Set<BackpackInstance> instances) {
@@ -61,13 +60,28 @@ public class BackpackManager {
     public static void load(MinecraftServer server) {
         BackpackState state = BackpackState.getServerState(server);
 
+        if (!instance.loaded) {
+            instance.loaded = BackpackDataSaver.onServerStarting(server);
+
+            Set<BackpackInstance> dataInstances = BackpackDataSaver.getBackpackInstances();
+            if (dataInstances != null && !dataInstances.isEmpty()) {
+                instance.load(dataInstances);
+                ServerBackpacks.LOGGER.info("Loaded Server Backpack's new format.");
+            }
+        }
+
         if (!instance.loaded && state != null) {
             Set<BackpackInstance> stateInstances = state.storedInventories;
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 instance.load(stateInstances);
+
+                BackpackDataSaver.setStoredInventories(stateInstances);
+                state.storedInventories.clear();
+                state.markDirty();
+
                 instance.loaded = true;
 
-                ServerBackpacks.LOGGER.info("Loaded Server Backpack's semi-new format.");
+                ServerBackpacks.LOGGER.info("Loaded Server Backpack's old format.");
             }
         }
     }
@@ -79,24 +93,7 @@ public class BackpackManager {
         }
 
         BackpackState state = BackpackState.getServerState(server);
-        instance.globalInventory.setInventoryDirectly(state.globalInventory.heldStacks());
-    }
-
-    //
-    // NBT
-    //
-
-    public static void loadNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        nbt.getList("backpackContents", NbtCompound.COMPOUND_TYPE).forEach(element ->
-                instances.add(BackpackInstance.load((NbtCompound) element, registryLookup)));
-    }
-
-    public static void saveNbt(Set<BackpackInstance> instances, NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        if (!instances.isEmpty()) {
-            NbtList nbtList = new NbtList();
-            instances.forEach(instance -> nbtList.add(instance.save(registryLookup)));
-            nbt.put("backpackContents", nbtList);
-        }
+        if (state != null) instance.globalInventory.setInventoryDirectly(state.globalInventory.heldStacks());
     }
 
     //
@@ -150,7 +147,6 @@ public class BackpackManager {
         return uuid;
     }
 
-    // It's near impossible to generate an uuid that is the same, but I'm just going to regenerate just in case.
     public static UUID generateUniqueUUID() {
         UUID uuid = UUID.randomUUID();
         if (instance != null && instance.hasBackpack(uuid)) {

@@ -151,6 +151,15 @@
     },
     "serverbackpacks:ender" : {
       "textures" : "textures/serverbackpacks/item/ender"
+    },
+    "serverbackpacks:void_upgrade" : {
+      "textures" : "textures/serverbackpacks/item/void_upgrade"
+    },
+    "serverbackpacks:magnet_upgrade" : {
+      "textures" : "textures/serverbackpacks/item/magnet_upgrade"
+    },
+    "serverbackpacks:crafting_upgrade" : {
+      "textures" : "textures/serverbackpacks/item/crafting_upgrade"
     }
   }
 }

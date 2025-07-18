@@ -53,6 +53,7 @@
   "item.serverbackpacks.global" : "GlobalPack",
   "item.serverbackpacks.ender" : "EnderPack",
 
+  "item.serverbackpacks.void_upgrade": "Void Module",
   "item.serverbackpacks.magnet_upgrade" : "Vacuum Module",
   "item.serverbackpacks.crafting_upgrade" : "Crafting Module",
 
@@ -83,6 +84,8 @@
   "info.serverbackpacks.mode.whitelist": "Whitelist",
   "info.serverbackpacks.mode.pickup": "Pickup",
 
+  "upgrade.serverbackpacks.void": "Void",
   "upgrade.serverbackpacks.magnet": "Vacuum",
   "upgrade.serverbackpacks.crafting": "Crafting"
+
 }

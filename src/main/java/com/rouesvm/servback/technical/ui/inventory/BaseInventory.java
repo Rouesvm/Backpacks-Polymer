@@ -37,7 +37,6 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return itemStack;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     public ItemStack addStack(ItemStack stack) {
         return BaseInventory.addStack(stack, this);
     }

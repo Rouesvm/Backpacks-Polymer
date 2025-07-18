@@ -53,6 +53,7 @@
   "item.serverbackpacks.global" : "Beg Global",
   "item.serverbackpacks.ender" : "Beg Ender",
 
+  "item.serverbackpacks.void_upgrade" : "Modul Void",
   "item.serverbackpacks.magnet_upgrade" : "Modul Serapan",
   "item.serverbackpacks.crafting_upgrade" : "Modul Pertukangan",
 
@@ -82,6 +83,7 @@
   "info.serverbackpacks.mode.whitelist": "Senarai Benar",
   "info.serverbackpacks.mode.pickup": "Ambil Semua",
 
+  "upgrade.serverbackpacks.void": "Void",
   "upgrade.serverbackpacks.magnet": "Serapan",
   "upgrade.serverbackpacks.crafting": "Pertukangan"
 }

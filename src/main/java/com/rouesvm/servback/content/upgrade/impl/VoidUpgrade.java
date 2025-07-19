@@ -149,10 +149,6 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
         if (!entity.isAlive()) return false;
         ItemStack stack = entity.getStack();
 
-        return switch (itemFilter.getMode()) {
-            case BLACKLIST -> !itemFilter.matches(stack);
-            case WHITELIST -> itemFilter.matches(stack);
-            case PICKUP    -> true;
-        };
+        return itemFilter.matches(stack);
     }
 }

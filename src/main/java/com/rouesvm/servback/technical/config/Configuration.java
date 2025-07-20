@@ -74,11 +74,11 @@ public class Configuration {
 
     public void sanitizeConfig(JsonObject jsonObject) {
         if (jsonObject.has("enable_globalpack") && !jsonObject.get("enable_globalpack").getAsBoolean()) {
-            instance.disabled_backpacks.add("serverbackpacks:global");
+            instance.disabled_backpacks.add("global");
         }
 
         if (jsonObject.has("enable_enderpack") && !jsonObject.get("enable_enderpack").getAsBoolean()) {
-            instance.disabled_backpacks.add("serverbackpacks:ender");
+            instance.disabled_backpacks.add("ender");
         }
 
     }

@@ -1,5 +1,7 @@
 package com.rouesvm.servback.content.item;
 
+import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.compat.geyser.bedrock.BedrockItem;
 import com.rouesvm.servback.content.component.UpgradeComponent;
 import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
@@ -10,6 +12,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -26,7 +29,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public class UpgradeItem extends SimplePolymerItem {
+public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
@@ -35,6 +38,13 @@ public class UpgradeItem extends SimplePolymerItem {
                 Items.POISONOUS_POTATO, true
         );
         this.upgradeType = upgradeType;
+    }
+
+    @Override
+    public Item getPolymerItem(ItemStack stack, PacketContext context) {
+        if (ServerBackpacks.isBedrock(context.getPlayer()))
+            return this;
+        else return super.getPolymerItem(stack, context);
     }
 
     @Override

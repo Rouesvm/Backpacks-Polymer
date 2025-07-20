@@ -32,6 +32,7 @@ import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 public class BundleGuiItem extends BasicPolymerBlockItem  {
     public BundleGuiItem(String name, Block block) {
         super(name, Items.LEATHER, block);
+
     }
 
     @Override

@@ -19,8 +19,8 @@ public class BackpackItemGroup {
             }
         }
 
-        entries.add(BackpackItemRegistry.GLOBAL_BACKPACK);
-        entries.add(BackpackItemRegistry.ENDER_BACKPACK);
+        if (BackpackItemRegistry.GLOBAL_BACKPACK != null) entries.add(BackpackItemRegistry.GLOBAL_BACKPACK);
+        if (BackpackItemRegistry.ENDER_BACKPACK != null) entries.add(BackpackItemRegistry.ENDER_BACKPACK);
 
         entries.add(BackpackItemRegistry.VOID_UPGRADE);
         entries.add(BackpackItemRegistry.MAGNET_UPGRADE);
@@ -29,7 +29,7 @@ public class BackpackItemGroup {
 
     public static void initialize() {
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ServerBackpacks.MOD_ID + "items"), PolymerItemGroupUtils.builder()
-                .icon(() -> new ItemStack(BackpackItemRegistry.ENDER_BACKPACK))
+                .icon(() -> new ItemStack(BackpackItemJsonRegistry.getBackpackByOrder(3)))
                 .displayName(Text.translatable("item.serverbackpacks.gui_backpacks"))
                 .entries(((context, entries) -> addItems(entries))).build()
         );

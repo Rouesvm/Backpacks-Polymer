@@ -8,6 +8,7 @@ import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackManager;
+import net.minecraft.block.Block;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,20 +18,16 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-public class BackpackItemRegistry {
-    public static final Item ENDER_BACKPACK = register(new BundleGuiItem("ender", BackpackBlockRegistry.ENDER_BACKPACK) {
-        @Override
-        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-            return player != null ? player.getEnderChestInventory() : null;
-        }
-    });
+import java.util.function.BiFunction;
 
-    public static final Item GLOBAL_BACKPACK = register(new BundleGuiItem("global", BackpackBlockRegistry.GLOBAL_BACKPACK) {
-        @Override
-        public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-            return BackpackManager.getGlobalInventory();
-        }
-    });
+public class BackpackItemRegistry {
+    public static Item ENDER_BACKPACK = registerBackpack("ender", BackpackBlockRegistry.ENDER_BACKPACK,
+            (player, stack) -> player != null ? player.getEnderChestInventory() : null
+    );
+
+    public static Item GLOBAL_BACKPACK = registerBackpack("global", BackpackBlockRegistry.GLOBAL_BACKPACK,
+            (player, stack) -> BackpackManager.getGlobalInventory()
+    );
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
             new Item.Settings().maxCount(1),
@@ -55,10 +52,22 @@ public class BackpackItemRegistry {
         return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
     }
 
-    public static <T extends BasicPolymerBlockItem> T register(T item) {
-        if (Configuration.instance().disabled_backpacks.contains(item.getIdentifier().getPath())
+    private static Item registerBackpack(String id, Block block, BiFunction<@Nullable ServerPlayerEntity, @Nullable ItemStack, Inventory> inventoryProvider) {
+        if (Configuration.instance().disabled_backpacks.contains(id)
+                || block == null
         ) return null;
 
+        var item = new BundleGuiItem(id, block) {
+            @Override
+            public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
+                return inventoryProvider.apply(player, stack);
+            }
+        };
+
+        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
+    }
+
+    public static <T extends BasicPolymerBlockItem> T register(T item) {
         return Registry.register(Registries.ITEM, item.getIdentifier(), item);
     }
 

@@ -24,18 +24,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade.MAX_SIZE;
+
 public class VoidUpgrade extends Upgrade implements PersistentUpgrade, FilterableUpgrade {
-    public static final int MAX_RANGE = 3;
+    public static final double MAX_RANGE = 2.5;
 
     public static final double MAX_ITEM_ENTITY_DISTANCE_TO_PLAYER = 0.75;
     public static final double MAX_DISTANCE_TO_PLAYER_SQUARED = 1.25*1.25;
 
-    private static final double SCANNING_RANGE = ((double) MAX_RANGE / 2) * 3;
-
     private int tick = 0;
 
     private final Set<ItemEntity> queue = new HashSet<>();
-    private final ItemFilter itemFilter = new ItemFilter(ItemFilter.MODE.PICKUP, new ObjectOpenHashSet<>(MAX_RANGE));
+    private final ItemFilter itemFilter = new ItemFilter(ItemFilter.MODE.PICKUP, new ObjectOpenHashSet<>(MAX_SIZE));
 
     public VoidUpgrade() {
         super(BackpackUpgradeRegistry.VOID);
@@ -133,7 +133,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
     }
 
     private void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
-        Box area = new Box(pos.add(-SCANNING_RANGE), pos.add(SCANNING_RANGE));
+        Box area = new Box(pos.add(-MAX_RANGE), pos.add(MAX_RANGE));
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)

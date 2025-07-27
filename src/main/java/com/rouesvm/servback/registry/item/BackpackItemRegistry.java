@@ -6,7 +6,6 @@ import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
-import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.Inventory;
@@ -45,18 +44,10 @@ public class BackpackItemRegistry {
     ));
 
     public static UpgradeItem register(String name, UpgradeItem item) {
-        if (!Configuration.instance().enable_upgrades
-                || Configuration.instance().disabled_upgrades.contains(name)
-        ) return null;
-
         return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
     }
 
     private static Item registerBackpack(String id, Block block, BiFunction<@Nullable ServerPlayerEntity, @Nullable ItemStack, Inventory> inventoryProvider) {
-        if (Configuration.instance().disabled_backpacks.contains(id)
-                || block == null
-        ) return null;
-
         var item = new BundleGuiItem(id, block) {
             @Override
             public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {

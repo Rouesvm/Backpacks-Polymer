@@ -1,6 +1,7 @@
 package com.rouesvm.servback.content.upgrade.impl;
 
 import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.FilterableUpgrade;
 import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
@@ -10,6 +11,7 @@ import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -17,6 +19,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
+import net.minecraft.util.ClickType;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -29,7 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, FilterableUpgrade {
+public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, FilterableUpgrade, ClickableUpgrade {
     public static final int MAX_SIZE = 5;
 
     public static final int MAX_RANGE = 3;
@@ -100,6 +103,13 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
 
         return true;
+    }
+
+    @Override
+    public boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, ClickType clickType) {
+        if (clickType == ClickType.RIGHT) {
+            return onUsed(player.getWorld(), player, stack);
+        } else return ClickableUpgrade.super.onClicked(player, stack, slot, clickType);
     }
 
     @Override
@@ -184,9 +194,10 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)
+                        && !entity.cannotPickup()
+                        && checkFilterForItem(entity)
                         && inventory.canInsert(entity.getStack())
-                        && checkFilterForItem(entity))
-                ).forEach(item -> {
+                )).forEach(item -> {
                     queue.add(item);
                     item.setPickupDelay(100);
                 });

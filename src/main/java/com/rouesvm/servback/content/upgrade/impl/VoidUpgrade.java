@@ -148,7 +148,6 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
     private boolean checkFilterForItem(ItemEntity entity) {
         if (!entity.isAlive()) return false;
         ItemStack stack = entity.getStack();
-
         return itemFilter.matches(stack);
     }
 }

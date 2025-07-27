@@ -86,6 +86,7 @@
 
   "upgrade.serverbackpacks.void": "Void",
   "upgrade.serverbackpacks.magnet": "Vacuum",
-  "upgrade.serverbackpacks.crafting": "Crafting"
+  "upgrade.serverbackpacks.crafting": "Crafting",
 
+  "tooltip.serverbackpacks.disabled": "This item is disabled!"
 }

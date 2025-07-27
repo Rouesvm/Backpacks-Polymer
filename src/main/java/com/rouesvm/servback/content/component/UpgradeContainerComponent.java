@@ -64,8 +64,8 @@ public class UpgradeContainerComponent {
                         Map<String, NbtCompound> out = new HashMap<>();
                         for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
                             NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
-                            if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
-                                saveableUpgrade.writeView(data);
+                            if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
+                                persistentUpgrade.writeView(data);
                             }
                             out.put(upgrade.getType().getId().toString(), data.getNbt());
                         }

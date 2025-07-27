@@ -7,6 +7,7 @@ import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.technical.config.Configuration;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -23,6 +24,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -52,6 +54,13 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
         Upgrade upgrade = upgradeItem.getUpgrade(stack);
         if (upgrade != null) upgrade.addTooltip(tooltip, stack, context);
+
+        if (Configuration.isDisabled(stack.getItem())) {
+            tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
+                    .formatted(Formatting.BOLD)
+                    .formatted(Formatting.RED)
+            );
+        }
     }
 
     @Override

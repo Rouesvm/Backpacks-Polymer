@@ -3,7 +3,6 @@ package com.rouesvm.servback.registry.block;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.impl.BackpackBlock;
-import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -28,9 +27,7 @@ public class BackpackBlockRegistry {
     public static final Block BACKPACK = register("backpack", new BackpackBlock());
 
     private static Block registerBackpack(String id, BiFunction<@Nullable ServerPlayerEntity, @Nullable BlockEntity, Inventory> inventoryProvider) {
-        if (Configuration.instance().disabled_backpacks.contains(id)
-        ) return null;
-        else return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, id), new BasicBackpackBlock(id) {
+        return Registry.register(Registries.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, id), new BasicBackpackBlock(id) {
             @Override
             public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
                 return inventoryProvider.apply(player, entity);

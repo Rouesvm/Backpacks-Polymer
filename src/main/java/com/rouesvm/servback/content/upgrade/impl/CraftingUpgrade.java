@@ -10,7 +10,6 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ClickType;
-import net.minecraft.world.World;
 
 public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
     public CraftingUpgrade() {
@@ -37,10 +36,5 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
-        return super.onUsed(world, player, stack);
     }
 }

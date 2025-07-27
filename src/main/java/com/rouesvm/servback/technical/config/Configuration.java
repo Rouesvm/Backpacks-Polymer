@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.Item;
 import org.joml.Vector3f;
 
 import java.io.File;
@@ -80,7 +81,6 @@ public class Configuration {
         if (jsonObject.has("enable_enderpack") && !jsonObject.get("enable_enderpack").getAsBoolean()) {
             instance.disabled_backpacks.add("ender");
         }
-
     }
 
     public void replaceEntryIfInvalid() {
@@ -97,6 +97,18 @@ public class Configuration {
             );
             else return value;
         });
+    }
+
+    public static boolean isDisabled(Item item) {
+        String idString = item.toString();
+        String removeNamespace = idString.replace(MOD_ID + ":", "");
+
+        if ((removeNamespace.contains("upgrade")
+                && !Configuration.instance().enable_upgrades)
+        ) return true;
+
+        return Configuration.instance().disabled_backpacks.contains(removeNamespace)
+                || Configuration.instance().disabled_upgrades.contains(removeNamespace);
     }
 
     public static <K, V> LinkedHashMap<K, V> createMap(Map<K, V> map) {

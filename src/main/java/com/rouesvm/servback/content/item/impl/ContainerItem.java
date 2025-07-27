@@ -56,8 +56,8 @@ public class ContainerItem extends BundleGuiItem {
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
         UUID uuid = polymerStack.get(BackpackDataComponentTypes.BACKPACK_UUID);
-        if (ServerBackpacks.isDevEnvironment)
-            if (uuid != null) tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
+        if (ServerBackpacks.isDevEnvironment
+        && uuid != null) tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
 
         addUpgradeTooltip(tooltip, polymerStack);
         addInventoryTooltip(tooltip, polymerStack);
@@ -68,8 +68,7 @@ public class ContainerItem extends BundleGuiItem {
         if (entity instanceof ServerPlayerEntity player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player.getWorld(), player.getPos(), (BackpackInventory) getInventory(player, stack))
-            );
+                    upgrade.tick(player.getWorld(), player.getPos(), (BackpackInventory) getInventory(player, stack)));
         }
     }
 
@@ -83,21 +82,18 @@ public class ContainerItem extends BundleGuiItem {
             blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(stack));
 
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            if (component != null) {
-                blockEntity.setUpgradeList(component.getBaseUpgrades());
-            }
+            if (component != null
+            ) blockEntity.setUpgradeList(component.getBaseUpgrades());
 
             UUID uuid = BackpackManager.getStackUUID(stack);
-            if (uuid == null) {
-                uuid = BackpackManager.createNewUUID(stack);
-            }
+            if (uuid == null
+            ) uuid = BackpackManager.createNewUUID(stack);
 
             blockEntity.setUuid(uuid);
             blockEntity.setStorage();
 
-            if (stack.getCustomName() != null) {
-                blockEntity.setCustomName(stack.getCustomName());
-            }
+            if (stack.getCustomName() != null
+            ) blockEntity.setCustomName(stack.getCustomName());
 
             blockEntity.markDirty();
 

@@ -17,9 +17,8 @@ public class TrinketsBackpack {
             ServerPlayerEntity player = context.getSource().getPlayer();
             Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(player);
             component.ifPresent(trinketComponent -> trinketComponent.forEach((slotReference, stack) -> {
-                if (stack.getItem() instanceof ContainerItem containerItem) {
-                    containerItem.onOpenGui(player, stack);
-                }
+                if (stack.getItem() instanceof ContainerItem containerItem
+                ) containerItem.onOpenGui(player, stack);
             }));
             return 1;
         }));

@@ -55,12 +55,10 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
         Upgrade upgrade = upgradeItem.getUpgrade(stack);
         if (upgrade != null) upgrade.addTooltip(tooltip, stack, context);
 
-        if (Configuration.isDisabled(stack.getItem())) {
-            tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
-                    .formatted(Formatting.BOLD)
-                    .formatted(Formatting.RED)
-            );
-        }
+        if (Configuration.isDisabled(stack.getItem())
+        ) tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
+                .formatted(Formatting.BOLD)
+                .formatted(Formatting.RED));
     }
 
     @Override

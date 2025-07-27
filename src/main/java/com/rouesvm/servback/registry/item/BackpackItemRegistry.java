@@ -21,12 +21,10 @@ import java.util.function.BiFunction;
 
 public class BackpackItemRegistry {
     public static Item ENDER_BACKPACK = registerBackpack("ender", BackpackBlockRegistry.ENDER_BACKPACK,
-            (player, stack) -> player != null ? player.getEnderChestInventory() : null
-    );
+            (player, stack) -> player != null ? player.getEnderChestInventory() : null);
 
     public static Item GLOBAL_BACKPACK = registerBackpack("global", BackpackBlockRegistry.GLOBAL_BACKPACK,
-            (player, stack) -> BackpackManager.getGlobalInventory()
-    );
+            (player, stack) -> BackpackManager.getGlobalInventory());
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
             new Item.Settings().maxCount(1),

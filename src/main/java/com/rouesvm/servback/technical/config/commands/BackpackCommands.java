@@ -40,12 +40,9 @@ public class BackpackCommands {
                     return 1;
                 })).then(literal("list").executes(context -> {
                     Set<UUID> instances = BackpackManager.instance().storedInstances.keySet();
-                    context.getSource().sendFeedback(
-                            () -> Text.translatable("command.serverbackpacks.list"), false);
-                    for (UUID uuid : instances) {
-                        context.getSource().sendFeedback(
+                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.list"), false);
+                    for (UUID uuid : instances) context.getSource().sendFeedback(
                                 () -> Text.literal(String.format("(%s)", uuid.toString())), false);
-                    }
                     return 1;
                 })).then(literal("open").then(argument("uuid", StringArgumentType.word()).executes(context -> {
                     String search = StringArgumentType.getString(context, "uuid");
@@ -74,19 +71,16 @@ public class BackpackCommands {
         return literal("config")
                 .then(literal("reset").executes(context -> {
                     Configuration.manager.instance = new Configuration.Instance();
-                    context.getSource().sendFeedback(
-                            () -> Text.translatable("command.serverbackpacks.reset"), true);
+                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.reset"), true);
                     return 1;
                 })).then(literal("reload").executes(context -> {
                     Configuration.manager.load();
-                    context.getSource().sendFeedback(
-                            () -> Text.translatable("command.serverbackpacks.reload"), true);
+                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.reload"), true);
                     return 1;
                 }))
                 .then(literal("save").executes(context -> {
                     Configuration.manager.save();
-                    context.getSource().sendFeedback(
-                            () -> Text.translatable("command.serverbackpacks.save"), true);
+                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.save"), true);
                     return 1;
                 }));
     }

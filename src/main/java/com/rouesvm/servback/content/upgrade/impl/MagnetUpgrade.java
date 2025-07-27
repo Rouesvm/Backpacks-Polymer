@@ -158,14 +158,16 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
             if (!iterator.hasNext()) return false;
 
             ItemEntity next = iterator.next();
-            if (next == null || !next.isAlive() || next.squaredDistanceTo(pos) > MAX_RANGE) {
+            if (next == null
+                    || !next.isAlive()
+                    || next.squaredDistanceTo(pos) > MAX_RANGE
+            ) {
                 iterator.remove();
                 return false;
             }
 
-            if (next.squaredDistanceTo(pos) > MAX_DISTANCE_TO_PLAYER_SQUARED) {
-                return false;
-            }
+            if (next.squaredDistanceTo(pos) > MAX_DISTANCE_TO_PLAYER_SQUARED
+            ) return false;
 
             ItemStack stack = next.getStack();
             if (!inventory.canInsert(stack)) {

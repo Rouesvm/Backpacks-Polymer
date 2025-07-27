@@ -42,12 +42,10 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
     @Override
     public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
-        if (Configuration.isDisabled(stack.getItem())) {
-            tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
-                    .formatted(Formatting.BOLD)
-                    .formatted(Formatting.RED)
-            );
-        }
+        if (Configuration.isDisabled(stack.getItem())
+        ) tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
+                .formatted(Formatting.BOLD)
+                .formatted(Formatting.RED));
     }
 
     @Override
@@ -56,9 +54,8 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             blockEntity.setItem(this);
             blockEntity.setSize(BackpackUtils.getExtendedSlots(stack));
 
-            if (stack.getCustomName() != null) {
-                blockEntity.setCustomName(stack.getCustomName());
-            }
+            if (stack.getCustomName() != null
+            ) blockEntity.setCustomName(stack.getCustomName());
 
             blockEntity.markDirty();
             ContainerItem.playOpenSound((ServerPlayerEntity) player);
@@ -73,11 +70,11 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         ItemStack stack = player.getStackInHand(hand);
 
         var cast = player.raycast(5,0,false);
-        if (!(player instanceof ServerPlayerEntity serverPlayer))
-            return ActionResult.PASS;
+        if (!(player instanceof ServerPlayerEntity serverPlayer)
+        ) return ActionResult.PASS;
 
-        if (cast.getType() == HitResult.Type.BLOCK)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        if (cast.getType() == HitResult.Type.BLOCK
+        ) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
         if (player.isSneaking()) {
             if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null) {
@@ -93,10 +90,10 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer))
-            return ActionResult.PASS;
-        if (serverPlayer.isSneaking())
-            return super.useOnBlock(context);
+        if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer)
+        ) return ActionResult.PASS;
+        if (serverPlayer.isSneaking()
+        ) return super.useOnBlock(context);
 
         onOpenGui(serverPlayer, context.getStack());
         serverPlayer.swingHand(context.getHand(), true);
@@ -108,9 +105,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
         Inventory inventory = getInventory(serverPlayer, stack);
 
-        if (inventory == null) {
-            return false;
-        } else {
+        if (inventory != null) {
             ItemStack itemStack = slot.getStack();
 
             if (slot instanceof CraftingResultSlot) return false;
@@ -127,7 +122,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 onContentChanged(player);
                 return true;
             } else return false;
-        }
+        } else return false;
     }
 
     @Override
@@ -172,9 +167,8 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
     public void onContentChanged(PlayerEntity user) {
         ScreenHandler screenHandler = user.currentScreenHandler;
-        if (screenHandler != null) {
-            screenHandler.onContentChanged(user.getInventory());
-        }
+        if (screenHandler != null
+        ) screenHandler.onContentChanged(user.getInventory());
     }
 
     public void onOpenGui(ServerPlayerEntity player, ItemStack stack) {

@@ -73,11 +73,9 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
         if (inventory == null || !(world instanceof ServerWorld serverWorld)) return;
 
         tick++;
-
         moveItemsToTarget(pos);
-        if (!voidItems(serverWorld, pos, inventory)) {
-            checkForItems(serverWorld, pos, inventory);
-        }
+        if (!voidItems(pos, inventory)
+        ) checkForItems(serverWorld, pos, inventory);
     }
 
     private void moveItemsToTarget(Vec3d pos) {
@@ -103,7 +101,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
         });
     }
 
-    private boolean voidItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
+    private boolean voidItems(Vec3d pos, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
         if (BackpackInventory.isFull(inventory)) {

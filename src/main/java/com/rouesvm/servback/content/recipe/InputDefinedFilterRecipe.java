@@ -96,8 +96,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
             if (stack.isEmpty()) continue;
 
             UpgradeComponent component = stack.get(BackpackDataComponentTypes.UPGRADE);
-            if (component != null
-                    && component.getUpgrade() instanceof FilterableUpgrade
+            if (component != null && component.getUpgrade() instanceof FilterableUpgrade
             ) return stack;
         }
 

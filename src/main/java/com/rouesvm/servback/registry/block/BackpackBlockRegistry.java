@@ -17,12 +17,10 @@ import java.util.function.BiFunction;
 
 public class BackpackBlockRegistry {
     public static final Block ENDER_BACKPACK = registerBackpack("ender_backpack",
-            (player, entity) -> player != null ? player.getEnderChestInventory() : null
-    );
+            (player, entity) -> player != null ? player.getEnderChestInventory() : null);
 
     public static final Block GLOBAL_BACKPACK = registerBackpack("global_backpack",
-            (player, entity) -> BackpackManager.getGlobalInventory()
-    );
+            (player, entity) -> BackpackManager.getGlobalInventory());
 
     public static final Block BACKPACK = register("backpack", new BackpackBlock());
 

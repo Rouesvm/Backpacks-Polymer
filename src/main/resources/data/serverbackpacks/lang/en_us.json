@@ -82,6 +82,7 @@
 
   "info.serverbackpacks.mode.blacklist": "Blacklist",
   "info.serverbackpacks.mode.whitelist": "Whitelist",
+  "info.serverbackpacks.mode.match_content": "Match Backpack's Content",
   "info.serverbackpacks.mode.pickup": "Pickup",
 
   "upgrade.serverbackpacks.void": "Void",

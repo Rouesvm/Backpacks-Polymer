@@ -80,10 +80,13 @@
   "info.serverbackpacks.mode": "Mod",
 
   "info.serverbackpacks.mode.blacklist": "Senarai Larangan",
-  "info.serverbackpacks.mode.whitelist": "Senarai Benar",
+  "info.serverbackpacks.mode.whitelist": "Senarai Dibenarkan",
+  "info.serverbackpacks.mode.match_content": "Padankan Kandungan Beg",
   "info.serverbackpacks.mode.pickup": "Ambil Semua",
 
   "upgrade.serverbackpacks.void": "Void",
   "upgrade.serverbackpacks.magnet": "Serapan",
-  "upgrade.serverbackpacks.crafting": "Pertukangan"
+  "upgrade.serverbackpacks.crafting": "Pertukangan",
+
+  "tooltip.serverbackpacks.disabled": "Item ini telah dinyahdayakan!"
 }

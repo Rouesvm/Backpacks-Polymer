@@ -195,7 +195,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)
                         && !entity.cannotPickup()
-                        && checkFilterForItem(entity)
+                        && checkFilterForItem(entity, inventory)
                         && inventory.canInsert(entity.getStack())
                 )).forEach(item -> {
                     queue.add(item);
@@ -203,13 +203,14 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
                 });
     }
 
-    private boolean checkFilterForItem(ItemEntity entity) {
+    private boolean checkFilterForItem(ItemEntity entity, BackpackInventory inventory) {
         if (!entity.isAlive()) return false;
         ItemStack stack = entity.getStack();
 
         return switch (itemFilter.getMode()) {
             case BLACKLIST -> !itemFilter.matches(stack);
             case WHITELIST -> itemFilter.matches(stack);
+            case MATCH_CONTENT -> itemFilter.matches(stack, inventory);
             case PICKUP    -> true;
         };
     }

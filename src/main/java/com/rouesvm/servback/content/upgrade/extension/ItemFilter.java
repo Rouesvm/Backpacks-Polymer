@@ -2,6 +2,7 @@ package com.rouesvm.servback.content.upgrade.extension;
 
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -22,8 +23,12 @@ public class ItemFilter implements PersistentUpgrade {
     }
 
     public boolean matches(ItemStack stack) {
-        return filterList.stream().anyMatch(filterID ->
-                matchesFilter(filterID, stack.getItem()));
+        return filterList.stream()
+                .anyMatch(filterID -> matchesFilter(filterID, stack.getItem()));
+    }
+
+    public boolean matches(ItemStack stack, BackpackInventory inventory) {
+        return inventory.containsAny(inventoryStack -> inventoryStack.isOf(stack.getItem()));
     }
 
     public static boolean matchesFilter(String filterID, Item item) {
@@ -77,6 +82,7 @@ public class ItemFilter implements PersistentUpgrade {
     public enum MODE {
         BLACKLIST,
         WHITELIST,
+        MATCH_CONTENT,
         PICKUP
     }
 }

@@ -91,7 +91,6 @@ public class ServerBackpacks implements ModInitializer {
 
 		ServerLifecycleEvents.BEFORE_SAVE.register((minecraftServer, b, b1) -> {
 			if (BackpackManager.instance() != null) {
-				BackpackManager.saveData();
 				BackpackManager.createBackup();
 			}
 		});

@@ -11,6 +11,7 @@ import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.state.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
+import com.rouesvm.servback.technical.data.state.codecs.SlotData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
 
@@ -86,6 +87,44 @@ public class BackpackSQL {
             ServerBackpacks.LOGGER.error("Failed to load backpack inventories", e);
         }
         return inventories;
+    }
+
+    public boolean saveInventory(BackpackInstance instance) {
+        if (instance == null || instance.getUuid() == null) return false;
+
+        String sql = "REPLACE INTO backpacks (uuid, backpack_data) VALUES (?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, instance.getUuid().toString());
+
+            BackpackInstanceData data = new BackpackInstanceData(instance.getUuid(), new InventoryData(SlotData.writeToCodec(instance.heldInventory())));
+            String jsonString = serializeBackpackData(data);
+
+            ps.setString(2, jsonString);
+            ps.executeUpdate();
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            ServerBackpacks.LOGGER.error("Failed to save backpack inventory for UUID: {}", instance.getUuid(), e);
+            return false;
+        }
+    }
+
+    public Optional<BackpackInstance> loadInventory(UUID uuid) {
+        String sql = "SELECT uuid, backpack_data FROM backpacks WHERE uuid = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String jsonString = rs.getString("backpack_data");
+                    BackpackInstanceData data = deserializeBackpackData(jsonString);
+                    BackpackInventory inventory = new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().itemStacks()));
+                    return Optional.of(new BackpackInstance(uuid, inventory));
+                }
+            }
+        } catch (Exception e) {
+            ServerBackpacks.LOGGER.error("Failed to load backpack inventory for UUID: {}", uuid, e);
+        }
+        return Optional.empty();
     }
 
     public boolean createConnection() {

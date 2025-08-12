@@ -70,7 +70,10 @@ public class BackpackManager {
 
     public static void createBackup() {
         saveData();
-        BackpackData.createBackup(getServer());
+
+        if (instance.data_type == DATA_TYPE.FILE_DATA) {
+            BackpackData.createBackup(getServer());
+        }
     }
 
     public void loadIntoStoredInstances(Set<BackpackInstance> instances) {

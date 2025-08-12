@@ -81,8 +81,8 @@ public class BackpackState extends PersistentState {
     public Set<BackpackInstance> getBackpackInstances() {
         return this.storedInventories.stream()
                 .map(data -> new BackpackInstance(
-                        data.getUuid(),
-                        new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().getItemStacks()))
+                        data.uuid(),
+                        new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().itemStacks()))
                 ))
                 .collect(Collectors.toSet());
     }

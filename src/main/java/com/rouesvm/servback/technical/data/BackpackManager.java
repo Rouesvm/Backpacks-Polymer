@@ -2,7 +2,9 @@ package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
+import com.rouesvm.servback.technical.data.sql.BackpackSQL;
 import com.rouesvm.servback.technical.data.state.BackpackState;
 import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
@@ -14,12 +16,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class BackpackManager {
+    private static BackpackSQL sqlStorage = null;
     private static BackpackManager instance;
 
     public final BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     public final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
     private boolean loaded = false;
+    private DATA_TYPE data_type = null;
+
     private MinecraftServer server;
 
     public static void setup(MinecraftServer server) {
@@ -27,10 +32,17 @@ public class BackpackManager {
         instance = new BackpackManager();
         instance.server = server;
 
+        if (Configuration.instance().enable_sql_data) {
+            sqlStorage = new BackpackSQL(server);
+            if (!sqlStorage.createConnection()) {
+                ServerBackpacks.LOGGER.error("Failed to initialize SQL connection; falling back to default storage.");
+                sqlStorage = null;
+            } else sqlStorage.createTableIfNotExists();
+        }
+
         load(server);
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
-
         BackpackData.createBackupDir(server);
     }
 
@@ -42,6 +54,11 @@ public class BackpackManager {
 
             saveData();
             createBackup();
+
+            if (sqlStorage != null) {
+                sqlStorage.close();
+                sqlStorage = null;
+            }
 
             instance = null;
         }
@@ -56,44 +73,67 @@ public class BackpackManager {
         BackpackData.createBackup(getServer());
     }
 
-    public static void saveData() {
-        BackpackData.setStoredInventories(instance.getBackpackInstances());
-        BackpackData.save(getServer());
-
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(getServer());
-        globalBackpackState.globalInventory = instance.globalInventory;
-    }
-
     public void loadIntoStoredInstances(Set<BackpackInstance> instances) {
         instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.getUuid(), backpackInstance));
     }
 
     public static void load(MinecraftServer server) {
+        if (Configuration.instance().enable_sql_data && sqlStorage != null) {
+            try {
+                Set<BackpackInstance> sqlData = sqlStorage.loadInventories();
+                if (sqlData != null && !sqlData.isEmpty()) {
+                    instance().data_type = DATA_TYPE.SQL;
+
+                    instance.loadIntoStoredInstances(sqlData);
+                    instance.loaded = true;
+                }
+            } catch (Exception e) {
+                ServerBackpacks.LOGGER.error("Failed to load backpacks from SQL, falling back.", e);
+            }
+        }
+
         BackpackState state = BackpackState.getServerState(server);
 
-        // Mod's own format (current default).
         if (!instance.loaded) {
             instance.loaded = BackpackData.loadData(server);
 
             Set<BackpackInstance> dataInstances = BackpackData.getBackpackInstances();
             if (dataInstances != null && !dataInstances.isEmpty()) {
+                instance.data_type = DATA_TYPE.FILE_DATA;
                 instance.loadIntoStoredInstances(dataInstances);
-                ServerBackpacks.LOGGER.info("Loaded Server Backpack's new format.");
             }
         }
 
-        // "Minecraft's Persistent State" format.
         if (!instance.loaded && state != null) {
+            instance.data_type = DATA_TYPE.MINECRAFT_STATE;
             instance.loaded = BackpackState.loadData(state);
         }
 
-        // 1.21.1 format.
         if (!instance.loaded) {
             instance.loaded = BackpackDataFixer.isDataPresent(server);
-            if (instance.loaded) ServerBackpacks.LOGGER.info("Loaded Server Backpack's older format.");
+            if (instance.loaded) instance.data_type = DATA_TYPE.OLD_MINECRAFT_STATE;
         }
 
-        if (!instance.loaded) ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
+        if (!instance.loaded)
+            ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
+        else ServerBackpacks.LOGGER.info("Loaded {} format as Server Backpack's data.", instance.data_type.toString());
+    }
+
+    public static void saveData() {
+        if (Configuration.instance().enable_sql_data && sqlStorage != null) {
+            try {
+                if (!sqlStorage.saveInventories()) ServerBackpacks.LOGGER.warn("Failed to save backpacks to SQL database.");
+            } catch (Exception e) {
+                ServerBackpacks.LOGGER.error("Error saving backpacks to SQL database.", e);
+            }
+            return;
+        }
+
+        BackpackData.setStoredInventories(instance.getBackpackInstances());
+        BackpackData.save(getServer());
+
+        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(getServer());
+        globalBackpackState.globalInventory = instance.globalInventory;
     }
 
     public static void loadOnServerStarted(MinecraftServer server) {
@@ -223,5 +263,12 @@ public class BackpackManager {
 
     public boolean hasBackpack(UUID uuid) {
         return uuid != null && this.storedInstances.containsKey(uuid);
+    }
+
+    private enum DATA_TYPE {
+        FILE_DATA,
+        MINECRAFT_STATE,
+        OLD_MINECRAFT_STATE,
+        SQL
     }
 }

@@ -67,12 +67,15 @@ public class BackpackGui extends BasicInventoryGui {
             String before = BackpackUtils.hashBackpackContents(frozenInstance.heldInventory());
             String after = BackpackUtils.hashBackpackContents(instance.heldInventory());
 
-            if (!before.equals(after)) BackpackManager.createBackup();
-
-            BackpackManager.saveData();
-
             handler.enableSyncing();
             handler.sendContentUpdates();
+
+            if (!before.equals(after)) {
+                BackpackManager.createBackup();
+                return;
+            }
+
+            BackpackManager.saveData();
         }
     }
 

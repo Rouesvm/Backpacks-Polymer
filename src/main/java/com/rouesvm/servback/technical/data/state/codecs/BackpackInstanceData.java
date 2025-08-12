@@ -7,23 +7,12 @@ import net.minecraft.util.Uuids;
 import java.util.Objects;
 import java.util.UUID;
 
-public class BackpackInstanceData {
-    private final UUID uuid;
-    private final InventoryData itemStacks;
-
-    public BackpackInstanceData(UUID uuid, InventoryData inventory) {
-        this.uuid = uuid;
-        this.itemStacks = inventory;
-    }
+public record BackpackInstanceData(UUID uuid, InventoryData itemStacks) {
 
     public static final Codec<BackpackInstanceData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Uuids.INT_STREAM_CODEC.fieldOf("uuid").forGetter(BackpackInstanceData::getUuid),
+            Uuids.INT_STREAM_CODEC.fieldOf("uuid").forGetter(BackpackInstanceData::uuid),
             InventoryData.CODEC.fieldOf("contents").forGetter(BackpackInstanceData::getInventoryData)
     ).apply(instance, BackpackInstanceData::new));
-
-    public UUID getUuid() {
-        return uuid;
-    }
 
     public InventoryData getInventoryData() {
         return itemStacks;

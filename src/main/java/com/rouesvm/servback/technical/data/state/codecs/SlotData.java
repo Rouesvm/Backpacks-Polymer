@@ -9,23 +9,12 @@ import net.minecraft.util.dynamic.Codecs;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SlotData {
-    private final Integer slot;
-    private final ItemStack itemStack;
-
-    public SlotData(Integer slot, ItemStack stack) {
-        this.slot = slot;
-        this.itemStack = stack;
-    }
+public record SlotData(Integer slot, ItemStack itemStack) {
 
     public static final Codec<SlotData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codecs.UNSIGNED_BYTE.fieldOf("slot").forGetter(SlotData::getSlot),
+            Codecs.UNSIGNED_BYTE.fieldOf("slot").forGetter(SlotData::slot),
             ItemStack.CODEC.fieldOf("itemStacks").forGetter(SlotData::getStack)
     ).apply(instance, SlotData::new));
-
-    public Integer getSlot() {
-        return slot;
-    }
 
     public ItemStack getStack() {
         return itemStack;
@@ -42,7 +31,7 @@ public class SlotData {
 
     public static DefaultedList<ItemStack> readFromCodec(List<SlotData> data, int size) {
         DefaultedList<ItemStack> stacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
-        for (SlotData slotData : data) stacks.set(slotData.getSlot(), slotData.getStack());
+        for (SlotData slotData : data) stacks.set(slotData.slot(), slotData.getStack());
         return stacks;
     }
 }

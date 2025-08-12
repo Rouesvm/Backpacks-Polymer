@@ -121,10 +121,14 @@ public class BackpackData {
     public static Set<BackpackInstance> getBackpackInstances() {
         return storedInventories.stream()
                 .map(data -> new BackpackInstance(
-                        data.getUuid(),
-                        new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().getItemStacks()))
+                        data.uuid(),
+                        new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().itemStacks()))
                 ))
                 .collect(Collectors.toSet());
+    }
+
+    public static List<BackpackInstanceData> getStoredInventories() {
+        return storedInventories;
     }
 
     public static void setStoredInventories(Set<BackpackInstance> backpackInstances) {

@@ -25,6 +25,8 @@ public class Configuration {
     public static final Instance defaultInstance = new Instance();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    private Path configDir;
+
     private final File configFile;
     public Instance instance = new Instance();
 
@@ -38,15 +40,19 @@ public class Configuration {
     }
     
     public Configuration(String name) {
-        Path configFolder = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/");
+        configDir = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/");
         try {
-            if (!configFolder.toFile().exists()) {
-                Files.createDirectories(configFolder);
+            if (!configDir.toFile().exists()) {
+                Files.createDirectories(configDir);
             }
         } catch (IOException ignored) {}
 
-        configFile = configFolder.resolve(name).toFile();
+        configFile = configDir.resolve(name).toFile();
         if (!configFile.exists()) save();
+    }
+
+    public Path getConfigDir() {
+        return configDir;
     }
 
     public static Instance instance() {
@@ -179,5 +185,21 @@ public class Configuration {
                 2, -25,
                 3, -25
         ));
+
+        @SerializedName("enable_sql_data")
+        public boolean enable_sql_data = false;
+
+        @SerializedName("sql_host")
+        public String sql_host = "localhost";
+        @SerializedName("sql_port")
+        public int sql_port = 3306;
+        @SerializedName("sql_database")
+        public String sql_database = "backpacks";
+        @SerializedName("sql_username")
+        public String sql_username = "backpacks";
+        @SerializedName("sql_password")
+        public String sql_password = "somepassword";
+        @SerializedName("sql_timeout")
+        public int sql_timeout = 30;
     }
 }

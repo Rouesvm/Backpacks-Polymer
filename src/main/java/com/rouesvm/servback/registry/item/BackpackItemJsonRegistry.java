@@ -20,11 +20,11 @@ public class BackpackItemJsonRegistry {
     private static final Map<Item, DyeColor> ITEM_TO_COLOR = new HashMap<>();
 
     public static @Nullable DyeColor getBackpackDyeColor(ContainerItem item) {
-        return ITEM_TO_COLOR.getOrDefault(item, null);
+        return ITEM_TO_COLOR.get(item);
     }
 
     public static int getOffset(int order) {
-        return ORDER_OFFSET.get(order);
+        return ORDER_OFFSET.getOrDefault(order, 0);
     }
 
     public static int getBackpackId(ContainerItem item) {
@@ -45,7 +45,7 @@ public class BackpackItemJsonRegistry {
     }
 
     public static Item getBackpackByOrder(int id, int order) {
-        var defaultMap = BACKPACKS.get(order);
+        Map<Integer, Item> defaultMap = BACKPACKS.getOrDefault(order, BACKPACKS.get(1));
         return BACKPACKS
                 .getOrDefault(order, BACKPACKS.get(1))
                 .getOrDefault(id, defaultMap.get(0));

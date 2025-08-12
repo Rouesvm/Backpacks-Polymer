@@ -46,9 +46,8 @@ public class BackpackUtils {
         BackpackInventory inventory = instance.inventory();
 
         if (!(stack.getItem() instanceof ContainerItem item)) return;
-        if (!inventory.isEmpty()
-                && stack.get(DataComponentTypes.CONTAINER) == null
-        ) return;
+        if (!inventory.isEmpty()) return;
+        if (stack.get(DataComponentTypes.CONTAINER) == null) return;
 
         DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
         if (inventory.insertItems(itemStacks)) {
@@ -101,7 +100,7 @@ public class BackpackUtils {
     }
 
     public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory target, int totalSlots) {
-        for (int i = target.size(); i >= totalSlots; i--) {
+        for (int i = target.size() - 1; i >= totalSlots; i--) {
             ItemStack excessItem =  i < target.heldStacks().size() ? target.heldStacks().get(i) : ItemStack.EMPTY;
             player.dropItem(excessItem, true);
         }

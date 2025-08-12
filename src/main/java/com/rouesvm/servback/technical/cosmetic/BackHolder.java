@@ -75,26 +75,13 @@ public class BackHolder extends ElementHolder {
     protected void onTick() {
         if (entity.isDead() || entity.isRemoved()) {
             destroy();
-            return;
         }
 
         boolean facingDown = entity.getFacing() == Direction.DOWN;
         boolean isSpectator = entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.isSpectator();
 
         EntityPose pose = entity.getPose();
-        boolean isHiddenPose = pose == EntityPose.SWIMMING || pose == EntityPose.SLEEPING || isSpectator;
-
-        if (facingDown) {
-            if (!hideFromPlayer && entity instanceof ServerPlayerEntity player) {
-                stopWatching(player);
-                hideFromPlayer = true;
-            }
-        } else if (hideFromPlayer && entity instanceof ServerPlayerEntity player) {
-            startWatching(player);
-            updatePosition();
-            sendRidePacket();
-            hideFromPlayer = false;
-        }
+        boolean isHiddenPose = facingDown || pose == EntityPose.SWIMMING || pose == EntityPose.SLEEPING || isSpectator;
 
         if (isHiddenPose) {
             if (!hidden) {
@@ -111,7 +98,7 @@ public class BackHolder extends ElementHolder {
 
             boolean sneaking = entity.isSneaking();
 
-            this.element.setYaw(entity.getBodyYaw() - cosmeticRotation);
+            this.element.setYaw(((BackInterface) entity).backpacks$bodyYaw() - cosmeticRotation);
             this.element.setPitch(sneaking ? cosmeticPitchWhenSneaking : 0);
 
             float y = sneaking ? cosmeticPosition.y - 0.02f : cosmeticPosition.y;

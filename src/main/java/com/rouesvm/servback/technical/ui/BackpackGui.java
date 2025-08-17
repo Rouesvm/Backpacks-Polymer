@@ -69,11 +69,11 @@ public class BackpackGui extends BasicInventoryGui {
             handler.sendContentUpdates();
 
             if (!before.equals(after)) {
-                BackpackManager.createBackup();
+                BackpackManager.createSingularBackup(instance);
                 return;
             }
 
-            BackpackManager.saveData();
+            BackpackManager.saveData(instance);
         }
     }
 

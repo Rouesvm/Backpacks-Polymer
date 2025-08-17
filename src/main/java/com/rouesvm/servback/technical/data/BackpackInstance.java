@@ -18,6 +18,12 @@ public class BackpackInstance {
         this.inventory = inventory;
     }
 
+    public BackpackInstance(UUID uuid, BackpackInventory inventory, long lastAccessed) {
+        this.uuid = uuid;
+        this.inventory = inventory;
+        this.lastAccessed = lastAccessed;
+    }
+
     public void copyToInventory(BackpackInventory target) {
         target.copyTo(this.inventory);
     }

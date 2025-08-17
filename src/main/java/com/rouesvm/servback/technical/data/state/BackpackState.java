@@ -6,9 +6,7 @@ import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
-import com.rouesvm.servback.technical.data.codecs.InventoryData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
-import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
@@ -79,13 +77,7 @@ public class BackpackState extends PersistentState {
 
     public Set<BackpackInstance> getBackpackInstances() {
         return this.storedInventories.stream()
-                .map(data -> new BackpackInstance(
-                        data.uuid(),
-                        new BackpackInventory(InventoryData.getHeldStacks(
-                                data.getInventoryData().itemStacks(),
-                                data.size()
-                        ))
-                ))
+                .map(BackpackData::turnDataToInstance)
                 .collect(Collectors.toSet());
     }
 }

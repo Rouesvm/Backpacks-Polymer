@@ -5,14 +5,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Uuids;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
-public record BackpackInstanceData(UUID uuid, InventoryData itemStacks, long last_accessed, int size) {
+public record BackpackInstanceData(UUID uuid, InventoryData itemStacks, Optional<Long> last_accessed, Optional<Integer> size) {
     public static final Codec<BackpackInstanceData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Uuids.INT_STREAM_CODEC.fieldOf("uuid").forGetter(BackpackInstanceData::uuid),
             InventoryData.CODEC.fieldOf("contents").forGetter(BackpackInstanceData::getInventoryData),
-            Codec.LONG.fieldOf("last_accessed").forGetter(BackpackInstanceData::last_accessed),
-            Codec.INT.fieldOf("size").forGetter(BackpackInstanceData::size)
+            Codec.LONG.optionalFieldOf("last_accessed").forGetter(BackpackInstanceData::last_accessed),
+            Codec.INT.optionalFieldOf("size").forGetter(BackpackInstanceData::size)
     ).apply(instance, BackpackInstanceData::new));
 
     public InventoryData getInventoryData() {

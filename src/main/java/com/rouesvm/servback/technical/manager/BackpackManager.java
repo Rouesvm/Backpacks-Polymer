@@ -5,6 +5,7 @@ import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackDataFixer;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.BackpackListData;
 import com.rouesvm.servback.technical.data.state.BackpackState;
 import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
@@ -34,7 +35,7 @@ public class BackpackManager {
         load(server);
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
-        BackpackData.createBackupDir(server);
+        BackpackData.createBackupDirs(server);
     }
 
     public static void destroy(MinecraftServer ignoredServer) {
@@ -57,6 +58,16 @@ public class BackpackManager {
     public static void createBackup() {
         saveData();
         BackpackData.createBackup(server());
+    }
+
+    public static void createSingularBackup(BackpackInstance instance) {
+        BackpackData.saveSingle(server(), instance);
+        BackpackData.createSingularBackup(server(), instance);
+    }
+
+    public static void saveData(BackpackInstance instance) {
+        BackpackData.setStoredInventory(instance);
+        BackpackData.saveSingle(server(), instance);
     }
 
     public static void loadFallback(MinecraftServer server, boolean loadState) {
@@ -84,11 +95,24 @@ public class BackpackManager {
             instance.loaded = BackpackData.loadData(server);
 
             Set<BackpackInstance> dataInstances = BackpackData.getBackpackInstances();
-            if (dataInstances != null && !dataInstances.isEmpty()) {
+            if (!dataInstances.isEmpty()) {
                 instance.data_type = DATA_TYPE.FILE_DATA;
                 instance.loadIntoStoredInstances(dataInstances);
             }
         }
+
+        if (!instance.loaded) {
+            instance.loaded = BackpackListData.loadData(server);
+
+            System.out.println(instance.loaded);
+
+            Set<BackpackInstance> dataInstances = BackpackListData.getBackpackInstances();
+            if (!dataInstances.isEmpty()) {
+                instance.data_type = DATA_TYPE.LIST_FILE_DATA;
+                instance.loadIntoStoredInstances(dataInstances);
+            }
+        }
+
     }
 
     public static void load(MinecraftServer server) {
@@ -200,6 +224,7 @@ public class BackpackManager {
 
     private enum DATA_TYPE {
         FILE_DATA,
+        LIST_FILE_DATA,
         MINECRAFT_STATE,
         OLD_MINECRAFT_STATE
     }

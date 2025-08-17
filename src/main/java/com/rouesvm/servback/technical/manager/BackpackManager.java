@@ -56,10 +56,7 @@ public class BackpackManager {
 
     public static void createBackup() {
         saveData();
-
-        if (instance.data_type != DATA_TYPE.SQL) {
-            BackpackData.createBackup(getServer());
-        }
+        BackpackData.createBackup(getServer());
     }
 
     public static void loadFallback(MinecraftServer server, boolean loadState) {
@@ -110,7 +107,7 @@ public class BackpackManager {
     public static void loadOnServerStarted(MinecraftServer server) {
         if (!instance.loaded) {
             ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
-            load(server);
+            loadFallback(server, true);
         }
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
@@ -204,7 +201,6 @@ public class BackpackManager {
     private enum DATA_TYPE {
         FILE_DATA,
         MINECRAFT_STATE,
-        OLD_MINECRAFT_STATE,
-        SQL
+        OLD_MINECRAFT_STATE
     }
 }

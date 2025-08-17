@@ -24,7 +24,7 @@ public class BackpackItemRegistry {
             (player, stack) -> player != null ? player.getEnderChestInventory() : null);
 
     public static Item GLOBAL_BACKPACK = registerBackpack("global", BackpackBlockRegistry.GLOBAL_BACKPACK,
-            (player, stack) -> BackpackManager.getGlobalInventory());
+            (player, stack) -> BackpackManager.globalInventory());
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
             new Item.Settings().maxCount(1),

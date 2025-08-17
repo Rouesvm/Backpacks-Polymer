@@ -1,4 +1,4 @@
-package com.rouesvm.servback.technical.data.state.codecs;
+package com.rouesvm.servback.technical.data.codecs;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

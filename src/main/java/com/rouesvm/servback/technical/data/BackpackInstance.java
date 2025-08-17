@@ -9,20 +9,16 @@ import java.util.UUID;
 
 public class BackpackInstance {
     private final UUID uuid;
-    private BackpackInventory inventory;
+    private final BackpackInventory inventory;
 
-    public long lastAccessed;
+    private long lastAccessed;
 
     public BackpackInstance(UUID uuid, BackpackInventory inventory) {
         this.uuid = uuid;
         this.inventory = inventory;
     }
 
-    public void setInventory(BackpackInventory inventory) {
-        this.inventory = inventory;
-    }
-
-    public void saveToInventory(BackpackInventory target) {
+    public void copyToInventory(BackpackInventory target) {
         target.copyTo(this.inventory);
     }
 
@@ -30,8 +26,16 @@ public class BackpackInstance {
         this.lastAccessed = System.currentTimeMillis();
     }
 
-    public UUID getUuid() {
+    public UUID uuid() {
         return uuid;
+    }
+
+    public int size() {
+        return inventory.size();
+    }
+
+    public long lastAccessed() {
+        return lastAccessed;
     }
 
     public BackpackInventory inventory() {

@@ -42,7 +42,7 @@ public class BackpackDataFixer {
         if (oldData != null) {
             Set<BackpackInstance> instances = convertToV2Format(oldData, server.getRegistryManager());
             instances.forEach(backpackInstance ->
-                    BackpackManager.instance().getStoredInstances().put(backpackInstance.getUuid(), backpackInstance));
+                    BackpackManager.instance().storedInstances().put(backpackInstance.uuid(), backpackInstance));
 
             try {
                 Files.delete(path);

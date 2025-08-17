@@ -37,7 +37,7 @@ public class BackpackManager {
         BackpackData.createBackupDir(server);
     }
 
-    public static void destroy(MinecraftServer server) {
+    public static void destroy(MinecraftServer ignoredServer) {
         CosmeticManager.destroy();
 
         if (instance != null) {
@@ -51,12 +51,12 @@ public class BackpackManager {
     }
 
     public void loadIntoStoredInstances(Set<BackpackInstance> instances) {
-        instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.getUuid(), backpackInstance));
+        instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.uuid(), backpackInstance));
     }
 
     public static void createBackup() {
         saveData();
-        BackpackData.createBackup(getServer());
+        BackpackData.createBackup(server());
     }
 
     public static void loadFallback(MinecraftServer server, boolean loadState) {
@@ -97,10 +97,10 @@ public class BackpackManager {
     }
 
     public static void saveData() {
-        BackpackData.setStoredInventories(instance.getBackpackInstances());
-        BackpackData.save(getServer());
+        BackpackData.setStoredInventories(instance.backpackInstances());
+        BackpackData.save(server());
 
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(getServer());
+        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server());
         globalBackpackState.globalInventory = instance.globalInventory;
     }
 
@@ -120,17 +120,17 @@ public class BackpackManager {
 
     public static void saveToBackpackInventory(BackpackInstance instance) {
         if (instance == null) return;
-        if (instance.getUuid() != null && instance.inventory() != null) {
+        if (instance.uuid() != null && instance.inventory() != null) {
             instance.setLastAccessed();
-            addBackpack(instance)
-                    .ifPresent(saved -> saved.saveToInventory(instance.inventory()));
+            Optional<BackpackInstance> saved = addBackpack(instance);
+            saved.ifPresent(savedInstance -> savedInstance.copyToInventory(instance.inventory()));
         }
     }
 
     public static Optional<BackpackInstance> addBackpack(BackpackInstance instance) {
-        UUID uuid = instance.getUuid();
+        UUID uuid = instance.uuid();
         if (uuid == null || instance.inventory() == null) return Optional.empty();
-        BackpackManager.instance.getStoredInstances().putIfAbsent(uuid, instance);
+        BackpackManager.instance.storedInstances().putIfAbsent(uuid, instance);
         return getInstance(uuid);
     }
 
@@ -143,7 +143,7 @@ public class BackpackManager {
     //
 
     public static Optional<BackpackInstance> getInstance(UUID uuid) {
-        BackpackInstance backpackInstance = instance.getStoredInstances().get(uuid);
+        BackpackInstance backpackInstance = instance.storedInstances().get(uuid);
         return Optional.ofNullable(backpackInstance);
     }
 
@@ -173,15 +173,15 @@ public class BackpackManager {
     // GENERAL
     //
 
-    public static MinecraftServer getServer() {
+    public static MinecraftServer server() {
         return instance.server;
     }
 
-    public Set<BackpackInstance> getBackpackInstances() {
+    public Set<BackpackInstance> backpackInstances() {
         return new HashSet<>(this.storedInstances.values());
     }
 
-    public Map<UUID, BackpackInstance> getStoredInstances() {
+    public Map<UUID, BackpackInstance> storedInstances() {
         return storedInstances;
     }
 
@@ -189,7 +189,7 @@ public class BackpackManager {
         instance.globalInventory.setInventoryDirectly(stacks);
     }
 
-    public static BackpackInventory getGlobalInventory() {
+    public static BackpackInventory globalInventory() {
         return instance.globalInventory;
     }
 

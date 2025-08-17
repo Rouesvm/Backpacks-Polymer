@@ -3,17 +3,14 @@ package com.rouesvm.servback.technical.data;
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.data.state.codecs.BackpackInstanceData;
-import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
-import com.rouesvm.servback.technical.data.state.codecs.SlotData;
+import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
+import com.rouesvm.servback.technical.data.codecs.InventoryData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.collection.DefaultedList;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,7 +96,7 @@ public class BackpackData {
         if (backupPath == null) return;
         if (!Configuration.instance().allow_backups) return;
 
-        BackpackData.setStoredInventories(BackpackManager.instance().getBackpackInstances());
+        BackpackData.setStoredInventories(BackpackManager.instance().backpackInstances());
 
         LocalDateTime currentTime = LocalDateTime.now();
         String formattedCurrentTime = currentTime.format(formatter);
@@ -134,12 +131,11 @@ public class BackpackData {
     }
 
     public static BackpackInstanceData turnInstanceToData(BackpackInstance instance) {
-        DefaultedList<ItemStack> stacks = instance.heldInventory();
         return new BackpackInstanceData(
-                instance.getUuid(),
-                new InventoryData(SlotData.writeToCodec(stacks)),
-                instance.lastAccessed,
-                stacks.size()
+                instance.uuid(),
+                InventoryData.stacksListToData(instance.heldInventory()),
+                instance.lastAccessed(),
+                instance.size()
         );
     }
 
@@ -149,14 +145,6 @@ public class BackpackData {
 
     public static void setStoredInventories(Set<BackpackInstance> backpackInstances) {
         storedInventories = new ArrayList<>();
-        backpackInstances.forEach(instance -> {
-            DefaultedList<ItemStack> stacks = instance.heldInventory();
-            storedInventories.add(new BackpackInstanceData(
-                    instance.getUuid(),
-                    new InventoryData(SlotData.writeToCodec(stacks)),
-                    instance.lastAccessed,
-                    stacks.size()
-            ));
-        });
+        backpackInstances.forEach(instance -> storedInventories.add(turnInstanceToData(instance)));
     }
 }

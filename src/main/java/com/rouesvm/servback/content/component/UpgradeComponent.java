@@ -48,7 +48,7 @@ public class UpgradeComponent {
                 UpgradeType<? extends Upgrade> type = BackpackUpgradeRegistry.get(id);
                 Upgrade upgrade = type.create();
                 if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
-                    saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.getServer().getRegistryManager(), data));
+                    saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
                 }
 
                 return UpgradeComponent.of(upgrade);

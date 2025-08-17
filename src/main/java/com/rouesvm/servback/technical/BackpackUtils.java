@@ -52,7 +52,7 @@ public class BackpackUtils {
 
         DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
         if (inventory.insertItems(itemStacks)) {
-            instance.setInventory(inventory);
+            instance.copyToInventory(inventory);
             BackpackManager.addBackpack(instance);
         }
 

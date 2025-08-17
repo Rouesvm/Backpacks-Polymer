@@ -75,9 +75,7 @@ public class BackpackUtils {
     public static int getExtendedSlots(ItemStack stack) {
         NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
         NbtCompound compound = component.copyNbt();
-
-        int level = compound.getInt("level", 0);
-        return 9 * level;
+        return 9 * compound.getInt("level", 0);
     }
 
     public static int addCustomData(ServerWorld world, ItemStack stack) {

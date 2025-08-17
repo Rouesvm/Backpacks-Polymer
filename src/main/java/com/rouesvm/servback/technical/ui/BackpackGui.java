@@ -61,12 +61,12 @@ public class BackpackGui extends BasicInventoryGui {
 
         ScreenHandler handler = this.getPlayer().currentScreenHandler;
 
+        handler.enableSyncing();
+        handler.sendContentUpdates();
+
         if (markDirty) {
             String before = BackpackUtils.hashBackpackContents(frozenInstance.heldInventory());
             String after = BackpackUtils.hashBackpackContents(instance.heldInventory());
-
-            handler.enableSyncing();
-            handler.sendContentUpdates();
 
             if (!before.equals(after)) {
                 BackpackManager.createSingularBackup(instance);

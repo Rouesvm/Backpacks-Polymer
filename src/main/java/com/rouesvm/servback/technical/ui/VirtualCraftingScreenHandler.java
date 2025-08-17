@@ -6,6 +6,7 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.world.ServerWorld;
@@ -50,6 +51,11 @@ public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
 
     @Override
     public void onClosed(PlayerEntity player) {
+        ScreenHandler handler = this.getPlayer().currentScreenHandler;
+
+        handler.enableSyncing();
+        handler.sendContentUpdates();
+
         super.onClosed(player);
         this.dropInventory(player, craftingInventory);
     }

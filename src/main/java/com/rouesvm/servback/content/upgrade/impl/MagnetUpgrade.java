@@ -27,10 +27,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, FilterableUpgrade, ClickableUpgrade {
     public static final int MAX_SIZE = 5;
@@ -42,7 +41,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
 
     private int tick = 0;
 
-    private final Set<ItemEntity> queue = new HashSet<>();
+    private final List<ItemEntity> queue = new ArrayList<>();
     private final ItemFilter itemFilter = new ItemFilter(ItemFilter.MODE.PICKUP, new ObjectOpenHashSet<>(MAX_SIZE));
 
     public MagnetUpgrade() {
@@ -160,7 +159,6 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
             ItemEntity next = iterator.next();
             if (next == null
                     || !next.isAlive()
-                    || next.squaredDistanceTo(pos) > MAX_RANGE
             ) {
                 iterator.remove();
                 return false;

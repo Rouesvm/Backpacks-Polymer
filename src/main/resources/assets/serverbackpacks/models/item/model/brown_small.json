@@ -1,6 +1,6 @@
 {
   "parent": "serverbackpacks:item/base_small",
   "textures": {
-    "layer0": "serverbackpacks:item/model/magenta_small"
+    "layer0": "serverbackpacks:item/model/brown_small"
   }
 }

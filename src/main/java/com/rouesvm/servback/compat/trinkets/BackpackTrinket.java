@@ -6,7 +6,8 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BackHolder;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackUUID;
 import dev.emi.trinkets.api.*;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.entity.LivingEntity;
@@ -38,7 +39,7 @@ public class BackpackTrinket implements Trinket {
             CosmeticManager manager = CosmeticManager.manager();
             if (!manager.hasInstance(player)) manager.getOrCreateInstance(player, stack);
 
-            UUID uuid = BackpackManager.getStackUUID(stack);
+            UUID uuid = BackpackUUID.getStackUUID(stack);
 
             if (uuid == null) return;
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);

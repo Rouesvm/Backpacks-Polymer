@@ -1,8 +1,11 @@
 package com.rouesvm.servback.technical.ui.inventory;
 
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
+
+import java.util.UUID;
 
 public class BackpackInventory extends BaseInventory {
     private BlockEntity entity;
@@ -53,5 +56,11 @@ public class BackpackInventory extends BaseInventory {
 
     public void setEntity(BlockEntity entity) {
         this.entity = entity;
+    }
+
+    public static void resizeInventory(UUID uuid, int newSize) {
+        if (uuid != null) BackpackManager.getInstance(uuid).ifPresent(
+                backpackInstance ->
+                        backpackInstance.inventory().resize(newSize));
     }
 }

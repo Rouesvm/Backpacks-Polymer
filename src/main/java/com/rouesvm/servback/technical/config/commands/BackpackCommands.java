@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -39,7 +39,7 @@ public class BackpackCommands {
                     BackpackManager.createBackup();
                     return 1;
                 })).then(literal("list").executes(context -> {
-                    Set<UUID> instances = BackpackManager.instance().storedInstances.keySet();
+                    Set<UUID> instances = BackpackManager.instance().getStoredInstances().keySet();
                     context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.list"), false);
                     for (UUID uuid : instances) context.getSource().sendFeedback(
                                 () -> Text.literal(String.format("(%s)", uuid.toString())), false);

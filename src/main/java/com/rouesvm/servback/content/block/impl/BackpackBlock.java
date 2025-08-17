@@ -10,7 +10,7 @@ import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import net.minecraft.block.Block;

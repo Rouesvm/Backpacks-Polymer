@@ -5,9 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
 import com.rouesvm.servback.technical.data.state.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;
@@ -82,7 +82,10 @@ public class BackpackState extends PersistentState {
         return this.storedInventories.stream()
                 .map(data -> new BackpackInstance(
                         data.uuid(),
-                        new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().itemStacks()))
+                        new BackpackInventory(InventoryData.getHeldStacks(
+                                data.getInventoryData().itemStacks(),
+                                data.size()
+                        ))
                 ))
                 .collect(Collectors.toSet());
     }

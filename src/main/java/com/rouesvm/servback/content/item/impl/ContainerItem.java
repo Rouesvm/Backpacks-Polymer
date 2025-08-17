@@ -9,7 +9,8 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackUUID;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.block.BlockState;
@@ -57,7 +58,7 @@ public class ContainerItem extends BundleGuiItem {
     public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
         UUID uuid = polymerStack.get(BackpackDataComponentTypes.BACKPACK_UUID);
         if (ServerBackpacks.isDevEnvironment
-        && uuid != null) tooltip.add(Text.of("UUID: " + BackpackManager.getStackUUID(polymerStack)));
+        && uuid != null) tooltip.add(Text.of("UUID: " + BackpackUUID.getStackUUID(polymerStack)));
 
         addUpgradeTooltip(tooltip, polymerStack);
         addInventoryTooltip(tooltip, polymerStack);
@@ -85,9 +86,9 @@ public class ContainerItem extends BundleGuiItem {
             if (component != null
             ) blockEntity.setUpgradeList(component.getBaseUpgrades());
 
-            UUID uuid = BackpackManager.getStackUUID(stack);
+            UUID uuid = BackpackUUID.getStackUUID(stack);
             if (uuid == null
-            ) uuid = BackpackManager.createNewUUID(stack);
+            ) uuid = BackpackUUID.createNewUUID(stack);
 
             blockEntity.setUuid(uuid);
             blockEntity.setStorage();
@@ -105,23 +106,24 @@ public class ContainerItem extends BundleGuiItem {
 
     @Override
     public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
-        return stack != null ? BackpackManager.getInventory(BackpackManager.getStackUUID(stack)) : null;
+        return stack != null ? BackpackManager.getInventory(BackpackUUID.getStackUUID(stack)) : null;
     }
 
     @Override
     public void openGui(ServerPlayerEntity player, ItemStack stack) {
-        BackpackManager.createNewUUID(stack);
+        BackpackUUID.createNewUUID(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
 
         Optional<BackpackInstance> instance = BackpackManager.getInstance(
-                BackpackManager.getStackUUID(stack),
+                BackpackUUID.getStackUUID(stack),
                 this.slots + BackpackUtils.getExtendedSlots(stack));
+
         instance.ifPresent(backpackInstance -> new BackpackGui(player, stack, backpackInstance));
     }
 
     @Override
     public void afterChanged(ItemStack stack, Inventory inventory) {
-        UUID uuid = BackpackManager.getStackUUID(stack);
+        UUID uuid = BackpackUUID.getStackUUID(stack);
         if (uuid != null) BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
     }
 

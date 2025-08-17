@@ -5,7 +5,7 @@ import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.codec.PacketCodec;

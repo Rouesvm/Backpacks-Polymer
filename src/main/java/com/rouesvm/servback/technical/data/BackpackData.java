@@ -6,11 +6,14 @@ import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.state.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.state.codecs.InventoryData;
 import com.rouesvm.servback.technical.data.state.codecs.SlotData;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.collection.DefaultedList;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -122,9 +125,22 @@ public class BackpackData {
         return storedInventories.stream()
                 .map(data -> new BackpackInstance(
                         data.uuid(),
-                        new BackpackInventory(InventoryData.getHeldStacks(data.getInventoryData().itemStacks()))
+                        new BackpackInventory(InventoryData.getHeldStacks(
+                                data.getInventoryData().itemStacks(),
+                                data.size()
+                        ))
                 ))
                 .collect(Collectors.toSet());
+    }
+
+    public static BackpackInstanceData turnInstanceToData(BackpackInstance instance) {
+        DefaultedList<ItemStack> stacks = instance.heldInventory();
+        return new BackpackInstanceData(
+                instance.getUuid(),
+                new InventoryData(SlotData.writeToCodec(stacks)),
+                instance.lastAccessed,
+                stacks.size()
+        );
     }
 
     public static List<BackpackInstanceData> getStoredInventories() {
@@ -134,11 +150,13 @@ public class BackpackData {
     public static void setStoredInventories(Set<BackpackInstance> backpackInstances) {
         storedInventories = new ArrayList<>();
         backpackInstances.forEach(instance -> {
-            BackpackInstanceData data = new BackpackInstanceData(
+            DefaultedList<ItemStack> stacks = instance.heldInventory();
+            storedInventories.add(new BackpackInstanceData(
                     instance.getUuid(),
-                    new InventoryData(SlotData.writeToCodec(instance.heldInventory()))
-            );
-            storedInventories.add(data);
+                    new InventoryData(SlotData.writeToCodec(stacks)),
+                    instance.lastAccessed,
+                    stacks.size()
+            ));
         });
     }
 }

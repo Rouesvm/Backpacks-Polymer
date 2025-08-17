@@ -8,7 +8,8 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackUUID;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
@@ -68,7 +69,7 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
     protected void readData(ReadView view) {
         super.readData(view);
         extraSize = view.getInt("extraSize", 0);
-        uuid = UUID.fromString(view.getString("uuid", BackpackManager.generateUniqueUUID().toString()));
+        uuid = UUID.fromString(view.getString("uuid", BackpackUUID.generateUniqueUUID().toString()));
 
         var upgradeContainer = view.getTypedListView("upgrade", UpgradeContainerComponent.CODEC);
         Optional<UpgradeContainerComponent> upgradeContainerComponent = upgradeContainer.stream().findFirst();

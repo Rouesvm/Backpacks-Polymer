@@ -13,8 +13,8 @@ public record InventoryData(List<SlotData> itemStacks) {
             SlotData.CODEC.listOf().fieldOf("Items").forGetter(InventoryData::itemStacks)
     ).apply(instance, InventoryData::new));
 
-    public static DefaultedList<ItemStack> getHeldStacks(List<SlotData> data) {
-        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
+    public static DefaultedList<ItemStack> getHeldStacks(List<SlotData> data, int size) {
+        DefaultedList<ItemStack> stacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
         if (!data.isEmpty()) data.forEach(slotData -> stacks.set(slotData.slot(), slotData.getStack()));
         return stacks;
     }

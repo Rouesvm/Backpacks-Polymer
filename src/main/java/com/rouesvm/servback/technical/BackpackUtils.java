@@ -2,7 +2,8 @@ package com.rouesvm.servback.technical;
 
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackUUID;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -59,7 +60,7 @@ public class BackpackUtils {
     }
 
     public static DefaultedList<ItemStack> getItemList(ItemStack stack) {
-        UUID uuid = BackpackManager.getStackUUID(stack);
+        UUID uuid = BackpackUUID.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
 
         if (inventory != null) {
@@ -93,7 +94,7 @@ public class BackpackUtils {
     }
 
     public static void resizeIfIncorrectSize(ServerPlayerEntity player, ItemStack stack, int maxBackpackSlot) {
-        UUID uuid = BackpackManager.getStackUUID(stack);
+        UUID uuid = BackpackUUID.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
         if (inventory != null) resize(player, uuid, inventory,
                     maxBackpackSlot + addCustomData(player.getWorld(), stack));
@@ -110,7 +111,7 @@ public class BackpackUtils {
     public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory target, int totalSlots) {
         if (target.size() != totalSlots) {
             dropExcessItems(player, target, totalSlots);
-            BackpackManager.resizeInventory(uuid, totalSlots);
+            BackpackInventory.resizeInventory(uuid, totalSlots);
         }
     }
 }

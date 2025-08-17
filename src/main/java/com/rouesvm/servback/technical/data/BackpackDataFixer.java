@@ -1,6 +1,7 @@
 package com.rouesvm.servback.technical.data;
 
 import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
@@ -41,7 +42,7 @@ public class BackpackDataFixer {
         if (oldData != null) {
             Set<BackpackInstance> instances = convertToV2Format(oldData, server.getRegistryManager());
             instances.forEach(backpackInstance ->
-                    BackpackManager.instance().storedInstances.put(backpackInstance.getUuid(), backpackInstance));
+                    BackpackManager.instance().getStoredInstances().put(backpackInstance.getUuid(), backpackInstance));
 
             try {
                 Files.delete(path);

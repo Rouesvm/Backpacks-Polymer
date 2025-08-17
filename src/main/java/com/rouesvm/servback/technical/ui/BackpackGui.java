@@ -4,7 +4,7 @@ import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackManager;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
 import eu.pb4.sgui.api.ClickType;
 import net.minecraft.item.ItemStack;
@@ -22,9 +22,7 @@ public class BackpackGui extends BasicInventoryGui {
         super(player, stack, instance.inventory());
 
         this.frozenInstance = instance.copy();
-
         this.instance = instance;
-        this.instance.setLastAccessed();
 
         if (stack != null) BackpackUtils.convertComponentToBackpackData(instance, stack);
     }

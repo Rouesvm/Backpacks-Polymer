@@ -74,11 +74,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
-remapJar {
-    dependsOn shadowJar
-    inputFile.set(shadowJar.archiveFile)
-}
-
 jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}"}

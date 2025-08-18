@@ -1,8 +1,11 @@
-package com.rouesvm.servback.technical.data;
+package com.rouesvm.servback.technical.data.alternative;
 
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.data.BackpackData;
+import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
@@ -29,13 +32,21 @@ public class BackpackListData {
                 .collect(Collectors.toSet());
     }
 
-    public static boolean loadData(MinecraftServer server) {
-        saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
+    public static boolean loadData(MinecraftServer server, boolean hasLoaded) {
+        if (!hasLoaded) {
+            saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 
-        try {
-            return loadExistingData(server);
-        } catch (IOException e) {
-            ServerBackpacks.LOGGER.error("Error while loading list data {}", e.getMessage());
+            try {
+                return loadExistingData(server);
+            } catch (IOException e) {
+                ServerBackpacks.LOGGER.error("Error while loading list data {}", e.getMessage());
+            }
+
+            Set<BackpackInstance> dataInstances = BackpackListData.getBackpackInstances();
+            if (!dataInstances.isEmpty()) {
+                BackpackManager.instance().loadIntoStoredInstances(dataInstances);
+                return true;
+            }
         }
 
         return false;
@@ -45,8 +56,6 @@ public class BackpackListData {
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(saveDir))) {
             var data = SAVE_CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE),
                     NbtIo.readCompound(dis));
-
-            System.out.println(data);
 
             data.result().ifPresentOrElse(result ->
                             storedInventories = result.getFirst(),

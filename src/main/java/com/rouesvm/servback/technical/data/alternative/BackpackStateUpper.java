@@ -1,6 +1,7 @@
-package com.rouesvm.servback.technical.data;
+package com.rouesvm.servback.technical.data.alternative;
 
 import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
@@ -26,9 +27,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-public class BackpackDataFixer {
+public class BackpackStateUpper {
     // The 1.21.1 way of loading data.
-    public static boolean isDataPresent(MinecraftServer server) {
+
+    public static boolean loadData(MinecraftServer server, boolean hasLoaded) {
+        if (!hasLoaded) {
+            return isDataPresent(server);
+        } else return false;
+    }
+
+    private static boolean isDataPresent(MinecraftServer server) {
         Path path = server.getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
         if (!path.toFile().exists()) return false;
 
@@ -41,8 +49,7 @@ public class BackpackDataFixer {
 
         if (oldData != null) {
             Set<BackpackInstance> instances = convertToV2Format(oldData, server.getRegistryManager());
-            instances.forEach(backpackInstance ->
-                    BackpackManager.instance().storedInstances().put(backpackInstance.uuid(), backpackInstance));
+            BackpackManager.instance().loadIntoStoredInstances(instances);
 
             try {
                 Files.delete(path);

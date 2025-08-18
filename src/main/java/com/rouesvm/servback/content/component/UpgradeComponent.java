@@ -34,7 +34,7 @@ public class UpgradeComponent {
 
     public static final Codec<UpgradeComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Identifier.CODEC.fieldOf("id").forGetter(component ->
-                    BackpackUpgradeRegistry.UPGRADES.getId(component.getUpgrade().getType())),
+                    BackpackUpgradeRegistry.getRegistry().getId(component.getUpgrade().getType())),
             NbtCompound.CODEC.fieldOf("data").forGetter(component -> {
                 NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
                 Upgrade upgrade = component.getUpgrade();

@@ -12,8 +12,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
 public class BackpackUpgradeRegistry {
-    public static final RegistryKey<Registry<UpgradeType<?>>> UPGRADES_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades"));
-    public static final Registry<UpgradeType<?>> UPGRADES = FabricRegistryBuilder.createSimple(
+    private static final RegistryKey<Registry<UpgradeType<?>>> UPGRADES_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades"));
+    private static final Registry<UpgradeType<?>> UPGRADES = FabricRegistryBuilder.createSimple(
             UPGRADES_REGISTRY_KEY).buildAndRegister();
 
     public static final UpgradeType<VoidUpgrade> VOID = register("void", VoidUpgrade::new);
@@ -23,6 +23,10 @@ public class BackpackUpgradeRegistry {
     public static <T extends Upgrade> UpgradeType<T> register(String name, UpgradeType.UpgradeFactory<T> factory) {
         Identifier id = Identifier.of(ServerBackpacks.MOD_ID, name);
         return Registry.register(UPGRADES, id, new UpgradeType<>(id, factory));
+    }
+
+    public static Registry<UpgradeType<?>> getRegistry() {
+        return UPGRADES;
     }
 
     public static UpgradeType<?> get(Identifier id) {

@@ -3,10 +3,10 @@ package com.rouesvm.servback.technical.manager;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.BackpackData;
-import com.rouesvm.servback.technical.data.BackpackDataFixer;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.BackpackListData;
-import com.rouesvm.servback.technical.data.state.BackpackState;
+import com.rouesvm.servback.technical.data.alternative.BackpackListData;
+import com.rouesvm.servback.technical.data.alternative.BackpackState;
+import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
 import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
@@ -23,7 +23,7 @@ public class BackpackManager {
     private final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
 
     private boolean loaded = false;
-    private DATA_TYPE data_type = null;
+    private DATA_TYPE data_type = DATA_TYPE.NONE;
 
     private MinecraftServer server;
 
@@ -71,61 +71,38 @@ public class BackpackManager {
     }
 
     public static void loadFallback(MinecraftServer server, boolean loadState) {
-        if (loadState) {
-            BackpackState state = BackpackState.getServerState(server);
+        if (BackpackListData.loadData(server, instance.loaded)) {
+            instance.loaded = true;
+            instance.data_type = DATA_TYPE.LIST_FILE_DATA;
+        }
 
-            if (!instance.loaded && state != null) {
+        if (loadState) {
+            if (BackpackState.loadData(server, instance.loaded)) {
+                instance.loaded = true;
                 instance.data_type = DATA_TYPE.MINECRAFT_STATE;
-                instance.loaded = BackpackState.loadData(state);
             }
         }
 
-        if (!instance.loaded) {
-            instance.loaded = BackpackDataFixer.isDataPresent(server);
-            if (instance.loaded) instance.data_type = DATA_TYPE.OLD_MINECRAFT_STATE;
+        if (BackpackStateUpper.loadData(server, instance.loaded)) {
+            instance.loaded = true;
+            instance.data_type = DATA_TYPE.OLD_MINECRAFT_STATE;
         }
-
-        if (!instance.loaded)
-            ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
-        else ServerBackpacks.LOGGER.info("Loaded {} format as Server Backpack's data.", instance.data_type.toString());
     }
 
     public static void loadFileData(MinecraftServer server) {
-        if (!instance.loaded) {
-            instance.loaded = BackpackData.loadData(server);
-
-            Set<BackpackInstance> dataInstances = BackpackData.getBackpackInstances();
-            if (!dataInstances.isEmpty()) {
-                instance.data_type = DATA_TYPE.FILE_DATA;
-                instance.loadIntoStoredInstances(dataInstances);
-            }
+        if (BackpackData.loadData(server, instance.loaded)) {
+            instance.loaded = true;
+            instance.data_type = BackpackManager.DATA_TYPE.FILE_DATA;
         }
-
-        if (!instance.loaded) {
-            instance.loaded = BackpackListData.loadData(server);
-
-            System.out.println(instance.loaded);
-
-            Set<BackpackInstance> dataInstances = BackpackListData.getBackpackInstances();
-            if (!dataInstances.isEmpty()) {
-                instance.data_type = DATA_TYPE.LIST_FILE_DATA;
-                instance.loadIntoStoredInstances(dataInstances);
-            }
-        }
-
     }
 
     public static void load(MinecraftServer server) {
         loadFileData(server);
         loadFallback(server, false);
-    }
 
-    public static void saveData() {
-        BackpackData.setStoredInventories(instance.backpackInstances());
-        BackpackData.save(server());
-
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server());
-        globalBackpackState.globalInventory = instance.globalInventory;
+        if (!instance.loaded)
+            ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
+        else ServerBackpacks.LOGGER.info("Loaded {} format as Server Backpack's data.", instance.data_type.toString());
     }
 
     public static void loadOnServerStarted(MinecraftServer server) {
@@ -136,6 +113,14 @@ public class BackpackManager {
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
         instance.globalInventory.setInventoryDirectly(globalBackpackState.globalInventory.heldStacks());
+    }
+
+    public static void saveData() {
+        BackpackData.setStoredInventories(instance.backpackInstances());
+        BackpackData.save(server());
+
+        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server());
+        globalBackpackState.globalInventory = instance.globalInventory;
     }
 
     //
@@ -222,10 +207,18 @@ public class BackpackManager {
         return uuid != null && backpackInstance.isPresent();
     }
 
-    private enum DATA_TYPE {
-        FILE_DATA,
-        LIST_FILE_DATA,
-        MINECRAFT_STATE,
-        OLD_MINECRAFT_STATE
+    public enum DATA_TYPE {
+        NONE("No data loaded"),
+        MINECRAFT_STATE("Minecraft state"),
+        OLD_MINECRAFT_STATE("Old Minecraft state"),
+        FILE_DATA("File-based data"),
+        LIST_FILE_DATA("List file-based data");
+
+        private final String description;
+
+        DATA_TYPE(String desc) { this.description = desc; }
+
+        @Override
+        public String toString() { return description; }
     }
 }

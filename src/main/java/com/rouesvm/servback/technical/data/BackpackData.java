@@ -79,7 +79,20 @@ public class BackpackData {
         }
     }
 
-    public static boolean loadData(MinecraftServer server) {
+    public static boolean loadData(MinecraftServer server, boolean hasLoaded) {
+        if (!hasLoaded) {
+            hasLoaded = BackpackData.loadData(server);
+
+            Set<BackpackInstance> dataInstances = BackpackData.getBackpackInstances();
+            if (hasLoaded && !dataInstances.isEmpty()) {
+                BackpackManager.instance().loadIntoStoredInstances(dataInstances);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean loadData(MinecraftServer server) {
         saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
 
         try {
@@ -109,7 +122,6 @@ public class BackpackData {
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
                     BackpackInstanceData.CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), nbt);
-
             return data.result()
                     .map(pair -> turnDataToInstance(pair.getFirst()));
         } catch (IOException | NbtCrashException e) {

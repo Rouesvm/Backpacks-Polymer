@@ -1,8 +1,7 @@
-package com.rouesvm.servback.technical.data.state;
+package com.rouesvm.servback.technical.data.alternative;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
@@ -42,16 +41,22 @@ public class BackpackState extends PersistentState {
         this(Collections.emptyList());
     }
 
-    public static boolean loadData(BackpackState state) {
+    public static boolean loadData(MinecraftServer server, boolean hasLoaded) {
+        BackpackState state = BackpackState.getServerState(server);
+
+        if (!hasLoaded && state != null)
+            return BackpackState.loadData(state);
+        else return false;
+    }
+
+    private static boolean loadData(BackpackState state) {
         Set<BackpackInstance> stateInstances = state.getBackpackInstances();
+
         if (stateInstances != null && !stateInstances.isEmpty()) {
             BackpackManager.instance().loadIntoStoredInstances(stateInstances);
 
-            BackpackData.setStoredInventories(stateInstances);
             state.clearBackpackInstances();
             state.markDirty();
-
-            ServerBackpacks.LOGGER.info("Loaded Server Backpack's old format.");
 
             return true;
         }
@@ -59,7 +64,7 @@ public class BackpackState extends PersistentState {
         return false;
     }
 
-    public static BackpackState getServerState(MinecraftServer server) {
+    private static BackpackState getServerState(MinecraftServer server) {
         if (server.getWorld(World.OVERWORLD) == null) return null;
         PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
         BackpackState state = persistentStateManager.getOrCreate(type);
@@ -67,15 +72,15 @@ public class BackpackState extends PersistentState {
         return state;
    }
 
-    public List<BackpackInstanceData> getStoredInventories() {
+    private List<BackpackInstanceData> getStoredInventories() {
         return new ArrayList<>(this.storedInventories);
     }
 
-    public void clearBackpackInstances() {
+    private void clearBackpackInstances() {
         this.storedInventories.clear();
     }
 
-    public Set<BackpackInstance> getBackpackInstances() {
+    private Set<BackpackInstance> getBackpackInstances() {
         return this.storedInventories.stream()
                 .map(BackpackData::turnDataToInstance)
                 .collect(Collectors.toSet());

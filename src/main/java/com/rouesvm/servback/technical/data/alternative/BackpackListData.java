@@ -37,15 +37,17 @@ public class BackpackListData {
             saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 
             try {
-                return loadExistingData(server);
+                hasLoaded = loadExistingData(server);
             } catch (IOException e) {
                 ServerBackpacks.LOGGER.error("Error while loading list data {}", e.getMessage());
             }
 
-            Set<BackpackInstance> dataInstances = BackpackListData.getBackpackInstances();
-            if (!dataInstances.isEmpty()) {
-                BackpackManager.instance().loadIntoStoredInstances(dataInstances);
-                return true;
+            if (hasLoaded) {
+                Set<BackpackInstance> dataInstances = BackpackListData.getBackpackInstances();
+                if (!dataInstances.isEmpty()) {
+                    BackpackManager.instance().loadIntoStoredInstances(dataInstances);
+                    return true;
+                }
             }
         }
 

@@ -25,8 +25,6 @@ public class Configuration {
     public static final Instance defaultInstance = new Instance();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private final Path configDir;
-
     private final File configFile;
     public Instance instance = new Instance();
 
@@ -40,7 +38,7 @@ public class Configuration {
     }
     
     public Configuration(String name) {
-        configDir = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/");
+        Path configDir = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/");
         try {
             if (!configDir.toFile().exists()) {
                 Files.createDirectories(configDir);

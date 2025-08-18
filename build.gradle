@@ -1,6 +1,5 @@
 plugins {
     id 'fabric-loom' version '1.10-SNAPSHOT'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'maven-publish'
 }
 
@@ -42,12 +41,6 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "org.xerial:sqlite-jdbc:3.47.2.0"
-    shadowBundle "org.xerial:sqlite-jdbc:3.47.2.0"
-
-    modImplementation "com.mysql:mysql-connector-j:8.4.0"
-    shadowBundle "com.mysql:mysql-connector-j:8.4.0"
-
     modImplementation ("eu.pb4:polymer-core:${project.polymer}")
     modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
     modImplementation ("eu.pb4:polymer-virtual-entity:${project.polymer}")
@@ -58,22 +51,6 @@ dependencies {
     modCompileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
     compileOnly("org.geysermc.geyser:api:${project.geyser}")
 }
-
-shadowJar {
-    exclude "net/fabricmc/**"
-    exclude "fabric/**"
-    exclude "architectury.common.json"
-
-    exclude "com/google/**"
-    exclude "google/**"
-    exclude "org/slf4j/**"
-    exclude "org/apache/commons/logging/**"
-    exclude "org/checkerframework/**"
-
-    configurations = [project.configurations.shadowBundle]
-    archiveClassifier = "dev-shadow"
-}
-
 
 processResources {
     inputs.property "version", project.version

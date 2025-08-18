@@ -77,7 +77,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
     }
 
     private ItemStack getResultStack(UpgradeComponent oldComponent, ItemStack center, Set<String> uniqueItems) {
-        Upgrade oldUpgrade = oldComponent.getUpgrade();
+        Upgrade oldUpgrade = oldComponent.upgrade();
         Upgrade upgrade = oldUpgrade.getType().create();
         if (!(upgrade instanceof FilterableUpgrade newUpgrade)) return ItemStack.EMPTY;
 
@@ -96,7 +96,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
             if (stack.isEmpty()) continue;
 
             UpgradeComponent component = stack.get(BackpackDataComponentTypes.UPGRADE);
-            if (component != null && component.getUpgrade() instanceof FilterableUpgrade
+            if (component != null && component.upgrade() instanceof FilterableUpgrade
             ) return stack;
         }
 

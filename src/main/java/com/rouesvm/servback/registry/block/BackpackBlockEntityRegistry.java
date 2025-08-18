@@ -17,7 +17,7 @@ public class BackpackBlockEntityRegistry {
             "backpack_block_entity",
             FabricBlockEntityTypeBuilder.create(BackpackBlockEntity::new, BackpackBlockRegistry.BACKPACK).build());
 
-    public static BlockEntityType<BasicBackpackBlockEntity> BASIC_BACKPACK_BLOCK_ENTITY= register(
+    public static final BlockEntityType<BasicBackpackBlockEntity> BASIC_BACKPACK_BLOCK_ENTITY= register(
             "basic_backpack_block_entity",
             FabricBlockEntityTypeBuilder.create(BasicBackpackBlockEntity::new)
                     .addBlocks(BackpackBlockRegistry.ENDER_BACKPACK, BackpackBlockRegistry.GLOBAL_BACKPACK).build());

@@ -37,7 +37,7 @@ public class BackpackRecipeJsonBuilder implements CraftingRecipeJsonBuilder {
     private final Map<String, AdvancementCriterion<?>> criteria = new LinkedHashMap<>();
     @Nullable
     private String group;
-    private boolean showNotification = true;
+    private final boolean showNotification = true;
 
     private BackpackRecipeJsonBuilder(RegistryEntryLookup<Item> registryLookup, RecipeCategory category, ItemConvertible output, int count) {
         this.registryLookup = registryLookup;

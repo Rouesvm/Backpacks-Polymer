@@ -20,10 +20,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 
 public class BackpackItemRegistry {
-    public static Item ENDER_BACKPACK = registerBackpack("ender", BackpackBlockRegistry.ENDER_BACKPACK,
+    public static final Item ENDER_BACKPACK = registerBackpack("ender", BackpackBlockRegistry.ENDER_BACKPACK,
             (player, stack) -> player != null ? player.getEnderChestInventory() : null);
 
-    public static Item GLOBAL_BACKPACK = registerBackpack("global", BackpackBlockRegistry.GLOBAL_BACKPACK,
+    public static final Item GLOBAL_BACKPACK = registerBackpack("global", BackpackBlockRegistry.GLOBAL_BACKPACK,
             (player, stack) -> BackpackManager.globalInventory());
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(

@@ -99,6 +99,6 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     public Upgrade getUpgrade(ItemStack stack) {
         UpgradeComponent component = UpgradeComponent.of(upgradeType.create());
         UpgradeComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE, component);
-        return stackComponent.getUpgrade();
+        return stackComponent.upgrade();
     }
 }

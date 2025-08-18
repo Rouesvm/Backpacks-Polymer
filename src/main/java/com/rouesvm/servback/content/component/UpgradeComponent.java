@@ -15,31 +15,22 @@ import net.minecraft.storage.NbtWriteView;
 import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Identifier;
 
-public class UpgradeComponent {
-    private final Upgrade upgrade;
-
-    private UpgradeComponent(Upgrade upgrade) {
-        this.upgrade = upgrade;
-    }
+public record UpgradeComponent(Upgrade upgrade) {
 
     public static UpgradeComponent of(Upgrade upgrade) {
         return new UpgradeComponent(upgrade);
-    }
-
-    public Upgrade getUpgrade() {
-        return upgrade;
     }
 
     public static final PacketCodec<ByteBuf, UpgradeComponent> PACKET_CODEC = null;
 
     public static final Codec<UpgradeComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Identifier.CODEC.fieldOf("id").forGetter(component ->
-                    BackpackUpgradeRegistry.getRegistry().getId(component.getUpgrade().getType())),
+                    BackpackUpgradeRegistry.getRegistry().getId(component.upgrade().getType())),
             NbtCompound.CODEC.fieldOf("data").forGetter(component -> {
                 NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
-                Upgrade upgrade = component.getUpgrade();
-                if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
-                    saveableUpgrade.writeView(data);
+                Upgrade upgrade = component.upgrade();
+                if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
+                    persistentUpgrade.writeView(data);
                 }
 
                 return data.getNbt();
@@ -47,8 +38,8 @@ public class UpgradeComponent {
             ).apply(instance, (id, data) -> {
                 UpgradeType<? extends Upgrade> type = BackpackUpgradeRegistry.get(id);
                 Upgrade upgrade = type.create();
-                if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
-                    saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
+                if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
+                    persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
                 }
 
                 return UpgradeComponent.of(upgrade);

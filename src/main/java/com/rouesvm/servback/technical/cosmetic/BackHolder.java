@@ -40,7 +40,6 @@ public class BackHolder extends ElementHolder {
     private Integer cosmeticPitchWhenSneaking = -25;
 
     private boolean hidden;
-    private boolean hideFromPlayer;
 
     private BackHolder(ItemStack stack, LivingEntity entity) {
         super();

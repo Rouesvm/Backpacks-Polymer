@@ -15,14 +15,12 @@ import java.util.List;
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class GlobalBackpackState extends PersistentState {
-    public BackpackInventory globalInventory;
-
+    public static final int GLOBAL_SIZE = 9 * 3;
     public static final Codec<GlobalBackpackState> CODEC = RecordCodecBuilder.create(
             (instance) ->
                     instance.group(
                             SlotData.CODEC.listOf().fieldOf("itemStacks").forGetter(GlobalBackpackState::getInventory)
                     ).apply(instance, GlobalBackpackState::new));
-
 
     private static final PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
             MOD_ID + "-v2-global",
@@ -31,11 +29,13 @@ public class GlobalBackpackState extends PersistentState {
             null
     );
 
+    public BackpackInventory globalInventory;
+
     private GlobalBackpackState(List<SlotData> data) {
-        this.globalInventory = new BackpackInventory(9 * 3);
+        this.globalInventory = new BackpackInventory(GLOBAL_SIZE);
 
         if (!data.isEmpty()) {
-            this.globalInventory.setInventoryDirectly(SlotData.readFromCodec(data, 9 * 3));
+            this.globalInventory.setInventoryDirectly(SlotData.readFromCodec(data, GLOBAL_SIZE));
         }
     }
 

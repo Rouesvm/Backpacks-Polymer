@@ -11,6 +11,8 @@ public interface ClickableUpgrade {
     }
 
     default boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, eu.pb4.sgui.api.ClickType clickType) {
-        return false;
+        ClickType mapped = clickType.isLeft ? ClickType.LEFT :
+                clickType.isRight ? ClickType.RIGHT : ClickType.LEFT;
+        return onClicked(player, stack, slot, mapped);
     }
 }

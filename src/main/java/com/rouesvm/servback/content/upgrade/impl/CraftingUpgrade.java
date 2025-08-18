@@ -21,11 +21,6 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
         return openGui(serverPlayer, clickType == ClickType.RIGHT);
     }
 
-    @Override
-    public boolean onClicked(ServerPlayerEntity serverPlayer, ItemStack stack, Slot slot, eu.pb4.sgui.api.ClickType clickType) {
-        return openGui(serverPlayer, clickType.isRight);
-    }
-
     public boolean openGui(ServerPlayerEntity serverPlayer, boolean isRight) {
         if (isRight) {
             serverPlayer.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) ->

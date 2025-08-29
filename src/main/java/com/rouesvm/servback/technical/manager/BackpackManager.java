@@ -98,7 +98,9 @@ public class BackpackManager {
 
     public static void load(MinecraftServer server) {
         loadFileData(server);
-        loadFallback(server, false);
+        if (!instance.loaded) {
+            loadFallback(server, false);
+        }
 
         if (!instance.loaded)
             ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");

@@ -1,0 +1,167 @@
+{
+  "format_version": 2,
+  "items": {
+    "minecraft:leather": [
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_white",
+        "bedrock_identifier": "serverbackpacks:medium_white",
+        "display_name": "Medium White Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_orange",
+        "bedrock_identifier": "serverbackpacks:medium_orange",
+        "display_name": "Medium Orange Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_magenta",
+        "bedrock_identifier": "serverbackpacks:medium_magenta",
+        "display_name": "Medium Magenta Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_light_blue",
+        "bedrock_identifier": "serverbackpacks:medium_light_blue",
+        "display_name": "Medium Light Blue Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_yellow",
+        "bedrock_identifier": "serverbackpacks:medium_yellow",
+        "display_name": "Medium Yellow Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_lime",
+        "bedrock_identifier": "serverbackpacks:medium_lime",
+        "display_name": "Medium Lime Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_pink",
+        "bedrock_identifier": "serverbackpacks:medium_pink",
+        "display_name": "Medium Pink Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_gray",
+        "bedrock_identifier": "serverbackpacks:medium_gray",
+        "display_name": "Medium Gray Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_light_gray",
+        "bedrock_identifier": "serverbackpacks:medium_light_gray",
+        "display_name": "Medium Light Gray Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_cyan",
+        "bedrock_identifier": "serverbackpacks:medium_cyan",
+        "display_name": "Medium Cyan Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_purple",
+        "bedrock_identifier": "serverbackpacks:medium_purple",
+        "display_name": "Medium Purple Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_blue",
+        "bedrock_identifier": "serverbackpacks:medium_blue",
+        "display_name": "Medium Blue Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_brown",
+        "bedrock_identifier": "serverbackpacks:medium_brown",
+        "display_name": "Medium Brown Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_green",
+        "bedrock_identifier": "serverbackpacks:medium_green",
+        "display_name": "Medium Green Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_red",
+        "bedrock_identifier": "serverbackpacks:medium_red",
+        "display_name": "Medium Red Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:medium_black",
+        "bedrock_identifier": "serverbackpacks:medium_black",
+        "display_name": "Medium Black Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      }
+    ]
+  }
+}

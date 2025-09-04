@@ -1,0 +1,167 @@
+{
+  "format_version": 2,
+  "items": {
+    "minecraft:leather": [
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_white",
+        "bedrock_identifier": "serverbackpacks:small_white",
+        "display_name": "Small White Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_orange",
+        "bedrock_identifier": "serverbackpacks:small_orange",
+        "display_name": "Small Orange Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_magenta",
+        "bedrock_identifier": "serverbackpacks:small_magenta",
+        "display_name": "Small Magenta Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_light_blue",
+        "bedrock_identifier": "serverbackpacks:small_light_blue",
+        "display_name": "Small Light Blue Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_yellow",
+        "bedrock_identifier": "serverbackpacks:small_yellow",
+        "display_name": "Small Yellow Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_lime",
+        "bedrock_identifier": "serverbackpacks:small_lime",
+        "display_name": "Small Lime Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_pink",
+        "bedrock_identifier": "serverbackpacks:small_pink",
+        "display_name": "Small Pink Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_gray",
+        "bedrock_identifier": "serverbackpacks:small_gray",
+        "display_name": "Small Gray Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_light_gray",
+        "bedrock_identifier": "serverbackpacks:small_light_gray",
+        "display_name": "Small Light Gray Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_cyan",
+        "bedrock_identifier": "serverbackpacks:small_cyan",
+        "display_name": "Small Cyan Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_purple",
+        "bedrock_identifier": "serverbackpacks:small_purple",
+        "display_name": "Small Purple Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_blue",
+        "bedrock_identifier": "serverbackpacks:small_blue",
+        "display_name": "Small Blue Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_brown",
+        "bedrock_identifier": "serverbackpacks:small_brown",
+        "display_name": "Small Brown Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_green",
+        "bedrock_identifier": "serverbackpacks:small_green",
+        "display_name": "Small Green Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_red",
+        "bedrock_identifier": "serverbackpacks:small_red",
+        "display_name": "Small Red Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:small_black",
+        "bedrock_identifier": "serverbackpacks:small_black",
+        "display_name": "Small Black Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
+      }
+    ]
+  }
+}

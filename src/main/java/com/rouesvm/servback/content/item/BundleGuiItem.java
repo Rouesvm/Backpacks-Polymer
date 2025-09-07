@@ -1,6 +1,8 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
+import com.rouesvm.servback.content.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackUtils;
 import com.rouesvm.servback.technical.ui.BasicGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
@@ -20,20 +22,40 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
+
+import java.util.List;
 
 import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 
 public class BundleGuiItem extends BasicPolymerBlockItem  {
     public BundleGuiItem(String name, Block block) {
         super(name, Items.LEATHER, block);
+    }
+
+    @Override
+    public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
+        if (stack.isOf(BackpackItemRegistry.ENDER_BACKPACK) && !Configuration.instance().enable_enderpack) {
+            tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
+                    .formatted(Formatting.BOLD)
+                    .formatted(Formatting.RED));
+        }
+
+        if (stack.isOf(BackpackItemRegistry.GLOBAL_BACKPACK) && !Configuration.instance().enable_globalpack) {
+            tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
+                    .formatted(Formatting.BOLD)
+                    .formatted(Formatting.RED));
+        }
     }
 
     @Override

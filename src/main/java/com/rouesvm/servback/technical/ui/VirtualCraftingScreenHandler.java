@@ -42,7 +42,7 @@ public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
     public void onContentChanged(Inventory inventory) {
         CraftingScreenHandler.updateResult(
                 this,
-                (ServerWorld) this.getPlayer().getEntityWorld(),
+                (ServerWorld) this.getPlayer().getWorld(),
                 this.getPlayer(),
                 craftingInventory, resultInventory,
                 null

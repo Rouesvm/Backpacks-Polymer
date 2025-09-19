@@ -44,7 +44,7 @@ public class BackpackItemRegistry {
         return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
     }
 
-    private static Item registerBackpack(String id, Block block, BiFunction<@Nullable ServerPlayerEntity, @Nullable ItemStack, Inventory> inventoryProvider) {
+    public static Item registerBackpack(String id, Block block, BiFunction<@Nullable ServerPlayerEntity, @Nullable ItemStack, Inventory> inventoryProvider) {
         var item = new BundleGuiItem(id, block) {
             @Override
             public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {

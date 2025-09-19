@@ -105,7 +105,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     @Override
     public boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, ClickType clickType) {
         if (clickType == ClickType.RIGHT) {
-            return onUsed(player.getWorld(), player, stack);
+            return onUsed(player.getEntityWorld(), player, stack);
         } else return ClickableUpgrade.super.onClicked(player, stack, slot, clickType);
     }
 

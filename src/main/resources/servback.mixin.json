@@ -3,6 +3,7 @@
   "package": "com.rouesvm.servback.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ItemEntityMixin",
     "LivingEntityMixin",
     "ShapedRecipeMixin",
     "ShulkerBoxMixin"

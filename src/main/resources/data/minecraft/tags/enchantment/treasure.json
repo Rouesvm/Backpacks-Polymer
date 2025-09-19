@@ -1,5 +1,6 @@
 {
   "values": [
-    "serverbackpacks:capacity"
+    "serverbackpacks:capacity",
+    "serverbackpacks:link_scroller"
   ]
 }

@@ -54,12 +54,11 @@ public class ModRecipeProvider extends FabricRecipeProvider {
         RegistryWrapper.Impl<Item> itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 
         ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.ENDER_BACKPACK, 1)
-                .pattern("#i#")
+                .pattern("#N#")
                 .pattern("SES")
-                .pattern(" N ")
-                .input('#', Items.LEATHER).input('S', Items.STRING)
-                .input('i', Items.IRON_INGOT).input('E', LARGE_BACKPACKS)
-                .input('N', Items.ENDER_EYE)
+                .pattern("#N#")
+                .input('#', Items.LEATHER).input('S', Items.OBSIDIAN)
+                .input('E', LARGE_BACKPACKS).input('N', Items.ENDER_EYE)
                 .criterion("get_obsidian", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
                 .offerTo(exporter);
 
@@ -74,10 +73,11 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
         BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemJsonRegistry.getBackpackByOrder(1), 1)
-                .pattern("#S#")
-                .pattern("SCS")
-                .pattern(" # ")
-                .input('#', Items.LEATHER).input('S', Items.STRING).input('C', Items.CHEST)
+                .pattern("SiS")
+                .pattern("#C#")
+                .pattern(" S ")
+                .input('#', Items.LEATHER).input('S', Items.STRING)
+                .input('i', Items.COPPER_INGOT).input('C', Items.CHEST)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .offerTo(exporter);
 
@@ -85,18 +85,19 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .pattern("iLi")
                 .pattern("S0S")
-                .pattern(" O ")
+                .pattern("LOL")
                 .input('L', Items.LEATHER).input('S', Items.STRING)
-                .input('i', Items.IRON_INGOT).input('O', ItemTags.PLANKS)
+                .input('i', Items.GOLD_INGOT).input('O', ItemTags.PLANKS)
                 .input('0', Ingredient.ofTag(itemWrap.getOrThrow(SMALL_BACKPACKS)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack")));
 
         BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(3), 1)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
-                .pattern("ZiZ")
-                .pattern("S0S")
-                .input('Z', Items.STRING).input('i', Items.IRON_INGOT)
-                .input('S', Items.SHULKER_SHELL)
+                .pattern("LSL")
+                .pattern("i0i")
+                .pattern("SBS")
+                .input('S', Items.STRING).input('i', Items.IRON_INGOT)
+                .input('B', Items.ENDER_EYE).input('L', Items.LEATHER)
                 .input('0', Ingredient.ofTag(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "large_backpack")));
 

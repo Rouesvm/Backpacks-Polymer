@@ -22,6 +22,7 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
     public static final TagKey<Item> MEDIUM_BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "medium_backpacks"));
     public static final TagKey<Item> LARGE_BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "large_backpacks"));
 
+    public static final TagKey<Item> BLACKLISTED = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "blacklisted"));
     public static final TagKey<Item> SUPPORTED_BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "supported_backpacks"));
     public static final TagKey<Item> BACKPACKS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "backpacks"));
 
@@ -46,11 +47,15 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
         this.getTagBuilder(BACKPACKS).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.GLOBAL_BACKPACK).getIdentifier());
         this.getTagBuilder(BACKPACKS).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.ENDER_BACKPACK).getIdentifier());
 
+        this.getTagBuilder(BLACKLISTED).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.GLOBAL_BACKPACK).getIdentifier());
+        this.getTagBuilder(BLACKLISTED).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.ENDER_BACKPACK).getIdentifier());
+
         this.getTagBuilder(BACKPACKS).addOptionalTag(SMALL_BACKPACKS.id());
         this.getTagBuilder(BACKPACKS).addOptionalTag(MEDIUM_BACKPACKS.id());
         this.getTagBuilder(BACKPACKS).addOptionalTag(LARGE_BACKPACKS.id());
 
         this.getTagBuilder(SUPPORTED_BACKPACKS).addOptionalTag(MEDIUM_BACKPACKS.id());
         this.getTagBuilder(SUPPORTED_BACKPACKS).addOptionalTag(LARGE_BACKPACKS.id());
+
     }
 }

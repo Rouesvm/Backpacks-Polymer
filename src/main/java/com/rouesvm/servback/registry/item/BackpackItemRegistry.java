@@ -4,9 +4,9 @@ import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.UpgradeItem;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -23,8 +23,7 @@ public class BackpackItemRegistry {
     public static final Item ENDER_BACKPACK = registerBackpack("ender", BackpackBlockRegistry.ENDER_BACKPACK,
             (player, stack) -> player != null ? player.getEnderChestInventory() : null);
 
-    public static final Item GLOBAL_BACKPACK = registerBackpack("global", BackpackBlockRegistry.GLOBAL_BACKPACK,
-            (player, stack) -> BackpackManager.globalInventory());
+    public static final Item GLOBAL_BACKPACK = register(new ContainerItem("global", 54));
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
             new Item.Settings().maxCount(1),

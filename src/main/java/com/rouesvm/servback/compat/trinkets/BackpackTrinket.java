@@ -44,7 +44,7 @@ public class BackpackTrinket implements Trinket {
             if (uuid == null) return;
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player.getWorld(), player.getPos(), BackpackManager.getInventory(uuid))
+                    upgrade.tick(player.getEntityWorld(), player.getPos(), BackpackManager.getInventory(uuid))
             );
         }
     }
@@ -72,7 +72,7 @@ public class BackpackTrinket implements Trinket {
     }
 
     public static ActionResult tryPlaceBackpack(PlayerEntity player, World world, Hand hand, BlockHitResult blockHitResult) {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             ItemStack stack = getStackInBackSlot(player);
             if (!stack.isEmpty()
                     && player.isSneaking()

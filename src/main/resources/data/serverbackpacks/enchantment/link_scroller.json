@@ -1,0 +1,31 @@
+         {
+  "description": {
+    "translate": "enchantment.serverbackpacks.interwoven_storage",
+    "fallback": "Interwoven Storage"
+  },
+  "supported_items": "serverbackpacks:global",
+  "weight": 4,
+  "max_level": 3,
+  "min_cost": {
+    "base": 4,
+    "per_level_above_first": 7
+  },
+  "max_cost": {
+    "base": 6,
+    "per_level_above_first": 18
+  },
+  "anvil_cost": 4,
+  "slots": [
+    "any"
+  ],
+  "effects": {
+    "minecraft:projectile_spawned": [
+      {
+        "effect": {
+          "type": "minecraft:run_function",
+          "function": "empty"
+        }
+      }
+    ]
+  }
+}

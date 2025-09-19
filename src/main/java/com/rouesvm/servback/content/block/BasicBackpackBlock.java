@@ -111,7 +111,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntity
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
             if (entity == null) return ActionResult.PASS;
 

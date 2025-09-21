@@ -41,6 +41,12 @@ public class BackpackDataComponentTypes {
             "boolean"
     );
 
+    public static final ComponentType<Integer> LINK_COUNT = register(
+            ComponentType.<Integer>builder().codec(Codec.INT).packetCodec(PacketCodecs.INTEGER).build(),
+            "link_count"
+    );
+
+
     private static <T> ComponentType<T> register(ComponentType<T> type, String name) {
         var registry = Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(MOD_ID, name), type);
         PolymerComponent.registerDataComponent(registry);

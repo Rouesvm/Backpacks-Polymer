@@ -1,6 +1,5 @@
 package com.rouesvm.servback.mixin;
 
-import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
@@ -34,7 +33,7 @@ public class ItemEntityMixin {
         World world = source.getWorld();
 
         if (!world.isClient() && source.age == 60 &&
-                (source.getStack().isOf(Items.ENDER_PEARL) || source.getStack().isOf(Items.ENDER_EYE))) {
+                (source.getStack().isOf(Items.ENDER_PEARL))) {
 
             Vec3d pos = source.getPos();
             Box area = Box.of(pos, 4.0, 4.0, 4.0);
@@ -44,9 +43,7 @@ public class ItemEntityMixin {
                     itemEntity.getStack().isOf(BackpackItemRegistry.GLOBAL_BACKPACK)));
 
             int globalBackpacks = itemEntities.size();
-
             if (globalBackpacks >= 2) {
-                ServerBackpacks.LOGGER.info("Found {} global backpacks near catalyst", globalBackpacks);
                 link(itemEntities, source);
             }
         }
@@ -59,9 +56,9 @@ public class ItemEntityMixin {
         UUID firstUUID = BackpackUUID.getStackUUID(entities.get(0).getStack());
         UUID secondUUID = BackpackUUID.getStackUUID(entities.get(1).getStack());
 
-        if (firstUUID != null && firstUUID.equals(secondUUID)) {
-            return;
-        }
+        if (firstUUID != null
+                && firstUUID.equals(secondUUID)
+        ) return;
 
         ItemStack sourceBackpack = null;
         ItemStack targetBackpack = null;
@@ -75,32 +72,37 @@ public class ItemEntityMixin {
             } else if (sourceBackpack == null) sourceBackpack = entity.getStack();
         }
 
-        if (sourceBackpack != null && targetBackpack != null) {
-            UUID sourceUUID = BackpackUUID.getStackUUID(sourceBackpack);
-            targetBackpack.set(BackpackDataComponentTypes.BACKPACK_UUID, sourceUUID);
-        } else if (sourceBackpack != null) {
-            targetBackpack = entities.get(1).getStack();
-            UUID sourceUUID = BackpackUUID.getStackUUID(sourceBackpack);
-            targetBackpack.set(BackpackDataComponentTypes.BACKPACK_UUID, sourceUUID);
-        } else {
-            sourceBackpack = entities.get(0).getStack();
-            targetBackpack = entities.get(1).getStack();
-            UUID newUUID = UUID.randomUUID();
-            sourceBackpack.set(BackpackDataComponentTypes.BACKPACK_UUID, newUUID);
-            targetBackpack.set(BackpackDataComponentTypes.BACKPACK_UUID, newUUID);
+        if (checkLink(entities, sourceBackpack, targetBackpack)) performLinkingResult(catalyst);
+    }
+
+    @Unique
+    private static boolean checkLink(List<ItemEntity> entities, ItemStack sourceBackpack, ItemStack targetBackpack) {
+        if (sourceBackpack == null) {
+            sourceBackpack = entities.getFirst().getStack();
         }
+
+        if (targetBackpack == null) {
+            targetBackpack = entities.get(1).getStack();
+        }
+
+        int sourceCount = sourceBackpack.getOrDefault(BackpackDataComponentTypes.LINK_COUNT, 0);
+        if (sourceCount >= 1) return false;
 
         UUID sourceUUID = BackpackUUID.getStackUUID(sourceBackpack);
         if (sourceUUID == null) {
             sourceUUID = UUID.randomUUID();
             sourceBackpack.set(BackpackDataComponentTypes.BACKPACK_UUID, sourceUUID);
         }
+
         targetBackpack.set(BackpackDataComponentTypes.BACKPACK_UUID, sourceUUID);
 
         targetBackpack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
         sourceBackpack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
 
-        performLinkingResult(catalyst);
+        sourceBackpack.set(BackpackDataComponentTypes.LINK_COUNT, sourceCount + 1);
+        targetBackpack.set(BackpackDataComponentTypes.LINK_COUNT, sourceBackpack.get(BackpackDataComponentTypes.LINK_COUNT));
+
+        return true;
     }
 
     @Unique

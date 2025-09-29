@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public class BackpackUUID {
     public static @Nullable UUID getStackUUID(ItemStack stack) {
+        if (stack == null) return null;
+
         UUID uuid = stack.get(BackpackDataComponentTypes.BACKPACK_UUID);
 
         if (uuid == null) {

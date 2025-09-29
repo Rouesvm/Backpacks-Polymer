@@ -95,7 +95,7 @@ public class BackpackUtils {
         UUID uuid = BackpackUUID.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
         if (inventory != null) resize(player, uuid, inventory,
-                    maxBackpackSlot + addCustomData(player.getEntityWorld(), stack));
+                    maxBackpackSlot + addCustomData(player.getWorld(), stack));
     }
 
     public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory target, int totalSlots) {

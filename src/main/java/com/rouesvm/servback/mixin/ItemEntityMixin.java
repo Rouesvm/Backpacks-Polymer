@@ -30,12 +30,12 @@ public class ItemEntityMixin {
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
         ItemEntity source = (ItemEntity) (Object) this;
-        World world = source.getWorld();
+        World world = source.getEntityWorld();
 
         if (!world.isClient() && source.age == 60 &&
                 (source.getStack().isOf(Items.ENDER_PEARL))) {
 
-            Vec3d pos = source.getPos();
+            Vec3d pos = source.getEntityPos();
             Box area = Box.of(pos, 4.0, 4.0, 4.0);
 
             List<ItemEntity> itemEntities = world.getEntitiesByClass(ItemEntity.class, area, (itemEntity -> itemEntity != source &&
@@ -107,8 +107,8 @@ public class ItemEntityMixin {
 
     @Unique
     private static void performLinkingResult(ItemEntity catalyst) {
-        World world = catalyst.getWorld();
-        Vec3d pos = catalyst.getPos();
+        World world = catalyst.getEntityWorld();
+        Vec3d pos = catalyst.getEntityPos();
 
         catalyst.discard();
 

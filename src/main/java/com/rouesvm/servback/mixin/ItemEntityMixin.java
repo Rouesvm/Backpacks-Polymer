@@ -13,7 +13,7 @@ public class ItemEntityMixin {
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
         ItemEntity source = (ItemEntity) (Object) this;
-        World world = source.getEntityWorld();
+        World world = source.getWorld();
         BackpackGlobalLinker.testLink(source, world);
     }
 }

@@ -24,7 +24,7 @@ public class BackpackGlobalLinker {
         if (!world.isClient() && source.age == 60 &&
                 (source.getStack().isOf(Items.ENDER_PEARL))) {
 
-            Vec3d pos = source.getEntityPos();
+            Vec3d pos = source.getPos();
             Box area = Box.of(pos, 4.0, 4.0, 4.0);
 
             List<ItemEntity> itemEntities = world.getEntitiesByClass(ItemEntity.class, area, (itemEntity -> itemEntity != source &&
@@ -93,8 +93,8 @@ public class BackpackGlobalLinker {
     }
 
     private static void performLinkingResult(ItemEntity catalyst) {
-        World world = catalyst.getEntityWorld();
-        Vec3d pos = catalyst.getEntityPos();
+        World world = catalyst.getWorld();
+        Vec3d pos = catalyst.getPos();
 
         catalyst.discard();
 

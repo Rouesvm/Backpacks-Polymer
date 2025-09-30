@@ -54,10 +54,10 @@ public class ModRecipeProvider extends FabricRecipeProvider {
         RegistryWrapper.Impl<Item> itemWrap = wrapperLookup.getOrThrow(RegistryKeys.ITEM);
 
         ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.ENDER_BACKPACK, 1)
-                .pattern("#N#")
+                .pattern(" # ")
                 .pattern("SES")
-                .pattern("#N#")
-                .input('#', Items.LEATHER).input('S', Items.OBSIDIAN)
+                .pattern(" N ")
+                .input('#', Items.STRING).input('S', Items.OBSIDIAN)
                 .input('E', LARGE_BACKPACKS).input('N', Items.ENDER_EYE)
                 .criterion("get_obsidian", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
                 .offerTo(exporter);
@@ -67,7 +67,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .pattern("SES")
                 .pattern(" N ")
                 .input('#', Items.ENDER_EYE).input('S', Items.STRING)
-                .input('i', Items.IRON_INGOT).input('E', BackpackItemRegistry.ENDER_BACKPACK)
+                .input('i', Items.IRON_INGOT).input('E', LARGE_BACKPACKS)
                 .input('N', Items.NETHER_STAR)
                 .criterion("get_eye", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
                 .offerTo(exporter);

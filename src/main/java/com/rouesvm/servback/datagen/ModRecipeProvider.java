@@ -76,7 +76,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('L', Items.LEATHER).input('S', Items.STRING)
                 .input('i', Items.GOLD_INGOT).input('O', ItemTags.PLANKS)
                 .input('0', Ingredient.fromTag(SMALL_BACKPACKS))
-                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack")).toString());
+                .offerTo(exporter, Identifier.of(MOD_ID, "medium_backpack"));
 
         BackpackRecipeJsonBuilder.create(RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(3), 1)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
@@ -86,7 +86,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('S', Items.STRING).input('i', Items.IRON_INGOT)
                 .input('B', Items.ENDER_EYE).input('L', Items.LEATHER)
                 .input('0', Ingredient.fromTag(MEDIUM_BACKPACKS))
-                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "large_backpack")).toString());
+                .offerTo(exporter, Identifier.of(MOD_ID, "large_backpack"));
 
         upgradeRecipes(exporter);
         dyedBackpackRecipes(exporter);
@@ -173,7 +173,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input(Ingredient.fromTag(backpack))
                 .group(tier + "_dyedbackpacks")
                 .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(BackpackItemJsonRegistry.getBackpackByOrder(tier)))
-                .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)).toString());
+                .offerTo(exporter, name);
     }
     
     @Override

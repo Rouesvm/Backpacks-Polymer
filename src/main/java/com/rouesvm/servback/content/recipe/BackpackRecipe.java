@@ -50,6 +50,8 @@ public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
             int order = BackpackItemJsonRegistry.getBackpackUpgradeOrder(containerItem.getSize());
 
             ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackByOrder(id, order + 1).getDefaultStack();
+            if (upgradeStack.isEmpty()) return stack.copy();
+
             upgradeStack = upgradeStack.copy();
             upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(stack));
             upgradeStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
@@ -83,31 +85,12 @@ public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
                                 Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(BackpackRecipe::showNotification))
                                 .apply(instance, BackpackRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, BackpackRecipe> PACKET_CODEC = PacketCodec.ofStatic(Serializer::write, Serializer::read);
-
         public MapCodec<BackpackRecipe> codec() {
             return CODEC;
         }
 
         public PacketCodec<RegistryByteBuf, BackpackRecipe> packetCodec() {
             return null;
-        }
-
-        private static BackpackRecipe read(RegistryByteBuf buf) {
-            String string = buf.readString();
-            CraftingRecipeCategory craftingRecipeCategory = buf.readEnumConstant(CraftingRecipeCategory.class);
-            RawShapedRecipe rawShapedRecipe = RawShapedRecipe.PACKET_CODEC.decode(buf);
-            ItemStack itemStack = ItemStack.PACKET_CODEC.decode(buf);
-            boolean bl = buf.readBoolean();
-            return new BackpackRecipe(string, craftingRecipeCategory, rawShapedRecipe, itemStack, bl);
-        }
-
-        private static void write(RegistryByteBuf buf, BackpackRecipe recipe) {
-            buf.writeString(recipe.getGroup());
-            buf.writeEnumConstant(recipe.getCategory());
-            RawShapedRecipe.PACKET_CODEC.encode(buf, recipe.getRaw());
-            ItemStack.PACKET_CODEC.encode(buf, recipe.getResult());
-            buf.writeBoolean(recipe.showNotification());
         }
     }
 }

@@ -12,28 +12,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin implements BackInterface {
-    @Unique private double prevX = 0;
-    @Unique private double prevZ = 0;
+    @Unique private double previousX = 0;
+    @Unique private double previousZ = 0;
     @Unique private float customBodyYaw = 0;
 
     @Inject(method = "tick", at = @At("RETURN"))
     private void rotationTick(CallbackInfo ci) {
-        var self = LivingEntity.class.cast(this);
-        var isPlayer = (self instanceof PlayerEntity);
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (!(self instanceof PlayerEntity)) return;
 
-        if ((prevX != 0 && prevZ != 0) && isPlayer)
+        if ((previousX != 0 && previousZ != 0))
             backpacks$tickMovement(self);
-        else this.customBodyYaw = self.bodyYaw;
+        else this.customBodyYaw = self.getBodyYaw();
 
-        prevX = self.getX();
-        prevZ = self.getZ();
+        previousX = self.getX();
+        previousZ = self.getZ();
     }
 
     @Unique
     private void backpacks$tickMovement(final LivingEntity entity) {
         float currentYaw = entity.getYaw();
-        double dx = entity.getX() - this.prevX;
-        double dz = entity.getZ() - this.prevZ;
+        double dx = entity.getX() - previousX;
+        double dz = entity.getZ() - previousZ;
         double moveSq = dx * dx + dz * dz;
 
         float targetYaw = this.customBodyYaw;

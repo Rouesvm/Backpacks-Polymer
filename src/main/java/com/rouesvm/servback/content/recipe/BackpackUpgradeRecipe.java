@@ -40,8 +40,10 @@ public class BackpackUpgradeRecipe implements SmithingRecipe, PolymerRecipe {
 
     @Override
     public boolean matches(SmithingRecipeInput input, World world) {
+        ItemStack[] matchingStacks = this.addition().getMatchingStacks();
+        if (matchingStacks.length == 0) return false;
         boolean baseMatch = this.base().test(input.base())
-                && ItemStack.areItemsAndComponentsEqual(this.addition().getMatchingStacks()[0], input.addition());
+                && ItemStack.areItemsAndComponentsEqual(matchingStacks[0], input.addition());
 
         if (!baseMatch) return false;
 
@@ -81,8 +83,9 @@ public class BackpackUpgradeRecipe implements SmithingRecipe, PolymerRecipe {
         List<Upgrade> upgrades = new ArrayList<>(component.getBaseUpgrades());
         Upgrade upgrade = upgradeBaseItem.getUpgrade(addition);
 
-        if (upgrades.contains(upgrade)) return resultStack;
-
+        if (upgrade == null || upgrades.contains(upgrade)) {
+            return resultStack;
+        }
         upgrades.add(upgrade);
         resultStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(upgrades));
 

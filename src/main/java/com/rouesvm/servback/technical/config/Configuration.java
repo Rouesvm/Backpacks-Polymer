@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,12 +67,44 @@ public class Configuration {
 
             Instance loaded = GSON.fromJson(rawJson, Instance.class);
             if (loaded != null) {
+                instance = loaded;
+                convertOldTypeToNew(jsonObject);
                 sanitizeConfig(jsonObject);
                 replaceEntryIfInvalid();
-                instance = loaded;
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
     }
+
+    public void convertOldTypeToNew(JsonObject jsonObject) {
+        if (!jsonObject.has("types_of_backpacks")) return;
+
+        JsonObject types = jsonObject.getAsJsonObject("types_of_backpacks");
+
+        for (String keyStr : types.keySet()) {
+            JsonObject oldType = types.getAsJsonObject(keyStr);
+            if (oldType == null) continue;
+
+            int key = Integer.parseInt(keyStr);
+
+            int slots = oldType.has("slots") ? oldType.get("slots").getAsInt() : 9;
+            boolean dyeable = oldType.has("dyeable") && oldType.get("dyeable").getAsBoolean();
+
+            List<String> backpacks = new ArrayList<>();
+            if (oldType.has("name")) {
+                backpacks.add(oldType.get("name").getAsString());
+            }
+
+            List<String> dyeBlacklist = new ArrayList<>();
+            if (oldType.has("dyeBlacklist")) {
+                oldType.getAsJsonArray("dyeBlacklist").forEach(e -> dyeBlacklist.add(e.getAsString()));
+            }
+
+            if (backpacks.isEmpty()) continue;
+
+            instance.types_of_backpacks.put(key, new BackpackType(slots, dyeable, backpacks, dyeBlacklist));
+        }
+    }
+
 
     public void sanitizeConfig(JsonObject jsonObject) {
         if (jsonObject.has("enable_globalpack") && !jsonObject.get("enable_globalpack").getAsBoolean()) {
@@ -118,6 +151,7 @@ public class Configuration {
     public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist) {}
 
     public static class Instance {
+        // this is kinda stupid, in the future change to a file based system.
         @SerializedName("types_of_backpacks")
         public Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
                 1, new BackpackType(
@@ -143,11 +177,11 @@ public class Configuration {
         @SerializedName("disabled_backpacks")
         public List<String> disabled_backpacks = List.of();
 
-        @SerializedName("enable_upgrades")
-        public boolean enable_upgrades = true;
-
         @SerializedName("disabled_upgrades")
         public List<String> disabled_upgrades = List.of();
+
+        @SerializedName("enable_upgrades")
+        public boolean enable_upgrades = true;
 
         @SerializedName("placeable")
         public boolean placeable = true;

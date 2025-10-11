@@ -13,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.StackReference;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
@@ -89,10 +90,16 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
+    protected boolean canPlace(ItemPlacementContext context, BlockState state) {
+        return Configuration.instance().placeable && super.canPlace(context, state);
+    }
+
+    @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer)
         ) return ActionResult.PASS;
-        if (serverPlayer.isSneaking()
+        if (Configuration.instance().placeable
+                && serverPlayer.isSneaking()
         ) return super.useOnBlock(context);
 
         onOpenGui(serverPlayer, context.getStack());

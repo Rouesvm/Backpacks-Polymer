@@ -8,11 +8,14 @@ import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
+import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.SpecialRecipeSerializer;
@@ -22,14 +25,16 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
-    public static final RecipeSerializer<InputDefinedFilterRecipe> SERIALIZER = new InputDefinedFilterRecipe.Serializer(InputDefinedFilterRecipe::new);
+public class InputDefinedFilterRecipe extends SpecialCraftingRecipe implements PolymerRecipe {
+    public static final RecipeSerializer<InputDefinedFilterRecipe> SERIALIZER = new Serializer(InputDefinedFilterRecipe::new);
 
     public InputDefinedFilterRecipe(CraftingRecipeCategory category) {
         super(category);
@@ -75,6 +80,16 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         if (uniqueItems.isEmpty()) return ItemStack.EMPTY;
 
         return getResultStack(oldComponent, stack, uniqueItems);
+    }
+
+    @Override
+    public @Nullable Recipe<?> getPolymerReplacement(ServerPlayerEntity player) {
+        return PolymerRecipe.createCraftingRecipe(this);
+    }
+
+    @Override
+    public boolean fits(int width, int height) {
+        return true;
     }
 
     private ItemStack getResultStack(UpgradeComponent oldComponent, ItemStack center, Set<String> uniqueItems) {
@@ -126,7 +141,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         if (tagId == null) return null;
 
         TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagId);
-        var tagKey = Registries.ITEM.getOptional(tag);
+        var tagKey = Registries.ITEM.getEntryList(tag);
         if (tagKey.isEmpty()) return null;
         if (!stack.isIn(tagKey.get())) return null;
 
@@ -141,14 +156,14 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
     }
 
     private boolean hasCustomName(ItemStack stack) {
-        return stack.getCustomName() != null;
+        return stack.get(DataComponentTypes.CUSTOM_NAME) != null;
     }
 
     @Override
-    public DefaultedList<ItemStack> getRecipeRemainders(CraftingRecipeInput input) {
-        DefaultedList<ItemStack> remainders = DefaultedList.ofSize(input.size(), ItemStack.EMPTY);
+    public DefaultedList<ItemStack> getRemainder(CraftingRecipeInput input) {
+        DefaultedList<ItemStack> remainders = DefaultedList.ofSize(input.getSize(), ItemStack.EMPTY);
 
-        for (int i = 0; i < input.size(); i++) {
+        for (int i = 0; i < input.getSize(); i++) {
             ItemStack stack = input.getStackInSlot(i);
             if (stack.getItem() instanceof UpgradeItem) continue;
 

@@ -6,11 +6,11 @@ import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
-import net.minecraft.data.recipe.RecipeExporter;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.TransmuteRecipeResult;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -19,7 +19,6 @@ import net.minecraft.util.Identifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class BackpackUpgradeRecipeJsonBuilder {
     private final Ingredient base;
@@ -50,11 +49,12 @@ public class BackpackUpgradeRecipeJsonBuilder {
 
     public void offerTo(RecipeExporter exporter, RegistryKey<Recipe<?>> recipeKey) {
         this.validate(recipeKey);
-        Advancement.Builder builder = exporter.getAdvancementBuilder().criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeKey)).rewards(AdvancementRewards.Builder.recipe(recipeKey)).criteriaMerger(AdvancementRequirements.CriterionMerger.OR);
+        Advancement.Builder builder = exporter.getAdvancementBuilder().criterion("has_the_recipe",
+                RecipeUnlockedCriterion.create(recipeKey.getValue())).rewards(AdvancementRewards.Builder.recipe(recipeKey.getValue())).criteriaMerger(AdvancementRequirements.CriterionMerger.OR);
         Objects.requireNonNull(builder);
         this.criteria.forEach(builder::criterion);
-        BackpackUpgradeRecipe smithingTransformRecipe = new BackpackUpgradeRecipe(this.base, Optional.of(this.addition), new TransmuteRecipeResult(this.result));
-        exporter.accept(recipeKey, smithingTransformRecipe, builder.build(recipeKey.getValue().withPrefixedPath("recipes/" + this.category.getName() + "/")));
+        BackpackUpgradeRecipe smithingTransformRecipe = new BackpackUpgradeRecipe(this.base, this.addition, new ItemStack(this.result));
+        exporter.accept(recipeKey.getValue(), smithingTransformRecipe, builder.build(recipeKey.getValue().withPrefixedPath("recipes/" + this.category.getName() + "/")));
     }
 
     private void validate(RegistryKey<Recipe<?>> recipeKey) {

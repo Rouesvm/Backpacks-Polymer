@@ -8,18 +8,23 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
+import eu.pb4.polymer.core.api.item.PolymerRecipe;
+import eu.pb4.polymer.core.api.utils.PolymerObject;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.RawShapedRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
 
-public class BackpackRecipe extends ShapedRecipe {
+public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
     public final RawShapedRecipe raw;
     public final ItemStack result;
 
@@ -55,6 +60,11 @@ public class BackpackRecipe extends ShapedRecipe {
         return resultStack;
     }
 
+    @Override
+    public @Nullable Recipe<?> getPolymerReplacement(ServerPlayerEntity player) {
+        return PolymerRecipe.createCraftingRecipe(this);
+    }
+
     public RawShapedRecipe getRaw() {
         return raw;
     }
@@ -63,7 +73,7 @@ public class BackpackRecipe extends ShapedRecipe {
         return result;
     }
 
-    public static class Serializer implements RecipeSerializer<BackpackRecipe> {
+    public static class Serializer implements RecipeSerializer<BackpackRecipe>, PolymerObject {
         public static final MapCodec<BackpackRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 (instance) ->
                         instance.group(Codec.STRING.optionalFieldOf("group", "").forGetter(BackpackRecipe::getGroup),
@@ -73,14 +83,14 @@ public class BackpackRecipe extends ShapedRecipe {
                                 Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(BackpackRecipe::showNotification))
                                 .apply(instance, BackpackRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, BackpackRecipe> PACKET_CODEC = PacketCodec.ofStatic(BackpackRecipe.Serializer::write, BackpackRecipe.Serializer::read);
+        public static final PacketCodec<RegistryByteBuf, BackpackRecipe> PACKET_CODEC = PacketCodec.ofStatic(Serializer::write, Serializer::read);
 
         public MapCodec<BackpackRecipe> codec() {
             return CODEC;
         }
 
         public PacketCodec<RegistryByteBuf, BackpackRecipe> packetCodec() {
-            return PACKET_CODEC;
+            return null;
         }
 
         private static BackpackRecipe read(RegistryByteBuf buf) {

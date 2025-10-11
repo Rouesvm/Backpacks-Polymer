@@ -9,9 +9,8 @@ import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
@@ -47,12 +46,12 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
     }
 
     @Override
-    public void readView(ReadView data) {
+    public void readView(NbtCompound data) {
         itemFilter.readView(data);
     }
 
     @Override
-    public void writeView(WriteView data) {
+    public void writeView(NbtCompound data) {
         itemFilter.writeView(data);
     }
 
@@ -84,7 +83,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
         Vec3d target = new Vec3d(pos.toVector3f());
 
         queue.forEach(item -> {
-            Vec3d current = item.getEntityPos();
+            Vec3d current = item.getPos();
             Vec3d delta = target.subtract(current);
 
             double distance = delta.length();
@@ -131,7 +130,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
     }
 
     private void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
-        Box area = new Box(pos.add(-MAX_RANGE), pos.add(MAX_RANGE));
+        Box area = new Box(pos.add(-MAX_RANGE, -MAX_RANGE, -MAX_RANGE), pos.add(MAX_RANGE, MAX_RANGE, MAX_RANGE));
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)

@@ -9,7 +9,6 @@ import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
-import com.rouesvm.servback.technical.manager.BackpackUUID;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
@@ -18,12 +17,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -58,18 +57,18 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void writeNbt(NbtCompound view, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(view, registryLookup);
         view.putInt("extraSize", extraSize);
         if (uuid != null) view.putString("uuid", uuid.toString());
         if (upgradeList != null) view.getListAppender("upgrade", UpgradeContainerComponent.CODEC).add(UpgradeContainerComponent.of(upgradeList));
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void readNbt(NbtCompound view, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(view, registryLookup);
         extraSize = view.getInt("extraSize", 0);
-        uuid = UUID.fromString(view.getString("uuid", BackpackUUID.generateUniqueUUID().toString()));
+        uuid = UUID.fromString(view.getString("uuid"));
 
         var upgradeContainer = view.getTypedListView("upgrade", UpgradeContainerComponent.CODEC);
         Optional<UpgradeContainerComponent> upgradeContainerComponent = upgradeContainer.stream().findFirst();
@@ -85,9 +84,9 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
         if (uuid == null) return stack;
 
         DynamicRegistryManager registryManager = this.getWorld().getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
+        Optional<RegistryEntry.Reference<Enchantment>> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getEntry(CAPACITY);
 
-        stack.addEnchantment(capacity, extraSize / 9);
+        stack.addEnchantment(capacity.get(), extraSize / 9);
         stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
 
         if (upgradeList != null) {

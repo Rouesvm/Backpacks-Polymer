@@ -1,6 +1,5 @@
 package com.rouesvm.servback.technical.ui;
 
-import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -43,11 +42,6 @@ public class BasicInventoryGui extends SimpleGui {
                     .append(stack.getName())
                     .append(")");
         }
-
-        if (ServerBackpacks.isBedrock(player) && (
-                this.slots != EXISTING_SMALL_CHEST_SIZE
-                && this.slots != EXISTING_LARGE_CHEST_SIZE
-        )) title = title.copy().append(BEDROCK_ROW_MARKER + this.slots/9);
 
         this.setTitle(Text.of(title));
 

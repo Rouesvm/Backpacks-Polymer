@@ -1,6 +1,5 @@
 package com.rouesvm.servback.content.block.impl;
 
-import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
@@ -35,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.rouesvm.servback.technical.BackpackUtils.resize;
 
-public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
+public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder {
     public static final EnumProperty<DyeColor> DYE_COLOR = EnumProperty.of("dye_color", DyeColor.class);
     public static final IntProperty SLOTS = IntProperty.of("slots", 1, 3);
 

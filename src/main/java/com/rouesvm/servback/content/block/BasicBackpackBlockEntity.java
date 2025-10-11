@@ -8,9 +8,9 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -32,7 +32,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void writeNbt(NbtCompound view, RegistryWrapper.WrapperLookup registryLookup) {
         view.putInt("size", size);
 
         if (item != null)
@@ -41,21 +41,21 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void readData(ReadView view) {
-        size = view.getInt("size", 9);
+    protected void readNbt(NbtCompound view, RegistryWrapper.WrapperLookup registryLookup) {
+        size = view.getInt("size");
 
-        Optional<Integer> dyeOrdinal = view.getOptionalInt("dye");
+        Optional<Integer> dyeOrdinal = Optional.of(view.getInt("dye"));
         dyeOrdinal.ifPresent(integer -> item = BackpackItemJsonRegistry.getBackpackBySize(
                 integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)),
                 size
         ));
 
         if (item == null) {
-            Optional<String> itemString = view.getOptionalString("item");
+            Optional<String> itemString = view.getString("item").describeConstable();
             item = itemString.map(Identifier::tryParse)
                     .map(Registries.ITEM::get)
                     .orElseGet(() -> {
-                        int rawId = view.getInt("item", Registries.ITEM.getRawId(BackpackItemJsonRegistry.getBackpackBySize(size)));
+                        int rawId = view.getInt("item");
                         return Registries.ITEM.get(rawId);
                     });
         }

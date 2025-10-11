@@ -5,13 +5,9 @@ import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -54,7 +50,7 @@ public class UpgradeContainerComponent {
 
                             Upgrade upgrade = upgradeType.create();
                             if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
-                                saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
+                                saveableUpgrade.readView(data);
                             }
                             upgrades.add(upgrade);
                         }
@@ -63,11 +59,11 @@ public class UpgradeContainerComponent {
                     upgradeContainer -> {
                         Map<String, NbtCompound> out = new HashMap<>();
                         for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
-                            NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
+                            NbtCompound data = new NbtCompound();
                             if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
                                 persistentUpgrade.writeView(data);
                             }
-                            out.put(upgrade.getType().getId().toString(), data.getNbt());
+                            out.put(upgrade.getType().getId().toString(), data);
                         }
                         return out;
                     }

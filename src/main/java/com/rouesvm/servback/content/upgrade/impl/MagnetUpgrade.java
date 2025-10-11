@@ -11,13 +11,12 @@ import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Formatting;
@@ -54,12 +53,12 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     }
 
     @Override
-    public void readView(ReadView data) {
+    public void readView(NbtCompound data) {
         itemFilter.readView(data);
     }
 
     @Override
-    public void writeView(WriteView data) {
+    public void writeView(NbtCompound data) {
         itemFilter.writeView(data);
     }
 
@@ -97,7 +96,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
                         .formatted(Formatting.GREEN)
                 ), true);
 
-        player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
+        player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.NEUTRAL, 1, 1);
 
         return true;
     }
@@ -127,7 +126,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         Vec3d target = new Vec3d(pos.toVector3f());
 
         queue.forEach(item -> {
-            Vec3d current = item.getEntityPos();
+            Vec3d current = item.getPos();
             Vec3d delta = target.subtract(current);
 
             double distance = delta.length();
@@ -188,7 +187,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     }
 
     private void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
-        Box area = new Box(pos.add(-MAX_RANGE), pos.add(MAX_RANGE));
+        Box area = new Box(pos.add(-MAX_RANGE, -MAX_RANGE, -MAX_RANGE), pos.add(MAX_RANGE, MAX_RANGE, MAX_RANGE));
 
         world.getEntitiesByClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)

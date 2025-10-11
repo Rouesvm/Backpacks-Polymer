@@ -1,16 +1,15 @@
 package com.rouesvm.servback.content.block;
 
 import com.mojang.serialization.MapCodec;
-import com.rouesvm.servback.ServerBackpacks;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.Direction;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerBlock {
     public static final MapCodec<BasicPolymerBlock> CODEC = createCodec(BasicPolymerBlock::new);
@@ -21,16 +20,12 @@ public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerB
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        if (context != null && ServerBackpacks.isBedrock(context.getPlayer()))
-            return state;
+    public BlockState getPolymerBlockState(BlockState blockState) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        if (context != null && ServerBackpacks.isBedrock(context.getPlayer()))
-            return state;
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.BARRIER.getDefaultState();
     }
 

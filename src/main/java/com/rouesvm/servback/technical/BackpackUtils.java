@@ -19,6 +19,7 @@ import net.minecraft.util.collection.DefaultedList;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -75,18 +76,25 @@ public class BackpackUtils {
     public static int getExtendedSlots(ItemStack stack) {
         NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
         NbtCompound compound = component.copyNbt();
-        return 9 * compound.getInt("level", 0);
+
+        int level = compound.getInt("level");
+        return 9 * level;
     }
 
     public static int addCustomData(ServerWorld world, ItemStack stack) {
         DynamicRegistryManager registryManager = world.getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
+        Optional<RegistryEntry.Reference<Enchantment>> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT)
+                .flatMap(optional -> optional.getEntry(CAPACITY));
 
-        int level = stack.getEnchantments().getLevel(capacity);
+        int level = 1;
+        if (capacity.isPresent()) {
+            level = stack.getEnchantments().getLevel(capacity.get());
 
-        NbtCompound compound = new NbtCompound();
-        compound.putInt("level", level);
-        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
+            NbtCompound compound = new NbtCompound();
+            compound.putInt("level", level);
+            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
+
+        }
 
         return 9 * level;
     }
@@ -95,7 +103,7 @@ public class BackpackUtils {
         UUID uuid = BackpackUUID.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
         if (inventory != null) resize(player, uuid, inventory,
-                    maxBackpackSlot + addCustomData(player.getEntityWorld(), stack));
+                    maxBackpackSlot + addCustomData((ServerWorld) player.getEntityWorld(), stack));
     }
 
     public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory target, int totalSlots) {

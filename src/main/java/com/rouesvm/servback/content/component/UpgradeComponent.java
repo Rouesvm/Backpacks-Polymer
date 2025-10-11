@@ -6,13 +6,9 @@ import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Identifier;
 
 public record UpgradeComponent(Upgrade upgrade) {
@@ -27,19 +23,19 @@ public record UpgradeComponent(Upgrade upgrade) {
             Identifier.CODEC.fieldOf("id").forGetter(component ->
                     BackpackUpgradeRegistry.getRegistry().getId(component.upgrade().getType())),
             NbtCompound.CODEC.fieldOf("data").forGetter(component -> {
-                NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
+                NbtCompound data = new NbtCompound();
                 Upgrade upgrade = component.upgrade();
                 if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
                     persistentUpgrade.writeView(data);
                 }
 
-                return data.getNbt();
+                return data;
             })
             ).apply(instance, (id, data) -> {
                 UpgradeType<? extends Upgrade> type = BackpackUpgradeRegistry.get(id);
                 Upgrade upgrade = type.create();
                 if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
-                    persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
+                    persistentUpgrade.readView(data);
                 }
 
                 return UpgradeComponent.of(upgrade);

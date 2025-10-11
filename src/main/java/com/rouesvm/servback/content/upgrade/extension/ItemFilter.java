@@ -5,6 +5,7 @@ import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.storage.ReadView;
@@ -48,15 +49,15 @@ public class ItemFilter implements PersistentUpgrade {
     }
 
     @Override
-    public void readView(ReadView data) {
-        this.mode = MODE.values()[data.getInt("mode", 0)];
+    public void readView(NbtCompound data) {
+        this.mode = MODE.values()[data.getInt("mode")];
 
         ReadView.TypedListReadView<String> listReadView = data.getTypedListView("Items", Codec.STRING);
         listReadView.forEach(filterList::add);
     }
 
     @Override
-    public void writeView(WriteView data) {
+    public void writeView(NbtCompound data) {
         if (this.mode != null) data.putInt("mode", mode.ordinal());
 
         WriteView.ListAppender<String> listAppender = data.getListAppender("Items", Codec.STRING);

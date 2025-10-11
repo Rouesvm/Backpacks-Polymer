@@ -9,14 +9,16 @@ import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.world.ServerWorld;
 
 public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
     private final CraftingInventory craftingInventory = new CraftingInventory(this, 3, 3);
     private final CraftingResultInventory resultInventory = new CraftingResultInventory();
 
+    private final PlayerEntity player;
+
     public VirtualCraftingScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(syncId, playerInventory);
+        this.player = playerInventory.player;
 
         this.slots.clear();
         this.addSlot(new CraftingResultSlot(this.getPlayer(), craftingInventory, resultInventory, 0, 124, 35));
@@ -38,11 +40,15 @@ public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
         }
     }
 
+    private PlayerEntity getPlayer() {
+        return this.player;
+    }
+
     @Override
     public void onContentChanged(Inventory inventory) {
         CraftingScreenHandler.updateResult(
                 this,
-                (ServerWorld) this.getPlayer().getEntityWorld(),
+                this.getPlayer().getEntityWorld(),
                 this.getPlayer(),
                 craftingInventory, resultInventory,
                 null

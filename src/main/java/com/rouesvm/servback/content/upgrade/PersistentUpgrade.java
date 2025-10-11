@@ -1,9 +1,8 @@
 package com.rouesvm.servback.content.upgrade;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.nbt.NbtCompound;
 
 public interface PersistentUpgrade {
-    void readView(ReadView data);
-    void writeView(WriteView data);
+    void readView(NbtCompound data);
+    void writeView(NbtCompound data);
 }

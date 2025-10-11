@@ -127,7 +127,6 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     @Override
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
         if (clickType == ClickType.LEFT && otherStack.isEmpty()) {
-            setSelectedStackIndex(stack, -1);
         } else {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             Inventory inventory = getInventory(serverPlayer, stack);
@@ -151,7 +150,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                     afterChanged(stack, inventory);
                     onContentChanged(player);
                     return true;
-                } else setSelectedStackIndex(stack, -1);
+                }
             }
         }
         return false;

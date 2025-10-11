@@ -5,9 +5,7 @@ import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.alternative.BackpackListData;
-import com.rouesvm.servback.technical.data.alternative.BackpackState;
 import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
-import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -76,13 +74,6 @@ public class BackpackManager {
             instance.data_type = DATA_TYPE.LIST_FILE_DATA;
         }
 
-        if (loadState) {
-            if (BackpackState.loadData(server, instance.loaded)) {
-                instance.loaded = true;
-                instance.data_type = DATA_TYPE.MINECRAFT_STATE;
-            }
-        }
-
         if (BackpackStateUpper.loadData(server, instance.loaded)) {
             instance.loaded = true;
             instance.data_type = DATA_TYPE.OLD_MINECRAFT_STATE;
@@ -112,17 +103,11 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
             loadFallback(server, true);
         }
-
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
-        instance.globalInventory.setInventoryDirectly(globalBackpackState.globalInventory.heldStacks());
     }
 
     public static void saveData() {
         BackpackData.setStoredInventories(instance.backpackInstances());
         BackpackData.save(server());
-
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server());
-        globalBackpackState.globalInventory = instance.globalInventory;
     }
 
     //

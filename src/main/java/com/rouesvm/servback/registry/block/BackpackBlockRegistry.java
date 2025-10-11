@@ -3,7 +3,6 @@ package com.rouesvm.servback.registry.block;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.impl.BackpackBlock;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
@@ -19,9 +18,7 @@ public class BackpackBlockRegistry {
     public static final Block ENDER_BACKPACK = registerBackpack("ender_backpack",
             (player, entity) -> player != null ? player.getEnderChestInventory() : null);
 
-    public static final Block GLOBAL_BACKPACK = registerBackpack("global_backpack",
-            (player, entity) -> BackpackManager.globalInventory());
-
+    public static final Block GLOBAL_BACKPACK = register("global_backpack", new BackpackBlock());
     public static final Block BACKPACK = register("backpack", new BackpackBlock());
 
     private static Block registerBackpack(String id, BiFunction<@Nullable ServerPlayerEntity, @Nullable BlockEntity, Inventory> inventoryProvider) {

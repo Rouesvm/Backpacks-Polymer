@@ -4,8 +4,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.util.collection.DefaultedList;
 
 public class BaseInventory implements Inventory, RecipeInputProvider {
@@ -87,8 +87,8 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder finder) {
-        for(ItemStack itemStack : this.heldStacks) {
+    public void provideRecipeInputs(RecipeMatcher finder) {
+        for(ItemStack itemStack : this.heldStacks()) {
             finder.addInput(itemStack);
         }
     }
@@ -150,8 +150,8 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return canInsert(stack);
     }
 
-    public static boolean isFull(Inventory inventory) {
-        for (ItemStack stack : inventory) {
+    public static boolean isFull(BaseInventory inventory) {
+        for (ItemStack stack : inventory.heldStacks()) {
             if (stack.isEmpty() || stack.getCount() < stack.getMaxCount()) {
                 return false;
             }
@@ -159,12 +159,12 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return true;
     }
 
-    public static boolean canInsert(ItemStack stack, Inventory inventory) {
+    public static boolean canInsert(ItemStack stack, BaseInventory inventory) {
         boolean bl = false;
 
         if (!stack.getItem().canBeNested()) return false;
 
-        for(ItemStack itemStack : inventory) {
+        for(ItemStack itemStack : inventory.heldStacks()) {
             if (itemStack.isEmpty()  || ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() < itemStack.getMaxCount()) {
                 bl = true;
                 break;

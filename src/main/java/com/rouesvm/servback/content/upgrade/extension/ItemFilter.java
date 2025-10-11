@@ -1,15 +1,14 @@
 package com.rouesvm.servback.content.upgrade.extension;
 
-import com.mojang.serialization.Codec;
 import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
 
 import java.util.Set;
@@ -52,20 +51,34 @@ public class ItemFilter implements PersistentUpgrade {
     public void readView(NbtCompound data) {
         this.mode = MODE.values()[data.getInt("mode")];
 
-        ReadView.TypedListReadView<String> listReadView = data.getTypedListView("Items", Codec.STRING);
-        listReadView.forEach(filterList::add);
+        filterList.clear();
+
+        if (data.contains("Items", NbtElement.LIST_TYPE)) {
+            NbtList items = data.getList("Items", NbtElement.COMPOUND_TYPE);
+            for (int i = 0; i < items.size(); i++) {
+                String itemStr = items.getCompound(i).getString("item");
+                if (!itemStr.isEmpty()) filterList.add(itemStr);
+            }
+        }
     }
 
     @Override
     public void writeView(NbtCompound data) {
         if (this.mode != null) data.putInt("mode", mode.ordinal());
 
-        WriteView.ListAppender<String> listAppender = data.getListAppender("Items", Codec.STRING);
+        NbtList items = new NbtList();
         filterList.stream()
-                .filter((string) -> !string.isEmpty())
-                .forEach(listAppender::add);
+                .filter(s -> !s.isEmpty())
+                .map(s -> {
+                    NbtCompound nbt = new NbtCompound();
+                    nbt.putString("item", s);
+                    return nbt;
+                })
+                .forEach(items::add);
 
-        if (listAppender.isEmpty()) data.remove("Items");
+        if (!items.isEmpty())
+            data.put("Items", items);
+        else data.remove("Items");
     }
 
     public Set<String> filterList() {

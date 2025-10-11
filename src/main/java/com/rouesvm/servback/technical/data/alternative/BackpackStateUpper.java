@@ -1,18 +1,16 @@
 package com.rouesvm.servback.technical.data.alternative;
 
-import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.collection.DefaultedList;
@@ -28,8 +26,6 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 public class BackpackStateUpper {
-    // The 1.21.1 way of loading data.
-
     public static boolean loadData(MinecraftServer server, boolean hasLoaded) {
         if (!hasLoaded) {
             return isDataPresent(server);
@@ -65,8 +61,8 @@ public class BackpackStateUpper {
 
     private static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
         return new BackpackInstance(
-                Uuids.toUuid(compound.getIntArray("uuid").get()),
-                loadInventory(compound.getCompound("contents").get(), registryLookup)
+                Uuids.toUuid(compound.getIntArray("uuid")),
+                loadInventory(compound.getCompound("contents"), registryLookup)
         );
     }
 
@@ -75,12 +71,12 @@ public class BackpackStateUpper {
 
         var data = nbt.get("data");
         if (data instanceof NbtCompound compound) {
-            Optional<NbtList> list = compound.getList("backpackContents");
+            NbtList list = compound.getList("backpackContents", NbtElement.COMPOUND_TYPE);
 
-            list.ifPresent(nbtElements -> nbtElements.forEach(element ->
-                    instances.add(load((NbtCompound) element, registryLookup))));
+            list.forEach(element ->
+                    instances.add(load((NbtCompound) element, registryLookup)));
 
-            Optional<NbtCompound> globalNbt = compound.getCompound("global");
+            Optional<NbtCompound> globalNbt = Optional.ofNullable(compound.getCompound("global"));
             if (globalNbt.isPresent()) {
                 BackpackInventory globalInventory = loadInventory(globalNbt.get(), registryLookup);
                 BackpackManager.setGlobalInventory(globalInventory.heldStacks());
@@ -92,7 +88,7 @@ public class BackpackStateUpper {
 
     private static BackpackInventory loadInventory(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
         DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
-        Inventories.readData(NbtReadView.create(new ErrorReporter.Logging(ServerBackpacks.LOGGER), registryLookup, nbtCompound), itemStacks);
+        Inventories.readNbt(nbtCompound, itemStacks, registryLookup);
         return new BackpackInventory(itemStacks);
     }
 }

@@ -111,7 +111,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             if (!itemStack.getItem().canBeNested()) return false;
 
             if (clickType == ClickType.LEFT && !itemStack.isEmpty()) {
-                if (BaseInventory.canInsert(itemStack, inventory)) {
+                if (BaseInventory.canInsert(itemStack, (BaseInventory) inventory)) {
                     itemStack = BaseInventory.addStack(itemStack, inventory);
                     ContainerItem.playInsertSound(serverPlayer, 0.8F);
                 } else ContainerItem.playInsertFailSound(serverPlayer);
@@ -141,7 +141,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
             if (inventory != null) {
                 if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
-                    if (BaseInventory.canInsert(otherStack, inventory)) {
+                    if (BaseInventory.canInsert(otherStack, (BaseInventory) inventory)) {
                         otherStack = BaseInventory.addStack(otherStack, inventory);
                         ContainerItem.playInsertSound(serverPlayer, 0.8F);
                     } else ContainerItem.playInsertFailSound(serverPlayer);

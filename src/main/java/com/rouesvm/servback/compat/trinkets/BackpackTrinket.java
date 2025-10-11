@@ -73,6 +73,8 @@ public class BackpackTrinket implements Trinket {
 
     public static ActionResult tryPlaceBackpack(PlayerEntity player, World world, Hand hand, BlockHitResult blockHitResult) {
         if (!world.isClient()) {
+            if (!Configuration.instance().placeable) return ActionResult.PASS;
+
             ItemStack stack = getStackInBackSlot(player);
             if (!stack.isEmpty()
                     && player.isSneaking()

@@ -5,6 +5,7 @@ import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.block.TickableBlockEntity;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
@@ -28,7 +29,6 @@ import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,7 +67,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
     }
 
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return ScreenHandler.calculateComparatorOutput(getInventory(
                 null, world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY).get()
         ));
@@ -80,6 +80,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 
         ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
+        stack.set(BackpackDataComponentTypes.IS_3D, true);
         BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
         BackpackTrinket.equipStack(player, stack);
         world.breakBlock(pos, false);

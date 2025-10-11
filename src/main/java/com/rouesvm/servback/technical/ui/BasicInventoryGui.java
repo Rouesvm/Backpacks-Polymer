@@ -1,6 +1,5 @@
 package com.rouesvm.servback.technical.ui;
 
-import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.inventory.Inventory;
@@ -12,11 +11,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public class BasicInventoryGui extends SimpleGui {
-    private static final String BEDROCK_ROW_MARKER = "chest.row.";
-
-    private static final int EXISTING_SMALL_CHEST_SIZE = 9*3;
-    private static final int EXISTING_LARGE_CHEST_SIZE = 9*6;
-
     protected final ItemStack stack;
     protected final Inventory inventory;
 
@@ -36,7 +30,6 @@ public class BasicInventoryGui extends SimpleGui {
         Text title = Text.translatable("item.serverbackpacks.gui_backpack");
 
         if (this.stack != null) {
-            stack.set(BackpackDataComponentTypes.IS_OPENED, true);
             title = title.copy()
                     .append(" (")
                     .append(stack.getName())

@@ -57,8 +57,6 @@ public class BackpackGui extends BasicInventoryGui {
 
     @Override
     public void onClose() {
-        if (stack != null) stack.set(BackpackDataComponentTypes.IS_OPENED, false);
-
         ScreenHandler handler = this.getPlayer().currentScreenHandler;
 
         handler.enableSyncing();

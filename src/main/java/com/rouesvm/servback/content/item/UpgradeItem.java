@@ -23,6 +23,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class UpgradeItem extends SimplePolymerItem {
     public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, @Nullable ServerPlayerEntity player) {
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
         Upgrade upgrade = upgradeItem.getUpgrade(stack);
-        if (upgrade != null) upgrade.addTooltip(tooltip, stack, player);
+        if (upgrade != null) upgrade.addTooltip(tooltip, stack, PacketContext.of(player));
 
         if (Configuration.isDisabled(stack.getItem())
         ) tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")

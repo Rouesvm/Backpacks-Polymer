@@ -149,10 +149,10 @@ public class BackpackData {
             );
 
             Optional<NbtElement> result = data.result();
-            if (result.isPresent() && result.get().asCompound().isPresent()) {
+            if (result.isPresent()) {
                 try (OutputStream os = Files.newOutputStream(tempFile,
                         StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
-                    NbtIo.writeCompressed(result.get().asCompound().get(), os);
+                    NbtIo.writeCompressed((NbtCompound) result.get(), os);
                 }
 
                 Files.move(tempFile, targetFile,

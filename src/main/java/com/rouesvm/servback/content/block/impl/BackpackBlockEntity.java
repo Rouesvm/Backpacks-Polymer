@@ -18,6 +18,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -61,19 +63,28 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
         super.writeNbt(view, registryLookup);
         view.putInt("extraSize", extraSize);
         if (uuid != null) view.putString("uuid", uuid.toString());
-        if (upgradeList != null) view.getListAppender("upgrade", UpgradeContainerComponent.CODEC).add(UpgradeContainerComponent.of(upgradeList));
+
+        if (upgradeList != null && !upgradeList.isEmpty()) {
+            NbtCompound upgradeCompound = new NbtCompound();
+            upgradeCompound.put("upgrades", UpgradeContainerComponent.CODEC.encodeStart(
+                    registryLookup.getOps(NbtOps.INSTANCE), UpgradeContainerComponent.of(upgradeList)).getOrThrow());
+            view.put("upgrade", upgradeCompound);
+        }
     }
 
     @Override
     protected void readNbt(NbtCompound view, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(view, registryLookup);
-        extraSize = view.getInt("extraSize", 0);
-        uuid = UUID.fromString(view.getString("uuid"));
 
-        var upgradeContainer = view.getTypedListView("upgrade", UpgradeContainerComponent.CODEC);
-        Optional<UpgradeContainerComponent> upgradeContainerComponent = upgradeContainer.stream().findFirst();
-        if (!upgradeContainer.isEmpty() && upgradeContainerComponent.isPresent()) {
-            upgradeList = upgradeContainerComponent.get().getBaseUpgrades();
+        extraSize = view.getInt("extraSize");
+
+        if (view.contains("uuid", NbtElement.STRING_TYPE)
+        ) uuid = UUID.fromString(view.getString("uuid"));
+
+        if (view.contains("upgrades")) {
+            var dataResult = UpgradeContainerComponent.CODEC.decode(registryLookup.getOps(NbtOps.INSTANCE), view.get("upgrades"));
+            UpgradeContainerComponent container = dataResult.getOrThrow().getFirst();
+            upgradeList = container.getBaseUpgrades();
         }
 
         setStorage();

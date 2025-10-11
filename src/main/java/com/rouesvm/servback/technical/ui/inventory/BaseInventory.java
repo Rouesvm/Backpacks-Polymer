@@ -108,7 +108,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     public static ItemStack addStack(ItemStack stack, Inventory inventory) {
         if (stack.isEmpty()) {
             return ItemStack.EMPTY;
-        } else if (!canInsert(stack, inventory)) {
+        } else if (!canInsert(stack, (BaseInventory) inventory)) {
                 return ItemStack.EMPTY;
         } else {
             ItemStack itemStack = stack.copy();

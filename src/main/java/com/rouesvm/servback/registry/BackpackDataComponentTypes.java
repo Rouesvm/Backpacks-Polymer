@@ -47,8 +47,8 @@ public class BackpackDataComponentTypes {
             "uuid"
     );
 
-    public static final ComponentType<Boolean> IS_OPENED = register(
-            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOLEAN).build(),
+    public static final ComponentType<Boolean> IS_3D = register(
+            ComponentType.<Boolean>builder().codec(Codec.BOOL).packetCodec(PacketCodecs.BOOL).build(),
             "boolean"
     );
 

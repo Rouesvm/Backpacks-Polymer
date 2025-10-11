@@ -1,6 +1,7 @@
 package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
@@ -20,12 +21,9 @@ public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, Pol
     private final PolymerModelData customModelId;
     private final PolymerModelData customModelId3D;
 
-    private final Item vanillaItem;
-
     public BasicPolymerBlockItem(String name, Item vanillaItem, Block block) {
         super(block, new Settings().maxCount(1));
         this.id = Identifier.of(ServerBackpacks.MOD_ID, name);
-        this.vanillaItem = vanillaItem;
         this.customModelId = PolymerResourcePackUtils.requestModel(vanillaItem,
                 Identifier.of(ServerBackpacks.MOD_ID, "item/" + getIdentifier().getPath()));
         this.customModelId3D = PolymerResourcePackUtils.requestModel(vanillaItem,
@@ -34,13 +32,17 @@ public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, Pol
     }
 
     @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity serverPlayerEntity) {
-        return this.vanillaItem;
+    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        if (itemStack.getOrDefault(BackpackDataComponentTypes.IS_3D, false))
+            return this.customModelId3D.item();
+        return this.customModelId.item();
     }
 
     @Override
     public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return customModelId.value();
+        if (itemStack.getOrDefault(BackpackDataComponentTypes.IS_3D, false))
+            return this.customModelId3D.value();
+        return this.customModelId.value();
     }
 
     public Identifier getIdentifier() {

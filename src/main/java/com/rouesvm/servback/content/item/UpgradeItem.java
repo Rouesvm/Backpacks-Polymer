@@ -1,7 +1,5 @@
 package com.rouesvm.servback.content.item;
 
-import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.compat.geyser.bedrock.BedrockItem;
 import com.rouesvm.servback.content.component.UpgradeComponent;
 import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
@@ -13,47 +11,35 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
-import xyz.nucleoid.packettweaker.PacketContext;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
+public class UpgradeItem extends SimplePolymerItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
-        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId().withSuffixedPath("_upgrade")))
-                        .component(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgradeType.create())),
-                Items.POISONOUS_POTATO, true
-        );
+        super(settings.component(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgradeType.create())),
+                Items.POISONOUS_POTATO);
         this.upgradeType = upgradeType;
     }
 
     @Override
-    public Item getPolymerItem(ItemStack stack, PacketContext context) {
-        if (ServerBackpacks.isBedrock(context.getPlayer()))
-            return this;
-        else return super.getPolymerItem(stack, context);
-    }
-
-    @Override
-    public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
+    public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, @Nullable ServerPlayerEntity player) {
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
         Upgrade upgrade = upgradeItem.getUpgrade(stack);
-        if (upgrade != null) upgrade.addTooltip(tooltip, stack, context);
+        if (upgrade != null) upgrade.addTooltip(tooltip, stack, player);
 
         if (Configuration.isDisabled(stack.getItem())
         ) tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
@@ -76,7 +62,7 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
 
@@ -88,11 +74,13 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
         if (successful) {
             NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
             NbtCompound compound = component.copyNbt();
-            compound.putBoolean("update", !compound.getBoolean("update", false));
+
+            boolean update = !compound.getBoolean("update");
+            compound.putBoolean("update", update);
 
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
 
-            return ActionResult.SUCCESS_SERVER;
+            return TypedActionResult.success(stack, true);
         } else return super.use(world, player, hand);
     }
 

@@ -49,7 +49,6 @@ dependencies {
     modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
     modCompileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
-    compileOnly("org.geysermc.geyser:api:${project.geyser}")
 }
 
 processResources {

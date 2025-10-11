@@ -22,27 +22,20 @@ import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
-
-import static net.minecraft.item.BundleItem.setSelectedStackIndex;
-
 public class BundleGuiItem extends BasicPolymerBlockItem  {
     public BundleGuiItem(String name, Block block) {
         super(name, Items.LEATHER, block);
     }
 
     @Override
-    public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
+    public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, @Nullable ServerPlayerEntity player) {
         if (Configuration.isDisabled(stack.getItem())
         ) tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
                 .formatted(Formatting.BOLD)
@@ -55,8 +48,8 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             blockEntity.setItem(this);
             blockEntity.setSize(BackpackUtils.getExtendedSlots(stack));
 
-            if (stack.getCustomName() != null
-            ) blockEntity.setCustomName(stack.getCustomName());
+            if (stack.getName() != null
+            ) blockEntity.setCustomName(stack.getName());
 
             blockEntity.markDirty();
             ContainerItem.playOpenSound((ServerPlayerEntity) player);
@@ -65,28 +58,27 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         return writeNbtToBlockEntity(world, player, pos, stack);
     }
 
-
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
         var cast = player.raycast(5,0,false);
         if (!(player instanceof ServerPlayerEntity serverPlayer)
-        ) return ActionResult.PASS;
+        ) return TypedActionResult.pass(stack);
 
         if (cast.getType() == HitResult.Type.BLOCK
-        ) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        ) return TypedActionResult.pass(stack);
 
         if (player.isSneaking()) {
             if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null) {
                 new UpgradeContainerGui(serverPlayer, stack);
-                return ActionResult.SUCCESS;
-            } else return ActionResult.PASS;
+                return TypedActionResult.success(stack);
+            } else return TypedActionResult.pass(stack);
         }
 
         onOpenGui(serverPlayer, stack);
         player.swingHand(hand, true);
-        return ActionResult.SUCCESS;
+        return TypedActionResult.success(stack);
     }
 
     @Override

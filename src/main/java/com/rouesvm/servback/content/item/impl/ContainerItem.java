@@ -64,6 +64,8 @@ public class ContainerItem extends BundleGuiItem {
 
         addUpgradeTooltip(tooltip, stack);
         addInventoryTooltip(tooltip, stack);
+
+        super.modifyClientTooltip(tooltip, stack, player);
     }
 
     @Override

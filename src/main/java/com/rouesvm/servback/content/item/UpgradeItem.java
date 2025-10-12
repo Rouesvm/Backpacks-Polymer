@@ -7,10 +7,13 @@ import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.config.Configuration;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -29,11 +32,23 @@ import java.util.List;
 
 public class UpgradeItem extends SimplePolymerItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
+    private final PolymerModelData customModelId;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
         super(settings.component(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgradeType.create())),
                 Items.POISONOUS_POTATO);
         this.upgradeType = upgradeType;
+        this.customModelId = PolymerResourcePackUtils.requestModel(Items.POISONOUS_POTATO,  upgradeType.getId().withSuffixedPath("_upgrade").withPrefixedPath("item/"));
+    }
+
+    @Override
+    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return this.customModelId.value();
+    }
+
+    @Override
+    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return this.customModelId.item();
     }
 
     @Override

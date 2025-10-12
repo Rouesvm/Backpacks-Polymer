@@ -56,6 +56,7 @@ dependencies {
     modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
     modImplementation ("eu.pb4:polymer-virtual-entity:${project.polymer}")
     modImplementation include("eu.pb4:sgui:${project.sgui}")
+    modImplementation include("eu.pb4:common-protection-api:1.0.0")
     modImplementation include("xyz.nucleoid:server-translations-api:${project.server_translations}")
     modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 

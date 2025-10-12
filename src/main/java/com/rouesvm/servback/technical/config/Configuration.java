@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
-import org.joml.Vector3f;
 
 import java.io.File;
 import java.io.FileReader;
@@ -160,26 +159,5 @@ public class Configuration {
 
         @SerializedName("display_back")
         public boolean display_back = true;
-
-        @SerializedName("back_positions")
-        public Map<Integer, Vector3f> back_positions = createMap(Map.of(
-                1, new Vector3f(0, -0.45f, 0.280f),
-                2, new Vector3f(0, -0.65f, 0.280f),
-                3, new Vector3f(0, -0.65f, 0.280f)
-        ));
-
-        @SerializedName("back_yaw")
-        public Map<Integer, Integer> back_yaw = createMap(Map.of(
-                1, 180,
-                2, 180,
-                3, 180
-        ));
-
-        @SerializedName("back_pitch_when_sneaking")
-        public Map<Integer, Integer> back_pitch_when_sneaking = createMap(Map.of(
-                1, -25,
-                2, -25,
-                3, -25
-        ));
     }
 }

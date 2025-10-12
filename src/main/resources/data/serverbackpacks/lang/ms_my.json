@@ -15,6 +15,7 @@
   "item.serverbackpacks.light_gray_small": "Beg Kecil Kelabu Muda",
   "item.serverbackpacks.black_small": "Beg Kecil Hitam",
   "item.serverbackpacks.gray_small": "Beg Kecil Kelabu",
+  "item.serverbackpacks.brown_small": "Beg Kecil Perang",
 
   "item.serverbackpacks.medium" : "Beg Sederhana",
   "item.serverbackpacks.red_medium": "Beg Sederhana Merah",
@@ -32,6 +33,7 @@
   "item.serverbackpacks.light_gray_medium": "Beg Sederhana Kelabu Muda",
   "item.serverbackpacks.black_medium": "Beg Sederhana Hitam",
   "item.serverbackpacks.gray_medium": "Beg Sederhana Kelabu",
+  "item.serverbackpacks.brown_medium": "Beg Sederhana Perang",
 
   "item.serverbackpacks.large" : "Beg Besar",
   "item.serverbackpacks.red_large": "Beg Besar Merah",
@@ -49,6 +51,7 @@
   "item.serverbackpacks.light_gray_large": "Beg Besar Kelabu Muda",
   "item.serverbackpacks.black_large": "Beg Besar Hitam",
   "item.serverbackpacks.gray_large": "Beg Besar Kelabu",
+  "item.serverbackpacks.brown_large": "Beg Besar Perang",
 
   "item.serverbackpacks.global" : "Beg Global",
   "item.serverbackpacks.ender" : "Beg Ender",

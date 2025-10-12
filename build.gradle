@@ -20,6 +20,17 @@ repositories {
 loom {
     splitEnvironmentSourceSets()
 
+    runs {
+        data {
+            client()
+            name "Data Generator"
+            vmArg "-Dfabric-api.datagen=true"
+            vmArg "-Dfabric-api.datagen.output-dir=src/generated/resources/"
+            vmArg "-Dfabric-api.datagen.modid=serverbackpacks"
+            runDir "build/datagen"
+        }
+    }
+
     mods {
         "serverbackpacks" {
             sourceSet sourceSets.main

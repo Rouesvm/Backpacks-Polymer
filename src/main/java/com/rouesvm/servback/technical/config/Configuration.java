@@ -20,14 +20,10 @@ import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class Configuration {
     public static Configuration manager;
-
-    public static final Instance defaultInstance = new Instance();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final File configFile;
     public Instance instance = new Instance();
-
-    private final int maxSlots = 9 * 6;
 
     public static void initialize() {
         manager = new Configuration(MOD_ID + ".json");
@@ -66,7 +62,6 @@ public class Configuration {
             Instance loaded = GSON.fromJson(rawJson, Instance.class);
             if (loaded != null) {
                 sanitizeConfig(jsonObject);
-                replaceEntryIfInvalid();
                 instance = loaded;
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
@@ -80,22 +75,6 @@ public class Configuration {
         if (jsonObject.has("enable_enderpack") && !jsonObject.get("enable_enderpack").getAsBoolean()) {
             instance.disabled_backpacks.add("ender");
         }
-    }
-
-    public void replaceEntryIfInvalid() {
-        instance.types_of_backpacks.replaceAll((key, value) -> {
-            boolean invalid = value.slots > maxSlots || value.backpacks == null || value.dyeBlacklist == null;
-            if (invalid) return defaultInstance.types_of_backpacks.getOrDefault(
-                    key,
-                    new BackpackType(
-                            key * 9,
-                            true,
-                            value.backpacks != null ? value.backpacks : List.of("unknown"),
-                            List.of("brown")
-                    )
-            );
-            else return value;
-        });
     }
 
     public static boolean isDisabled(Item item) {
@@ -117,28 +96,6 @@ public class Configuration {
     public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist) {}
 
     public static class Instance {
-        @SerializedName("types_of_backpacks")
-        public Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
-                1, new BackpackType(
-                        9,
-                        true,
-                        List.of("small"),
-                        List.of("brown")
-                ),
-                2, new BackpackType(
-                        18,
-                        true,
-                        List.of("medium"),
-                        List.of("brown")
-                ),
-                3, new BackpackType(
-                        27,
-                        true,
-                        List.of("large"),
-                        List.of("brown")
-                )
-        ));
-
         @SerializedName("disabled_backpacks")
         public List<String> disabled_backpacks = List.of();
 

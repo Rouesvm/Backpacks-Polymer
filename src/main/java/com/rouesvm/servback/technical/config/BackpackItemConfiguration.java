@@ -29,25 +29,26 @@ public class BackpackItemConfiguration {
             BackCosmetic cosmetic
     ) {}
 
+    public static final BackCosmetic DEFAULT_COSMETIC = new BackCosmetic(new Vector3f(0, -0.45f, 0.280f), 180, -25);
+
     public static final BackpackDefinedType DEFAULT_SMALL =  new BackpackDefinedType(
             "small", "medium",
             9, true,
             List.of(),
-            new BackCosmetic(new Vector3f(0, -0.45f, 0.280f), 180, -25)
+            DEFAULT_COSMETIC
     );
     public static final BackpackDefinedType DEFAULT_MEDIUM =  new BackpackDefinedType(
             "medium", "large",
             18, true,
             List.of(),
-            new BackCosmetic(new Vector3f(0, -0.45f, 0.280f), 180, -25)
+            DEFAULT_COSMETIC
     );
     public static final BackpackDefinedType DEFAULT_LARGE =  new BackpackDefinedType(
             "large", "",
             27, true,
             List.of(),
-            new BackCosmetic(new Vector3f(0, -0.45f, 0.280f), 180, -25)
+            DEFAULT_COSMETIC
     );
-
 
     public static BackpackItemConfiguration manager;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -139,10 +140,39 @@ public class BackpackItemConfiguration {
         }
     }
 
+    public void saveDefinedBackpacks() {
+        if (!Files.exists(configDir)) {
+            try {
+                Files.createDirectories(configDir);
+            } catch (IOException e) {
+                ServerBackpacks.LOGGER.error("Failed to create config directory: {}", e.getMessage());
+                return;
+            }
+        }
+
+        for (BackpackDefinedType type : backpackTypes) {
+            Path file = configDir.resolve(type.backpack() + ".json");
+
+            try (FileWriter writer = new FileWriter(file.toFile())) {
+                GSON.toJson(type, writer);
+                ServerBackpacks.LOGGER.info("Saved backpack config: {}", file.getFileName());
+            } catch (IOException e) {
+                ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", type.backpack(), e.getMessage());
+            }
+        }
+    }
+
     public static void initialize() {
         manager = new BackpackItemConfiguration();
-        manager.createDefaultFiles();
-        manager.loadAllBackpacks();
+
+        List<BackpackDefinedType> definedTypes = BackpackConfigurationFixer.convertOldConfigToNew();
+        if (definedTypes.isEmpty()) {
+            manager.createDefaultFiles();
+            manager.loadAllBackpacks();
+        } else {
+            manager.backpackTypes = definedTypes;
+            manager.saveDefinedBackpacks();
+        }
 
         if (manager.backpackTypes.isEmpty()) {
             ServerBackpacks.LOGGER.warn("No valid backpack configs found even after defaults.");

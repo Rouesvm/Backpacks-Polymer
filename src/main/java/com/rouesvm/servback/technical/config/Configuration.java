@@ -12,9 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
@@ -24,6 +23,8 @@ public class Configuration {
 
     private final File configFile;
     public Instance instance = new Instance();
+
+    public List<BackpackType> backpackTypes = new ArrayList<>();
 
     public static void initialize() {
         manager = new Configuration(MOD_ID + ".json");
@@ -62,9 +63,71 @@ public class Configuration {
             Instance loaded = GSON.fromJson(rawJson, Instance.class);
             if (loaded != null) {
                 sanitizeConfig(jsonObject);
+                convertTypesToList(jsonObject);
+                convertOldTypeToList(jsonObject);
                 instance = loaded;
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
+    }
+
+    public void convertTypesToList(JsonObject jsonObject) {
+        if (!jsonObject.has("types_of_backpacks")) return;
+
+        JsonObject types = jsonObject.getAsJsonObject("types_of_backpacks");
+
+        for (String keyStr : types.keySet()) {
+            JsonObject oldType = types.getAsJsonObject(keyStr);
+            if (oldType == null) continue;
+
+            int key = Integer.parseInt(keyStr);
+
+            int slots = oldType.has("slots") ? oldType.get("slots").getAsInt() : 9;
+            boolean dyeable = oldType.has("dyeable") && oldType.get("dyeable").getAsBoolean();
+
+            List<String> backpacks = new ArrayList<>();
+            if (oldType.has("backpacks")) {
+                oldType.getAsJsonArray("backpacks").forEach((string) -> backpacks.add(string.getAsString()));
+            }
+
+            List<String> dyeBlacklist = new ArrayList<>();
+            if (oldType.has("dyeBlacklist")) {
+                oldType.getAsJsonArray("dyeBlacklist").forEach(e -> dyeBlacklist.add(e.getAsString()));
+            }
+
+            if (backpacks.isEmpty()) continue;
+
+            backpackTypes.add(new BackpackType(slots, dyeable, backpacks, dyeBlacklist, key));
+        }
+    }
+
+    public void convertOldTypeToList(JsonObject jsonObject) {
+        if (!jsonObject.has("types_of_backpacks")) return;
+
+        JsonObject types = jsonObject.getAsJsonObject("types_of_backpacks");
+
+        for (String keyStr : types.keySet()) {
+            JsonObject oldType = types.getAsJsonObject(keyStr);
+            if (oldType == null) continue;
+
+            int key = Integer.parseInt(keyStr);
+
+            int slots = oldType.has("slots") ? oldType.get("slots").getAsInt() : 9;
+            boolean dyeable = oldType.has("dyeable") && oldType.get("dyeable").getAsBoolean();
+
+            List<String> backpacks = new ArrayList<>();
+            if (oldType.has("name")) {
+                backpacks.add(oldType.get("name").getAsString());
+            }
+
+            List<String> dyeBlacklist = new ArrayList<>();
+            if (oldType.has("dyeBlacklist")) {
+                oldType.getAsJsonArray("dyeBlacklist").forEach(e -> dyeBlacklist.add(e.getAsString()));
+            }
+
+            if (backpacks.isEmpty()) continue;
+
+            backpackTypes.add(new BackpackType(slots, dyeable, backpacks, dyeBlacklist, key));
+        }
     }
 
     public void sanitizeConfig(JsonObject jsonObject) {
@@ -89,11 +152,7 @@ public class Configuration {
                 || Configuration.instance().disabled_upgrades.contains(removeNamespace);
     }
 
-    public static <K, V> LinkedHashMap<K, V> createMap(Map<K, V> map) {
-        return new LinkedHashMap<>(map);
-    }
-
-    public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist) {}
+    public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist, int tier) {}
 
     public static class Instance {
         @SerializedName("disabled_backpacks")

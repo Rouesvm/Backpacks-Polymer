@@ -1,7 +1,9 @@
 package com.rouesvm.servback.technical.data;
 
+import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
@@ -9,6 +11,8 @@ import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.codecs.InventoryData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import net.minecraft.SharedConstants;
+import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
@@ -109,6 +113,45 @@ public class BackpackData {
         } else save(server);
 
         return false;
+    }
+
+    private static void applyDataFixToItemStacks(MinecraftServer server, NbtCompound root, int oldVersion, int newVersion) {
+        DataFixer fixer = server.getDataFixer();
+
+        Optional<NbtList> backpacksOptional = root.getList("backpackContents");
+        if (backpacksOptional.isEmpty()) return;
+
+        NbtList backpacks = backpacksOptional.get();
+        for (int i = 0; i < backpacks.size(); ++i) {
+            Optional<NbtCompound> backpackEntry = backpacks.getCompound(i);
+            if (backpackEntry.isEmpty()) continue;
+
+            Optional<NbtCompound> contents = backpackEntry.get().getCompound("contents");
+            if (contents.isEmpty()) continue;
+
+            Optional<NbtList> items = contents.get().getList("Items");
+            if (items.isEmpty()) continue;
+
+            NbtList itemList = items.get();
+            for (int j = 0; j < itemList.size(); ++j) {
+                Optional<NbtCompound> slotCompound = itemList.getCompound(j);
+                if (slotCompound.isEmpty()) continue;
+
+                NbtCompound slot = slotCompound.get();
+
+                Optional<NbtCompound> wrapped = slot.getCompound("itemStacks");
+                if (wrapped.isEmpty()) continue;
+
+                Dynamic<NbtElement> inputDynamic = new Dynamic<>(NbtOps.INSTANCE, wrapped.get());
+                Dynamic<NbtElement> outputDynamic = fixer.update(
+                        TypeReferences.ITEM_STACK, inputDynamic,
+                        oldVersion, newVersion
+                );
+
+                NbtCompound fixed = (NbtCompound) outputDynamic.getValue();
+                slot.put("itemStacks", fixed);
+            }
+        }
     }
 
     private static Optional<BackpackInstance> loadSingle(Path saveDir, MinecraftServer server, UUID uuid) {
@@ -249,7 +292,8 @@ public class BackpackData {
                 instance.uuid(),
                 InventoryData.stacksListToData(instance.heldInventory()),
                 Optional.of(instance.lastAccessed()),
-                Optional.of(instance.size())
+                Optional.of(instance.size()),
+                Optional.of(SharedConstants.getGameVersion().dataVersion().id())
         );
     }
 

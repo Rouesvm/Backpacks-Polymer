@@ -45,13 +45,8 @@ public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
         ItemStack resultStack = super.craft(craftingRecipeInput, wrapperLookup);
 
         ItemStack stack = craftingRecipeInput.getStackInSlot(4);
-        if (stack.getItem() instanceof ContainerItem containerItem) {
-            int id = BackpackItemJsonRegistry.getBackpackId(containerItem);
-            int order = BackpackItemJsonRegistry.getBackpackUpgradeOrder(containerItem.getSize());
-
-            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackByOrder(id, order + 1).getDefaultStack();
-            if (upgradeStack.isEmpty()) return stack.copy();
-
+        if (stack.getItem() instanceof ContainerItem backpack) {
+            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackUpgrade(backpack).getDefaultStack();
             upgradeStack = upgradeStack.copy();
             upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(stack));
             upgradeStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));

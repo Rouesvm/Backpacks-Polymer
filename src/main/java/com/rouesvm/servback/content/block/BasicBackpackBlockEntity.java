@@ -37,7 +37,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
 
         if (item != null)
             view.putString("item", item.toString());
-        else view.putString("item", BackpackItemJsonRegistry.getBackpackBySize(size).toString());
+        else view.putString("item", BackpackItemJsonRegistry.getBackpackByName("small").toString());
     }
 
     @Override
@@ -55,7 +55,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
             item = itemString.map(Identifier::tryParse)
                     .map(Registries.ITEM::get)
                     .orElseGet(() -> {
-                        int rawId = view.getInt("item");
+                        int rawId = view.getInt("item", Registries.ITEM.getRawId(BackpackItemJsonRegistry.getBackpackByName("small")));
                         return Registries.ITEM.get(rawId);
                     });
         }
@@ -63,7 +63,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
 
     public ItemStack getDefaultStack() {
         ItemStack stack = item != null ? item.getDefaultStack()
-                : BackpackItemJsonRegistry.getBackpackBySize(size).getDefaultStack();
+                : BackpackItemJsonRegistry.getBackpackByName("small").getDefaultStack();
         if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
         return stack;
     }

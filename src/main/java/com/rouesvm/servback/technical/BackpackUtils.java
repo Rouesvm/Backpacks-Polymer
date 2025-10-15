@@ -11,6 +11,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -86,14 +87,13 @@ public class BackpackUtils {
         Optional<RegistryEntry.Reference<Enchantment>> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT)
                 .flatMap(optional -> optional.getEntry(CAPACITY));
 
-        int level = 1;
+        int level = 0;
         if (capacity.isPresent()) {
             level = stack.getEnchantments().getLevel(capacity.get());
 
             NbtCompound compound = new NbtCompound();
             compound.putInt("level", level);
             stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
-
         }
 
         return 9 * level;

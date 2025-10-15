@@ -8,6 +8,7 @@ import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import com.rouesvm.servback.technical.ui.UpgradeContainerGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
+import eu.pb4.common.protection.api.CommonProtection;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,6 +30,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
 public class BundleGuiItem extends BasicPolymerBlockItem  {
     public BundleGuiItem(String name, Block block) {
         super(name, Items.LEATHER, block);
@@ -91,6 +93,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer)
         ) return ActionResult.PASS;
         if (Configuration.instance().placeable
+                && CommonProtection.canPlaceBlock(context.getWorld(), context.getBlockPos(), serverPlayer.getGameProfile(), serverPlayer)
                 && serverPlayer.isSneaking()
         ) return super.useOnBlock(context);
 

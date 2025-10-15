@@ -29,6 +29,7 @@ public class BlockHolder extends ElementHolder {
     }
 
     // wonky
+    // I agree with you
     @Override
     protected void onTick() {
         if (alreadySetItem || world == null) return;

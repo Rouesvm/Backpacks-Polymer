@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
-import org.joml.Vector3f;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,22 +13,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
 public class Configuration {
     public static Configuration manager;
-
-    public static final Instance defaultInstance = new Instance();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final File configFile;
     public Instance instance = new Instance();
 
-    private final int maxSlots = 9 * 6;
+    public List<BackpackType> backpackTypes = new ArrayList<>();
 
     public static void initialize() {
         manager = new Configuration(MOD_ID + ".json");
@@ -67,15 +62,45 @@ public class Configuration {
 
             Instance loaded = GSON.fromJson(rawJson, Instance.class);
             if (loaded != null) {
-                instance = loaded;
-                convertOldTypeToNew(jsonObject);
                 sanitizeConfig(jsonObject);
-                replaceEntryIfInvalid();
+                convertTypesToList(jsonObject);
+                convertOldTypeToList(jsonObject);
+                instance = loaded;
             }
         } catch (JsonIOException | JsonSyntaxException | IOException ignored) {}
     }
 
-    public void convertOldTypeToNew(JsonObject jsonObject) {
+    public void convertTypesToList(JsonObject jsonObject) {
+        if (!jsonObject.has("types_of_backpacks")) return;
+
+        JsonObject types = jsonObject.getAsJsonObject("types_of_backpacks");
+
+        for (String keyStr : types.keySet()) {
+            JsonObject oldType = types.getAsJsonObject(keyStr);
+            if (oldType == null) continue;
+
+            int key = Integer.parseInt(keyStr);
+
+            int slots = oldType.has("slots") ? oldType.get("slots").getAsInt() : 9;
+            boolean dyeable = oldType.has("dyeable") && oldType.get("dyeable").getAsBoolean();
+
+            List<String> backpacks = new ArrayList<>();
+            if (oldType.has("backpacks")) {
+                oldType.getAsJsonArray("backpacks").forEach((string) -> backpacks.add(string.getAsString()));
+            }
+
+            List<String> dyeBlacklist = new ArrayList<>();
+            if (oldType.has("dyeBlacklist")) {
+                oldType.getAsJsonArray("dyeBlacklist").forEach(e -> dyeBlacklist.add(e.getAsString()));
+            }
+
+            if (backpacks.isEmpty()) continue;
+
+            backpackTypes.add(new BackpackType(slots, dyeable, backpacks, dyeBlacklist, key));
+        }
+    }
+
+    public void convertOldTypeToList(JsonObject jsonObject) {
         if (!jsonObject.has("types_of_backpacks")) return;
 
         JsonObject types = jsonObject.getAsJsonObject("types_of_backpacks");
@@ -101,10 +126,9 @@ public class Configuration {
 
             if (backpacks.isEmpty()) continue;
 
-            instance.types_of_backpacks.put(key, new BackpackType(slots, dyeable, backpacks, dyeBlacklist));
+            backpackTypes.add(new BackpackType(slots, dyeable, backpacks, dyeBlacklist, key));
         }
     }
-
 
     public void sanitizeConfig(JsonObject jsonObject) {
         if (jsonObject.has("enable_globalpack") && !jsonObject.get("enable_globalpack").getAsBoolean()) {
@@ -114,22 +138,6 @@ public class Configuration {
         if (jsonObject.has("enable_enderpack") && !jsonObject.get("enable_enderpack").getAsBoolean()) {
             instance.disabled_backpacks.add("ender");
         }
-    }
-
-    public void replaceEntryIfInvalid() {
-        instance.types_of_backpacks.replaceAll((key, value) -> {
-            boolean invalid = value.slots > maxSlots || value.backpacks == null || value.dyeBlacklist == null;
-            if (invalid) return defaultInstance.types_of_backpacks.getOrDefault(
-                    key,
-                    new BackpackType(
-                            key * 9,
-                            true,
-                            value.backpacks != null ? value.backpacks : List.of("unknown"),
-                            List.of("brown")
-                    )
-            );
-            else return value;
-        });
     }
 
     public static boolean isDisabled(Item item) {
@@ -144,44 +152,17 @@ public class Configuration {
                 || Configuration.instance().disabled_upgrades.contains(removeNamespace);
     }
 
-    public static <K, V> LinkedHashMap<K, V> createMap(Map<K, V> map) {
-        return new LinkedHashMap<>(map);
-    }
-
-    public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist) {}
+    public record BackpackType(int slots, boolean dyeable, List<String> backpacks, List<String> dyeBlacklist, int tier) {}
 
     public static class Instance {
-        // this is kinda stupid, in the future change to a file based system.
-        @SerializedName("types_of_backpacks")
-        public Map<Integer, BackpackType> types_of_backpacks = createMap(Map.of(
-                1, new BackpackType(
-                        9,
-                        true,
-                        List.of("small"),
-                        List.of("brown")
-                ),
-                2, new BackpackType(
-                        18,
-                        true,
-                        List.of("medium"),
-                        List.of("brown")
-                ),
-                3, new BackpackType(
-                        27,
-                        true,
-                        List.of("large"),
-                        List.of("brown")
-                )
-        ));
-
         @SerializedName("disabled_backpacks")
         public List<String> disabled_backpacks = List.of();
 
-        @SerializedName("disabled_upgrades")
-        public List<String> disabled_upgrades = List.of();
-
         @SerializedName("enable_upgrades")
         public boolean enable_upgrades = true;
+
+        @SerializedName("disabled_upgrades")
+        public List<String> disabled_upgrades = List.of();
 
         @SerializedName("placeable")
         public boolean placeable = true;
@@ -194,26 +175,5 @@ public class Configuration {
 
         @SerializedName("display_back")
         public boolean display_back = true;
-
-        @SerializedName("back_positions")
-        public Map<Integer, Vector3f> back_positions = createMap(Map.of(
-                1, new Vector3f(0, -0.45f, 0.280f),
-                2, new Vector3f(0, -0.65f, 0.280f),
-                3, new Vector3f(0, -0.65f, 0.280f)
-        ));
-
-        @SerializedName("back_yaw")
-        public Map<Integer, Integer> back_yaw = createMap(Map.of(
-                1, 180,
-                2, 180,
-                3, 180
-        ));
-
-        @SerializedName("back_pitch_when_sneaking")
-        public Map<Integer, Integer> back_pitch_when_sneaking = createMap(Map.of(
-                1, -25,
-                2, -25,
-                3, -25
-        ));
     }
 }

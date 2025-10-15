@@ -122,23 +122,23 @@ public class BackpackData {
     private static void applyDataFixToItemStacks(@NotNull MinecraftServer server, NbtCompound root, int newVersion) {
         DataFixer fixer = server.getDataFixer();
 
-        Optional<Integer> data_version = root.getInt("data_version");
+        Optional<Integer> data_version = Optional.of(root.getInt("data_version"));
         if (data_version.isEmpty()) return;
 
-        Optional<NbtCompound> contents = root.getCompound("contents");
+        Optional<NbtCompound> contents = Optional.ofNullable(root.getCompound("contents"));
         if (contents.isEmpty()) return;
 
-        Optional<NbtList> items = contents.get().getList("Items");
+        Optional<NbtList> items = Optional.ofNullable(contents.get().getList("Items", NbtElement.COMPOUND_TYPE));
         if (items.isEmpty()) return;
 
         NbtList itemList = items.get();
         for (int j = 0; j < itemList.size(); ++j) {
-            Optional<NbtCompound> slotCompound = itemList.getCompound(j);
+            Optional<NbtCompound> slotCompound = Optional.ofNullable(itemList.getCompound(j));
             if (slotCompound.isEmpty()) continue;
 
             NbtCompound slot = slotCompound.get();
 
-            Optional<NbtCompound> wrapped = slot.getCompound("itemStacks");
+            Optional<NbtCompound> wrapped = Optional.ofNullable(slot.getCompound("itemStacks"));
             if (wrapped.isEmpty()) continue;
 
             Dynamic<NbtElement> inputDynamic = new Dynamic<>(NbtOps.INSTANCE, wrapped.get());
@@ -160,7 +160,7 @@ public class BackpackData {
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
             NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
-            applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().dataVersion().id());
+            applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().getSaveVersion().getId());
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
                     BackpackInstanceData.CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), nbt);
@@ -287,7 +287,7 @@ public class BackpackData {
                 InventoryData.stacksListToData(instance.heldInventory()),
                 Optional.of(instance.lastAccessed()),
                 Optional.of(instance.size()),
-                Optional.of(SharedConstants.getGameVersion().dataVersion().id())
+                Optional.of(SharedConstants.getGameVersion().getSaveVersion().getId())
         );
     }
 

@@ -32,6 +32,11 @@ public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, Pol
     }
 
     @Override
+    public String getTranslationKey() {
+        return id.toTranslationKey("item");
+    }
+
+    @Override
     public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
         if (itemStack.getOrDefault(BackpackDataComponentTypes.IS_3D, false))
             return this.customModelId3D.item();

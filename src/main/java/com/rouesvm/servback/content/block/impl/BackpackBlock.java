@@ -54,7 +54,7 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
         DyeColor color = BackpackItemJsonRegistry.getBackpackDyeColor(item);
         return super.getPlacementState(context)
                 .with(DYE_COLOR, color != null ? color : DyeColor.BROWN)
-                .with(SLOTS, BackpackItemJsonRegistry.getBackpackUpgradeOrder(item.getSize()));
+                .with(SLOTS, item.getSize() / 9);
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {

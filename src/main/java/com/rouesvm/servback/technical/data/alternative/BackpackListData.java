@@ -62,28 +62,28 @@ public class BackpackListData {
     private static void applyFixToNestedItemStacks(MinecraftServer server, NbtCompound root, int oldVersion, int newVersion) {
         DataFixer fixer = server.getDataFixer();
 
-        Optional<NbtList> backpacksOptional = root.getList("backpackContents");
+        Optional<NbtList> backpacksOptional = Optional.ofNullable(root.getList("backpackContents", NbtElement.COMPOUND_TYPE));
         if (backpacksOptional.isEmpty()) return;
 
         NbtList backpacks = backpacksOptional.get();
         for (int i = 0; i < backpacks.size(); ++i) {
-            Optional<NbtCompound> backpackEntry = backpacks.getCompound(i);
+            Optional<NbtCompound> backpackEntry = Optional.ofNullable(backpacks.getCompound(i));
             if (backpackEntry.isEmpty()) continue;
 
-            Optional<NbtCompound> contents = backpackEntry.get().getCompound("contents");
+            Optional<NbtCompound> contents = Optional.ofNullable(backpackEntry.get().getCompound("contents"));
             if (contents.isEmpty()) continue;
 
-            Optional<NbtList> items = contents.get().getList("Items");
+            Optional<NbtList> items = Optional.ofNullable(contents.get().getList("Items", NbtElement.COMPOUND_TYPE));
             if (items.isEmpty()) continue;
 
             NbtList itemList = items.get();
             for (int j = 0; j < itemList.size(); ++j) {
-                Optional<NbtCompound> slotCompound = itemList.getCompound(j);
+                Optional<NbtCompound> slotCompound = Optional.ofNullable(itemList.getCompound(j));
                 if (slotCompound.isEmpty()) continue;
 
                 NbtCompound slot = slotCompound.get();
 
-                Optional<NbtCompound> wrapped = slot.getCompound("itemStacks");
+                Optional<NbtCompound> wrapped = Optional.ofNullable(slot.getCompound("itemStacks"));
                 if (wrapped.isEmpty()) continue;
 
                 Dynamic<NbtElement> inputDynamic = new Dynamic<>(NbtOps.INSTANCE, wrapped.get());
@@ -102,7 +102,7 @@ public class BackpackListData {
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(saveDir))) {
             NbtCompound compound = NbtIo.readCompound(dis);
 
-            int newDataVersion = SharedConstants.getGameVersion().dataVersion().id();
+            int newDataVersion = SharedConstants.getGameVersion().getSaveVersion().getId();
             int oldDataVersion = 4440;
 
             applyFixToNestedItemStacks(server, compound, oldDataVersion, newDataVersion);

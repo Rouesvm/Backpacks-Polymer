@@ -44,18 +44,12 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     protected void readNbt(NbtCompound view, RegistryWrapper.WrapperLookup registryLookup) {
         size = view.getInt("size");
 
-        Optional<Integer> dyeOrdinal = Optional.of(view.getInt("dye"));
-        dyeOrdinal.ifPresent(integer -> item = BackpackItemJsonRegistry.getBackpackBySize(
-                integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)),
-                size
-        ));
-
         if (item == null) {
             Optional<String> itemString = view.getString("item").describeConstable();
             item = itemString.map(Identifier::tryParse)
                     .map(Registries.ITEM::get)
                     .orElseGet(() -> {
-                        int rawId = view.getInt("item", Registries.ITEM.getRawId(BackpackItemJsonRegistry.getBackpackByName("small")));
+                        int rawId = view.getInt("item");
                         return Registries.ITEM.get(rawId);
                     });
         }

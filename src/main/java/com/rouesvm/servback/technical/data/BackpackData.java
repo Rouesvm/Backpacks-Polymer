@@ -115,42 +115,36 @@ public class BackpackData {
         return false;
     }
 
-    private static void applyDataFixToItemStacks(MinecraftServer server, NbtCompound root, int oldVersion, int newVersion) {
+    private static void applyDataFixToItemStacks(MinecraftServer server, NbtCompound root, int newVersion) {
         DataFixer fixer = server.getDataFixer();
 
-        Optional<NbtList> backpacksOptional = root.getList("backpackContents");
-        if (backpacksOptional.isEmpty()) return;
+        Optional<Integer> data_version = root.getInt("data_version");
+        if (data_version.isEmpty()) return;
 
-        NbtList backpacks = backpacksOptional.get();
-        for (int i = 0; i < backpacks.size(); ++i) {
-            Optional<NbtCompound> backpackEntry = backpacks.getCompound(i);
-            if (backpackEntry.isEmpty()) continue;
+        Optional<NbtCompound> contents = root.getCompound("contents");
+        if (contents.isEmpty()) return;
 
-            Optional<NbtCompound> contents = backpackEntry.get().getCompound("contents");
-            if (contents.isEmpty()) continue;
+        Optional<NbtList> items = contents.get().getList("Items");
+        if (items.isEmpty()) return;
 
-            Optional<NbtList> items = contents.get().getList("Items");
-            if (items.isEmpty()) continue;
+        NbtList itemList = items.get();
+        for (int j = 0; j < itemList.size(); ++j) {
+            Optional<NbtCompound> slotCompound = itemList.getCompound(j);
+            if (slotCompound.isEmpty()) continue;
 
-            NbtList itemList = items.get();
-            for (int j = 0; j < itemList.size(); ++j) {
-                Optional<NbtCompound> slotCompound = itemList.getCompound(j);
-                if (slotCompound.isEmpty()) continue;
+            NbtCompound slot = slotCompound.get();
 
-                NbtCompound slot = slotCompound.get();
+            Optional<NbtCompound> wrapped = slot.getCompound("itemStacks");
+            if (wrapped.isEmpty()) continue;
 
-                Optional<NbtCompound> wrapped = slot.getCompound("itemStacks");
-                if (wrapped.isEmpty()) continue;
+            Dynamic<NbtElement> inputDynamic = new Dynamic<>(NbtOps.INSTANCE, wrapped.get());
+            Dynamic<NbtElement> outputDynamic = fixer.update(
+                    TypeReferences.ITEM_STACK, inputDynamic,
+                    data_version.get(), newVersion
+            );
 
-                Dynamic<NbtElement> inputDynamic = new Dynamic<>(NbtOps.INSTANCE, wrapped.get());
-                Dynamic<NbtElement> outputDynamic = fixer.update(
-                        TypeReferences.ITEM_STACK, inputDynamic,
-                        oldVersion, newVersion
-                );
-
-                NbtCompound fixed = (NbtCompound) outputDynamic.getValue();
-                slot.put("itemStacks", fixed);
-            }
+            NbtCompound fixed = (NbtCompound) outputDynamic.getValue();
+            slot.put("itemStacks", fixed);
         }
     }
 
@@ -162,6 +156,7 @@ public class BackpackData {
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
             NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
+            applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().dataVersion().id());
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
                     BackpackInstanceData.CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), nbt);

@@ -76,7 +76,7 @@ public class ContainerItem extends BundleGuiItem {
         if (entity instanceof ServerPlayerEntity player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player.getEntityWorld(), player.getEntityPos(), (BackpackInventory) getInventory(player, stack)));
+                    upgrade.tick(player.getWorld(), player.getPos(), (BackpackInventory) getInventory(player, stack)));
         }
     }
 
@@ -192,8 +192,8 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public static void playOpenSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertSound(World world, BlockPos pos, float pitch) {
@@ -201,11 +201,11 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public static void playInsertSound(ServerPlayerEntity player, float pitch) {
-        playInsertSound(player.getEntityWorld(), player.getBlockPos(), pitch);
+        playInsertSound(player.getWorld(), player.getBlockPos(), pitch);
     }
 
     public static void playDropContentsSound(ServerPlayerEntity player, float pitch) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, pitch + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
+        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, pitch + player.getWorld().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertFailSound(ServerPlayerEntity player) {

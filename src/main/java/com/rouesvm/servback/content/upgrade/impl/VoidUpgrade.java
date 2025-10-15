@@ -84,7 +84,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
         Vec3d target = new Vec3d(pos.toVector3f());
 
         queue.forEach(item -> {
-            Vec3d current = item.getEntityPos();
+            Vec3d current = item.getPos();
             Vec3d delta = target.subtract(current);
 
             double distance = delta.length();

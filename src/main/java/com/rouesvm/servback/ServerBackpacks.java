@@ -10,6 +10,7 @@ import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemGroup;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.technical.config.BackpackItemConfiguration;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
 import com.rouesvm.servback.technical.data.BackpackData;
@@ -55,6 +56,7 @@ public class ServerBackpacks implements ModInitializer {
 		PolymerResourcePackUtils.markAsRequired();
 
 		Configuration.initialize();
+        BackpackItemConfiguration.initialize();
 
 		BackpackDataComponentTypes.initialize();
 

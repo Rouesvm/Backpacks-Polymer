@@ -37,25 +37,19 @@ public class BasicBackpackBlockEntity extends BlockEntity {
 
         if (item != null)
             view.putString("item", item.toString());
-        else view.putString("item", BackpackItemJsonRegistry.getBackpackBySize(size).toString());
+        else view.putString("item", BackpackItemJsonRegistry.getBackpackByName("small").toString());
     }
 
     @Override
     protected void readData(ReadView view) {
         size = view.getInt("size", 9);
 
-        Optional<Integer> dyeOrdinal = view.getOptionalInt("dye");
-        dyeOrdinal.ifPresent(integer -> item = BackpackItemJsonRegistry.getBackpackBySize(
-                integer + BackpackItemJsonRegistry.getOffset(BackpackItemJsonRegistry.getBackpackUpgradeOrder(size)),
-                size
-        ));
-
         if (item == null) {
             Optional<String> itemString = view.getOptionalString("item");
             item = itemString.map(Identifier::tryParse)
                     .map(Registries.ITEM::get)
                     .orElseGet(() -> {
-                        int rawId = view.getInt("item", Registries.ITEM.getRawId(BackpackItemJsonRegistry.getBackpackBySize(size)));
+                        int rawId = view.getInt("item", Registries.ITEM.getRawId(BackpackItemJsonRegistry.getBackpackByName("small")));
                         return Registries.ITEM.get(rawId);
                     });
         }
@@ -63,7 +57,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
 
     public ItemStack getDefaultStack() {
         ItemStack stack = item != null ? item.getDefaultStack()
-                : BackpackItemJsonRegistry.getBackpackBySize(size).getDefaultStack();
+                : BackpackItemJsonRegistry.getBackpackByName("small").getDefaultStack();
         if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
         return stack;
     }

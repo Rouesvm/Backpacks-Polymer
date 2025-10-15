@@ -8,6 +8,7 @@ import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import com.rouesvm.servback.technical.ui.UpgradeContainerGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
+import eu.pb4.common.protection.api.CommonProtection;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,8 +34,6 @@ import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
-
-import static net.minecraft.item.BundleItem.setSelectedStackIndex;
 
 public class BundleGuiItem extends BasicPolymerBlockItem  {
     public BundleGuiItem(String name, Block block) {
@@ -99,6 +98,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer)
         ) return ActionResult.PASS;
         if (Configuration.instance().placeable
+                && CommonProtection.canPlaceBlock(context.getWorld(), context.getBlockPos(), serverPlayer.getGameProfile(), serverPlayer)
                 && serverPlayer.isSneaking()
         ) return super.useOnBlock(context);
 
@@ -135,7 +135,6 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     @Override
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
         if (clickType == ClickType.LEFT && otherStack.isEmpty()) {
-            setSelectedStackIndex(stack, -1);
         } else {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             Inventory inventory = getInventory(serverPlayer, stack);
@@ -159,7 +158,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                     afterChanged(stack, inventory);
                     onContentChanged(player);
                     return true;
-                } else setSelectedStackIndex(stack, -1);
+                }
             }
         }
         return false;

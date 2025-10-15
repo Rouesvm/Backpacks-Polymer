@@ -1,7 +1,9 @@
 package com.rouesvm.servback.technical.data;
 
+import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
@@ -9,9 +11,14 @@ import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.codecs.InventoryData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.SharedConstants;
+import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -40,10 +47,11 @@ public class BackpackData {
 
     private static Path saveDir;
 
-    private static final Map<UUID, String> lastSingularHashes = new HashMap<>();
-    private static final Map<UUID, String> lastFullHashes = new HashMap<>();
+    private static final Map<UUID, String> lastSingularHashes = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, String> lastFullHashes = new Object2ObjectOpenHashMap<>();
 
-    private static Set<BackpackInstance> storedInventories = new HashSet<>();
+    private static final Set<BackpackInstance> storedInventories =
+            Collections.synchronizedSet(new ObjectOpenHashSet<>());
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
 
@@ -111,6 +119,39 @@ public class BackpackData {
         return false;
     }
 
+    private static void applyDataFixToItemStacks(@NotNull MinecraftServer server, NbtCompound root, int newVersion) {
+        DataFixer fixer = server.getDataFixer();
+
+        Optional<Integer> data_version = root.getInt("data_version");
+        if (data_version.isEmpty()) return;
+
+        Optional<NbtCompound> contents = root.getCompound("contents");
+        if (contents.isEmpty()) return;
+
+        Optional<NbtList> items = contents.get().getList("Items");
+        if (items.isEmpty()) return;
+
+        NbtList itemList = items.get();
+        for (int j = 0; j < itemList.size(); ++j) {
+            Optional<NbtCompound> slotCompound = itemList.getCompound(j);
+            if (slotCompound.isEmpty()) continue;
+
+            NbtCompound slot = slotCompound.get();
+
+            Optional<NbtCompound> wrapped = slot.getCompound("itemStacks");
+            if (wrapped.isEmpty()) continue;
+
+            Dynamic<NbtElement> inputDynamic = new Dynamic<>(NbtOps.INSTANCE, wrapped.get());
+            Dynamic<NbtElement> outputDynamic = fixer.update(
+                    TypeReferences.ITEM_STACK, inputDynamic,
+                    data_version.get(), newVersion
+            );
+
+            NbtCompound fixed = (NbtCompound) outputDynamic.getValue();
+            slot.put("itemStacks", fixed);
+        }
+    }
+
     private static Optional<BackpackInstance> loadSingle(Path saveDir, MinecraftServer server, UUID uuid) {
         if (saveDir == null) return Optional.empty();
 
@@ -119,6 +160,7 @@ public class BackpackData {
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
             NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
+            applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().dataVersion().id());
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
                     BackpackInstanceData.CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), nbt);
@@ -198,9 +240,8 @@ public class BackpackData {
     }
 
     public static void save(MinecraftServer server) {
-        final Set<BackpackInstance> instances = storedInventories;
         executor.execute(() -> {
-            for (BackpackInstance instance : instances) {
+            for (BackpackInstance instance : storedInventories) {
                 saveSingle(server, instance);
             }
 
@@ -225,22 +266,18 @@ public class BackpackData {
 
     public static void createSingularBackup(MinecraftServer server, BackpackInstance instance) {
         if (singularBackupDir == null || !Configuration.instance().allow_backups) return;
-
-        storedInventories.remove(instance);
-        storedInventories.add(instance);
-
+        replaceStoredInventory(instance);
         executor.execute(() -> saveBackup(createTimestampedDir(singularBackupDir), server, instance, lastSingularHashes));
     }
 
     public static void createBackup(MinecraftServer server) {
         if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
 
-        setStoredInventories(BackpackManager.instance().backpackInstances());
+        replaceStoredInventories(BackpackManager.instance().backpackInstances());
 
-        final Set<BackpackInstance> instances = storedInventories;
         executor.execute(() -> {
             Path currentDir = createTimestampedDir(fullBackupDir);
-            for (BackpackInstance instance : instances) saveBackup(currentDir, server, instance, lastFullHashes);
+            for (BackpackInstance instance : storedInventories) saveBackup(currentDir, server, instance, lastFullHashes);
         });
     }
 
@@ -249,7 +286,8 @@ public class BackpackData {
                 instance.uuid(),
                 InventoryData.stacksListToData(instance.heldInventory()),
                 Optional.of(instance.lastAccessed()),
-                Optional.of(instance.size())
+                Optional.of(instance.size()),
+                Optional.of(SharedConstants.getGameVersion().dataVersion().id())
         );
     }
 
@@ -273,13 +311,12 @@ public class BackpackData {
         return storedInventories;
     }
 
-    public static void setStoredInventory(BackpackInstance backpackInstance) {
-        storedInventories.remove(backpackInstance);
+    public static void replaceStoredInventory(BackpackInstance backpackInstance) {
         storedInventories.add(backpackInstance);
     }
 
-    public static void setStoredInventories(Set<BackpackInstance> backpackInstances) {
-        storedInventories = new HashSet<>();
+    public static void replaceStoredInventories(Set<BackpackInstance> backpackInstances) {
+        storedInventories.clear();
         storedInventories.addAll(backpackInstances);
     }
 }

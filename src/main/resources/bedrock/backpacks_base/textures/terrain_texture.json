@@ -8,6 +8,15 @@
     "serverbackpacks:ender_backpack": {
       "textures": "textures/serverbackpacks/block/ender"
     },
+    "serverbackpacks:1": {
+      "textures": "textures/serverbackpacks/block/small/small"
+    },
+    "serverbackpacks:2": {
+      "textures": "textures/serverbackpacks/block/medium/medium"
+    },
+    "serverbackpacks:3": {
+      "textures": "textures/serverbackpacks/block/large/large"
+    },
     "serverbackpacks:brown_1": {
       "textures": "textures/serverbackpacks/block/small/brown_small"
     },

@@ -72,7 +72,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_eye", InventoryChangedCriterion.Conditions.items(Items.ENDER_EYE))
                 .offerTo(exporter);
 
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemJsonRegistry.getBackpackByOrder(1), 1)
+        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemJsonRegistry.getBackpackByName("small"), 1)
                 .pattern("SiS")
                 .pattern("#C#")
                 .pattern(" S ")
@@ -81,7 +81,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .offerTo(exporter);
 
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(2), 1)
+        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByName("medium"), 1)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .pattern("iLi")
                 .pattern("S0S")
@@ -91,7 +91,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('0', Ingredient.ofTag(itemWrap.getOrThrow(SMALL_BACKPACKS)))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "medium_backpack")));
 
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByOrder(3), 1)
+        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByName("large"), 1)
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .pattern("LSL")
                 .pattern("i0i")
@@ -138,7 +138,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
                         Ingredient.ofItem(BackpackItemRegistry.VOID_UPGRADE),
                         RecipeCategory.TOOLS,
-                        BackpackItemJsonRegistry.getBackpackByOrder(1))
+                        BackpackItemJsonRegistry.getBackpackByName("small"))
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "void_upgrade_backpack")));
 
@@ -146,7 +146,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
                         Ingredient.ofItem(BackpackItemRegistry.MAGNET_UPGRADE),
                         RecipeCategory.TOOLS,
-                        BackpackItemJsonRegistry.getBackpackByOrder(1))
+                        BackpackItemJsonRegistry.getBackpackByName("small"))
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "magnet_upgrade_backpack")));
 
@@ -154,14 +154,13 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
                         Ingredient.ofItem(BackpackItemRegistry.CRAFTING_UPGRADE),
                         RecipeCategory.TOOLS,
-                        BackpackItemJsonRegistry.getBackpackByOrder(1))
+                        BackpackItemJsonRegistry.getBackpackByName("small"))
                 .criterion("get_chest", InventoryChangedCriterion.Conditions.items(Items.CHEST))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "crafting_upgrade_backpack")));
     }
 
     private void dyedBackpackRecipes(RegistryWrapper.Impl<Item> itemWrap, RecipeExporter exporter) {
         for (int i = 1; i <= 3; i++) {
-            ContainerItem baseBackpack = (ContainerItem) BackpackItemJsonRegistry.getBackpackByOrder(i);
             RegistryEntryList<Item> matchingBackpacks = switch (i) {
                 case 1 -> itemWrap.getOrThrow(SMALL_BACKPACKS);
                 case 2 -> itemWrap.getOrThrow(MEDIUM_BACKPACKS);
@@ -169,21 +168,31 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 default -> throw new IllegalStateException("Unexpected value: " + i);
             };
 
+            String tierName = switch(i) {
+                case 2 -> "medium";
+                case 3 -> "large";
+                default -> "small";
+            };
+
+            ContainerItem baseBackpack = (ContainerItem) BackpackItemJsonRegistry.getBackpackByName(tierName);
             for (DyeColor color : DyeColor.values()) {
-                ContainerItem dyedBackpack = (ContainerItem) BackpackItemJsonRegistry.getBackpackByOrder(color, i);
+                ContainerItem dyedBackpack = (ContainerItem) BackpackItemJsonRegistry.getBackpackByName(color.toString().toLowerCase() + "_" + tierName);
                 String dyeName = color.name().toLowerCase();
                 Item dye = DyeItem.byColor(color);
 
                 String transmuteId = String.format("%s_%s_%d", dyeName, baseBackpack.getIdentifier().getPath(), i);
-                createTransmuteRecipe(exporter, matchingBackpacks, dye, dyedBackpack, i, transmuteId);
+                createTransmuteRecipe(exporter, matchingBackpacks, dye, dyedBackpack, baseBackpack, tierName, transmuteId);
             }
         }
     }
 
-    private void createTransmuteRecipe(RecipeExporter exporter, RegistryEntryList<Item> backpack, Item dyeColor, Item result, int tier, String name) {
-        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.ofTag(backpack), Ingredient.ofItem(dyeColor), result)
-                .group(tier + "_dyedbackpacks")
-                .criterion(backpack.toString(), InventoryChangedCriterion.Conditions.items(BackpackItemJsonRegistry.getBackpackByOrder(tier)))
+    private void createTransmuteRecipe(RecipeExporter exporter, RegistryEntryList<Item> backpackTag,
+                                       Item dyeColor, Item result,
+                                       Item baseItem, String tierName, String name
+    ) {
+        TransmuteRecipeJsonBuilder.create(RecipeCategory.MISC, Ingredient.ofTag(backpackTag), Ingredient.ofItem(dyeColor), result)
+                .group(tierName + "_dyed_backpacks")
+                .criterion(backpackTag.toString(), InventoryChangedCriterion.Conditions.items(baseItem))
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, name)));
     }
 

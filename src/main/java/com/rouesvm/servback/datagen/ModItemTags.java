@@ -10,9 +10,9 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
@@ -32,17 +32,23 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
-        for (int i = 1; i <= 3; i++) {
-            for (DyeColor color : DyeColor.values()) {
-                ContainerItem item = (ContainerItem) BackpackItemJsonRegistry.getBackpackByOrder(color, i);
-                Identifier itemID = item.getIdentifier();
-                switch (i) {
-                    case 1 -> this.getTagBuilder(SMALL_BACKPACKS).addOptional(itemID);
-                    case 2 -> this.getTagBuilder(MEDIUM_BACKPACKS).addOptional(itemID);
-                    case 3 -> this.getTagBuilder(LARGE_BACKPACKS).addOptional(itemID);
-                }
-            }
-        }
+        Set<Item> small = BackpackItemJsonRegistry.getBackpacksByName("small");
+        small.forEach((item) -> {
+            Identifier itemID = ((ContainerItem) item).getIdentifier();
+            this.getTagBuilder(SMALL_BACKPACKS).addOptional(itemID);
+        });
+
+        Set<Item> medium = BackpackItemJsonRegistry.getBackpacksByName("medium");
+        medium.forEach((item) -> {
+            Identifier itemID = ((ContainerItem) item).getIdentifier();
+            this.getTagBuilder(MEDIUM_BACKPACKS).addOptional(itemID);
+        });
+
+        Set<Item> large = BackpackItemJsonRegistry.getBackpacksByName("large");
+        large.forEach((item) -> {
+            Identifier itemID = ((ContainerItem) item).getIdentifier();
+            this.getTagBuilder(LARGE_BACKPACKS).addOptional(itemID);
+        });
 
         this.getTagBuilder(BACKPACKS).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.GLOBAL_BACKPACK).getIdentifier());
         this.getTagBuilder(BACKPACKS).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.ENDER_BACKPACK).getIdentifier());

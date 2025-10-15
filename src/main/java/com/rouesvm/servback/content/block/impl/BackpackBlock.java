@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.DyeColor;
@@ -36,12 +37,17 @@ import org.jetbrains.annotations.Nullable;
 import static com.rouesvm.servback.technical.BackpackUtils.resize;
 
 public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
+    public static final BooleanProperty HAS_DYE = BooleanProperty.of("has_dye");
     public static final EnumProperty<DyeColor> DYE_COLOR = EnumProperty.of("dye_color", DyeColor.class);
     public static final IntProperty SLOTS = IntProperty.of("slots", 1, 3);
 
     public BackpackBlock() {
         super("backpack");
-        this.setDefaultState(super.stateManager.getDefaultState().with(DYE_COLOR, DyeColor.BROWN).with(SLOTS, 1));
+        this.setDefaultState(this.getStateManager().getDefaultState()
+                .with(HAS_DYE, false)
+                .with(DYE_COLOR, DyeColor.BROWN)
+                .with(SLOTS, 1)
+        );
     }
 
     @Override
@@ -55,11 +61,12 @@ public class BackpackBlock extends BasicBackpackBlock implements BlockEntityProv
         DyeColor color = BackpackItemJsonRegistry.getBackpackDyeColor(item);
         return super.getPlacementState(context)
                 .with(DYE_COLOR, color != null ? color : DyeColor.BROWN)
+                .with(HAS_DYE, false)
                 .with(SLOTS, item.getSize() / 9);
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING).add(DYE_COLOR).add(SLOTS);
+        builder.add(FACING).add(HAS_DYE).add(DYE_COLOR).add(SLOTS);
     }
 
     @Override

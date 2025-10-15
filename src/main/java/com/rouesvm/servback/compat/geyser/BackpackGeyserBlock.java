@@ -94,6 +94,7 @@ public class BackpackGeyserBlock {
 
     private static NonVanillaCustomBlockData registerBackpackBlock(Block block, Identifier location) {
         return createHorizontalBlock(block, location)
+                .booleanProperty(BackpackBlock.HAS_DYE.getName())
                 .intProperty(BackpackBlock.SLOTS.getName(), slots)
                 .stringProperty(BackpackBlock.DYE_COLOR.getName(), dye_colors)
                 .permutations(createBackpackPermutations())
@@ -185,10 +186,28 @@ public class BackpackGeyserBlock {
                             .build())
                     .build();
 
-            dyePermutations.add(new CustomBlockPermutation(customBlockComponents,
+            dyePermutations.add(new CustomBlockPermutation(
+                    customBlockComponents,
                     String.format(STATE_CONDITION, BackpackBlock.SLOTS.getName(), size) + " && " +
-                            String.format(STATE_CONDITION, BackpackBlock.DYE_COLOR.getName(), "'" + dyeColor.toLowerCase() + "'")));
+                            String.format(STATE_CONDITION, BackpackBlock.DYE_COLOR.getName(), "'" + dyeColor.toLowerCase() + "'") + " && " +
+                            String.format(STATE_CONDITION, BackpackBlock.HAS_DYE.getName(), "true")
+            ));
         }
+
+        CustomBlockComponents basicComponents = CustomBlockComponents.builder()
+                .materialInstance("*", MaterialInstance.builder()
+                        .texture("serverbackpacks:" + size)
+                        .renderMethod("opaque")
+                        .faceDimming(true)
+                        .ambientOcclusion(true)
+                        .build())
+                .build();
+
+        dyePermutations.add(new CustomBlockPermutation(
+                basicComponents,
+                String.format(STATE_CONDITION, BackpackBlock.SLOTS.getName(), size) + " && " +
+                        String.format(STATE_CONDITION, BackpackBlock.HAS_DYE.getName(), "false")
+        ));
 
         return dyePermutations;
     }

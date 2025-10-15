@@ -9,6 +9,7 @@ import com.rouesvm.servback.technical.data.alternative.BackpackState;
 import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
 import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;
@@ -20,7 +21,7 @@ public class BackpackManager {
     private static BackpackManager instance;
 
     private final BackpackInventory globalInventory = new BackpackInventory(9 * 3);
-    private final Map<UUID, BackpackInstance> storedInstances = new HashMap<>();
+    private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
 
     private boolean loaded = false;
     private DATA_TYPE data_type = DATA_TYPE.NONE;
@@ -66,7 +67,7 @@ public class BackpackManager {
     }
 
     public static void saveData(BackpackInstance instance) {
-        BackpackData.setStoredInventory(instance);
+        BackpackData.replaceStoredInventory(instance);
         BackpackData.saveSingle(server(), instance);
     }
 
@@ -118,7 +119,7 @@ public class BackpackManager {
     }
 
     public static void saveData() {
-        BackpackData.setStoredInventories(instance.backpackInstances());
+        BackpackData.replaceStoredInventories(instance.backpackInstances());
         BackpackData.save(server());
 
         GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server());

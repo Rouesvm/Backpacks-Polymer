@@ -11,6 +11,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,6 +20,7 @@ import net.minecraft.util.collection.DefaultedList;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -80,13 +82,21 @@ public class BackpackUtils {
 
     public static int addCustomData(ServerWorld world, ItemStack stack) {
         DynamicRegistryManager registryManager = world.getRegistryManager();
-        RegistryEntry.Reference<Enchantment> capacity = registryManager.getOptional(RegistryKeys.ENCHANTMENT).get().getOrThrow(CAPACITY);
+        Optional<Registry<Enchantment>> enchantmentReference = registryManager.getOptional(RegistryKeys.ENCHANTMENT);
 
-        int level = stack.getEnchantments().getLevel(capacity);
+        int level = 0;
+        if (enchantmentReference.isPresent()) {
+            Optional<RegistryEntry.Reference<Enchantment>> capacity = enchantmentReference.get().getOptional(CAPACITY);
 
-        NbtCompound compound = new NbtCompound();
-        compound.putInt("level", level);
-        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
+            if (capacity.isPresent()) {
+                level = stack.getEnchantments().getLevel(capacity.get());
+
+                NbtCompound compound = new NbtCompound();
+                compound.putInt("level", level);
+                stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
+
+            }
+        }
 
         return 9 * level;
     }

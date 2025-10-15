@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-// guys I think I'm going insane
 public class BackpackConfigurationFixer {
     public static List<BackpackItemConfiguration.BackpackDefinedType> convertOldConfigToNew() {
         List<Configuration.BackpackType> backpackTypes = Configuration.manager.backpackTypes;

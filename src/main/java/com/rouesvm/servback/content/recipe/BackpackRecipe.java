@@ -40,8 +40,8 @@ public class BackpackRecipe extends ShapedRecipe {
         ItemStack resultStack = super.craft(craftingRecipeInput, wrapperLookup);
 
         ItemStack stack = craftingRecipeInput.getStackInSlot(4);
-        if (stack.getItem() instanceof ContainerItem containerItem) {
-            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackUpgrade(containerItem).getDefaultStack();
+        if (stack.getItem() instanceof ContainerItem backpack) {
+            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackUpgrade(backpack).getDefaultStack();
             upgradeStack = upgradeStack.copy();
             upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(stack));
             upgradeStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));

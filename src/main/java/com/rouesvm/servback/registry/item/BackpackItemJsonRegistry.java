@@ -3,25 +3,30 @@ package com.rouesvm.servback.registry.item;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.technical.config.BackpackItemConfiguration;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.item.Item;
 import net.minecraft.util.DyeColor;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class BackpackItemJsonRegistry {
-    public static final Set<Item> BACKPACKS = new HashSet<>();
+    public static final Set<Item> BACKPACKS = new ObjectOpenHashSet<>();
 
-    public static final Map<Item, String> BACKPACKS_TO_NAME = new HashMap<>();
-    public static final Map<String, Item> NAME_TO_BACKPACK = new HashMap<>();
+    public static final Map<Item, String> BACKPACKS_TO_NAME = new Object2ObjectOpenHashMap<>();
+    public static final Map<String, Item> NAME_TO_BACKPACK = new Object2ObjectOpenHashMap<>();
 
-    public static final Map<String, Set<Item>> NAME_TO_BACKPACKS = new HashMap<>();
+    public static final Map<String, Set<Item>> NAME_TO_BACKPACKS = new Object2ObjectOpenHashMap<>();
 
-    public static final Map<Item, Item> ITEM_TO_UPGRADED = new HashMap<>();
-    public static final Map<Item, String> ITEM_TO_UPGRADED_STRING = new HashMap<>();
+    public static final Map<Item, Item> ITEM_TO_UPGRADED = new Object2ObjectOpenHashMap<>();
+    public static final Map<Item, String> ITEM_TO_UPGRADED_STRING = new Object2ObjectOpenHashMap<>();
 
-    public static final Map<Item, DyeColor> ITEM_TO_DYE = new HashMap<>();
+    public static final Map<Item, DyeColor> ITEM_TO_DYE = new Object2ObjectOpenHashMap<>();
 
-    public static final Map<Item, BackpackItemConfiguration.BackCosmetic> ITEM_TO_BACK_COSMETIC = new HashMap<>();
+    public static final Map<Item, BackpackItemConfiguration.BackCosmetic> ITEM_TO_BACK_COSMETIC = new Object2ObjectOpenHashMap<>();
 
     public static Set<Item> getBackpacksByName(String name) {
         return NAME_TO_BACKPACKS.get(name);

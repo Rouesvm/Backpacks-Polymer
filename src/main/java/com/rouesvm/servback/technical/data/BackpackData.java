@@ -16,6 +16,7 @@ import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -115,7 +116,7 @@ public class BackpackData {
         return false;
     }
 
-    private static void applyDataFixToItemStacks(MinecraftServer server, NbtCompound root, int newVersion) {
+    private static void applyDataFixToItemStacks(@NotNull MinecraftServer server, NbtCompound root, int newVersion) {
         DataFixer fixer = server.getDataFixer();
 
         Optional<Integer> data_version = root.getInt("data_version");

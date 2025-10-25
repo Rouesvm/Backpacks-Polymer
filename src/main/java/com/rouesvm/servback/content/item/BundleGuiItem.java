@@ -82,7 +82,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 return ActionResult.SUCCESS;
             } else return ActionResult.PASS;
         }
-
+        
         onOpenGui(serverPlayer, stack);
         player.swingHand(hand, true);
         return ActionResult.SUCCESS;

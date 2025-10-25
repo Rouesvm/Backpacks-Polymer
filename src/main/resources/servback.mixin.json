@@ -6,7 +6,9 @@
     "ItemEntityMixin",
     "LivingEntityMixin",
     "ShapedRecipeMixin",
-    "ShulkerBoxMixin"
+    "ShulkerBoxMixin",
+    "compat.BedframeBlockTranslatorMixin",
+    "compat.BedframeItemTranslatorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

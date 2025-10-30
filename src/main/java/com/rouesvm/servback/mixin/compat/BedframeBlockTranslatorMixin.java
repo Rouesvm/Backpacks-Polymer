@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
 
+// true jank
 @Mixin(value = lol.sylvie.bedframe.geyser.translator.BlockTranslator.class, remap = false)
 public class BedframeBlockTranslatorMixin {
     @Inject(method = "<init>", at = @At("TAIL"))

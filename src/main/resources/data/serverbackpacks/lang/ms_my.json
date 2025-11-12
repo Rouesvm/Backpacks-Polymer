@@ -82,6 +82,9 @@
   "info.serverbackpacks.contains": "Kandungan",
   "info.serverbackpacks.mode": "Mod",
 
+  "info.serverbackpacks.remove": "Keluarkan",
+  "info.serverbackpacks.use": "Guna",
+
   "info.serverbackpacks.mode.blacklist": "Senarai Larangan",
   "info.serverbackpacks.mode.whitelist": "Senarai Dibenarkan",
   "info.serverbackpacks.mode.match_content": "Padankan Kandungan Beg",

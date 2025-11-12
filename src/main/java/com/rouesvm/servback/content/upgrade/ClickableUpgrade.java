@@ -6,13 +6,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ClickType;
 
 public interface ClickableUpgrade {
-    default boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, ClickType clickType) {
+    default boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, ClickType clickType, boolean inContainer) {
         return false;
     }
 
-    default boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, eu.pb4.sgui.api.ClickType clickType) {
+    default boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, eu.pb4.sgui.api.ClickType clickType, boolean inContainer) {
         ClickType mapped = clickType.isLeft ? ClickType.LEFT :
                 clickType.isRight ? ClickType.RIGHT : ClickType.LEFT;
-        return onClicked(player, stack, slot, mapped);
+        return onClicked(player, stack, slot, mapped, inContainer);
     }
 }

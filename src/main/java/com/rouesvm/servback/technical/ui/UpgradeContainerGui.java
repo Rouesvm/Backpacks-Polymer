@@ -8,6 +8,7 @@ import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import eu.pb4.sgui.api.ClickType;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
@@ -17,6 +18,8 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -24,6 +27,30 @@ import java.util.List;
 public class UpgradeContainerGui extends SimpleGui {
     protected List<Upgrade> upgradeList;
     protected final ItemStack backpackStack;
+
+    protected boolean remove = false;
+
+    public static ItemStack modeStack = Items.COMMAND_BLOCK.getDefaultStack();
+    static {
+        modeStack.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.mode")
+                .append(": ")
+                .append(Text.translatable("info.serverbackpacks.use")));
+    }
+
+    public static ItemStack modeRemoveStack = Items.REPEATING_COMMAND_BLOCK.getDefaultStack();
+    static {
+        modeRemoveStack.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.mode")
+                .append(": ")
+                .append(Text.translatable("info.serverbackpacks.remove")));
+    }
+
+    private void clickCallback(ClickType clickType) {
+        if (clickType.isLeft) {
+            this.remove = !remove;
+            this.setSlot(4, GuiElementBuilder.from(remove ? modeRemoveStack : modeStack).setCallback(this::clickCallback));
+            this.player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
+        }
+    }
 
     public UpgradeContainerGui(ServerPlayerEntity player, ItemStack stack) {
         super(ScreenHandlerType.HOPPER, player, false);
@@ -37,8 +64,9 @@ public class UpgradeContainerGui extends SimpleGui {
 
         this.setTitle(Text.translatable("info.serverbackpacks.upgrades"));
 
-        int i=0;
-        for (Upgrade upgrade : upgradeList) {
+        int i;
+        for (i=0; i < upgradeList.size(); i++) {
+            Upgrade upgrade = upgradeList.get(i);
             UpgradeType<? extends Upgrade> upgradeType = upgrade.getType();
             if (upgradeType == null || upgradeType.getItem() == null) continue;
 
@@ -47,7 +75,6 @@ public class UpgradeContainerGui extends SimpleGui {
             upgradeStack.set(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgrade));
 
             this.setSlot(i, upgradeStack);
-            i++;
         }
 
         ItemStack barrier = Items.BARRIER.getDefaultStack();
@@ -56,6 +83,8 @@ public class UpgradeContainerGui extends SimpleGui {
         for (int index = i; index < getSize(); index++) {
             this.setSlot(index, barrier);
         }
+
+        this.setSlot(4, GuiElementBuilder.from(modeStack).setCallback(this::clickCallback));
 
         open();
     }
@@ -72,25 +101,24 @@ public class UpgradeContainerGui extends SimpleGui {
 
         Upgrade upgrade = item.getUpgrade(stack);
 
-        if (type.isRight) {
+        if (remove) {
+            this.screenHandler.setCursorStack(stack.copyAndEmpty());
+
+            ItemStack barrier = Items.BARRIER.getDefaultStack();
+            barrier.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.empty"));
+
+            this.setSlot(index, barrier);
+
+            upgradeList.remove(upgrade);
+            backpackStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(upgradeList));
+
+            if (upgradeList.isEmpty()) {
+                backpackStack.remove(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+                close();
+            }
+        } else {
             if (upgrade instanceof ClickableUpgrade clickableUpgrade)
-                clickableUpgrade.onClicked(player, stack, slot, type);
-            return false;
-        }
-
-        this.screenHandler.setCursorStack(stack.copyAndEmpty());
-
-        ItemStack barrier = Items.BARRIER.getDefaultStack();
-        barrier.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("info.serverbackpacks.empty"));
-
-        this.setSlot(index, barrier);
-
-        upgradeList.remove(upgrade);
-        backpackStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(upgradeList));
-
-        if (upgradeList.isEmpty()) {
-            backpackStack.remove(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            close();
+                clickableUpgrade.onClicked(player, stack, slot, type, true);
         }
 
         return true;

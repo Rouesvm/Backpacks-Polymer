@@ -5,13 +5,10 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.BackpackUtils;
-import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.codecs.InventoryData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.SharedConstants;
 import net.minecraft.datafixer.TypeReferences;
@@ -27,8 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,18 +37,10 @@ public class BackpackData {
         return t;
     });
 
-    private static Path singularBackupDir;
-    private static Path fullBackupDir;
-
     private static Path saveDir;
-
-    private static final Map<UUID, String> lastSingularHashes = new Object2ObjectOpenHashMap<>();
-    private static final Map<UUID, String> lastFullHashes = new Object2ObjectOpenHashMap<>();
 
     private static final Set<BackpackInstance> storedInventories =
             Collections.synchronizedSet(new ObjectOpenHashSet<>());
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
 
     public static void shutdownThread() {
         executor.shutdown();
@@ -64,26 +51,6 @@ public class BackpackData {
             }
         } catch (InterruptedException e) {
             ServerBackpacks.LOGGER.error("Error while stopping thread {}", e.getMessage());
-        }
-    }
-
-    public static void createBackupDirs(MinecraftServer server) {
-        Path backupDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks-backups");
-
-        try {
-            Files.createDirectories(backupDir);
-        } catch (IOException e) {
-            ServerBackpacks.LOGGER.error("Failed to create backup directory", e);
-        }
-
-        singularBackupDir = backupDir.resolve("singular");
-        fullBackupDir = backupDir.resolve("full");
-
-        try {
-            Files.createDirectories(singularBackupDir);
-            Files.createDirectories(fullBackupDir);
-        } catch (IOException e) {
-            ServerBackpacks.LOGGER.error("Failed to create singular/full backup directories", e);
         }
     }
 
@@ -205,8 +172,9 @@ public class BackpackData {
             ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e.getMessage());
             try {
                 Files.deleteIfExists(tempFile);
-            } catch (IOException ignored) {
-
+            } catch (IOException cleanupError) {
+                ServerBackpacks.LOGGER.warn("Failed to cleanup temp file: {}",
+                        tempFile, cleanupError);
             }
         }
     }
@@ -249,38 +217,6 @@ public class BackpackData {
         });
     }
 
-    private static Path createTimestampedDir(Path baseDir) {
-        String formattedTime = LocalDateTime.now().format(formatter);
-        return baseDir.resolve(formattedTime);
-    }
-
-    private static void saveBackup(Path dir, MinecraftServer server, BackpackInstance instance, Map<UUID, String> lastHashes) {
-        UUID uuid = instance.uuid();
-        String hash = BackpackUtils.hashBackpackContents(instance.heldInventory());
-
-        if (!hash.equals(lastHashes.get(uuid))) {
-            saveSingle(dir, server, instance);
-            lastHashes.put(uuid, hash);
-        }
-    }
-
-    public static void createSingularBackup(MinecraftServer server, BackpackInstance instance) {
-        if (singularBackupDir == null || !Configuration.instance().allow_backups) return;
-        replaceStoredInventory(instance);
-        executor.execute(() -> saveBackup(createTimestampedDir(singularBackupDir), server, instance, lastSingularHashes));
-    }
-
-    public static void createBackup(MinecraftServer server) {
-        if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
-
-        replaceStoredInventories(BackpackManager.instance().backpackInstances());
-
-        executor.execute(() -> {
-            Path currentDir = createTimestampedDir(fullBackupDir);
-            for (BackpackInstance instance : storedInventories) saveBackup(currentDir, server, instance, lastFullHashes);
-        });
-    }
-
     public static BackpackInstanceData turnInstanceToData(BackpackInstance instance) {
         return new BackpackInstanceData(
                 instance.uuid(),
@@ -312,7 +248,10 @@ public class BackpackData {
     }
 
     public static void replaceStoredInventory(BackpackInstance backpackInstance) {
-        storedInventories.add(backpackInstance);
+        synchronized(storedInventories) {
+            storedInventories.removeIf(inst -> inst.uuid().equals(backpackInstance.uuid()));
+            storedInventories.add(backpackInstance);
+        }
     }
 
     public static void replaceStoredInventories(Set<BackpackInstance> backpackInstances) {

@@ -1,0 +1,121 @@
+package com.rouesvm.servback.technical.data;
+
+import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.BackpackUtils;
+import com.rouesvm.servback.technical.config.Configuration;
+import com.rouesvm.servback.technical.manager.BackpackManager;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.WorldSavePath;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+public class BackpackDataBackups {
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "ServerBackpacks-DataBackup");
+        t.setDaemon(true);
+        return t;
+    });
+
+    public static void shutdownThread() {
+        executor.shutdown();
+
+        try {
+            if (executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                ServerBackpacks.LOGGER.info("Thread stopped.");
+            }
+        } catch (InterruptedException e) {
+            ServerBackpacks.LOGGER.error("Error while stopping thread {}", e.getMessage());
+        }
+    }
+
+    private static Path singularBackupDir;
+    private static Map<UUID, Path> backupDirsUUID = new HashMap<>();
+
+    private static Path fullBackupDir;
+
+    private static final Map<UUID, String> lastSingularHashes = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, String> lastFullHashes = new Object2ObjectOpenHashMap<>();
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
+
+    private static Path createTimestampedDir(Path baseDir) {
+        String formattedTime = LocalDateTime.now().format(formatter);
+        return baseDir.resolve(formattedTime);
+    }
+
+    public static void createBackupDirs(MinecraftServer server) {
+        Path backupDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks-backups");
+
+        try {
+            Files.createDirectories(backupDir);
+        } catch (IOException e) {
+            ServerBackpacks.LOGGER.error("Failed to create backup directory", e);
+        }
+
+        singularBackupDir = backupDir.resolve("singular");
+        fullBackupDir = backupDir.resolve("full");
+
+        try {
+            Files.createDirectories(singularBackupDir);
+            Files.createDirectories(fullBackupDir);
+        } catch (IOException e) {
+            ServerBackpacks.LOGGER.error("Failed to create singular/full backup directories", e);
+            singularBackupDir = null;
+            fullBackupDir = null;
+        }
+    }
+
+    private static void saveBackup(Path dir, MinecraftServer server, BackpackInstance instance, Map<UUID, String> lastHashes) {
+        UUID uuid = instance.uuid();
+        String hash = BackpackUtils.hashBackpackContents(instance.heldInventory());
+
+        if (!hash.equals(lastHashes.get(uuid))) {
+            BackpackData.saveSingle(dir, server, instance);
+            lastHashes.put(uuid, hash);
+        }
+    }
+
+    public static void createSingularBackup(MinecraftServer server, BackpackInstance instance) {
+        if (singularBackupDir == null || !Configuration.instance().allow_backups) return;
+        backupDirsUUID.computeIfAbsent(instance.uuid(), k -> singularBackupDir.resolve(instance.uuid().toString()));
+
+        Path backupDir = backupDirsUUID.get(instance.uuid());
+        if (!Files.exists(backupDir)) {
+            try {
+                Files.createDirectories(backupDir);
+            } catch (IOException e) {
+                ServerBackpacks.LOGGER.error("Failed to create uuid's backup directory", e);
+                backupDir = null;
+                backupDirsUUID.remove(instance.uuid());
+            }
+        }
+
+        if (backupDir != null) {
+            BackpackData.replaceStoredInventory(instance);
+            Path finalBackupDir = backupDir;
+            executor.execute(() -> saveBackup(createTimestampedDir(finalBackupDir), server, instance, lastSingularHashes));
+        }
+    }
+
+    public static void createBackup(MinecraftServer server) {
+        if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
+
+        BackpackData.replaceStoredInventories(BackpackManager.instance().backpackInstances());
+
+        executor.execute(() -> {
+            Path currentDir = createTimestampedDir(fullBackupDir);
+            for (BackpackInstance instance : BackpackData.getBackpackInstances()) saveBackup(currentDir, server, instance, lastFullHashes);
+        });
+    }
+}

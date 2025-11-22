@@ -19,7 +19,7 @@ public class CosmeticManager {
         return manager;
     }
 
-    public static void setup() {
+    public static void initialize() {
         manager = new CosmeticManager();
     }
 

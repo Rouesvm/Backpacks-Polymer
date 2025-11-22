@@ -14,6 +14,7 @@ import com.rouesvm.servback.technical.config.BackpackItemConfiguration;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.config.commands.BackpackCommands;
 import com.rouesvm.servback.technical.data.BackpackData;
+import com.rouesvm.servback.technical.data.BackpackDataBackups;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -87,25 +88,26 @@ public class ServerBackpacks implements ModInitializer {
 		ServerPlayConnectionEvents.DISCONNECT.register((serverPlayNetworkHandler, a) ->
 				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer()));
 
-		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::setup);
+		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::initialize);
 		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::loadOnServerStarted);
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 
 		ServerLifecycleEvents.BEFORE_SAVE.register((minecraftServer, b, b1) -> {
 			if (BackpackManager.instance() != null) {
-				BackpackManager.createBackup();
+				BackpackManager.createBackupAndSave();
 			}
 		});
 
         Runtime.getRuntime().addShutdownHook(new Thread(BackpackData::shutdownThread));
+        Runtime.getRuntime().addShutdownHook(new Thread(BackpackDataBackups::shutdownThread));
 
 		backupEvents();
 	}
 
 	private static void backupEvents() {
-		ServerPlayerEvents.LEAVE.register((p0) -> BackpackManager.createBackup());
-		ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackManager.createBackup());
+		ServerPlayerEvents.LEAVE.register((p0) -> BackpackManager.createBackupAndSave());
+		ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackManager.createBackupAndSave());
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

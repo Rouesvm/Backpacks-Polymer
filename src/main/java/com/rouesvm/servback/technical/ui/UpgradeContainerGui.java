@@ -18,7 +18,6 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
@@ -48,7 +47,7 @@ public class UpgradeContainerGui extends SimpleGui {
         if (clickType.isLeft) {
             this.remove = !remove;
             this.setSlot(4, GuiElementBuilder.from(remove ? modeRemoveStack : modeStack).setCallback(this::clickCallback));
-            this.player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
+            this.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), 1, 1);
         }
     }
 

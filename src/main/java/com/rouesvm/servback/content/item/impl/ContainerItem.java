@@ -192,8 +192,8 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public static void playOpenSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.PLAYERS, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
+        player.playSound(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
+        player.playSound(SoundEvents.ITEM_BUNDLE_INSERT, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertSound(World world, BlockPos pos, float pitch) {
@@ -205,11 +205,11 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public static void playDropContentsSound(ServerPlayerEntity player, float pitch) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, SoundCategory.PLAYERS, 0.8F, pitch + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
+        player.playSound(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, 0.8F, pitch + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertFailSound(ServerPlayerEntity player) {
-        player.playSoundToPlayer(SoundEvents.ITEM_BUNDLE_INSERT_FAIL, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        player.playSound(SoundEvents.ITEM_BUNDLE_INSERT_FAIL, 1.0F, 1.0F);
     }
 
 }

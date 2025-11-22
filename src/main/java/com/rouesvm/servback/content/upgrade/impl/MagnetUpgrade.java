@@ -14,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -97,7 +96,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
                         .formatted(Formatting.GREEN)
                 ), true);
 
-        player.playSoundToPlayer(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.UI, 1, 1);
+        player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), 1, 1);
 
         return true;
     }

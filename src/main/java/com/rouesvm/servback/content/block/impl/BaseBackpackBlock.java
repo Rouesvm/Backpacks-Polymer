@@ -21,7 +21,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +42,7 @@ public class BaseBackpackBlock extends BasicBackpackBlock implements BlockEntity
     }
 
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return ScreenHandler.calculateComparatorOutput(getInventory(
                 null, world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY).get()
         ));

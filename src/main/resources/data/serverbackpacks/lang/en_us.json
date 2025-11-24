@@ -83,6 +83,9 @@
   "info.serverbackpacks.contains": "Contains",
   "info.serverbackpacks.mode": "Mode",
 
+  "info.serverbackpacks.remove": "Remove",
+  "info.serverbackpacks.use": "Use",
+
   "info.serverbackpacks.mode.blacklist": "Blacklist",
   "info.serverbackpacks.mode.whitelist": "Whitelist",
   "info.serverbackpacks.mode.match_content": "Match Backpack's Content",

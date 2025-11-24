@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.config.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.content.item.BundleGuiItem;
 import dev.emi.trinkets.api.TrinketComponent;
 import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.server.command.ServerCommandSource;
@@ -17,8 +17,8 @@ public class TrinketsBackpack {
             ServerPlayerEntity player = context.getSource().getPlayer();
             Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(player);
             component.ifPresent(trinketComponent -> trinketComponent.forEach((slotReference, stack) -> {
-                if (stack.getItem() instanceof ContainerItem containerItem
-                ) containerItem.onOpenGui(player, stack);
+                if (stack.getItem() instanceof BundleGuiItem item
+                ) item.onOpenGui(player, stack);
             }));
             return 1;
         }));

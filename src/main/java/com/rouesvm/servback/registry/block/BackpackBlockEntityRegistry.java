@@ -15,12 +15,12 @@ import net.minecraft.util.Identifier;
 public class BackpackBlockEntityRegistry {
     public static final BlockEntityType<BackpackBlockEntity> BACKPACK_BLOCK_ENTITY = register(
             "backpack_block_entity",
-            FabricBlockEntityTypeBuilder.create(BackpackBlockEntity::new, BackpackBlockRegistry.BACKPACK).build());
+            FabricBlockEntityTypeBuilder.create(BackpackBlockEntity::new, BackpackBlockRegistry.BACKPACK, BackpackBlockRegistry.GLOBAL_BACKPACK).build());
 
-    public static final BlockEntityType<BasicBackpackBlockEntity> BASIC_BACKPACK_BLOCK_ENTITY= register(
+    public static final BlockEntityType<BasicBackpackBlockEntity> BASIC_BACKPACK_BLOCK_ENTITY = register(
             "basic_backpack_block_entity",
             FabricBlockEntityTypeBuilder.create(BasicBackpackBlockEntity::new)
-                    .addBlocks(BackpackBlockRegistry.ENDER_BACKPACK, BackpackBlockRegistry.GLOBAL_BACKPACK).build());
+                    .addBlocks(BackpackBlockRegistry.ENDER_BACKPACK).build());
 
     private static <T extends BlockEntity> BlockEntityType<T> register(String name, BlockEntityType<T> blockEntityType) {
         var entity = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ServerBackpacks.MOD_ID, name), blockEntityType);

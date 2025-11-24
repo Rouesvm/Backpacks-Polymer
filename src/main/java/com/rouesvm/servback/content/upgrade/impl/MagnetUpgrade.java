@@ -103,10 +103,10 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     }
 
     @Override
-    public boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, ClickType clickType) {
-        if (clickType == ClickType.RIGHT) {
-            return onUsed(player.getWorld(), player, stack);
-        } else return ClickableUpgrade.super.onClicked(player, stack, slot, clickType);
+    public boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, ClickType clickType, boolean inContainer) {
+        if ((clickType == ClickType.RIGHT) != inContainer) {
+            return onUsed(player.getEntityWorld(), player, stack);
+        } else return ClickableUpgrade.super.onClicked(player, stack, slot, clickType, inContainer);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         Vec3d target = new Vec3d(pos.toVector3f());
 
         queue.forEach(item -> {
-            Vec3d current = item.getPos();
+            Vec3d current = item.getEntityPos();
             Vec3d delta = target.subtract(current);
 
             double distance = delta.length();

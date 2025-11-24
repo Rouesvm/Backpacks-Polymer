@@ -3,16 +3,14 @@ package com.rouesvm.servback.technical.manager;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.BackpackData;
+import com.rouesvm.servback.technical.data.BackpackDataBackups;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.alternative.BackpackListData;
 import com.rouesvm.servback.technical.data.alternative.BackpackState;
 import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
-import com.rouesvm.servback.technical.data.state.GlobalBackpackState;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -20,7 +18,6 @@ import java.util.*;
 public class BackpackManager {
     private static BackpackManager instance;
 
-    private final BackpackInventory globalInventory = new BackpackInventory(9 * 3);
     private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
 
     private boolean loaded = false;
@@ -28,15 +25,16 @@ public class BackpackManager {
 
     private MinecraftServer server;
 
-    public static void setup(MinecraftServer server) {
-        if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.setup();
+    public static void initialize(MinecraftServer server) {
+        if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.initialize();
         instance = new BackpackManager();
         instance.server = server;
 
         load(server);
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
-        BackpackData.createBackupDirs(server);
+
+        BackpackDataBackups.createBackupDirs(server);
     }
 
     public static void destroy(MinecraftServer ignoredServer) {
@@ -44,10 +42,7 @@ public class BackpackManager {
 
         if (instance != null) {
             ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
-
-            saveData();
-            createBackup();
-
+            createBackupAndSave();
             instance = null;
         }
     }
@@ -56,14 +51,14 @@ public class BackpackManager {
         instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.uuid(), backpackInstance));
     }
 
-    public static void createBackup() {
+    public static void createBackupAndSave() {
         saveData();
-        BackpackData.createBackup(server());
+        BackpackDataBackups.createBackup(server());
     }
 
     public static void createSingularBackup(BackpackInstance instance) {
         BackpackData.saveSingle(server(), instance);
-        BackpackData.createSingularBackup(server(), instance);
+        BackpackDataBackups.createSingularBackup(server(), instance);
     }
 
     public static void saveData(BackpackInstance instance) {
@@ -113,17 +108,11 @@ public class BackpackManager {
             ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
             loadFallback(server, true);
         }
-
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server);
-        instance.globalInventory.setInventoryDirectly(globalBackpackState.globalInventory.heldStacks());
     }
 
     public static void saveData() {
         BackpackData.replaceStoredInventories(instance.backpackInstances());
         BackpackData.save(server());
-
-        GlobalBackpackState globalBackpackState = GlobalBackpackState.getServerState(server());
-        globalBackpackState.globalInventory = instance.globalInventory;
     }
 
     //
@@ -195,14 +184,6 @@ public class BackpackManager {
 
     public Map<UUID, BackpackInstance> storedInstances() {
         return storedInstances;
-    }
-
-    public static void setGlobalInventory(DefaultedList<ItemStack> stacks) {
-        instance.globalInventory.setInventoryDirectly(stacks);
-    }
-
-    public static BackpackInventory globalInventory() {
-        return instance.globalInventory;
     }
 
     public boolean hasBackpack(UUID uuid) {

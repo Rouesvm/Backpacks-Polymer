@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
 
@@ -11,24 +11,21 @@ base {
 }
 
 repositories {
-    maven { url = uri("https://repo.opencollab.dev/main/") }
+    maven { url = "https://repo.opencollab.dev/main/" }
     maven { url = 'https://maven.nucleoid.xyz' }
     maven { url = "https://maven.terraformersmc.com/" }
     maven { url = "https://maven.ladysnake.org/releases" }
+
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 loom {
     splitEnvironmentSourceSets()
 
     runs {
-        data {
-            client()
-            name "Data Generator"
-            vmArg "-Dfabric-api.datagen=true"
-            vmArg "-Dfabric-api.datagen.output-dir=src/generated/resources/"
-            vmArg "-Dfabric-api.datagen.modid=serverbackpacks"
-            runDir "build/datagen"
-        }
     }
 
     mods {
@@ -53,13 +50,16 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation ("eu.pb4:polymer-core:${project.polymer}")
+    modImplementation ("eu.pb4:polymer-blocks:${project.polymer}")
     modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
     modImplementation ("eu.pb4:polymer-virtual-entity:${project.polymer}")
+
     modImplementation include("eu.pb4:sgui:${project.sgui}")
     modImplementation include("eu.pb4:common-protection-api:1.0.0")
     modImplementation include("xyz.nucleoid:server-translations-api:${project.server_translations}")
     modImplementation include("me.lucko:fabric-permissions-api:${project.fabric_permissions_version}")
 
+    modCompileOnly ("maven.modrinth:bedframe:0.1.1")
     modCompileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
     compileOnly("org.geysermc.geyser:api:${project.geyser}")
 }

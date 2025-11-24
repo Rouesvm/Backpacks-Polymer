@@ -82,7 +82,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 return ActionResult.SUCCESS;
             } else return ActionResult.PASS;
         }
-
+        
         onOpenGui(serverPlayer, stack);
         player.swingHand(hand, true);
         return ActionResult.SUCCESS;
@@ -122,7 +122,10 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 if (BaseInventory.canInsert(itemStack, inventory)) {
                     itemStack = BaseInventory.addStack(itemStack, inventory);
                     ContainerItem.playInsertSound(serverPlayer, 0.8F);
-                } else ContainerItem.playInsertFailSound(serverPlayer);
+                } else {
+                    ContainerItem.playInsertFailSound(serverPlayer);
+                    return false;
+                }
 
                 slot.setStack(itemStack);
                 afterChanged(stack, inventory);
@@ -152,7 +155,10 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                     if (BaseInventory.canInsert(otherStack, inventory)) {
                         otherStack = BaseInventory.addStack(otherStack, inventory);
                         ContainerItem.playInsertSound(serverPlayer, 0.8F);
-                    } else ContainerItem.playInsertFailSound(serverPlayer);
+                    } else {
+                        ContainerItem.playInsertFailSound(serverPlayer);
+                        return false;
+                    }
 
                     cursorStackReference.set(otherStack);
                     afterChanged(stack, inventory);

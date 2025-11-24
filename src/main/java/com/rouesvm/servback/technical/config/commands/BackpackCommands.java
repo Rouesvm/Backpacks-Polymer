@@ -36,7 +36,7 @@ public class BackpackCommands {
                     return 1;
                 }).then(literal("backup").executes(context -> {
                     context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.backup"), false);
-                    BackpackManager.createBackup();
+                    BackpackManager.createBackupAndSave();
                     return 1;
                 })).then(literal("list").executes(context -> {
                     Set<UUID> instances = BackpackManager.instance().storedInstances().keySet();

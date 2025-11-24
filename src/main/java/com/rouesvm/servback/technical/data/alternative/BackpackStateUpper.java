@@ -79,12 +79,6 @@ public class BackpackStateUpper {
 
             list.ifPresent(nbtElements -> nbtElements.forEach(element ->
                     instances.add(load((NbtCompound) element, registryLookup))));
-
-            Optional<NbtCompound> globalNbt = compound.getCompound("global");
-            if (globalNbt.isPresent()) {
-                BackpackInventory globalInventory = loadInventory(globalNbt.get(), registryLookup);
-                BackpackManager.setGlobalInventory(globalInventory.heldStacks());
-            }
         }
 
         return instances;

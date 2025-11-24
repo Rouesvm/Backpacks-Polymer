@@ -17,12 +17,12 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
     }
 
     @Override
-    public boolean onClicked(ServerPlayerEntity serverPlayer, ItemStack stack, Slot slot, ClickType clickType) {
-        return openGui(serverPlayer, clickType == ClickType.RIGHT);
+    public boolean onClicked(ServerPlayerEntity serverPlayer, ItemStack stack, Slot slot, ClickType clickType, boolean inContainer) {
+        return openGui(serverPlayer, clickType == ClickType.RIGHT, inContainer);
     }
 
-    public boolean openGui(ServerPlayerEntity serverPlayer, boolean isRight) {
-        if (isRight) {
+    public boolean openGui(ServerPlayerEntity serverPlayer, boolean isRight, boolean inContainer) {
+        if (isRight != inContainer) {
             serverPlayer.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) ->
                     new VirtualCraftingScreenHandler(syncId, inventory),
                     Text.translatable("container.crafting")

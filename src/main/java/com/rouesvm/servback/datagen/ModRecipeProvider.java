@@ -62,7 +62,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_obsidian", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
+        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")

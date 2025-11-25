@@ -3,6 +3,7 @@ package com.rouesvm.servback.datagen;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.recipe.builder.BackpackRecipeJsonBuilder;
 import com.rouesvm.servback.content.recipe.builder.BackpackUpgradeRecipeJsonBuilder;
+import com.rouesvm.servback.content.recipe.builder.TransferNBTJsonBuilder;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -62,7 +63,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("get_obsidian", InventoryChangedCriterion.Conditions.items(Items.OBSIDIAN))
                 .offerTo(exporter);
 
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
+        TransferNBTJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")

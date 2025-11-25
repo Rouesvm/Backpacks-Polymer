@@ -135,7 +135,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
         BackpackUpgradeRecipeJsonBuilder.create(
-                        Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
+                        Ingredient.ofTag(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.ofItem(BackpackItemRegistry.VOID_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))
@@ -143,7 +143,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "void_upgrade_backpack")));
 
         BackpackUpgradeRecipeJsonBuilder.create(
-                        Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
+                        Ingredient.ofTag(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.ofItem(BackpackItemRegistry.MAGNET_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))
@@ -151,7 +151,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "magnet_upgrade_backpack")));
 
         BackpackUpgradeRecipeJsonBuilder.create(
-                        Ingredient.ofTag(itemWrap.getOrThrow(SUPPORTED_BACKPACKS)),
+                        Ingredient.ofTag(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.ofItem(BackpackItemRegistry.CRAFTING_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))

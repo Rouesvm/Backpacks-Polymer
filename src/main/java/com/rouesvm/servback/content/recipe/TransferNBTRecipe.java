@@ -31,7 +31,7 @@ public class TransferNBTRecipe extends ShapedRecipe {
     }
 
     public RecipeSerializer<? extends ShapedRecipe> getSerializer() {
-        return BackpackRecipeRegistry.BACKPACK_CRAFTING_RECIPE;
+        return BackpackRecipeRegistry.TRANSFER_NBT_RECIPE;
     }
 
     @Override

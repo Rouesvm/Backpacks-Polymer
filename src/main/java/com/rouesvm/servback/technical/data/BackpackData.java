@@ -45,11 +45,16 @@ public class BackpackData {
         executor.shutdown();
 
         try {
-            if (executor.awaitTermination(30, TimeUnit.SECONDS)) {
-                ServerBackpacks.LOGGER.info("Thread stopped.");
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                ServerBackpacks.LOGGER.warn("Thread did not stop in time, forcing shutdown.");
+                executor.shutdownNow();
+            } else {
+                ServerBackpacks.LOGGER.info("Thread stopped gracefully.");
             }
         } catch (InterruptedException e) {
             ServerBackpacks.LOGGER.error("Error while stopping thread {}", e.getMessage());
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -64,7 +69,6 @@ public class BackpackData {
         }
         return false;
     }
-
 
     private static boolean loadData(MinecraftServer server) {
         saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
@@ -125,6 +129,7 @@ public class BackpackData {
 
     public static void saveSingle(Path saveDir, MinecraftServer server, BackpackInstance instance) {
         if (!Files.exists(saveDir)) {
+            saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
             try {
                 Files.createDirectories(saveDir);
             } catch (IOException e) {

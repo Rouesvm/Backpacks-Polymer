@@ -1,8 +1,10 @@
 package com.rouesvm.servback.technical.config.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.config.Configuration;
@@ -12,10 +14,15 @@ import com.rouesvm.servback.technical.ui.BackpackGui;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static net.minecraft.server.command.CommandManager.argument;
@@ -38,13 +45,12 @@ public class BackpackCommands {
                     context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.backup"), false);
                     BackpackManager.createBackupAndSave();
                     return 1;
-                })).then(literal("list").executes(context -> {
-                    Set<UUID> instances = BackpackManager.instance().storedInstances().keySet();
-                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.list"), false);
-                    for (UUID uuid : instances) context.getSource().sendFeedback(
-                                () -> Text.literal(String.format("(%s)", uuid.toString())), false);
-                    return 1;
-                })).then(literal("open").then(argument("uuid", StringArgumentType.word()).executes(context -> {
+                })).then(literal("list").executes(context -> listBackpacks(context, 1))
+                                .then(argument("page", IntegerArgumentType.integer(1))
+                                        .executes(context -> listBackpacks(context,
+                                                IntegerArgumentType.getInteger(context, "page")))
+                                )
+                ).then(literal("open").then(argument("uuid", StringArgumentType.word()).executes(context -> {
                     String search = StringArgumentType.getString(context, "uuid");
                     if (!search.isEmpty()) {
                         if (search.length() != 36) throw new CommandSyntaxException(
@@ -83,5 +89,77 @@ public class BackpackCommands {
                     context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.save"), true);
                     return 1;
                 }));
+    }
+
+    public static int listBackpacks(CommandContext<ServerCommandSource> context, int page) {
+        List<UUID> instances = new ArrayList<>(BackpackManager.instance().getDiscoveredBackpackUUIDs());
+
+        int pageSize = 10;
+        int totalPages = (int) Math.ceil(instances.size() / (double) pageSize);
+
+        if (page < 1 || page > totalPages) {
+            context.getSource().sendError(Text.literal("Invalid page number. Valid pages: 1-" + totalPages));
+            return 0;
+        }
+
+        int startIndex = (page - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, instances.size());
+        List<UUID> pageInstances = instances.subList(startIndex, endIndex);
+
+        context.getSource().sendFeedback(() ->
+                        Text.literal(String.format("-== Backpacks Instances (Page %d/%d) ==-", page, totalPages))
+                                .styled(style -> style.withColor(Formatting.WHITE).withBold(true)),
+                false
+        );
+
+        for (UUID uuid : pageInstances) {
+            context.getSource().sendFeedback(() ->
+                            Text.literal("* " + uuid.toString())
+                                    .styled(style -> style
+                                            .withColor(Formatting.AQUA)
+                                            .withUnderline(true)
+                                            .withClickEvent(new ClickEvent.SuggestCommand(
+                                                    "/backpacks open " + uuid
+                                            ))
+                                            .withHoverEvent(new HoverEvent.ShowText(
+                                                    Text.literal("Click to open UUID")
+                                            ))
+                                    ),
+                    false
+            );
+        }
+
+        MutableText footer = Text.literal("");
+
+        if (page > 1) {
+            footer.append(
+                    Text.literal("[< Previous] ")
+                            .styled(style -> style
+                                    .withColor(Formatting.YELLOW)
+                                    .withClickEvent(new ClickEvent.RunCommand(
+                                            "/backpacks list " + (page - 1)
+                                    ))
+                            )
+            );
+        }
+
+        footer.append(Text.literal(String.format("Page %d/%d ", page, totalPages))
+                .styled(style -> style.withColor(Formatting.GRAY)));
+
+        if (page < totalPages) {
+            footer.append(
+                    Text.literal("[Next >]")
+                            .styled(style -> style
+                                    .withColor(Formatting.YELLOW)
+                                    .withClickEvent(new ClickEvent.RunCommand(
+                                            "/backpacks list " + (page + 1)
+                                    ))
+                            )
+            );
+        }
+
+        context.getSource().sendFeedback(() -> footer, false);
+
+        return 1;
     }
 }

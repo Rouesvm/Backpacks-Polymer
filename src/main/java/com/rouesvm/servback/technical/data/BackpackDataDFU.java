@@ -41,7 +41,7 @@ public class BackpackDataDFU {
                     data_version.get(), newVersion
             );
 
-            itemList.set(j, outputDynamic.getValue());
+            slot.put("itemStacks", outputDynamic.getValue());
         }
 
         root.putInt("data_version", newVersion);

@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -31,16 +32,21 @@ public class BackpackDataBackups {
         executor.shutdown();
 
         try {
-            if (executor.awaitTermination(30, TimeUnit.SECONDS)) {
-                ServerBackpacks.LOGGER.info("Thread stopped.");
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                ServerBackpacks.LOGGER.warn("Thread did not stop in time, forcing shutdown.");
+                executor.shutdownNow();
+            } else {
+                ServerBackpacks.LOGGER.info("Thread stopped gracefully.");
             }
         } catch (InterruptedException e) {
             ServerBackpacks.LOGGER.error("Error while stopping thread {}", e.getMessage());
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
     private static Path singularBackupDir;
-    private static Map<UUID, Path> backupDirsUUID = new HashMap<>();
+    private static final Map<UUID, Path> backupDirsUUID = new HashMap<>();
 
     private static Path fullBackupDir;
 
@@ -112,10 +118,11 @@ public class BackpackDataBackups {
         if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
 
         BackpackData.replaceStoredInventories(BackpackManager.instance().backpackInstances());
+        final List<BackpackInstance> finalStoredInventories = List.copyOf(BackpackData.getBackpackInstances());
 
         executor.execute(() -> {
             Path currentDir = createTimestampedDir(fullBackupDir);
-            for (BackpackInstance instance : BackpackData.getBackpackInstances()) saveBackup(currentDir, server, instance, lastFullHashes);
+            for (BackpackInstance instance : finalStoredInventories) saveBackup(currentDir, server, instance, lastFullHashes);
         });
     }
 }

@@ -10,6 +10,7 @@ import com.rouesvm.servback.technical.data.alternative.BackpackState;
 import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +20,7 @@ public class BackpackManager {
     private static BackpackManager instance;
 
     private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
+    private final Set<UUID> discoveredBackpackUUIDs = new ObjectOpenHashSet<>();
 
     private boolean loaded = false;
     private DATA_TYPE data_type = DATA_TYPE.NONE;
@@ -49,6 +51,14 @@ public class BackpackManager {
 
     public void loadIntoStoredInstances(Set<BackpackInstance> instances) {
         instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.uuid(), backpackInstance));
+    }
+
+    public void loadDiscoveredBackpackUUIDs(Set<UUID> uuids) {
+        discoveredBackpackUUIDs.addAll(uuids);
+    }
+
+    public Set<UUID> getDiscoveredBackpackUUIDs() {
+        return new HashSet<>(discoveredBackpackUUIDs);
     }
 
     public static void createBackupAndSave() {
@@ -145,7 +155,21 @@ public class BackpackManager {
 
     public static Optional<BackpackInstance> getInstance(UUID uuid) {
         BackpackInstance backpackInstance = instance.storedInstances().get(uuid);
-        return Optional.ofNullable(backpackInstance);
+        if (backpackInstance != null) {
+            return Optional.of(backpackInstance);
+        }
+
+        if (!instance.discoveredBackpackUUIDs.contains(uuid)) {
+            return Optional.empty();
+        }
+
+        Optional<BackpackInstance> loaded = BackpackData.getOrLoadBackpack(uuid, server());
+        if (loaded.isPresent()) {
+            instance.storedInstances.put(uuid, loaded.get());
+            return loaded;
+        }
+
+        return Optional.empty();
     }
 
     public static Optional<BackpackInstance> getInstance(UUID uuid, int slots) {

@@ -39,10 +39,10 @@ public class BackpackCommands {
         dispatcher.register(literal("backpacks")
                 .requires(source -> Permissions.check(source, "serverbackpacks.command", 4))
                 .executes(context -> {
-                    context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);
+                    context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), true);
                     return 1;
                 }).then(literal("backup").executes(context -> {
-                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.backup"), false);
+                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.backup"), true);
                     BackpackManager.createBackupAndSave();
                     return 1;
                 })).then(literal("list").executes(context -> listBackpacks(context, 1))
@@ -109,7 +109,7 @@ public class BackpackCommands {
         context.getSource().sendFeedback(() ->
                         Text.literal(String.format("-== Backpacks Instances (Page %d/%d) ==-", page, totalPages))
                                 .styled(style -> style.withColor(Formatting.WHITE).withBold(true)),
-                false
+                true
         );
 
         for (UUID uuid : pageInstances) {
@@ -125,7 +125,7 @@ public class BackpackCommands {
                                                     Text.literal("Click to open UUID")
                                             ))
                                     ),
-                    false
+                    true
             );
         }
 
@@ -158,7 +158,7 @@ public class BackpackCommands {
             );
         }
 
-        context.getSource().sendFeedback(() -> footer, false);
+        context.getSource().sendFeedback(() -> footer, true);
 
         return 1;
     }

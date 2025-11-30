@@ -128,6 +128,8 @@ public class BackpackData {
     }
 
     public static void saveSingle(Path saveDir, MinecraftServer server, BackpackInstance instance) {
+        if (instance == null) return;
+
         if (!Files.exists(saveDir)) {
             saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
             try {
@@ -141,9 +143,10 @@ public class BackpackData {
         Path tempFile = saveDir.resolve(instance.uuid() + ".dat.tmp");
 
         try {
+            BackpackInstanceData backpackData = turnInstanceToData(instance);
             DataResult<NbtElement> data = BackpackInstanceData.CODEC.encodeStart(
                     server.getRegistryManager().getOps(NbtOps.INSTANCE),
-                    turnInstanceToData(instance)
+                    backpackData
             );
 
             Optional<NbtElement> result = data.result();
@@ -174,7 +177,10 @@ public class BackpackData {
     }
 
     public static void save(MinecraftServer server) {
-        final List<BackpackInstance> finalStoredInventories = List.copyOf(loadedBackpacks.values());
+        final List<BackpackInstance> finalStoredInventories = toBackpackInstances().stream()
+                .filter(Objects::nonNull)
+                .toList();
+
         executor.execute(() -> {
             for (BackpackInstance instance : finalStoredInventories) {
                 saveSingle(server, instance);
@@ -210,7 +216,7 @@ public class BackpackData {
         );
     }
 
-    public static Set<BackpackInstance> getBackpackInstances() {
+    public static Set<BackpackInstance> toBackpackInstances() {
         return new HashSet<>(loadedBackpacks.values());
     }
 

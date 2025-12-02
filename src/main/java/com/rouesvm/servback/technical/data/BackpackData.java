@@ -118,16 +118,16 @@ public class BackpackData {
             BackpackDataDFU.applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().dataVersion().id());
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
-                    BackpackInstanceData.CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), nbt);
+                    BackpackInstanceData.CODEC.decode(BackpackManager.nbtOps, nbt);
             return data.result()
-                    .map(pair -> turnDataToInstance(pair.getFirst()));
+                    .map(pair -> turnDataToInstance(uuid, pair.getFirst()));
         } catch (IOException | NbtCrashException e) {
             ServerBackpacks.LOGGER.error("Failed to load single backpack {}", uuid, e);
             return Optional.empty();
         }
     }
 
-    public static void saveSingle(Path saveDir, MinecraftServer server, BackpackInstance instance) {
+    public static void saveSingleToDisk(Path saveDir, MinecraftServer server, BackpackInstance instance) {
         if (instance == null) return;
 
         if (!Files.exists(saveDir)) {
@@ -145,7 +145,7 @@ public class BackpackData {
         try {
             BackpackInstanceData backpackData = turnInstanceToData(instance);
             DataResult<NbtElement> data = BackpackInstanceData.CODEC.encodeStart(
-                    server.getRegistryManager().getOps(NbtOps.INSTANCE),
+                    BackpackManager.nbtOps,
                     backpackData
             );
 
@@ -161,7 +161,7 @@ public class BackpackData {
                         StandardCopyOption.ATOMIC_MOVE);
             }
         } catch (IOException e) {
-            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e.getMessage());
+            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e.getStackTrace());
             try {
                 Files.deleteIfExists(tempFile);
             } catch (IOException cleanupError) {
@@ -171,29 +171,28 @@ public class BackpackData {
         }
     }
 
-    public static void saveSingle(MinecraftServer server, BackpackInstance instance) {
+    public static void saveSingleToDisk(MinecraftServer server, BackpackInstance instance) {
         discoveredBackpackUUIDs.add(instance.uuid());
-        saveSingle(saveDir, server, instance);
+        saveSingleToDisk(saveDir, server, instance);
     }
 
-    public static void save(MinecraftServer server) {
+    public static void saveToDisk(MinecraftServer server) {
         final List<BackpackInstance> finalStoredInventories = toBackpackInstances().stream()
                 .filter(Objects::nonNull)
                 .toList();
 
         executor.execute(() -> {
             for (BackpackInstance instance : finalStoredInventories) {
-                saveSingle(server, instance);
+                saveSingleToDisk(server, instance);
             }
-
             ServerBackpacks.LOGGER.info("Saving data for Server Backpacks.");
         });
     }
 
     public static BackpackInstanceData turnInstanceToData(BackpackInstance instance) {
         return new BackpackInstanceData(
-                instance.uuid(),
-                InventoryData.stacksListToData(instance.heldInventory()),
+                Optional.empty(),
+                Optional.of(InventoryData.stacksListToData(instance.heldInventory())),
                 Optional.of(instance.lastAccessed()),
                 Optional.of(instance.size()),
                 Optional.of(SharedConstants.getGameVersion().dataVersion().id())
@@ -201,19 +200,21 @@ public class BackpackData {
     }
 
     public static BackpackInstance turnDataToInstance(BackpackInstanceData instance) {
+        if (instance.uuid().isPresent())
+            return turnDataToInstance(instance.uuid().get(), instance);
+        else return null;
+    }
+
+    public static BackpackInstance turnDataToInstance(UUID uuid, BackpackInstanceData instance) {
         long lastAccessed = instance.last_accessed().orElse(System.currentTimeMillis());
         int size = instance.size().orElse(9 * 6);
 
-        return new BackpackInstance(
-                instance.uuid(),
-                new BackpackInventory(
-                        InventoryData.getHeldStacks(
-                                instance.getInventoryData().itemStacks(),
-                                size
-                        )
-                ),
-                lastAccessed
-        );
+        if (instance.inventoryData().isPresent()) {
+            InventoryData inventoryData = instance.inventoryData().get();
+            BackpackInventory inventory = new BackpackInventory(InventoryData.getHeldStacks(inventoryData.itemStacks(), size));
+
+            return new BackpackInstance(uuid, inventory, lastAccessed);
+        } else return new BackpackInstance(uuid, new BackpackInventory(size), lastAccessed);
     }
 
     public static Set<BackpackInstance> toBackpackInstances() {

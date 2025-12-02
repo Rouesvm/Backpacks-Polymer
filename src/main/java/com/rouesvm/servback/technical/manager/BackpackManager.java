@@ -11,6 +11,9 @@ import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +30,11 @@ public class BackpackManager {
 
     private MinecraftServer server;
 
+    public static RegistryOps<NbtElement> nbtOps;
+
     public static void initialize(MinecraftServer server) {
+        nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
+
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.initialize();
         instance = new BackpackManager();
         instance.server = server;
@@ -113,13 +120,13 @@ public class BackpackManager {
 
     public static void saveData() {
         BackpackData.replaceStoredInventories(instance.toBackpackInstances());
-        BackpackData.save(server());
+        BackpackData.saveToDisk(server());
     }
 
     public static void saveData(BackpackInstance instance) {
         if (!server().isStopping() && !server().isSaving()) {
             BackpackData.replaceStoredInventory(instance);
-            BackpackData.saveSingle(server(), instance);
+            BackpackData.saveSingleToDisk(server(), instance);
         }
     }
 
@@ -142,7 +149,6 @@ public class BackpackManager {
         }
 
         UUID uuid = instance.uuid();
-        BackpackManager.instance.discoveredBackpackUUIDs.add(uuid);
         BackpackManager.instance.storedInstances.putIfAbsent(uuid, instance);
 
         return getInstance(uuid);
@@ -211,6 +217,10 @@ public class BackpackManager {
 
     public Set<UUID> discoveredBackpackUUIDs() {
         return new HashSet<>(discoveredBackpackUUIDs);
+    }
+
+    public static void addUUIDIfEmpty(UUID uuid) {
+        if (!hasUUID(uuid)) instance.discoveredBackpackUUIDs.add(uuid);
     }
 
     public static boolean hasUUID(UUID uuid) {

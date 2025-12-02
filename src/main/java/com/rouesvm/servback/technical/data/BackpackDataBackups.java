@@ -83,7 +83,7 @@ public class BackpackDataBackups {
         String hash = BackpackUtils.hashBackpackContents(instance.heldInventory());
 
         if (!hash.equals(lastHashes.get(uuid))) {
-            BackpackData.saveSingle(dir, server, instance);
+            BackpackData.saveSingleToDisk(dir, server, instance);
             lastHashes.put(uuid, hash);
         }
     }

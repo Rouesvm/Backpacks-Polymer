@@ -96,7 +96,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
                 item.setVelocity(smooth);
             } else item.setVelocity(Vec3d.ZERO);
 
-            item.velocityModified = true;
+            item.velocityDirty = true;
             item.setPickupDelay(100);
         });
     }

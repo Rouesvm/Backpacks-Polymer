@@ -138,7 +138,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
                 item.setVelocity(smooth);
             } else item.setVelocity(Vec3d.ZERO);
 
-            item.velocityModified = true;
+            item.velocityDirty = true;
             item.setPickupDelay(100);
         });
     }

@@ -95,8 +95,8 @@ public class BackpackGlobalLinker {
         if (backpackToUnlink != null) {
             BackpackUUID.createNewUUID(backpackToUnlink);
 
-            World world = backpackEntity.getEntityWorld();
-            Vec3d pos = backpackEntity.getEntityPos();
+            World world = backpackEntity.getWorld();
+            Vec3d pos = backpackEntity.getPos();
 
             applyEffects((ServerWorld) world, pos);
         }
@@ -132,8 +132,8 @@ public class BackpackGlobalLinker {
         }
 
         if (performLink(entities, sourceBackpack, targetBackpack)) {
-            World world = catalyst.getEntityWorld();
-            Vec3d pos = catalyst.getEntityPos();
+            World world = catalyst.getWorld();
+            Vec3d pos = catalyst.getPos();
 
             catalyst.discard();
             applyEffects((ServerWorld) world, pos);

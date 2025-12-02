@@ -112,7 +112,7 @@ public class BackpackUtils {
     public static void dropItems(Entity entity, BackpackInventory target, int totalSlots) {
         for (int i = target.size() - 1; i >= totalSlots; i--) {
             ItemStack excessItem =  i < target.heldStacks().size() ? target.heldStacks().get(i) : ItemStack.EMPTY;
-            entity.dropStack((ServerWorld) entity.getEntityWorld(), excessItem);
+            entity.dropStack((ServerWorld) entity.getWorld(), excessItem);
         }
     }
 

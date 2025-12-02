@@ -3,7 +3,9 @@ package com.rouesvm.servback.technical;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
@@ -23,31 +25,49 @@ import java.util.UUID;
 
 public class BackpackGlobalLinker {
     public static void testLink(ItemEntity source, World world) {
-        if (!world.isClient() && source.age == 60 &&
-                (source.getStack().isOf(Items.ENDER_PEARL))) {
+        if (world.isClient()) return;
+        if (source.age < 60) return;
+        if (source.isRemoved()) return;
 
-            Vec3d pos = source.getEntityPos();
-            Box area = Box.of(pos, 4.0, 4.0, 4.0);
+        ItemStack stack = source.getStack();
 
-            List<ItemEntity> itemEntities = world.getEntitiesByClass(ItemEntity.class, area, (itemEntity -> itemEntity != source &&
-                    itemEntity.age > 10 &&
-                    itemEntity.getStack().isOf(BackpackItemRegistry.GLOBAL_BACKPACK)));
+        boolean isBackpack = stack.isOf(BackpackItemRegistry.GLOBAL_BACKPACK);
 
-            int globalBackpacks = itemEntities.size();
-            if (globalBackpacks >= 2) {
-                link(itemEntities, source);
-                unlink(itemEntities);
-            }
-        }
+        if (!isBackpack) return;
+
+        Box area = source.getBoundingBox().expand(2);
+
+        List<ItemEntity> backpackEntities = world.getEntitiesByClass(ItemEntity.class, area, (itemEntity ->
+                itemEntity != source &&
+                        itemEntity.age > 10 &&
+                        itemEntity.getStack().isOf(BackpackItemRegistry.GLOBAL_BACKPACK)));
+
+        List<ItemEntity> enderPearlsEntities = world.getEntitiesByClass(ItemEntity.class, area, (itemEntity ->
+                itemEntity != source &&
+                        itemEntity.age > 10 &&
+                        itemEntity.getStack().isOf(Items.ENDER_PEARL)));
+
+        backpackEntities.add(source);
+        ItemEntity enderPearl = enderPearlsEntities.isEmpty() ? null : enderPearlsEntities.get(0);
+
+        int globalBackpacks = backpackEntities.size();
+        if (globalBackpacks < 2) return;
+
+        if (enderPearl != null && source.isOnGround()) {
+            link(backpackEntities, enderPearl);
+        } else if (source.isSubmergedInWater()) unlink(backpackEntities);
     }
 
     public static void unlink(List<ItemEntity> entities) {
         if (entities.size() < 2) return;
 
-        UUID firstUUID = BackpackUUID.getStackUUID(entities.get(0).getStack());
+        UUID firstUUID = BackpackUUID.getStackUUID(entities.getFirst().getStack());
         UUID secondUUID = BackpackUUID.getStackUUID(entities.get(1).getStack());
 
-        if (firstUUID != null && !firstUUID.equals(secondUUID)) return;
+        if (firstUUID == null) return;
+        if (secondUUID == null) return;
+
+        if (!firstUUID.equals(secondUUID)) return;
 
         ItemStack backpackToUnlink = null;
         ItemStack sourceBackpack = null;
@@ -55,8 +75,6 @@ public class BackpackGlobalLinker {
         ItemEntity backpackEntity = null;
 
         for (ItemEntity entity : entities) {
-            if (!entity.isInFluid()) continue;
-
             ItemStack stack = entity.getStack();
             UpgradeContainerComponent containerComponent = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
 
@@ -64,8 +82,11 @@ public class BackpackGlobalLinker {
                 if (backpackToUnlink == null) {
                     backpackToUnlink = stack;
                     backpackEntity = entity;
+                    continue;
                 }
-            } else sourceBackpack = stack;
+            }
+
+            sourceBackpack = stack;
         }
 
         removeVisuals(backpackToUnlink);
@@ -82,7 +103,7 @@ public class BackpackGlobalLinker {
 
         if (sourceBackpack != null) {
             int sourceCount = sourceBackpack.getOrDefault(BackpackDataComponentTypes.LINK_COUNT, 0);
-            sourceBackpack.set(BackpackDataComponentTypes.LINK_COUNT, sourceCount + 1);
+            sourceBackpack.set(BackpackDataComponentTypes.LINK_COUNT, sourceCount - 1);
 
             if (backpackToUnlink != null) {
                 backpackToUnlink.set(BackpackDataComponentTypes.LINK_COUNT, sourceBackpack.get(BackpackDataComponentTypes.LINK_COUNT));
@@ -131,7 +152,17 @@ public class BackpackGlobalLinker {
         int sourceCount = sourceBackpack.getOrDefault(BackpackDataComponentTypes.LINK_COUNT, 0);
         if (sourceCount >= 1) return false;
 
+
+        UUID targetUUID = BackpackUUID.getStackUUID(targetBackpack);
         UUID sourceUUID = BackpackUUID.getStackUUID(sourceBackpack);
+
+        if (targetUUID != null) {
+            BackpackInventory inventory = BackpackManager.getInventory(targetUUID);
+            if (inventory != null && !inventory.isEmpty()) {
+                BackpackUtils.dropItems(entities.getFirst(), inventory, 0);
+            }
+        }
+
         if (sourceUUID == null) {
             sourceUUID = BackpackUUID.generateUniqueUUID();
             sourceBackpack.set(BackpackDataComponentTypes.BACKPACK_UUID, sourceUUID);

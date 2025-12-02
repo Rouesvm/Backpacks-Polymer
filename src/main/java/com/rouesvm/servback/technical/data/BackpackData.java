@@ -173,7 +173,9 @@ public class BackpackData {
 
     public static void saveSingleToDisk(MinecraftServer server, BackpackInstance instance) {
         discoveredBackpackUUIDs.add(instance.uuid());
-        saveSingleToDisk(saveDir, server, instance);
+
+        BackpackInstance finalInstance = instance.copy();
+        executor.execute(() -> saveSingleToDisk(saveDir, server, finalInstance));
     }
 
     public static void saveToDisk(MinecraftServer server) {

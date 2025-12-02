@@ -69,11 +69,8 @@ public class BackpackGui extends BasicInventoryGui {
             String after = BackpackUtils.hashBackpackContents(instance.heldInventory());
 
             if (!before.equals(after)) {
-                BackpackManager.createSingularBackup(instance);
-                return;
+                BackpackManager.createSingularBackupAndSave(instance);
             }
-
-            BackpackManager.saveData(instance);
         }
     }
 

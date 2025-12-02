@@ -3,7 +3,6 @@ package com.rouesvm.servback.technical.data;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
@@ -13,10 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -32,11 +28,16 @@ public class BackpackDataBackups {
         executor.shutdown();
 
         try {
-            if (executor.awaitTermination(30, TimeUnit.SECONDS)) {
-                ServerBackpacks.LOGGER.info("Thread stopped.");
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                ServerBackpacks.LOGGER.warn("Thread did not stop in time, forcing shutdown.");
+                executor.shutdownNow();
+            } else {
+                ServerBackpacks.LOGGER.info("Thread stopped gracefully.");
             }
         } catch (InterruptedException e) {
             ServerBackpacks.LOGGER.error("Error while stopping thread {}", e.getMessage());
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -103,7 +104,6 @@ public class BackpackDataBackups {
         }
 
         if (backupDir != null) {
-            BackpackData.replaceStoredInventory(instance);
             Path finalBackupDir = backupDir;
             executor.execute(() -> saveBackup(createTimestampedDir(finalBackupDir), server, instance, lastSingularHashes));
         }
@@ -111,9 +111,9 @@ public class BackpackDataBackups {
 
     public static void createBackup(MinecraftServer server) {
         if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
-
-        BackpackData.replaceStoredInventories(BackpackManager.instance().backpackInstances());
-        final List<BackpackInstance> finalStoredInventories = List.copyOf(BackpackData.getBackpackInstances());
+        final List<BackpackInstance> finalStoredInventories = BackpackData.toBackpackInstances().stream()
+                .filter(Objects::nonNull)
+                .toList();
 
         executor.execute(() -> {
             Path currentDir = createTimestampedDir(fullBackupDir);

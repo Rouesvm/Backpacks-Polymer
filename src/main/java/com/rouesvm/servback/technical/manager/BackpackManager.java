@@ -30,25 +30,23 @@ public class BackpackManager implements Manager {
     private DATA_TYPE data_type = DATA_TYPE.NONE;
     private STORAGE_TYPE storage_type = STORAGE_TYPE.DEFAULT;
 
-    private Data data;
-    private MinecraftServer server;
+    private final Data data;
+    private final MinecraftServer server;
 
-    private RegistryOps<NbtElement> nbtOps;
+    private final RegistryOps<NbtElement> nbtOps;
+
+    public BackpackManager(MinecraftServer server) {
+        this.server = server;
+        this.nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
+        this.data = new BackpackData(this);
+    }
 
     public static void initialize(MinecraftServer server) {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.initialize();
 
-        instance.nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
-
-        instance = new BackpackManager();
-        instance.server = server;
-
-        if (instance.storage_type == STORAGE_TYPE.DEFAULT) {
-            instance.data = new BackpackData(instance());
-        }
+        instance = new BackpackManager(server);
 
         load(server);
-
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
     }
 

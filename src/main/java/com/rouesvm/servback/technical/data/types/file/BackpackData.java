@@ -49,11 +49,10 @@ public class BackpackData implements Data {
         this.dataBackup = new BackpackDataBackup(manager, this);
 
         this.saveDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownThread));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::onRuntimeEnded));
     }
 
-    @Override
-    public void shutdownThread() {
+    public void onRuntimeEnded() {
         executor.shutdown();
 
         try {

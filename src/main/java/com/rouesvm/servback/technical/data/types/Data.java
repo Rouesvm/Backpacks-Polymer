@@ -14,8 +14,6 @@ public interface Data {
     Optional<BackpackInstance> getOrLoadBackpack(UUID uuid);
     boolean loadData(boolean hasLoaded);
 
-    void shutdownThread();
-
     void saveSingleToDisk(BackpackInstance instance, Path saveDir);
     void saveSingleToDisk(BackpackInstance instance);
     void saveAllToDisk();

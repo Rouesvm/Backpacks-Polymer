@@ -162,7 +162,7 @@ public class BackpackManager {
             return Optional.of(backpackInstance);
         }
 
-        if (!instance.discoveredBackpackUUIDs.contains(uuid)) {
+        if (!hasUUID(uuid)) {
             return Optional.empty();
         }
 
@@ -178,7 +178,7 @@ public class BackpackManager {
     public static Optional<BackpackInstance> getInstance(UUID uuid, int slots) {
         if (instance == null) return Optional.empty();
 
-        if (instance.hasBackpack(uuid))
+        if (hasBackpack(uuid))
             BackpackInventory.resizeInventory(uuid, slots);
         else addBackpack(uuid, new BackpackInventory(slots));
 
@@ -213,7 +213,11 @@ public class BackpackManager {
         return new HashSet<>(discoveredBackpackUUIDs);
     }
 
-    public boolean hasBackpack(UUID uuid) {
+    public static boolean hasUUID(UUID uuid) {
+        return uuid != null && instance.discoveredBackpackUUIDs.contains(uuid);
+    }
+
+    public static boolean hasBackpack(UUID uuid) {
         Optional<BackpackInstance> backpackInstance = getInstance(uuid);
         return uuid != null && backpackInstance.isPresent();
     }

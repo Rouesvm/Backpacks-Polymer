@@ -35,7 +35,7 @@ public class BackpackUUID {
 
     public static UUID generateUniqueUUID() {
         UUID uuid = UUID.randomUUID();
-        if (BackpackManager.instance() != null && BackpackManager.instance().hasBackpack(uuid)) {
+        if (BackpackManager.instance() != null && BackpackManager.hasUUID(uuid)) {
             uuid = UUID.randomUUID();
         }
         return uuid;

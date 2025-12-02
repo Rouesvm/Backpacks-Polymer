@@ -48,7 +48,7 @@ public class BackpackGlobalLinker {
                         itemEntity.getStack().isOf(Items.ENDER_PEARL)));
 
         backpackEntities.add(source);
-        ItemEntity enderPearl = enderPearlsEntities.isEmpty() ? null : enderPearlsEntities.get(0);
+        ItemEntity enderPearl = enderPearlsEntities.isEmpty() ? null : enderPearlsEntities.getFirst();
 
         int globalBackpacks = backpackEntities.size();
         if (globalBackpacks < 2) return;

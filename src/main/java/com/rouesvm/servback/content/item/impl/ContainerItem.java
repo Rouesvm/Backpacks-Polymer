@@ -93,9 +93,7 @@ public class ContainerItem extends BundleGuiItem {
             if (component != null
             ) blockEntity.setUpgradeList(component.getBaseUpgrades());
 
-            UUID uuid = BackpackUUID.getStackUUID(stack);
-            if (uuid == null
-            ) uuid = BackpackUUID.getUUIDOrCreateNew(stack);
+            UUID uuid = BackpackUUID.getUUIDOrCreateNew(stack);
 
             blockEntity.setUuid(uuid);
             blockEntity.setStorage();

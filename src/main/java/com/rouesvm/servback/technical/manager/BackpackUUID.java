@@ -2,6 +2,7 @@ package com.rouesvm.servback.technical.manager;
 
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -24,7 +25,7 @@ public class BackpackUUID {
         return uuid;
     }
 
-    public static UUID getUUIDOrCreateNew(ItemStack stack) {
+    public static @NotNull UUID getUUIDOrCreateNew(ItemStack stack) {
         UUID uuid = getStackUUID(stack);
         if (uuid == null) {
             uuid = createNewUUID(stack);

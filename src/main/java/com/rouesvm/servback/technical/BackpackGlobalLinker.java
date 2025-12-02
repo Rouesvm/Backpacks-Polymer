@@ -78,7 +78,7 @@ public class BackpackGlobalLinker {
             ItemStack stack = entity.getStack();
             UpgradeContainerComponent containerComponent = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
 
-            if (containerComponent == null || containerComponent.getBaseUpgrades().isEmpty()) {
+            if (containerComponent == null || containerComponent.baseUpgrades().isEmpty()) {
                 if (backpackToUnlink == null) {
                     backpackToUnlink = stack;
                     backpackEntity = entity;

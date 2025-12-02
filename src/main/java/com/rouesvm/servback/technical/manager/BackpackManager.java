@@ -2,12 +2,12 @@ package com.rouesvm.servback.technical.manager;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
-import com.rouesvm.servback.technical.data.BackpackData;
-import com.rouesvm.servback.technical.data.BackpackDataBackups;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.alternative.BackpackListData;
 import com.rouesvm.servback.technical.data.alternative.BackpackState;
 import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
+import com.rouesvm.servback.technical.data.types.Data;
+import com.rouesvm.servback.technical.data.types.file.BackpackData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -19,31 +19,37 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class BackpackManager {
+public class BackpackManager implements Manager {
     private static BackpackManager instance;
 
     private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
     private final Set<UUID> discoveredBackpackUUIDs = new ObjectOpenHashSet<>();
 
     private boolean loaded = false;
-    private DATA_TYPE data_type = DATA_TYPE.NONE;
 
+    private DATA_TYPE data_type = DATA_TYPE.NONE;
+    private STORAGE_TYPE storage_type = STORAGE_TYPE.DEFAULT;
+
+    private Data data;
     private MinecraftServer server;
 
-    public static RegistryOps<NbtElement> nbtOps;
+    private RegistryOps<NbtElement> nbtOps;
 
     public static void initialize(MinecraftServer server) {
-        nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
-
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.initialize();
+
+        instance.nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
+
         instance = new BackpackManager();
         instance.server = server;
+
+        if (instance.storage_type == STORAGE_TYPE.DEFAULT) {
+            instance.data = new BackpackData(instance());
+        }
 
         load(server);
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
-
-        BackpackDataBackups.createBackupDirs(server);
     }
 
     public static void destroy(MinecraftServer ignoredServer) {
@@ -66,12 +72,12 @@ public class BackpackManager {
 
     public static void createBackupAndSave() {
         saveData();
-        BackpackDataBackups.createBackup(server());
+        instance.dataHandler().createBackup();
     }
 
-    public static void createSingularBackupAndSave(BackpackInstance instance) {
-        saveData(instance);
-        BackpackDataBackups.createSingularBackup(server(), instance);
+    public static void createSingularBackupAndSave(BackpackInstance backpackInstance) {
+        saveData(backpackInstance);
+        instance.dataHandler().createSingularBackup(backpackInstance);
     }
 
     public static void loadFallback(MinecraftServer server, boolean loadState) {
@@ -93,15 +99,19 @@ public class BackpackManager {
         }
     }
 
-    public static void loadFileData(MinecraftServer server) {
-        if (BackpackData.loadData(server, instance.loaded)) {
+    public static void loadFileData() {
+        Data dataHandler = instance.dataHandler();
+        if (dataHandler.loadData(instance.loaded)) {
             instance.loaded = true;
             instance.data_type = BackpackManager.DATA_TYPE.FILE_DATA;
+
+            instance.loadDiscoveredBackpackUUIDs(dataHandler.getUUIDs());
         }
     }
 
     public static void load(MinecraftServer server) {
-        loadFileData(server);
+        loadFileData();
+
         if (!instance.loaded) {
             loadFallback(server, false);
         }
@@ -119,37 +129,39 @@ public class BackpackManager {
     }
 
     public static void saveData() {
-        BackpackData.replaceStoredInventories(instance.toBackpackInstances());
-        BackpackData.saveToDisk(server());
+        Data dataHandler = instance.dataHandler();
+        dataHandler.replaceStoredInventories(instance.toBackpackInstances());
+        dataHandler.saveAllToDisk();
     }
 
-    public static void saveData(BackpackInstance instance) {
-        if (!server().isStopping() && !server().isSaving()) {
-            BackpackData.replaceStoredInventory(instance);
-            BackpackData.saveSingleToDisk(server(), instance);
-        }
+    public static void saveData(BackpackInstance backpackInstance) {
+        if (instance.server().isStopping() || instance.server().isSaving()) return;
+
+        Data dataHandler = instance.dataHandler();
+        dataHandler.replaceStoredInventory(backpackInstance);
+        dataHandler.saveSingleToDisk(backpackInstance);
     }
 
     //
     // SAVING AND ADDING BACKPACKS
     //
 
-    public static void saveToBackpackInventory(BackpackInstance instance) {
-        if (instance == null) return;
-        if (instance.uuid() != null && instance.inventory() != null) {
-            instance.setLastAccessed();
-            Optional<BackpackInstance> saved = addBackpack(instance);
-            saved.ifPresent(savedInstance -> savedInstance.copyToInventory(instance.inventory()));
+    public static void writeChangesToInventory(BackpackInstance backpackInstance) {
+        if (backpackInstance == null) return;
+        if (backpackInstance.uuid() != null && backpackInstance.inventory() != null) {
+            backpackInstance.setLastAccessed();
+            Optional<BackpackInstance> saved = addBackpack(backpackInstance);
+            saved.ifPresent(savedInstance -> savedInstance.copyToInventory(backpackInstance.inventory()));
         }
     }
 
-    public static Optional<BackpackInstance> addBackpack(BackpackInstance instance) {
-        if (instance.uuid() == null || instance.inventory() == null) {
+    public static Optional<BackpackInstance> addBackpack(BackpackInstance backpackInstance) {
+        if (backpackInstance.uuid() == null || backpackInstance.inventory() == null) {
             return Optional.empty();
         }
 
-        UUID uuid = instance.uuid();
-        BackpackManager.instance.storedInstances.putIfAbsent(uuid, instance);
+        UUID uuid = backpackInstance.uuid();
+        instance.storedInstances.putIfAbsent(uuid, backpackInstance);
 
         return getInstance(uuid);
     }
@@ -172,7 +184,7 @@ public class BackpackManager {
             return Optional.empty();
         }
 
-        Optional<BackpackInstance> loaded = BackpackData.getOrLoadBackpack(uuid, server());
+        Optional<BackpackInstance> loaded = instance.dataHandler().getOrLoadBackpack(uuid);
         if (loaded.isPresent()) {
             instance.storedInstances.put(uuid, loaded.get());
             return loaded;
@@ -207,8 +219,18 @@ public class BackpackManager {
     // GENERAL
     //
 
-    public static MinecraftServer server() {
-        return instance.server;
+    public Data dataHandler() {
+        return this.data;
+    }
+
+    @Override
+    public MinecraftServer server() {
+        return this.server;
+    }
+
+    @Override
+    public RegistryOps<NbtElement> nbtOps() {
+        return this.nbtOps;
     }
 
     public Set<BackpackInstance> toBackpackInstances() {
@@ -242,6 +264,18 @@ public class BackpackManager {
         private final String description;
 
         DATA_TYPE(String desc) { this.description = desc; }
+
+        @Override
+        public String toString() { return description; }
+    }
+
+    public enum STORAGE_TYPE {
+        DEFAULT("Default storage"),
+        SQL("SQL storage");
+
+        private final String description;
+
+        STORAGE_TYPE(String desc) { this.description = desc; }
 
         @Override
         public String toString() { return description; }

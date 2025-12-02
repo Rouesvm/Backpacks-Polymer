@@ -2,11 +2,11 @@ package com.rouesvm.servback.technical.data.alternative;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.PersistentStateType;
@@ -65,10 +65,13 @@ public class BackpackState extends PersistentState {
     }
 
     private static BackpackState getServerState(MinecraftServer server) {
-        if (server.getWorld(World.OVERWORLD) == null) return null;
-        PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
+        ServerWorld world = server.getWorld(World.OVERWORLD);
+        if (world == null) return null;
+
+        PersistentStateManager persistentStateManager = world.getPersistentStateManager();
         BackpackState state = persistentStateManager.getOrCreate(type);
         state.markDirty();
+
         return state;
    }
 
@@ -82,7 +85,8 @@ public class BackpackState extends PersistentState {
 
     private Set<BackpackInstance> getBackpackInstances() {
         return this.storedInventories.stream()
-                .map(BackpackData::turnDataToInstance)
+                .map(BackpackInstanceData::toInstance)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 }

@@ -39,7 +39,7 @@ public record UpgradeComponent(Upgrade upgrade) {
                 UpgradeType<? extends Upgrade> type = BackpackUpgradeRegistry.get(id);
                 Upgrade upgrade = type.create();
                 if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
-                    persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
+                    persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance().server().getRegistryManager(), data));
                 }
 
                 return UpgradeComponent.of(upgrade);

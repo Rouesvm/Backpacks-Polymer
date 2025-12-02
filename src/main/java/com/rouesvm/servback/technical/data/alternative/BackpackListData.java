@@ -4,7 +4,6 @@ import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
@@ -29,7 +28,7 @@ public class BackpackListData {
 
     public static Set<BackpackInstance> getBackpackInstances() {
         return storedInventories.stream()
-                .map(BackpackData::turnDataToInstance)
+                .map(BackpackInstanceData::toInstance)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
@@ -105,7 +104,7 @@ public class BackpackListData {
 
             applyFixToNestedItemStacks(server, compound, oldDataVersion, newDataVersion);
 
-            var dataResult = SAVE_CODEC.decode(BackpackManager.nbtOps, compound);
+            var dataResult = SAVE_CODEC.decode(BackpackManager.instance().nbtOps(), compound);
 
             dataResult.error().ifPresent(err -> {
                 ServerBackpacks.LOGGER.error("SAVE_CODEC.decode failed: {}", err.message());

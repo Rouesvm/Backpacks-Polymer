@@ -115,7 +115,7 @@ public class BackpackData {
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
             NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
-            BackpackDataDFU.applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().dataVersion().id());
+            BackpackDFU.applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().dataVersion().id());
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
                     BackpackInstanceData.CODEC.decode(BackpackManager.nbtOps, nbt);

@@ -24,12 +24,17 @@ public class BackpackUUID {
         return uuid;
     }
 
-    public static UUID createNewUUID(ItemStack stack) {
+    public static UUID getUUIDOrCreateNew(ItemStack stack) {
         UUID uuid = getStackUUID(stack);
         if (uuid == null) {
-            uuid = generateUniqueUUID();
-            stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
+            uuid = createNewUUID(stack);
         }
+        return uuid;
+    }
+
+    public static UUID createNewUUID(ItemStack stack) {
+        UUID uuid = generateUniqueUUID();
+        stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
         return uuid;
     }
 

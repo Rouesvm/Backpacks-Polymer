@@ -57,23 +57,14 @@ public class BackpackManager {
         discoveredBackpackUUIDs.addAll(uuids);
     }
 
-    public Set<UUID> getDiscoveredBackpackUUIDs() {
-        return new HashSet<>(discoveredBackpackUUIDs);
-    }
-
     public static void createBackupAndSave() {
         saveData();
         BackpackDataBackups.createBackup(server());
     }
 
-    public static void createSingularBackup(BackpackInstance instance) {
-        BackpackData.saveSingle(server(), instance);
+    public static void createSingularBackupAndSave(BackpackInstance instance) {
+        saveData(instance);
         BackpackDataBackups.createSingularBackup(server(), instance);
-    }
-
-    public static void saveData(BackpackInstance instance) {
-        BackpackData.replaceStoredInventory(instance);
-        BackpackData.saveSingle(server(), instance);
     }
 
     public static void loadFallback(MinecraftServer server, boolean loadState) {
@@ -121,8 +112,15 @@ public class BackpackManager {
     }
 
     public static void saveData() {
-        BackpackData.replaceStoredInventories(instance.backpackInstances());
+        BackpackData.replaceStoredInventories(instance.toBackpackInstances());
         BackpackData.save(server());
+    }
+
+    public static void saveData(BackpackInstance instance) {
+        if (!server().isStopping() && !server().isSaving()) {
+            BackpackData.replaceStoredInventory(instance);
+            BackpackData.saveSingle(server(), instance);
+        }
     }
 
     //
@@ -139,9 +137,14 @@ public class BackpackManager {
     }
 
     public static Optional<BackpackInstance> addBackpack(BackpackInstance instance) {
+        if (instance.uuid() == null || instance.inventory() == null) {
+            return Optional.empty();
+        }
+
         UUID uuid = instance.uuid();
-        if (uuid == null || instance.inventory() == null) return Optional.empty();
-        BackpackManager.instance.storedInstances().putIfAbsent(uuid, instance);
+        BackpackManager.instance.discoveredBackpackUUIDs.add(uuid);
+        BackpackManager.instance.storedInstances.putIfAbsent(uuid, instance);
+
         return getInstance(uuid);
     }
 
@@ -154,12 +157,12 @@ public class BackpackManager {
     //
 
     public static Optional<BackpackInstance> getInstance(UUID uuid) {
-        BackpackInstance backpackInstance = instance.storedInstances().get(uuid);
+        BackpackInstance backpackInstance = instance.storedInstances.get(uuid);
         if (backpackInstance != null) {
             return Optional.of(backpackInstance);
         }
 
-        if (!instance.discoveredBackpackUUIDs.contains(uuid)) {
+        if (!hasUUID(uuid)) {
             return Optional.empty();
         }
 
@@ -175,7 +178,7 @@ public class BackpackManager {
     public static Optional<BackpackInstance> getInstance(UUID uuid, int slots) {
         if (instance == null) return Optional.empty();
 
-        if (instance.hasBackpack(uuid))
+        if (hasBackpack(uuid))
             BackpackInventory.resizeInventory(uuid, slots);
         else addBackpack(uuid, new BackpackInventory(slots));
 
@@ -202,15 +205,19 @@ public class BackpackManager {
         return instance.server;
     }
 
-    public Set<BackpackInstance> backpackInstances() {
+    public Set<BackpackInstance> toBackpackInstances() {
         return new HashSet<>(this.storedInstances.values());
     }
 
-    public Map<UUID, BackpackInstance> storedInstances() {
-        return storedInstances;
+    public Set<UUID> discoveredBackpackUUIDs() {
+        return new HashSet<>(discoveredBackpackUUIDs);
     }
 
-    public boolean hasBackpack(UUID uuid) {
+    public static boolean hasUUID(UUID uuid) {
+        return uuid != null && instance.discoveredBackpackUUIDs.contains(uuid);
+    }
+
+    public static boolean hasBackpack(UUID uuid) {
         Optional<BackpackInstance> backpackInstance = getInstance(uuid);
         return uuid != null && backpackInstance.isPresent();
     }

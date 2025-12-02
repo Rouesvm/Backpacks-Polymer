@@ -8,6 +8,7 @@ import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -108,17 +109,17 @@ public class BackpackUtils {
                     maxBackpackSlot + addCustomData(player.getWorld(), stack));
     }
 
-    public static void dropExcessItems(ServerPlayerEntity player, BackpackInventory target, int totalSlots) {
+    public static void dropItems(Entity entity, BackpackInventory target, int totalSlots) {
         for (int i = target.size() - 1; i >= totalSlots; i--) {
             ItemStack excessItem =  i < target.heldStacks().size() ? target.heldStacks().get(i) : ItemStack.EMPTY;
-            player.dropItem(excessItem, true);
+            entity.dropStack((ServerWorld) entity.getEntityWorld(), excessItem);
         }
-        ContainerItem.playDropContentsSound(player, -0.2F);
     }
 
     public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory target, int totalSlots) {
         if (target.size() != totalSlots) {
-            dropExcessItems(player, target, totalSlots);
+            dropItems(player, target, totalSlots);
+            ContainerItem.playDropContentsSound(player, -0.2F);
             BackpackInventory.resizeInventory(uuid, totalSlots);
         }
     }

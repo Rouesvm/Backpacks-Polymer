@@ -2,6 +2,7 @@ package com.rouesvm.servback.technical.manager;
 
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -24,18 +25,20 @@ public class BackpackUUID {
         return uuid;
     }
 
-    public static UUID createNewUUID(ItemStack stack) {
+    public static @NotNull UUID getUUIDOrCreateNew(ItemStack stack) {
         UUID uuid = getStackUUID(stack);
-        if (uuid == null) {
-            uuid = generateUniqueUUID();
-            stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
-        }
+        return uuid != null ? uuid : createNewUUID(stack);
+    }
+
+    public static UUID createNewUUID(ItemStack stack) {
+        UUID uuid = generateUniqueUUID();
+        stack.set(BackpackDataComponentTypes.BACKPACK_UUID, uuid);
         return uuid;
     }
 
     public static UUID generateUniqueUUID() {
         UUID uuid = UUID.randomUUID();
-        if (BackpackManager.instance() != null && BackpackManager.instance().hasBackpack(uuid)) {
+        if (BackpackManager.instance() != null && BackpackManager.hasUUID(uuid)) {
             uuid = UUID.randomUUID();
         }
         return uuid;

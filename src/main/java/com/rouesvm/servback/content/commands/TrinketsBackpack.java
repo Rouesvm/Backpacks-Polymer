@@ -1,4 +1,4 @@
-package com.rouesvm.servback.technical.config.commands;
+package com.rouesvm.servback.content.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.rouesvm.servback.content.item.BundleGuiItem;

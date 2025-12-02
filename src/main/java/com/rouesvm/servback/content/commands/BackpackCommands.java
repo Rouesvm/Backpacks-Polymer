@@ -1,4 +1,4 @@
-package com.rouesvm.servback.technical.config.commands;
+package com.rouesvm.servback.content.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -92,7 +92,7 @@ public class BackpackCommands {
     }
 
     public static int listBackpacks(CommandContext<ServerCommandSource> context, int page) {
-        List<UUID> instances = new ArrayList<>(BackpackManager.instance().getDiscoveredBackpackUUIDs());
+        List<UUID> instances = new ArrayList<>(BackpackManager.instance().discoveredBackpackUUIDs());
 
         int pageSize = 10;
         int totalPages = (int) Math.ceil(instances.size() / (double) pageSize);
@@ -106,60 +106,44 @@ public class BackpackCommands {
         int endIndex = Math.min(startIndex + pageSize, instances.size());
         List<UUID> pageInstances = instances.subList(startIndex, endIndex);
 
-        context.getSource().sendFeedback(() ->
-                        Text.literal(String.format("-== Backpacks Instances (Page %d/%d) ==-", page, totalPages))
-                                .styled(style -> style.withColor(Formatting.WHITE).withBold(true)),
-                false
-        );
+        sendToPlayer(context, Text.literal(String.format("-== Backpacks Instances (Page %d/%d) ==-", page, totalPages))
+                .formatted(Formatting.WHITE, Formatting.BOLD));
 
         for (UUID uuid : pageInstances) {
-            context.getSource().sendFeedback(() ->
-                            Text.literal("* " + uuid.toString())
-                                    .styled(style -> style
-                                            .withColor(Formatting.AQUA)
-                                            .withUnderline(true)
-                                            .withClickEvent(new ClickEvent.SuggestCommand(
-                                                    "/backpacks open " + uuid
-                                            ))
-                                            .withHoverEvent(new HoverEvent.ShowText(
-                                                    Text.literal("Click to open UUID")
-                                            ))
-                                    ),
-                    false
-            );
+            sendToPlayer(context, Text.literal("* " + uuid)
+                    .formatted(Formatting.AQUA)
+                    .styled(style -> style
+                            .withClickEvent(new ClickEvent.SuggestCommand("/backpacks open " + uuid))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to open UUID")))
+                    ));
         }
 
         MutableText footer = Text.literal("");
 
         if (page > 1) {
-            footer.append(
-                    Text.literal("[< Previous] ")
-                            .styled(style -> style
-                                    .withColor(Formatting.YELLOW)
-                                    .withClickEvent(new ClickEvent.RunCommand(
-                                            "/backpacks list " + (page - 1)
-                                    ))
-                            )
-            );
+            footer.append(Text.literal("[< Previous] ")
+                    .formatted(Formatting.YELLOW)
+                    .styled(style -> style.withClickEvent(new ClickEvent.RunCommand("/backpacks list " + (page - 1)))));
         }
 
-        footer.append(Text.literal(String.format("Page %d/%d ", page, totalPages))
-                .styled(style -> style.withColor(Formatting.GRAY)));
+        footer.append(Text.literal(String.format("Page %d/%d ", page, totalPages)).formatted(Formatting.GRAY));
 
         if (page < totalPages) {
-            footer.append(
-                    Text.literal("[Next >]")
-                            .styled(style -> style
-                                    .withColor(Formatting.YELLOW)
-                                    .withClickEvent(new ClickEvent.RunCommand(
-                                            "/backpacks list " + (page + 1)
-                                    ))
-                            )
-            );
+            footer.append(Text.literal("[Next >]")
+                    .formatted(Formatting.YELLOW)
+                    .styled(style -> style.withClickEvent(new ClickEvent.RunCommand("/backpacks list " + (page + 1)))));
         }
 
-        context.getSource().sendFeedback(() -> footer, false);
+        sendToPlayer(context, footer);
 
         return 1;
+    }
+
+    private static void sendToPlayer(CommandContext<ServerCommandSource> context, Text text) {
+        if (context.getSource().getPlayer() != null) {
+            context.getSource().getPlayer().sendMessage(text, false);
+        } else {
+            context.getSource().sendFeedback(() -> text, false);
+        }
     }
 }

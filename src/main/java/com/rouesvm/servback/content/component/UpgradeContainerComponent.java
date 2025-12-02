@@ -53,8 +53,8 @@ public class UpgradeContainerComponent {
                             if (upgradeType == null) continue;
 
                             Upgrade upgrade = upgradeType.create();
-                            if (upgrade instanceof PersistentUpgrade saveableUpgrade) {
-                                saveableUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
+                            if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
+                                persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
                             }
                             upgrades.add(upgrade);
                         }

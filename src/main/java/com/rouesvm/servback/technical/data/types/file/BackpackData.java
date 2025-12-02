@@ -224,11 +224,11 @@ public class BackpackData implements Data {
 
     @Override
     public void createSingularBackup(BackpackInstance instance) {
-        dataBackup.createSingularBackup(manager.server(), instance);
+        dataBackup.createSingularBackup(instance);
     }
 
     @Override
     public void createBackup() {
-        dataBackup.createBackup(manager.server());
+        dataBackup.createBackup();
     }
 }

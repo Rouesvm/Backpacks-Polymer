@@ -27,10 +27,7 @@ public class BackpackUUID {
 
     public static @NotNull UUID getUUIDOrCreateNew(ItemStack stack) {
         UUID uuid = getStackUUID(stack);
-        if (uuid == null) {
-            uuid = createNewUUID(stack);
-        }
-        return uuid;
+        return uuid != null ? uuid : createNewUUID(stack);
     }
 
     public static UUID createNewUUID(ItemStack stack) {

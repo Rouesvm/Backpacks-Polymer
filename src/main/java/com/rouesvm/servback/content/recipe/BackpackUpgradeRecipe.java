@@ -59,7 +59,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
 
             if (component == null)
                 return true;
-            else return !component.getBaseUpgrades().contains(upgrade);
+            else return !component.baseUpgrades().contains(upgrade);
         }
 
         return true;
@@ -81,7 +81,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
                 UpgradeContainerComponent.of(new ArrayList<>())
         );
 
-        List<Upgrade> upgrades = new ArrayList<>(component.getBaseUpgrades());
+        List<Upgrade> upgrades = new ArrayList<>(component.baseUpgrades());
         Upgrade upgrade = upgradeBaseItem.getUpgrade(addition);
 
         if (upgrades.contains(upgrade)) return resultStack;

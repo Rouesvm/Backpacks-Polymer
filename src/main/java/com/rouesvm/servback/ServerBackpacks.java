@@ -13,8 +13,6 @@ import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.config.BackpackItemConfiguration;
 import com.rouesvm.servback.technical.config.Configuration;
-import com.rouesvm.servback.technical.data.BackpackData;
-import com.rouesvm.servback.technical.data.BackpackDataBackups;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -98,9 +96,6 @@ public class ServerBackpacks implements ModInitializer {
 				BackpackManager.createBackupAndSave();
 			}
 		});
-
-        Runtime.getRuntime().addShutdownHook(new Thread(BackpackData::shutdownThread));
-        Runtime.getRuntime().addShutdownHook(new Thread(BackpackDataBackups::shutdownThread));
 
 		backupEvents();
 	}

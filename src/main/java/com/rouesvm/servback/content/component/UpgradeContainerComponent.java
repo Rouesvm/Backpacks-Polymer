@@ -19,19 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UpgradeContainerComponent {
-    private final List<Upgrade> baseUpgrades;
-
-    private UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
-        this.baseUpgrades = baseUpgrades;
-    }
+public record UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
 
     public static UpgradeContainerComponent of(List<Upgrade> baseUpgrades) {
         return new UpgradeContainerComponent(baseUpgrades);
-    }
-
-    public List<Upgrade> getBaseUpgrades() {
-        return baseUpgrades;
     }
 
     public void add(Upgrade upgrade) {
@@ -54,7 +45,7 @@ public class UpgradeContainerComponent {
 
                             Upgrade upgrade = upgradeType.create();
                             if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
-                                persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.server().getRegistryManager(), data));
+                                persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance().server().getRegistryManager(), data));
                             }
                             upgrades.add(upgrade);
                         }

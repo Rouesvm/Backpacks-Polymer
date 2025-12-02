@@ -51,7 +51,7 @@ public class BackpackGui extends BasicInventoryGui {
 
     @Override
     public void slotUpdate() {
-        BackpackManager.saveToBackpackInventory(instance);
+        BackpackManager.writeChangesToInventory(instance);
         markDirty = true;
     }
 

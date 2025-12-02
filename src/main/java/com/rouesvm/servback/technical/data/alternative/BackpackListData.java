@@ -4,7 +4,6 @@ import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.technical.data.BackpackData;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
@@ -18,10 +17,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BackpackListData {
@@ -32,7 +28,8 @@ public class BackpackListData {
 
     public static Set<BackpackInstance> getBackpackInstances() {
         return storedInventories.stream()
-                .map(BackpackData::turnDataToInstance)
+                .map(BackpackInstanceData::toInstance)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
@@ -107,8 +104,7 @@ public class BackpackListData {
 
             applyFixToNestedItemStacks(server, compound, oldDataVersion, newDataVersion);
 
-            var ops = server.getRegistryManager().getOps(NbtOps.INSTANCE);
-            var dataResult = SAVE_CODEC.decode(ops, compound);
+            var dataResult = SAVE_CODEC.decode(BackpackManager.instance().nbtOps(), compound);
 
             dataResult.error().ifPresent(err -> {
                 ServerBackpacks.LOGGER.error("SAVE_CODEC.decode failed: {}", err.message());

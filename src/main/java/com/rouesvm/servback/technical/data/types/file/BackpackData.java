@@ -1,19 +1,19 @@
-package com.rouesvm.servback.technical.data;
+package com.rouesvm.servback.technical.data.types.file;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.technical.data.BackpackDFU;
+import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
-import com.rouesvm.servback.technical.data.codecs.InventoryData;
-import com.rouesvm.servback.technical.manager.BackpackManager;
-import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import com.rouesvm.servback.technical.data.types.Data;
+import com.rouesvm.servback.technical.manager.Manager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.*;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
 import java.io.DataInputStream;
@@ -29,19 +29,30 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class BackpackData {
+public class BackpackData implements Data {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "ServerBackpacks-Data");
         t.setDaemon(true);
         return t;
     });
 
-    private static Path saveDir;
+    private final Map<UUID, BackpackInstance> loadedBackpacks = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
+    private final Set<UUID> discoveredBackpackUUIDs = ObjectSets.synchronize(new ObjectOpenHashSet<>());
 
-    private static final Map<UUID, BackpackInstance> loadedBackpacks = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
-    private static final Set<UUID> discoveredBackpackUUIDs = ObjectSets.synchronize(new ObjectOpenHashSet<>());
+    private final Manager manager;
+    private final Path saveDir;
 
-    public static void shutdownThread() {
+    private  final BackpackDataBackup dataBackup;
+
+    public BackpackData(Manager manager) {
+        this.manager = manager;
+        this.dataBackup = new BackpackDataBackup(manager, this);
+
+        this.saveDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
+        Runtime.getRuntime().addShutdownHook(new Thread(this::onRuntimeEnded));
+    }
+
+    public void onRuntimeEnded() {
         executor.shutdown();
 
         try {
@@ -58,21 +69,56 @@ public class BackpackData {
         }
     }
 
-    public static boolean loadData(MinecraftServer server, boolean hasLoaded) {
-        if (!hasLoaded) {
-            hasLoaded = BackpackData.loadData(server);
+    @Override
+    public Set<UUID> getUUIDs() {
+        return new HashSet<>(discoveredBackpackUUIDs);
+    }
 
-            if (hasLoaded && !discoveredBackpackUUIDs.isEmpty()) {
-                BackpackManager.instance().loadDiscoveredBackpackUUIDs(discoveredBackpackUUIDs);
-                return true;
-            }
+    @Override
+    public Optional<BackpackInstance> getOrLoadBackpack(UUID uuid) {
+        BackpackInstance cached = loadedBackpacks.get(uuid);
+        if (cached != null) {
+            return Optional.of(cached);
+        }
+
+        Optional<BackpackInstance> loaded = loadSingle(saveDir, uuid);
+        if (loaded.isPresent()) {
+            BackpackInstance instance = loaded.get();
+            loadedBackpacks.put(uuid, instance);
+            return Optional.of(instance);
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<BackpackInstance> loadSingle(Path saveDir, UUID uuid) {
+        if (saveDir == null) return Optional.empty();
+
+        Path file = saveDir.resolve(uuid.toString() + ".dat");
+        if (!Files.exists(file)) return Optional.empty();
+
+        try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
+            NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
+            BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, SharedConstants.getGameVersion().dataVersion().id());
+
+            DataResult<Pair<BackpackInstanceData, NbtElement>> data =
+                    BackpackInstanceData.CODEC.decode(manager.nbtOps(), nbt);
+            return data.result().map(pair -> pair.getFirst().toInstance(uuid));
+        } catch (IOException | NbtCrashException e) {
+            ServerBackpacks.LOGGER.error("Failed to load single backpack {}", uuid, e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public boolean loadData(boolean hasLoaded) {
+        if (!hasLoaded) {
+            return loadData() && !discoveredBackpackUUIDs.isEmpty();
         }
         return false;
     }
 
-    private static boolean loadData(MinecraftServer server) {
-        saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
-
+    private boolean loadData() {
         try {
             Files.createDirectories(saveDir);
 
@@ -91,47 +137,12 @@ public class BackpackData {
         }
     }
 
-    public static Optional<BackpackInstance> getOrLoadBackpack(UUID uuid, MinecraftServer server) {
-        BackpackInstance cached = loadedBackpacks.get(uuid);
-        if (cached != null) {
-            return Optional.of(cached);
-        }
-
-        Optional<BackpackInstance> loaded = loadSingle(saveDir, server, uuid);
-        if (loaded.isPresent()) {
-            BackpackInstance instance = loaded.get();
-            loadedBackpacks.put(uuid, instance);
-            return Optional.of(instance);
-        }
-
-        return Optional.empty();
-    }
-
-    private static Optional<BackpackInstance> loadSingle(Path saveDir, MinecraftServer server, UUID uuid) {
-        if (saveDir == null) return Optional.empty();
-
-        Path file = saveDir.resolve(uuid.toString() + ".dat");
-        if (!Files.exists(file)) return Optional.empty();
-
-        try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
-            NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
-            BackpackDataDFU.applyDataFixToItemStacks(server, nbt, SharedConstants.getGameVersion().dataVersion().id());
-
-            DataResult<Pair<BackpackInstanceData, NbtElement>> data =
-                    BackpackInstanceData.CODEC.decode(server.getRegistryManager().getOps(NbtOps.INSTANCE), nbt);
-            return data.result()
-                    .map(pair -> turnDataToInstance(pair.getFirst()));
-        } catch (IOException | NbtCrashException e) {
-            ServerBackpacks.LOGGER.error("Failed to load single backpack {}", uuid, e);
-            return Optional.empty();
-        }
-    }
-
-    public static void saveSingle(Path saveDir, MinecraftServer server, BackpackInstance instance) {
+    @Override
+    public void saveSingleToDisk(BackpackInstance instance, Path saveDir) {
         if (instance == null) return;
 
         if (!Files.exists(saveDir)) {
-            saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
+            saveDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
             try {
                 Files.createDirectories(saveDir);
             } catch (IOException e) {
@@ -143,9 +154,9 @@ public class BackpackData {
         Path tempFile = saveDir.resolve(instance.uuid() + ".dat.tmp");
 
         try {
-            BackpackInstanceData backpackData = turnInstanceToData(instance);
+            BackpackInstanceData backpackData = instance.toCodec();
             DataResult<NbtElement> data = BackpackInstanceData.CODEC.encodeStart(
-                    server.getRegistryManager().getOps(NbtOps.INSTANCE),
+                    manager.nbtOps(),
                     backpackData
             );
 
@@ -161,7 +172,7 @@ public class BackpackData {
                         StandardCopyOption.ATOMIC_MOVE);
             }
         } catch (IOException e) {
-            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e.getMessage());
+            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e.getStackTrace());
             try {
                 Files.deleteIfExists(tempFile);
             } catch (IOException cleanupError) {
@@ -171,63 +182,53 @@ public class BackpackData {
         }
     }
 
-    public static void saveSingle(MinecraftServer server, BackpackInstance instance) {
+    @Override
+    public void saveSingleToDisk(BackpackInstance instance) {
         discoveredBackpackUUIDs.add(instance.uuid());
-        saveSingle(saveDir, server, instance);
+
+        BackpackInstance finalInstance = instance.copy();
+        executor.execute(() -> saveSingleToDisk(finalInstance, saveDir));
     }
 
-    public static void save(MinecraftServer server) {
-        final List<BackpackInstance> finalStoredInventories = toBackpackInstances().stream()
+    @Override
+    public void saveAllToDisk() {
+        final List<BackpackInstance> finalStoredInventories = manager.toBackpackInstances().stream()
                 .filter(Objects::nonNull)
                 .toList();
 
         executor.execute(() -> {
             for (BackpackInstance instance : finalStoredInventories) {
-                saveSingle(server, instance);
+                saveSingleToDisk(instance, saveDir);
             }
-
             ServerBackpacks.LOGGER.info("Saving data for Server Backpacks.");
         });
     }
 
-    public static BackpackInstanceData turnInstanceToData(BackpackInstance instance) {
-        return new BackpackInstanceData(
-                instance.uuid(),
-                InventoryData.stacksListToData(instance.heldInventory()),
-                Optional.of(instance.lastAccessed()),
-                Optional.of(instance.size()),
-                Optional.of(SharedConstants.getGameVersion().dataVersion().id())
-        );
-    }
-
-    public static BackpackInstance turnDataToInstance(BackpackInstanceData instance) {
-        long lastAccessed = instance.last_accessed().orElse(System.currentTimeMillis());
-        int size = instance.size().orElse(9 * 6);
-
-        return new BackpackInstance(
-                instance.uuid(),
-                new BackpackInventory(
-                        InventoryData.getHeldStacks(
-                                instance.getInventoryData().itemStacks(),
-                                size
-                        )
-                ),
-                lastAccessed
-        );
-    }
-
-    public static Set<BackpackInstance> toBackpackInstances() {
+    @Override
+    public Set<BackpackInstance> getBackpackInstances() {
         return new HashSet<>(loadedBackpacks.values());
     }
 
-    public static void replaceStoredInventory(BackpackInstance backpackInstance) {
+    @Override
+    public void replaceStoredInventory(BackpackInstance backpackInstance) {
         loadedBackpacks.put(backpackInstance.uuid(), backpackInstance);
     }
 
-    public static void replaceStoredInventories(Set<BackpackInstance> backpackInstances) {
+    @Override
+    public void replaceStoredInventories(Set<BackpackInstance> backpackInstances) {
         loadedBackpacks.clear();
         for (BackpackInstance instance : backpackInstances) {
             loadedBackpacks.put(instance.uuid(), instance);
         }
+    }
+
+    @Override
+    public void createSingularBackup(BackpackInstance instance) {
+        dataBackup.createSingularBackup(instance);
+    }
+
+    @Override
+    public void createBackup() {
+        dataBackup.createBackup();
     }
 }

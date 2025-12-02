@@ -75,7 +75,7 @@ public class ContainerItem extends BundleGuiItem {
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
         if (entity instanceof ServerPlayerEntity player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            if (component != null) component.getBaseUpgrades().forEach((upgrade) ->
+            if (component != null) component.baseUpgrades().forEach((upgrade) ->
                     upgrade.tick(player.getEntityWorld(), player.getEntityPos(), (BackpackInventory) getInventory(player, stack)));
         }
     }
@@ -91,7 +91,7 @@ public class ContainerItem extends BundleGuiItem {
 
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null
-            ) blockEntity.setUpgradeList(component.getBaseUpgrades());
+            ) blockEntity.setUpgradeList(component.baseUpgrades());
 
             UUID uuid = BackpackUUID.getUUIDOrCreateNew(stack);
 
@@ -141,14 +141,14 @@ public class ContainerItem extends BundleGuiItem {
     public static void addUpgradeTooltip(List<Text> tooltip, ItemStack stack) {
         UpgradeContainerComponent upgradeContainer = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
         if (upgradeContainer == null) return;
-        if (upgradeContainer.getBaseUpgrades().isEmpty()) return;
+        if (upgradeContainer.baseUpgrades().isEmpty()) return;
 
         tooltip.add(Text.translatable("info.serverbackpacks.upgrades")
                 .append(":")
                 .formatted(Formatting.GRAY)
         );
 
-        for (Upgrade upgrade : upgradeContainer.getBaseUpgrades()) {
+        for (Upgrade upgrade : upgradeContainer.baseUpgrades()) {
             tooltip.add(Text.literal(" ")
                     .append(upgrade.getType().getTranslationKey())
                     .formatted(Formatting.DARK_GREEN)

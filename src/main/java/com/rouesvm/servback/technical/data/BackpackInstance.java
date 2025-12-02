@@ -1,10 +1,14 @@
 package com.rouesvm.servback.technical.data;
 
+import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
+import com.rouesvm.servback.technical.data.codecs.InventoryData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
+import net.minecraft.SharedConstants;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BackpackInstance {
@@ -18,7 +22,7 @@ public class BackpackInstance {
         this.inventory = inventory;
     }
 
-    public BackpackInstance(UUID uuid, BackpackInventory inventory, long lastAccessed) {
+    public BackpackInstance(long lastAccessed, UUID uuid, BackpackInventory inventory) {
         this.uuid = uuid;
         this.inventory = inventory;
         this.lastAccessed = lastAccessed;
@@ -68,5 +72,15 @@ public class BackpackInstance {
     @Override
     public int hashCode() {
         return Objects.hashCode(uuid);
+    }
+
+    public BackpackInstanceData toCodec() {
+        return new BackpackInstanceData(
+                Optional.empty(),
+                Optional.of(InventoryData.stacksListToData(this.heldInventory())),
+                Optional.of(this.lastAccessed()),
+                Optional.of(this.size()),
+                Optional.of(SharedConstants.getGameVersion().dataVersion().id())
+        );
     }
 }

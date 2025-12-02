@@ -74,7 +74,7 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
         var upgradeContainer = view.getTypedListView("upgrade", UpgradeContainerComponent.CODEC);
         Optional<UpgradeContainerComponent> upgradeContainerComponent = upgradeContainer.stream().findFirst();
         if (!upgradeContainer.isEmpty() && upgradeContainerComponent.isPresent()) {
-            upgradeList = upgradeContainerComponent.get().getBaseUpgrades();
+            upgradeList = upgradeContainerComponent.get().baseUpgrades();
         }
 
         setStorage();

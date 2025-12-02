@@ -8,6 +8,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public class BackpackUUID {
+    public static @NotNull UUID getUUIDOrCreateNew(ItemStack stack) {
+        UUID uuid = getStackUUID(stack);
+        return uuid != null ? uuid : createNewUUID(stack);
+    }
+
     public static @Nullable UUID getStackUUID(ItemStack stack) {
         if (stack == null) return null;
 
@@ -22,12 +27,9 @@ public class BackpackUUID {
             }
         }
 
-        return uuid;
-    }
+        if (uuid != null) BackpackManager.addUUIDIfEmpty(uuid);
 
-    public static @NotNull UUID getUUIDOrCreateNew(ItemStack stack) {
-        UUID uuid = getStackUUID(stack);
-        return uuid != null ? uuid : createNewUUID(stack);
+        return uuid;
     }
 
     public static UUID createNewUUID(ItemStack stack) {

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class BackpackDataDFU {
+public class BackpackDFU {
     public static void applyDataFixToItemStacks(@NotNull MinecraftServer server, NbtCompound root, int newVersion) {
         DataFixer fixer = server.getDataFixer();
 

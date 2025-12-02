@@ -55,7 +55,6 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
         this.getTagBuilder(BACKPACKS).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.GLOBAL_BACKPACK).getIdentifier());
         this.getTagBuilder(BACKPACKS).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.ENDER_BACKPACK).getIdentifier());
 
-        this.getTagBuilder(BLACKLISTED).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.GLOBAL_BACKPACK).getIdentifier());
         this.getTagBuilder(BLACKLISTED).addOptional(((BasicPolymerBlockItem) BackpackItemRegistry.ENDER_BACKPACK).getIdentifier());
 
         this.getTagBuilder(BACKPACKS).addOptionalTag(SMALL_BACKPACKS.id());

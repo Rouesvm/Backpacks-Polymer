@@ -43,7 +43,7 @@ public class FallbackData implements Data {
     }
 
     @Override
-    public boolean loadData(boolean hasLoaded) {
+    public boolean initializeData(boolean hasLoaded) {
         return false;
     }
 

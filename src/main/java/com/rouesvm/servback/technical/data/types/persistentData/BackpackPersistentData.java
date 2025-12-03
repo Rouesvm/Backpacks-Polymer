@@ -35,7 +35,7 @@ public class BackpackPersistentData extends FallbackData {
     }
 
     @Override
-    public boolean loadData(boolean hasLoaded) {
+    public boolean initializeData(boolean hasLoaded) {
         if (!hasLoaded) {
             return isDataPresent();
         } else return false;

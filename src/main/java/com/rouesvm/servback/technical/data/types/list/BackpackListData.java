@@ -30,7 +30,7 @@ public class BackpackListData extends FallbackData {
         super(manager);
     }
 
-    public boolean loadData(boolean hasLoaded) {
+    public boolean initializeData(boolean hasLoaded) {
         if (!hasLoaded) {
             saveDir = manager().server().getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 

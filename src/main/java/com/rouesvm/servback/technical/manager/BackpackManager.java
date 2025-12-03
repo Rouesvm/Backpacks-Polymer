@@ -73,7 +73,7 @@ public class BackpackManager implements Manager {
 
     // stop loading if one succeed
     public void loadStorageData() {
-        if (storageHandler.loadData(loaded)) {
+        if (storageHandler.initializeData(loaded)) {
             loaded = true;
             dataHandler = storageHandler;
             data_type = storageHandler.getType();
@@ -95,7 +95,7 @@ public class BackpackManager implements Manager {
     public void loadFallback(boolean isOnServerStarted) {
         fallbackStorages.forEach(fallback -> {
             if (!(fallback.getType() == DATA_TYPE.MINECRAFT_STATE && !isOnServerStarted)
-                    && fallback.loadData(loaded)
+                    && fallback.initializeData(loaded)
             ) {
                 loaded = true;
                 dataHandler = fallback;

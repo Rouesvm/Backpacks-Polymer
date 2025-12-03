@@ -30,13 +30,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class BackpackData implements Data {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "ServerBackpacks-Data");
         t.setDaemon(true);
         return t;
     });
 
-    private final Set<UUID> uuids = new ObjectOpenHashSet<>();
+    private final Set<UUID> availableUUIDS = new ObjectOpenHashSet<>();
     private final Map<UUID, BackpackInstance> loadedBackpacks = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
 
     private final Manager manager;
@@ -71,7 +71,7 @@ public class BackpackData implements Data {
 
     @Override
     public Set<UUID> getUUIDs() {
-        return new HashSet<>(uuids);
+        return new HashSet<>(availableUUIDS);
     }
 
     @Override
@@ -114,11 +114,10 @@ public class BackpackData implements Data {
     }
 
     @Override
-    public boolean loadData(boolean hasLoaded) {
-        if (!hasLoaded) {
-            return loadData() && !uuids.isEmpty();
-        }
-        return false;
+    public boolean initializeData(boolean hasLoaded) {
+        if (!hasLoaded)
+            return scanAndLoadUUIDs() && !availableUUIDS.isEmpty();
+        else return false;
     }
 
     @Override
@@ -126,7 +125,7 @@ public class BackpackData implements Data {
         return DATA_TYPE.FILE_DATA;
     }
 
-    private boolean loadData() {
+    private boolean scanAndLoadUUIDs() {
         try {
             Files.createDirectories(saveDir);
 
@@ -134,11 +133,11 @@ public class BackpackData implements Data {
                 paths.filter(p -> p.toString().endsWith(".dat"))
                         .forEach(p -> {
                             String filename = p.getFileName().toString().replace(".dat", "");
-                            uuids.add(UUID.fromString(filename));
+                            availableUUIDS.add(UUID.fromString(filename));
                         });
             }
 
-            return !uuids.isEmpty();
+            return !availableUUIDS.isEmpty();
         } catch (IOException e) {
             ServerBackpacks.LOGGER.error("Failed to check backpack directory", e);
             return false;
@@ -154,7 +153,7 @@ public class BackpackData implements Data {
             try {
                 Files.createDirectories(saveDir);
             } catch (IOException e) {
-                ServerBackpacks.LOGGER.error("Error while creating directory {}", e.getMessage());
+                ServerBackpacks.LOGGER.error("Error while creating directory ", e);
             }
         }
 
@@ -168,7 +167,9 @@ public class BackpackData implements Data {
                     backpackData
             );
 
-            Optional<NbtElement> result = data.result();
+            Optional<NbtElement> result = data.resultOrPartial(err ->
+                    ServerBackpacks.LOGGER.error("Inventory failed encodd: {}", err));
+
             if (result.isPresent() && result.get().asCompound().isPresent()) {
                 try (OutputStream os = Files.newOutputStream(tempFile,
                         StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
@@ -180,7 +181,7 @@ public class BackpackData implements Data {
                         StandardCopyOption.ATOMIC_MOVE);
             }
         } catch (IOException e) {
-            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e.getStackTrace());
+            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e);
             try {
                 Files.deleteIfExists(tempFile);
             } catch (IOException cleanupError) {
@@ -192,10 +193,10 @@ public class BackpackData implements Data {
 
     @Override
     public void saveSingleToDisk(BackpackInstance instance) {
-        uuids.add(instance.uuid());
+        availableUUIDS.add(instance.uuid());
 
         BackpackInstance finalInstance = instance.copy();
-        executor.execute(() -> saveSingleToDisk(finalInstance, saveDir));
+        executor.submit(() -> saveSingleToDisk(finalInstance, saveDir));
     }
 
     @Override
@@ -204,7 +205,7 @@ public class BackpackData implements Data {
                 .filter(Objects::nonNull)
                 .toList();
 
-        executor.execute(() -> {
+        executor.submit(() -> {
             for (BackpackInstance instance : finalStoredInventories) {
                 saveSingleToDisk(instance, saveDir);
             }

@@ -13,7 +13,7 @@ public interface Data {
     Set<BackpackInstance> getBackpackInstances();
 
     Optional<BackpackInstance> getOrLoadBackpack(UUID uuid);
-    boolean loadData(boolean hasLoaded);
+    boolean initializeData(boolean hasLoaded);
 
     DATA_TYPE getType();
 

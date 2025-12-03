@@ -13,7 +13,7 @@ public class BackpackPersistentStateData extends FallbackData {
     }
 
     @Override
-    public boolean loadData(boolean hasLoaded) {
+    public boolean initializeData(boolean hasLoaded) {
         BackpackPersistentState state = BackpackPersistentState.getServerState(manager().server());
 
         if (!hasLoaded && state != null) {

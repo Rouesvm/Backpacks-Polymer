@@ -2,8 +2,8 @@ package com.rouesvm.servback.technical.data.types.state;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.types.LegacyData;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.Manager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
@@ -58,8 +58,8 @@ public class BackpackPersistentData implements LegacyData {
     }
 
     @Override
-    public BackpackManager.DATA_TYPE getType() {
-        return BackpackManager.DATA_TYPE.OLD_MINECRAFT_STATE;
+    public DATA_TYPE getType() {
+        return DATA_TYPE.OLD_MINECRAFT_STATE;
     }
 
     private boolean isDataPresent() {

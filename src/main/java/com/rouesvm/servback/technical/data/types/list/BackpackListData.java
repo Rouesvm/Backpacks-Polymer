@@ -4,9 +4,9 @@ import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackDFU;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.types.LegacyData;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.Manager;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
@@ -68,8 +68,8 @@ public class BackpackListData implements LegacyData {
     }
 
     @Override
-    public BackpackManager.DATA_TYPE getType() {
-        return BackpackManager.DATA_TYPE.LIST_FILE_DATA;
+    public DATA_TYPE getType() {
+        return DATA_TYPE.LIST_FILE_DATA;
     }
 
     private void applyFixToNestedItemStacks(MinecraftServer server, NbtCompound root, int oldVersion, int newVersion) {

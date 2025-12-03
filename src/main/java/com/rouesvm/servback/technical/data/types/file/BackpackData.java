@@ -5,9 +5,9 @@ import com.mojang.serialization.DataResult;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackDFU;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.types.Data;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.Manager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -120,8 +120,8 @@ public class BackpackData implements Data {
     }
 
     @Override
-    public BackpackManager.DATA_TYPE getType() {
-        return BackpackManager.DATA_TYPE.FILE_DATA;
+    public DATA_TYPE getType() {
+        return DATA_TYPE.FILE_DATA;
     }
 
     private boolean loadData() {

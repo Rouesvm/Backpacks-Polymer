@@ -3,6 +3,7 @@ package com.rouesvm.servback.technical.manager;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.types.Data;
 import com.rouesvm.servback.technical.data.types.file.BackpackData;
 import com.rouesvm.servback.technical.data.types.list.BackpackListData;
@@ -253,21 +254,6 @@ public class BackpackManager implements Manager {
     public static boolean hasBackpack(UUID uuid) {
         Optional<BackpackInstance> backpackInstance = getInstance(uuid);
         return uuid != null && backpackInstance.isPresent();
-    }
-
-    public enum DATA_TYPE {
-        NONE("No data loaded"),
-        MINECRAFT_STATE("Minecraft state"),
-        OLD_MINECRAFT_STATE("Old Minecraft state"),
-        FILE_DATA("File-based data"),
-        LIST_FILE_DATA("List file-based data");
-
-        private final String description;
-
-        DATA_TYPE(String desc) { this.description = desc; }
-
-        @Override
-        public String toString() { return description; }
     }
 
     public enum STORAGE_TYPE {

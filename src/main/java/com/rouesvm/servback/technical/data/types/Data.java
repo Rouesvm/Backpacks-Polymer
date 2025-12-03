@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.data.types;
 
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ public interface Data {
     Optional<BackpackInstance> getOrLoadBackpack(UUID uuid);
     boolean loadData(boolean hasLoaded);
 
-    BackpackManager.DATA_TYPE getType();
+    DATA_TYPE getType();
 
     void saveSingleToDisk(BackpackInstance instance, Path saveDir);
     void saveSingleToDisk(BackpackInstance instance);

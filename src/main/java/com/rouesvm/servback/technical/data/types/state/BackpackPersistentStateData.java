@@ -1,8 +1,8 @@
 package com.rouesvm.servback.technical.data.types.state;
 
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.types.LegacyData;
-import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.Manager;
 
 import java.util.*;
@@ -47,7 +47,7 @@ public class BackpackPersistentStateData implements LegacyData {
     }
 
     @Override
-    public BackpackManager.DATA_TYPE getType() {
-        return BackpackManager.DATA_TYPE.MINECRAFT_STATE;
+    public DATA_TYPE getType() {
+        return DATA_TYPE.MINECRAFT_STATE;
     }
 }

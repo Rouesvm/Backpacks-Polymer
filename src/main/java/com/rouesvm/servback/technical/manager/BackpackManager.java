@@ -66,12 +66,13 @@ public class BackpackManager implements Manager {
                 new BackpackPersistentData(this)));
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
+
         loadStorageData();
     }
 
     // stop loading if one succeed
     public void loadStorageData() {
-        if (storageHandler.loadData(instance.loaded)) {
+        if (storageHandler.loadData(loaded)) {
             loaded = true;
             dataHandler = storageHandler;
             data_type = storageHandler.getType();
@@ -90,26 +91,26 @@ public class BackpackManager implements Manager {
         }
     }
 
-    public void loadDiscoveredBackpackUUIDs(Set<UUID> uuids) {
-        discoveredBackpackUUIDs.addAll(uuids);
-    }
-
-    public static void loadFallback(boolean isOnServerStarted) {
-        instance.fallbackStorages.forEach(fallback -> {
+    public void loadFallback(boolean isOnServerStarted) {
+        fallbackStorages.forEach(fallback -> {
             if (!(fallback.getType() == DATA_TYPE.MINECRAFT_STATE && !isOnServerStarted)
-                    && fallback.loadData(instance.loaded)
+                    && fallback.loadData(loaded)
             ) {
-                instance.loaded = true;
-                instance.dataHandler = fallback;
-                instance.data_type = fallback.getType();
+                loaded = true;
+                dataHandler = fallback;
+                data_type = fallback.getType();
             }
         });
+    }
+
+    public void loadDiscoveredBackpackUUIDs(Set<UUID> uuids) {
+        discoveredBackpackUUIDs.addAll(uuids);
     }
 
     public static void loadOnServerStarted() {
         if (!instance.loaded) {
             ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
-            loadFallback(true);
+            instance.loadFallback(true);
             instance.loadDiscoveredBackpackUUIDs(instance.dataHandler().getUUIDs());
         }
     }

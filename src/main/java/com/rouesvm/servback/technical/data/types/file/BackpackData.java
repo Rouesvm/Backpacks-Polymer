@@ -7,11 +7,10 @@ import com.rouesvm.servback.technical.data.BackpackDFU;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.types.Data;
+import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.Manager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.*;
 import net.minecraft.util.WorldSavePath;
@@ -37,7 +36,6 @@ public class BackpackData implements Data {
     });
 
     private final Map<UUID, BackpackInstance> loadedBackpacks = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
-    private final Set<UUID> discoveredBackpackUUIDs = ObjectSets.synchronize(new ObjectOpenHashSet<>());
 
     private final Manager manager;
     private final Path saveDir;
@@ -71,7 +69,7 @@ public class BackpackData implements Data {
 
     @Override
     public Set<UUID> getUUIDs() {
-        return new HashSet<>(discoveredBackpackUUIDs);
+        return new HashSet<>(uuids);
     }
 
     @Override
@@ -99,7 +97,10 @@ public class BackpackData implements Data {
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
             NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
-            BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, SharedConstants.getGameVersion().dataVersion().id());
+            Optional<Integer> data_version = nbt.getInt("data_version");
+
+            int latest = SharedConstants.getGameVersion().dataVersion().id();
+            BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, data_version.orElse(latest), latest);
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
                     BackpackInstanceData.CODEC.decode(manager.nbtOps(), nbt);
@@ -113,9 +114,14 @@ public class BackpackData implements Data {
     @Override
     public boolean loadData(boolean hasLoaded) {
         if (!hasLoaded) {
-            return loadData() && !discoveredBackpackUUIDs.isEmpty();
+            return loadData() && !uuids.isEmpty();
         }
         return false;
+    }
+
+    @Override
+    public BackpackManager.DATA_TYPE getType() {
+        return BackpackManager.DATA_TYPE.FILE_DATA;
     }
 
     private boolean loadData() {
@@ -126,11 +132,11 @@ public class BackpackData implements Data {
                 paths.filter(p -> p.toString().endsWith(".dat"))
                         .forEach(p -> {
                             String filename = p.getFileName().toString().replace(".dat", "");
-                            discoveredBackpackUUIDs.add(UUID.fromString(filename));
+                            uuids.add(UUID.fromString(filename));
                         });
             }
 
-            return !discoveredBackpackUUIDs.isEmpty();
+            return !uuids.isEmpty();
         } catch (IOException e) {
             ServerBackpacks.LOGGER.error("Failed to check backpack directory", e);
             return false;
@@ -184,7 +190,7 @@ public class BackpackData implements Data {
 
     @Override
     public void saveSingleToDisk(BackpackInstance instance) {
-        discoveredBackpackUUIDs.add(instance.uuid());
+        uuids.add(instance.uuid());
 
         BackpackInstance finalInstance = instance.copy();
         executor.execute(() -> saveSingleToDisk(finalInstance, saveDir));
@@ -192,7 +198,7 @@ public class BackpackData implements Data {
 
     @Override
     public void saveAllToDisk() {
-        final List<BackpackInstance> finalStoredInventories = manager.toBackpackInstances().stream()
+        final List<BackpackInstance> finalStoredInventories = manager.getBackpackInstances().stream()
                 .filter(Objects::nonNull)
                 .toList();
 

@@ -3,11 +3,11 @@ package com.rouesvm.servback.technical.manager;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.alternative.BackpackListData;
-import com.rouesvm.servback.technical.data.alternative.BackpackState;
-import com.rouesvm.servback.technical.data.alternative.BackpackStateUpper;
 import com.rouesvm.servback.technical.data.types.Data;
 import com.rouesvm.servback.technical.data.types.file.BackpackData;
+import com.rouesvm.servback.technical.data.types.list.BackpackListData;
+import com.rouesvm.servback.technical.data.types.state.BackpackPersistentData;
+import com.rouesvm.servback.technical.data.types.state.BackpackPersistentStateData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -22,32 +22,9 @@ import java.util.*;
 public class BackpackManager implements Manager {
     private static BackpackManager instance;
 
-    private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
-    private final Set<UUID> discoveredBackpackUUIDs = new ObjectOpenHashSet<>();
-
-    private boolean loaded = false;
-
-    private DATA_TYPE data_type = DATA_TYPE.NONE;
-    private STORAGE_TYPE storage_type = STORAGE_TYPE.DEFAULT;
-
-    private final Data data;
-    private final MinecraftServer server;
-
-    private final RegistryOps<NbtElement> nbtOps;
-
-    public BackpackManager(MinecraftServer server) {
-        this.server = server;
-        this.nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
-        this.data = new BackpackData(this);
-    }
-
     public static void initialize(MinecraftServer server) {
         if (ServerBackpacks.hasTrinketLoaded) CosmeticManager.initialize();
-
         instance = new BackpackManager(server);
-
-        load(server);
-        ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
     }
 
     public static void destroy(MinecraftServer ignoredServer) {
@@ -60,84 +37,105 @@ public class BackpackManager implements Manager {
         }
     }
 
-    public void loadIntoStoredInstances(Set<BackpackInstance> instances) {
-        instances.forEach(backpackInstance -> storedInstances.put(backpackInstance.uuid(), backpackInstance));
+    private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
+    private final Set<UUID> discoveredBackpackUUIDs = new ObjectOpenHashSet<>();
+
+    private boolean loaded = false;
+
+    private DATA_TYPE data_type = DATA_TYPE.NONE;
+    private STORAGE_TYPE storage_type = STORAGE_TYPE.DEFAULT;
+
+    private final List<Data> fallbackStorages = new ArrayList<>();
+
+    private Data dataHandler;
+    private final Data storageHandler;
+
+    private final MinecraftServer server;
+
+    private final RegistryOps<NbtElement> nbtOps;
+
+    public BackpackManager(MinecraftServer server) {
+        this.server = server;
+        this.nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
+        this.storageHandler = new BackpackData(this);
+        this.dataHandler = storageHandler;
+
+        this.fallbackStorages.addAll(List.of(
+                new BackpackListData(this),
+                new BackpackPersistentStateData(this),
+                new BackpackPersistentData(this)));
+
+        ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
+        loadStorageData();
+    }
+
+    // stop loading if one succeed
+    public void loadStorageData() {
+        if (storageHandler.loadData(instance.loaded)) {
+            loaded = true;
+            dataHandler = storageHandler;
+            data_type = storageHandler.getType();
+        }
+
+        if (!loaded) {
+            loadFallback(false);
+        }
+
+        if (!loaded)
+            ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
+        else ServerBackpacks.LOGGER.info("Loaded {} format as Server Backpack's data.", data_type.toString());
+
+        if (loaded) {
+            loadDiscoveredBackpackUUIDs(dataHandler.getUUIDs());
+        }
     }
 
     public void loadDiscoveredBackpackUUIDs(Set<UUID> uuids) {
         discoveredBackpackUUIDs.addAll(uuids);
     }
 
+    public static void loadFallback(boolean isOnServerStarted) {
+        instance.fallbackStorages.forEach(fallback -> {
+            if (!(fallback.getType() == DATA_TYPE.MINECRAFT_STATE && !isOnServerStarted)
+                    && fallback.loadData(instance.loaded)
+            ) {
+                instance.loaded = true;
+                instance.dataHandler = fallback;
+                instance.data_type = fallback.getType();
+            }
+        });
+    }
+
+    public static void loadOnServerStarted() {
+        if (!instance.loaded) {
+            ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
+            loadFallback(true);
+            instance.loadDiscoveredBackpackUUIDs(instance.dataHandler().getUUIDs());
+        }
+    }
+
     public static void createBackupAndSave() {
         saveData();
-        instance.dataHandler().createBackup();
+        instance.storageHandler().createBackup();
     }
 
     public static void createSingularBackupAndSave(BackpackInstance backpackInstance) {
         saveData(backpackInstance);
-        instance.dataHandler().createSingularBackup(backpackInstance);
-    }
-
-    public static void loadFallback(MinecraftServer server, boolean loadState) {
-        if (BackpackListData.loadData(server, instance.loaded)) {
-            instance.loaded = true;
-            instance.data_type = DATA_TYPE.LIST_FILE_DATA;
-        }
-
-        if (loadState) {
-            if (BackpackState.loadData(server, instance.loaded)) {
-                instance.loaded = true;
-                instance.data_type = DATA_TYPE.MINECRAFT_STATE;
-            }
-        }
-
-        if (BackpackStateUpper.loadData(server, instance.loaded)) {
-            instance.loaded = true;
-            instance.data_type = DATA_TYPE.OLD_MINECRAFT_STATE;
-        }
-    }
-
-    public static void loadFileData() {
-        Data dataHandler = instance.dataHandler();
-        if (dataHandler.loadData(instance.loaded)) {
-            instance.loaded = true;
-            instance.data_type = BackpackManager.DATA_TYPE.FILE_DATA;
-
-            instance.loadDiscoveredBackpackUUIDs(dataHandler.getUUIDs());
-        }
-    }
-
-    public static void load(MinecraftServer server) {
-        loadFileData();
-
-        if (!instance.loaded) {
-            loadFallback(server, false);
-        }
-
-        if (!instance.loaded)
-            ServerBackpacks.LOGGER.error("Failed to load Server Backpack's data.");
-        else ServerBackpacks.LOGGER.info("Loaded {} format as Server Backpack's data.", instance.data_type.toString());
-    }
-
-    public static void loadOnServerStarted(MinecraftServer server) {
-        if (!instance.loaded) {
-            ServerBackpacks.LOGGER.info("Running Server Backpack's data old format convertor...");
-            loadFallback(server, true);
-        }
+        instance.storageHandler().createSingularBackup(backpackInstance);
     }
 
     public static void saveData() {
-        Data dataHandler = instance.dataHandler();
-        dataHandler.replaceStoredInventories(instance.toBackpackInstances());
-        dataHandler.saveAllToDisk();
+        Data storageHandler = instance.storageHandler();
+        storageHandler.replaceStoredInventories(instance.getBackpackInstances());
+        storageHandler.saveAllToDisk();
     }
 
     public static void saveData(BackpackInstance backpackInstance) {
         if (instance.server().isStopping() || instance.server().isSaving()) return;
 
-        Data dataHandler = instance.dataHandler();
-        dataHandler.replaceStoredInventory(backpackInstance);
-        dataHandler.saveSingleToDisk(backpackInstance);
+        Data storageHandler = instance.storageHandler();
+        storageHandler.replaceStoredInventory(backpackInstance);
+        storageHandler.saveSingleToDisk(backpackInstance);
     }
 
     //
@@ -191,7 +189,7 @@ public class BackpackManager implements Manager {
         return Optional.empty();
     }
 
-    public static Optional<BackpackInstance> getInstance(UUID uuid, int slots) {
+    public static Optional<BackpackInstance> getInstanceAndResize(UUID uuid, int slots) {
         if (instance == null) return Optional.empty();
 
         if (hasBackpack(uuid))
@@ -217,8 +215,12 @@ public class BackpackManager implements Manager {
     // GENERAL
     //
 
+    public Data storageHandler() {
+        return this.storageHandler;
+    }
+
     public Data dataHandler() {
-        return this.data;
+        return this.dataHandler;
     }
 
     @Override
@@ -231,11 +233,11 @@ public class BackpackManager implements Manager {
         return this.nbtOps;
     }
 
-    public Set<BackpackInstance> toBackpackInstances() {
+    public Set<BackpackInstance> getBackpackInstances() {
         return new HashSet<>(this.storedInstances.values());
     }
 
-    public Set<UUID> discoveredBackpackUUIDs() {
+    public Set<UUID> getBackpackUUIDs() {
         return new HashSet<>(discoveredBackpackUUIDs);
     }
 

@@ -119,7 +119,7 @@ public class ContainerItem extends BundleGuiItem {
         BackpackUUID.getUUIDOrCreateNew(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
 
-        Optional<BackpackInstance> instance = BackpackManager.getInstance(
+        Optional<BackpackInstance> instance = BackpackManager.getInstanceAndResize(
                 BackpackUUID.getStackUUID(stack),
                 this.slots + BackpackUtils.getExtendedSlots(stack));
 

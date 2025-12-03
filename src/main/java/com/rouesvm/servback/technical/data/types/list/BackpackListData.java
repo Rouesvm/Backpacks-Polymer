@@ -6,7 +6,7 @@ import com.rouesvm.servback.technical.data.BackpackDFU;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
-import com.rouesvm.servback.technical.data.types.LegacyData;
+import com.rouesvm.servback.technical.data.types.FallbackData;
 import com.rouesvm.servback.technical.manager.Manager;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
@@ -21,45 +21,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class BackpackListData implements LegacyData {
+public class BackpackListData extends FallbackData {
     private static final Codec<List<BackpackInstanceData>> SAVE_CODEC = BackpackInstanceData.CODEC.listOf().fieldOf("backpackContents").codec();
 
     private Path saveDir;
-    private final Set<BackpackInstance> loadedBackpackData = new HashSet<>();
-    private final Map<UUID, BackpackInstance> loadedBackpacks = new HashMap<>();
-
-    private final Manager manager;
 
     public BackpackListData(Manager manager) {
-        this.manager = manager;
-    }
-
-    @Override
-    public Set<UUID> getUUIDs() {
-        return new HashSet<>(uuids);
-    }
-
-    @Override
-    public Optional<BackpackInstance> getOrLoadBackpack(UUID uuid) {
-        BackpackInstance cached = loadedBackpacks.get(uuid);
-        if (cached != null) {
-            return Optional.of(cached);
-        } else return Optional.empty();
+        super(manager);
     }
 
     public boolean loadData(boolean hasLoaded) {
         if (!hasLoaded) {
-            saveDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
+            saveDir = manager().server().getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 
             try {
-                hasLoaded = loadExistingData(manager.server());
+                hasLoaded = loadExistingData(manager().server());
             } catch (IOException e) {
                 ServerBackpacks.LOGGER.error("Error while loading list data {}", e.getMessage());
             }
 
             if (hasLoaded) {
                 ServerBackpacks.LOGGER.info("Successfully loaded list data!");
-                return !loadedBackpackData.isEmpty();
+                return true;
             }
         }
 
@@ -92,7 +75,7 @@ public class BackpackListData implements LegacyData {
 
             applyFixToNestedItemStacks(server, compound, oldDataVersion, newDataVersion);
 
-            var dataResult = SAVE_CODEC.decode(manager.nbtOps(), compound);
+            var dataResult = SAVE_CODEC.decode(manager().nbtOps(), compound);
 
             dataResult.error().ifPresent(err -> {
                 ServerBackpacks.LOGGER.error("SAVE_CODEC.decode failed: {}", err.message());
@@ -102,11 +85,11 @@ public class BackpackListData implements LegacyData {
             List<BackpackInstanceData> instanceData = new ArrayList<>();
             dataResult.result().ifPresent(pair -> instanceData.addAll(pair.getFirst()));
 
-            instanceData.forEach(backpackInstanceData -> loadedBackpackData.add(backpackInstanceData.toInstance()));
-            loadedBackpackData.forEach(backpackInstance -> loadedBackpacks.put(backpackInstance.uuid(), backpackInstance));
-            uuids.addAll(loadedBackpacks.keySet());
+            Set<BackpackInstance> instances = new HashSet<>();
+            instanceData.forEach(backpackInstanceData -> instances.add(backpackInstanceData.toInstance()));
+            addBackpackInstances(instances);
 
-            return !loadedBackpackData.isEmpty();
+            return !instances.isEmpty();
         }
     }
 }

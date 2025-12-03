@@ -2,7 +2,6 @@ package com.rouesvm.servback.technical.data.types;
 
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.DATA_TYPE;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -10,8 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface Data {
-    Set<UUID> uuids = new ObjectOpenHashSet<>();
-
     Set<UUID> getUUIDs();
     Set<BackpackInstance> getBackpackInstances();
 

@@ -3,7 +3,7 @@ package com.rouesvm.servback.technical.data.types.persistentData;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.DATA_TYPE;
-import com.rouesvm.servback.technical.data.types.LegacyData;
+import com.rouesvm.servback.technical.data.types.FallbackData;
 import com.rouesvm.servback.technical.manager.Manager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
@@ -23,18 +23,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 // The 1.21.1 way of loading data.
-public class BackpackPersistentData implements LegacyData {
-    private final Set<BackpackInstance> loadedBackpackData = new HashSet<>();
-    private final Map<UUID, BackpackInstance> loadedBackpacks = new HashMap<>();
-
-    private final Manager manager;
-
+public class BackpackPersistentData extends FallbackData {
     public BackpackPersistentData(Manager manager) {
-        this.manager = manager;
+        super(manager);
     }
 
     @Override
@@ -45,25 +42,12 @@ public class BackpackPersistentData implements LegacyData {
     }
 
     @Override
-    public Set<UUID> getUUIDs() {
-        return new HashSet<>(uuids);
-    }
-
-    @Override
-    public Optional<BackpackInstance> getOrLoadBackpack(UUID uuid) {
-        BackpackInstance cached = loadedBackpacks.get(uuid);
-        if (cached != null) {
-            return Optional.of(cached);
-        } else return Optional.empty();
-    }
-
-    @Override
     public DATA_TYPE getType() {
         return DATA_TYPE.OLD_MINECRAFT_STATE;
     }
 
     private boolean isDataPresent() {
-        Path path = manager.server().getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
+        Path path = manager().server().getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
         if (!path.toFile().exists()) return false;
 
         NbtCompound oldData = null;
@@ -74,9 +58,8 @@ public class BackpackPersistentData implements LegacyData {
         } catch (Exception ignored) {}
 
         if (oldData != null) {
-            loadedBackpackData.addAll(convertToV2Format(oldData));
-            loadedBackpackData.forEach(backpackInstance -> loadedBackpacks.put(backpackInstance.uuid(), backpackInstance));
-            uuids.addAll(loadedBackpacks.keySet());
+            Set<BackpackInstance> instances = convertToV2Format(oldData);
+            addBackpackInstances(instances);
 
             try {
                 Files.delete(path);
@@ -98,7 +81,7 @@ public class BackpackPersistentData implements LegacyData {
             Optional<NbtList> list = compound.getList("backpackContents");
 
             list.ifPresent(nbtElements -> nbtElements.forEach(element ->
-                    instances.add(load((NbtCompound) element, manager.server().getRegistryManager()))));
+                    instances.add(load((NbtCompound) element, manager().server().getRegistryManager()))));
         }
 
         return instances;

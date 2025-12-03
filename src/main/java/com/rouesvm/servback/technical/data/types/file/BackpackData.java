@@ -11,6 +11,7 @@ import com.rouesvm.servback.technical.data.types.Data;
 import com.rouesvm.servback.technical.manager.Manager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.*;
 import net.minecraft.util.WorldSavePath;
@@ -35,6 +36,7 @@ public class BackpackData implements Data {
         return t;
     });
 
+    private final Set<UUID> uuids = new ObjectOpenHashSet<>();
     private final Map<UUID, BackpackInstance> loadedBackpacks = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
 
     private final Manager manager;

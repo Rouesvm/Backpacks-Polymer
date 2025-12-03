@@ -25,7 +25,7 @@ public class BackpackListData implements LegacyData {
     private static final Codec<List<BackpackInstanceData>> SAVE_CODEC = BackpackInstanceData.CODEC.listOf().fieldOf("backpackContents").codec();
 
     private Path saveDir;
-    private final List<BackpackInstanceData> loadedBackpackData = new ArrayList<>();
+    private final Set<BackpackInstance> loadedBackpackData = new HashSet<>();
     private final Map<UUID, BackpackInstance> loadedBackpacks = new HashMap<>();
 
     private final Manager manager;
@@ -58,9 +58,8 @@ public class BackpackListData implements LegacyData {
             }
 
             if (hasLoaded) {
-                Set<BackpackInstance> dataInstances = this.getBackpackInstances();
                 ServerBackpacks.LOGGER.info("Successfully loaded list data!");
-                return !dataInstances.isEmpty();
+                return !loadedBackpackData.isEmpty();
             }
         }
 
@@ -100,14 +99,11 @@ public class BackpackListData implements LegacyData {
                 err.error().ifPresent(e -> ServerBackpacks.LOGGER.error("Decode exception: {}", e.message()));
             });
 
-            var result = dataResult.result();
-            if (result.isPresent()) {
-                var pair = result.get();
-                loadedBackpackData.addAll(pair.getFirst());
-            } else loadedBackpackData.clear();
+            List<BackpackInstanceData> instanceData = new ArrayList<>();
+            dataResult.result().ifPresent(pair -> instanceData.addAll(pair.getFirst()));
 
-            Set<BackpackInstance> dataInstances = this.getBackpackInstances();
-            dataInstances.forEach(backpackInstance -> loadedBackpacks.put(backpackInstance.uuid(), backpackInstance));
+            instanceData.forEach(backpackInstanceData -> loadedBackpackData.add(backpackInstanceData.toInstance()));
+            loadedBackpackData.forEach(backpackInstance -> loadedBackpacks.put(backpackInstance.uuid(), backpackInstance));
             uuids.addAll(loadedBackpacks.keySet());
 
             return !loadedBackpackData.isEmpty();

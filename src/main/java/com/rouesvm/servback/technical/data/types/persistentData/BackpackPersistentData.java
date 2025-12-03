@@ -1,4 +1,4 @@
-package com.rouesvm.servback.technical.data.types.state;
+package com.rouesvm.servback.technical.data.types.persistentData;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackInstance;

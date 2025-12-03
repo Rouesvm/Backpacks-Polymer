@@ -7,7 +7,7 @@ import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.types.Data;
 import com.rouesvm.servback.technical.data.types.file.BackpackData;
 import com.rouesvm.servback.technical.data.types.list.BackpackListData;
-import com.rouesvm.servback.technical.data.types.state.BackpackPersistentData;
+import com.rouesvm.servback.technical.data.types.persistentData.BackpackPersistentData;
 import com.rouesvm.servback.technical.data.types.state.BackpackPersistentStateData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

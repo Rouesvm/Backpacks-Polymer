@@ -92,7 +92,7 @@ public class BackpackCommands {
     }
 
     public static int listBackpacks(CommandContext<ServerCommandSource> context, int page) {
-        List<UUID> instances = new ArrayList<>(BackpackManager.instance().discoveredBackpackUUIDs());
+        List<UUID> instances = new ArrayList<>(BackpackManager.instance().getBackpackUUIDs());
 
         int pageSize = 10;
         int totalPages = (int) Math.ceil(instances.size() / (double) pageSize);

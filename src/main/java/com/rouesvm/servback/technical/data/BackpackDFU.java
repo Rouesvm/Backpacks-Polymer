@@ -13,11 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public class BackpackDFU {
-    public static void applyDataFixToItemStacks(@NotNull MinecraftServer server, NbtCompound root, int newVersion) {
+    public static void applyDataFixToItemStacks(@NotNull MinecraftServer server, NbtCompound root, int oldVersion, int newVersion) {
         DataFixer fixer = server.getDataFixer();
-
-        Optional<Integer> data_version = root.getInt("data_version");
-        if (data_version.isEmpty() || data_version.get() == newVersion) return;
+        if (oldVersion == newVersion) return;
 
         Optional<NbtCompound> contents = root.getCompound("contents");
         if (contents.isEmpty()) return;
@@ -38,7 +36,7 @@ public class BackpackDFU {
             Dynamic<NbtElement> inputDynamic = new Dynamic<>(NbtOps.INSTANCE, wrapped.get());
             Dynamic<NbtElement> outputDynamic = fixer.update(
                     TypeReferences.ITEM_STACK, inputDynamic,
-                    data_version.get(), newVersion
+                    oldVersion, newVersion
             );
 
             slot.put("itemStacks", outputDynamic.getValue());

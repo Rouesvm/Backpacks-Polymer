@@ -1,8 +1,10 @@
-package com.rouesvm.servback.technical.data.alternative;
+package com.rouesvm.servback.technical.data.types.state;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.types.LegacyData;
 import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.manager.Manager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
@@ -10,7 +12,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Uuids;
@@ -22,22 +23,47 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-public class BackpackStateUpper {
-    // The 1.21.1 way of loading data.
+// The 1.21.1 way of loading data.
+public class BackpackPersistentData implements LegacyData {
+    private final Set<BackpackInstance> loadedBackpackData = new HashSet<>();
+    private final Map<UUID, BackpackInstance> loadedBackpacks = new HashMap<>();
 
-    public static boolean loadData(MinecraftServer server, boolean hasLoaded) {
+    private final Manager manager;
+
+    public BackpackPersistentData(Manager manager) {
+        this.manager = manager;
+    }
+
+    @Override
+    public boolean loadData(boolean hasLoaded) {
         if (!hasLoaded) {
-            return isDataPresent(server);
+            return isDataPresent();
         } else return false;
     }
 
-    private static boolean isDataPresent(MinecraftServer server) {
-        Path path = server.getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
+    @Override
+    public Set<UUID> getUUIDs() {
+        return new HashSet<>(uuids);
+    }
+
+    @Override
+    public Optional<BackpackInstance> getOrLoadBackpack(UUID uuid) {
+        BackpackInstance cached = loadedBackpacks.get(uuid);
+        if (cached != null) {
+            return Optional.of(cached);
+        } else return Optional.empty();
+    }
+
+    @Override
+    public BackpackManager.DATA_TYPE getType() {
+        return BackpackManager.DATA_TYPE.OLD_MINECRAFT_STATE;
+    }
+
+    private boolean isDataPresent() {
+        Path path = manager.server().getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
         if (!path.toFile().exists()) return false;
 
         NbtCompound oldData = null;
@@ -48,8 +74,9 @@ public class BackpackStateUpper {
         } catch (Exception ignored) {}
 
         if (oldData != null) {
-            Set<BackpackInstance> instances = convertToV2Format(oldData, server.getRegistryManager());
-            BackpackManager.instance().loadIntoStoredInstances(instances);
+            loadedBackpackData.addAll(convertToV2Format(oldData));
+            loadedBackpackData.forEach(backpackInstance -> loadedBackpacks.put(backpackInstance.uuid(), backpackInstance));
+            uuids.addAll(loadedBackpacks.keySet());
 
             try {
                 Files.delete(path);
@@ -63,14 +90,7 @@ public class BackpackStateUpper {
         return false;
     }
 
-    private static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
-        return new BackpackInstance(
-                Uuids.toUuid(compound.getIntArray("uuid").get()),
-                loadInventory(compound.getCompound("contents").get(), registryLookup)
-        );
-    }
-
-    private static Set<BackpackInstance> convertToV2Format(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    private Set<BackpackInstance> convertToV2Format(NbtCompound nbt) {
         Set<BackpackInstance> instances = new HashSet<>();
 
         var data = nbt.get("data");
@@ -78,10 +98,17 @@ public class BackpackStateUpper {
             Optional<NbtList> list = compound.getList("backpackContents");
 
             list.ifPresent(nbtElements -> nbtElements.forEach(element ->
-                    instances.add(load((NbtCompound) element, registryLookup))));
+                    instances.add(load((NbtCompound) element, manager.server().getRegistryManager()))));
         }
 
         return instances;
+    }
+
+    private static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
+        return new BackpackInstance(
+                Uuids.toUuid(compound.getIntArray("uuid").get()),
+                loadInventory(compound.getCompound("contents").get(), registryLookup)
+        );
     }
 
     private static BackpackInventory loadInventory(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {

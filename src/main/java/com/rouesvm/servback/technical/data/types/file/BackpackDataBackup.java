@@ -44,7 +44,6 @@ public class BackpackDataBackup {
     }
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm");
-    private static final DateTimeFormatter withoutMinutesFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH");
 
     private Path singularBackupDir;
     private final Map<UUID, Path> backupDirsUUID = new HashMap<>();
@@ -86,7 +85,7 @@ public class BackpackDataBackup {
         }
     }
 
-    private Path createTimestampedDir(Path baseDir, DateTimeFormatter formatter) {
+    private Path createTimestampedDir(Path baseDir) {
         String formattedTime = LocalDateTime.now().format(formatter);
         return baseDir.resolve(formattedTime);
     }
@@ -125,13 +124,13 @@ public class BackpackDataBackup {
 
         if (backupDir != null) {
             Path finalBackupDir = backupDir;
-            executor.submit(() -> saveBackup(createTimestampedDir(finalBackupDir, formatter), instance, lastSingularHashes));
+            executor.submit(() -> saveBackup(createTimestampedDir(finalBackupDir), instance, lastSingularHashes));
         }
     }
 
     public void createBackup() {
         if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
-        Path currentDir = createTimestampedDir(fullBackupDir, withoutMinutesFormat);
+        Path currentDir = createTimestampedDir(fullBackupDir);
 
         final List<BackpackInstance> finalStoredInventories = data.getBackpackInstances().stream()
                 .filter(Objects::nonNull)

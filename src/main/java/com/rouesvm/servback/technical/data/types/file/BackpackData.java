@@ -42,7 +42,7 @@ public class BackpackData implements Data {
     private final Manager manager;
     private final Path saveDir;
 
-    private  final BackpackDataBackup dataBackup;
+    private final BackpackDataBackup dataBackup;
 
     public BackpackData(Manager manager) {
         this.manager = manager;

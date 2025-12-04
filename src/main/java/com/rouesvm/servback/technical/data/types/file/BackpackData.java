@@ -209,7 +209,6 @@ public class BackpackData implements Data {
             for (BackpackInstance instance : finalStoredInventories) {
                 saveSingleToDisk(instance, saveDir);
             }
-            ServerBackpacks.LOGGER.info("Saving data for Server Backpacks.");
         });
     }
 

@@ -41,7 +41,7 @@ public class BackpackManager implements Manager {
     private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
     private final Set<UUID> discoveredBackpackUUIDs = new ObjectOpenHashSet<>();
 
-    private boolean loaded = false;
+    private boolean loaded;
 
     private DATA_TYPE data_type = DATA_TYPE.NONE;
     private STORAGE_TYPE storage_type = STORAGE_TYPE.DEFAULT;
@@ -68,12 +68,14 @@ public class BackpackManager implements Manager {
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
 
-        loadStorageData();
+        initializeStorageData();
     }
 
     // stop loading if one succeed
-    public void loadStorageData() {
-        if (storageHandler.initializeData(loaded)) {
+    public void initializeStorageData() {
+        loaded = false;
+
+        if (storageHandler.initializeData(false)) {
             loaded = true;
             dataHandler = storageHandler;
             data_type = storageHandler.getType();

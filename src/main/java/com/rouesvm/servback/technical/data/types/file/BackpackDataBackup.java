@@ -107,6 +107,11 @@ public class BackpackDataBackup {
             lastHashes.put(uuid, hash);
         }
     }
+
+    private void saveFullBackup(Path dir, BackpackInstance instance) {
+        data.saveSingleToDisk(instance, dir);
+    }
+
     public void createSingularBackup(BackpackInstance instance) {
         if (singularBackupDir == null || !Configuration.instance().allow_backups) return;
         backupDirsUUID.computeIfAbsent(instance.uuid(), k -> singularBackupDir.resolve(instance.uuid().toString()));
@@ -136,7 +141,7 @@ public class BackpackDataBackup {
 
         executor.execute(() -> {
             Path currentDir = createTimestampedDir(fullBackupDir);
-            for (BackpackInstance instance : finalStoredInventories) saveBackup(currentDir, instance, lastFullHashes);
+            for (BackpackInstance instance : finalStoredInventories) saveFullBackup(currentDir, instance);
         });
     }
 }

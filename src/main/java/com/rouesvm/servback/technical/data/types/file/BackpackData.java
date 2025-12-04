@@ -168,7 +168,7 @@ public class BackpackData implements Data {
             );
 
             Optional<NbtElement> result = data.resultOrPartial(err ->
-                    ServerBackpacks.LOGGER.error("Inventory failed encodd: {}", err));
+                    ServerBackpacks.LOGGER.error("Inventory failed to encode: {}", err));
 
             if (result.isPresent() && result.get().asCompound().isPresent()) {
                 try (OutputStream os = Files.newOutputStream(tempFile,
@@ -176,7 +176,7 @@ public class BackpackData implements Data {
                     NbtIo.writeCompressed(result.get().asCompound().get(), os);
                 }
 
-                Files.move(tempFile, targetFile,
+                if (Files.exists(tempFile)) Files.move(tempFile, targetFile,
                         StandardCopyOption.REPLACE_EXISTING,
                         StandardCopyOption.ATOMIC_MOVE);
             }

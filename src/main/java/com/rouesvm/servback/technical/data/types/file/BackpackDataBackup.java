@@ -130,11 +130,19 @@ public class BackpackDataBackup {
 
     public void createBackup() {
         if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
-        Path currentDir = createTimestampedDir(fullBackupDir);
 
         final List<BackpackInstance> finalStoredInventories = data.getBackpackInstances().stream()
                 .filter(Objects::nonNull)
                 .toList();
+
+        Path currentDir = createTimestampedDir(fullBackupDir);
+
+        try {
+            Files.createDirectories(currentDir);
+        } catch (IOException e) {
+            ServerBackpacks.LOGGER.error("Failed to create timestamped backup directory {}", currentDir, e);
+            return;
+        }
 
         executor.submit(() -> {
             for (BackpackInstance instance : finalStoredInventories) data.saveSingleToDisk(instance, currentDir);

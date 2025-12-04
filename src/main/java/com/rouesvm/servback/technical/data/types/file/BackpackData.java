@@ -195,6 +195,7 @@ public class BackpackData implements Data {
     public void saveSingleToDisk(BackpackInstance instance) {
         availableUUIDS.add(instance.uuid());
         BackpackInstance finalInstance = instance.copy();
+
         executor.submit(() -> saveSingleToDisk(finalInstance, saveDir));
     }
 

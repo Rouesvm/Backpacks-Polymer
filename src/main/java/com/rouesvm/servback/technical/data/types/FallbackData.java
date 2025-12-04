@@ -57,7 +57,7 @@ public class FallbackData implements Data {
     @Override
     public void saveSingleToDisk(BackpackInstance instance) {}
     @Override
-    public void saveAllToDisk() {}
+    public void saveAllToDisk(Set<BackpackInstance> backpackInstances) {}
 
     @Override
     public void replaceStoredInventory(BackpackInstance backpackInstance) {}

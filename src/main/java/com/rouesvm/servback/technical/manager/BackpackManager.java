@@ -131,7 +131,7 @@ public class BackpackManager implements Manager {
     public static void saveData() {
         Data storageHandler = instance.storageHandler();
         storageHandler.replaceStoredInventories(instance.getBackpackInstances());
-        storageHandler.saveAllToDisk();
+        storageHandler.saveAllToDisk(instance.getBackpackInstances());
     }
 
     public static void saveData(BackpackInstance backpackInstance) {

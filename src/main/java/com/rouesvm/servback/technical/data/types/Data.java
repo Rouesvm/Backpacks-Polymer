@@ -10,6 +10,8 @@ import java.util.UUID;
 
 public interface Data {
     Set<UUID> getUUIDs();
+
+
     Set<BackpackInstance> getBackpackInstances();
 
     Optional<BackpackInstance> getOrLoadBackpack(UUID uuid);
@@ -19,7 +21,7 @@ public interface Data {
 
     void saveSingleToDisk(BackpackInstance instance, Path saveDir);
     void saveSingleToDisk(BackpackInstance instance);
-    void saveAllToDisk();
+    void saveAllToDisk(Set<BackpackInstance> backpackInstances);
 
     void replaceStoredInventory(BackpackInstance backpackInstance);
     void replaceStoredInventories(Set<BackpackInstance> backpackInstances);

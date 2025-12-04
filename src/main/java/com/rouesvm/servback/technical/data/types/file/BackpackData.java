@@ -194,16 +194,14 @@ public class BackpackData implements Data {
     @Override
     public void saveSingleToDisk(BackpackInstance instance) {
         availableUUIDS.add(instance.uuid());
-
         BackpackInstance finalInstance = instance.copy();
         executor.submit(() -> saveSingleToDisk(finalInstance, saveDir));
     }
 
     @Override
-    public void saveAllToDisk() {
-        final List<BackpackInstance> finalStoredInventories = manager.getBackpackInstances().stream()
-                .filter(Objects::nonNull)
-                .toList();
+    public void saveAllToDisk(Set<BackpackInstance> backpackInstances) {
+        final List<BackpackInstance> finalStoredInventories = new ArrayList<>();
+        backpackInstances.forEach(backpackInstance -> finalStoredInventories.add(backpackInstance.copy()));
 
         executor.submit(() -> {
             for (BackpackInstance instance : finalStoredInventories) {

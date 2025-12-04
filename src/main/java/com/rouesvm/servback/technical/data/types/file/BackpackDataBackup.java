@@ -44,6 +44,7 @@ public class BackpackDataBackup {
     }
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm");
+    private static final DateTimeFormatter withoutMinutesFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH");
 
     private Path singularBackupDir;
     private final Map<UUID, Path> backupDirsUUID = new HashMap<>();
@@ -51,7 +52,6 @@ public class BackpackDataBackup {
     private Path fullBackupDir;
 
     private final Map<UUID, String> lastSingularHashes = new Object2ObjectOpenHashMap<>();
-    private final Map<UUID, String> lastFullHashes = new Object2ObjectOpenHashMap<>();
 
     private final Manager manager;
     private final Data data;
@@ -86,7 +86,7 @@ public class BackpackDataBackup {
         }
     }
 
-    private Path createTimestampedDir(Path baseDir) {
+    private Path createTimestampedDir(Path baseDir, DateTimeFormatter formatter) {
         String formattedTime = LocalDateTime.now().format(formatter);
         return baseDir.resolve(formattedTime);
     }
@@ -108,10 +108,6 @@ public class BackpackDataBackup {
         }
     }
 
-    private void saveFullBackup(Path dir, BackpackInstance instance) {
-        data.saveSingleToDisk(instance, dir);
-    }
-
     public void createSingularBackup(BackpackInstance instance) {
         if (singularBackupDir == null || !Configuration.instance().allow_backups) return;
         backupDirsUUID.computeIfAbsent(instance.uuid(), k -> singularBackupDir.resolve(instance.uuid().toString()));
@@ -129,19 +125,20 @@ public class BackpackDataBackup {
 
         if (backupDir != null) {
             Path finalBackupDir = backupDir;
-            executor.execute(() -> saveBackup(createTimestampedDir(finalBackupDir), instance, lastSingularHashes));
+            executor.submit(() -> saveBackup(createTimestampedDir(finalBackupDir, formatter), instance, lastSingularHashes));
         }
     }
 
     public void createBackup() {
         if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
+        Path currentDir = createTimestampedDir(fullBackupDir, withoutMinutesFormat);
+
         final List<BackpackInstance> finalStoredInventories = data.getBackpackInstances().stream()
                 .filter(Objects::nonNull)
                 .toList();
 
-        executor.execute(() -> {
-            Path currentDir = createTimestampedDir(fullBackupDir);
-            for (BackpackInstance instance : finalStoredInventories) saveFullBackup(currentDir, instance);
+        executor.submit(() -> {
+            for (BackpackInstance instance : finalStoredInventories) data.saveSingleToDisk(instance, currentDir);
         });
     }
 }

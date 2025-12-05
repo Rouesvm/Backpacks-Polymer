@@ -3,10 +3,11 @@ package com.rouesvm.servback.technical.manager;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.types.Data;
 import com.rouesvm.servback.technical.data.types.file.BackpackData;
 import com.rouesvm.servback.technical.data.types.list.BackpackListData;
-import com.rouesvm.servback.technical.data.types.state.BackpackPersistentData;
+import com.rouesvm.servback.technical.data.types.persistentData.BackpackPersistentData;
 import com.rouesvm.servback.technical.data.types.state.BackpackPersistentStateData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -40,7 +41,7 @@ public class BackpackManager implements Manager {
     private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
     private final Set<UUID> discoveredBackpackUUIDs = new ObjectOpenHashSet<>();
 
-    private boolean loaded = false;
+    private boolean loaded;
 
     private DATA_TYPE data_type = DATA_TYPE.NONE;
     private STORAGE_TYPE storage_type = STORAGE_TYPE.DEFAULT;
@@ -67,12 +68,14 @@ public class BackpackManager implements Manager {
 
         ServerBackpacks.LOGGER.info("Loading Server Backpack's data on server starting...");
 
-        loadStorageData();
+        initializeStorageData();
     }
 
     // stop loading if one succeed
-    public void loadStorageData() {
-        if (storageHandler.loadData(loaded)) {
+    public void initializeStorageData() {
+        loaded = false;
+
+        if (storageHandler.initializeData(false)) {
             loaded = true;
             dataHandler = storageHandler;
             data_type = storageHandler.getType();
@@ -94,7 +97,7 @@ public class BackpackManager implements Manager {
     public void loadFallback(boolean isOnServerStarted) {
         fallbackStorages.forEach(fallback -> {
             if (!(fallback.getType() == DATA_TYPE.MINECRAFT_STATE && !isOnServerStarted)
-                    && fallback.loadData(loaded)
+                    && fallback.initializeData(loaded)
             ) {
                 loaded = true;
                 dataHandler = fallback;
@@ -128,7 +131,7 @@ public class BackpackManager implements Manager {
     public static void saveData() {
         Data storageHandler = instance.storageHandler();
         storageHandler.replaceStoredInventories(instance.getBackpackInstances());
-        storageHandler.saveAllToDisk();
+        storageHandler.saveAllToDisk(instance.getBackpackInstances());
     }
 
     public static void saveData(BackpackInstance backpackInstance) {
@@ -253,21 +256,6 @@ public class BackpackManager implements Manager {
     public static boolean hasBackpack(UUID uuid) {
         Optional<BackpackInstance> backpackInstance = getInstance(uuid);
         return uuid != null && backpackInstance.isPresent();
-    }
-
-    public enum DATA_TYPE {
-        NONE("No data loaded"),
-        MINECRAFT_STATE("Minecraft state"),
-        OLD_MINECRAFT_STATE("Old Minecraft state"),
-        FILE_DATA("File-based data"),
-        LIST_FILE_DATA("List file-based data");
-
-        private final String description;
-
-        DATA_TYPE(String desc) { this.description = desc; }
-
-        @Override
-        public String toString() { return description; }
     }
 
     public enum STORAGE_TYPE {

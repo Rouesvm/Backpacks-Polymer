@@ -102,7 +102,6 @@ public class ServerBackpacks implements ModInitializer {
 
 	private static void backupEvents() {
 		ServerPlayerEvents.LEAVE.register((p0) -> BackpackManager.createBackupAndSave());
-		ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackManager.createBackupAndSave());
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

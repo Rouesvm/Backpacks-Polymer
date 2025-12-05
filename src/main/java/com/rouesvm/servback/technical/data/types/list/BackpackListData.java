@@ -4,9 +4,9 @@ import com.mojang.serialization.Codec;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackDFU;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
-import com.rouesvm.servback.technical.data.types.LegacyData;
-import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.data.types.FallbackData;
 import com.rouesvm.servback.technical.manager.Manager;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
@@ -21,46 +21,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class BackpackListData implements LegacyData {
+public class BackpackListData extends FallbackData {
     private static final Codec<List<BackpackInstanceData>> SAVE_CODEC = BackpackInstanceData.CODEC.listOf().fieldOf("backpackContents").codec();
 
     private Path saveDir;
-    private final List<BackpackInstanceData> loadedBackpackData = new ArrayList<>();
-    private final Map<UUID, BackpackInstance> loadedBackpacks = new HashMap<>();
-
-    private final Manager manager;
 
     public BackpackListData(Manager manager) {
-        this.manager = manager;
+        super(manager);
     }
 
-    @Override
-    public Set<UUID> getUUIDs() {
-        return new HashSet<>(uuids);
-    }
-
-    @Override
-    public Optional<BackpackInstance> getOrLoadBackpack(UUID uuid) {
-        BackpackInstance cached = loadedBackpacks.get(uuid);
-        if (cached != null) {
-            return Optional.of(cached);
-        } else return Optional.empty();
-    }
-
-    public boolean loadData(boolean hasLoaded) {
+    public boolean initializeData(boolean hasLoaded) {
         if (!hasLoaded) {
-            saveDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
+            saveDir = manager().server().getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
 
             try {
-                hasLoaded = loadExistingData(manager.server());
+                hasLoaded = loadExistingData(manager().server());
             } catch (IOException e) {
                 ServerBackpacks.LOGGER.error("Error while loading list data {}", e.getMessage());
             }
 
             if (hasLoaded) {
-                Set<BackpackInstance> dataInstances = this.getBackpackInstances();
                 ServerBackpacks.LOGGER.info("Successfully loaded list data!");
-                return !dataInstances.isEmpty();
+                return true;
             }
         }
 
@@ -68,8 +50,8 @@ public class BackpackListData implements LegacyData {
     }
 
     @Override
-    public BackpackManager.DATA_TYPE getType() {
-        return BackpackManager.DATA_TYPE.LIST_FILE_DATA;
+    public DATA_TYPE getType() {
+        return DATA_TYPE.LIST_FILE_DATA;
     }
 
     private void applyFixToNestedItemStacks(MinecraftServer server, NbtCompound root, int oldVersion, int newVersion) {
@@ -93,24 +75,21 @@ public class BackpackListData implements LegacyData {
 
             applyFixToNestedItemStacks(server, compound, oldDataVersion, newDataVersion);
 
-            var dataResult = SAVE_CODEC.decode(manager.nbtOps(), compound);
+            var dataResult = SAVE_CODEC.decode(manager().nbtOps(), compound);
 
             dataResult.error().ifPresent(err -> {
                 ServerBackpacks.LOGGER.error("SAVE_CODEC.decode failed: {}", err.message());
                 err.error().ifPresent(e -> ServerBackpacks.LOGGER.error("Decode exception: {}", e.message()));
             });
 
-            var result = dataResult.result();
-            if (result.isPresent()) {
-                var pair = result.get();
-                loadedBackpackData.addAll(pair.getFirst());
-            } else loadedBackpackData.clear();
+            List<BackpackInstanceData> instanceData = new ArrayList<>();
+            dataResult.result().ifPresent(pair -> instanceData.addAll(pair.getFirst()));
 
-            Set<BackpackInstance> dataInstances = this.getBackpackInstances();
-            dataInstances.forEach(backpackInstance -> loadedBackpacks.put(backpackInstance.uuid(), backpackInstance));
-            uuids.addAll(loadedBackpacks.keySet());
+            Set<BackpackInstance> instances = new HashSet<>();
+            instanceData.forEach(backpackInstanceData -> instances.add(backpackInstanceData.toInstance()));
+            addBackpackInstances(instances);
 
-            return !loadedBackpackData.isEmpty();
+            return !instances.isEmpty();
         }
     }
 }

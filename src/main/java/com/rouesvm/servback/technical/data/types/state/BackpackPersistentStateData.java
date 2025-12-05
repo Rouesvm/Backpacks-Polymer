@@ -1,34 +1,25 @@
 package com.rouesvm.servback.technical.data.types.state;
 
 import com.rouesvm.servback.technical.data.BackpackInstance;
-import com.rouesvm.servback.technical.data.types.LegacyData;
-import com.rouesvm.servback.technical.manager.BackpackManager;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
+import com.rouesvm.servback.technical.data.types.FallbackData;
 import com.rouesvm.servback.technical.manager.Manager;
 
-import java.util.*;
+import java.util.Set;
 
-public class BackpackPersistentStateData implements LegacyData {
-    private final Map<UUID, BackpackInstance> loadedBackpacks = new HashMap<>();
-
-    private final Manager manager;
-
+public class BackpackPersistentStateData extends FallbackData {
     public BackpackPersistentStateData(Manager manager) {
-        this.manager = manager;
+        super(manager);
     }
 
     @Override
-    public Set<UUID> getUUIDs() {
-        return new HashSet<>(uuids);
-    }
-
-    @Override
-    public boolean loadData(boolean hasLoaded) {
-        BackpackPersistentState state = BackpackPersistentState.getServerState(manager.server());
+    public boolean initializeData(boolean hasLoaded) {
+        BackpackPersistentState state = BackpackPersistentState.getServerState(manager().server());
 
         if (!hasLoaded && state != null) {
             Set<BackpackInstance> stateInstances = state.getBackpackInstances();
             if (stateInstances != null && !stateInstances.isEmpty()) {
-                stateInstances.forEach(instance -> loadedBackpacks.put(instance.uuid(), instance));
+                addBackpackInstances(stateInstances);
                 state.clearBackpackInstances();
                 state.markDirty();
                 return true;
@@ -39,15 +30,7 @@ public class BackpackPersistentStateData implements LegacyData {
     }
 
     @Override
-    public Optional<BackpackInstance> getOrLoadBackpack(UUID uuid) {
-        BackpackInstance cached = loadedBackpacks.get(uuid);
-        if (cached != null) {
-            return Optional.of(cached);
-        } else return Optional.empty();
-    }
-
-    @Override
-    public BackpackManager.DATA_TYPE getType() {
-        return BackpackManager.DATA_TYPE.MINECRAFT_STATE;
+    public DATA_TYPE getType() {
+        return DATA_TYPE.MINECRAFT_STATE;
     }
 }

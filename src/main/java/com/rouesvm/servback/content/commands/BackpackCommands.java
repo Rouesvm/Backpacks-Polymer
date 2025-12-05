@@ -11,8 +11,9 @@ import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.command.permission.Permission;
+import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -33,11 +34,13 @@ public class BackpackCommands {
         CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> init(dispatcher));
     }
 
+    private static final Permission ADMIN_PERMISSION = new Permission.Level(PermissionLevel.ADMINS);
+
     public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
         if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
 
         dispatcher.register(literal("backpacks")
-                .requires(source -> Permissions.check(source, "serverbackpacks.command", 4))
+                .requires(source -> source.getPermissions().hasPermission(ADMIN_PERMISSION))
                 .executes(context -> {
                     context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);
                     return 1;

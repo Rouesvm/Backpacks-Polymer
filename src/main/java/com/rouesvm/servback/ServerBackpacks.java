@@ -87,7 +87,7 @@ public class ServerBackpacks implements ModInitializer {
 				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer()));
 
 		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::initialize);
-		ServerLifecycleEvents.SERVER_STARTED.register(BackpackManager::loadOnServerStarted);
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> BackpackManager.loadOnServerStarted());
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 
@@ -102,7 +102,6 @@ public class ServerBackpacks implements ModInitializer {
 
 	private static void backupEvents() {
 		ServerPlayerEvents.LEAVE.register((p0) -> BackpackManager.createBackupAndSave());
-		ServerPlayerEvents.AFTER_RESPAWN.register((p0, p1, p2) -> BackpackManager.createBackupAndSave());
 	}
 
 	public static boolean isBedrock(ServerPlayerEntity player) {

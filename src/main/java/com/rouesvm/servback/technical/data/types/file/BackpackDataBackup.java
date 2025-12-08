@@ -51,7 +51,6 @@ public class BackpackDataBackup {
     private Path fullBackupDir;
 
     private final Map<UUID, String> lastSingularHashes = new Object2ObjectOpenHashMap<>();
-    private final Map<UUID, String> lastFullHashes = new Object2ObjectOpenHashMap<>();
 
     private final Manager manager;
     private final Data data;
@@ -107,6 +106,7 @@ public class BackpackDataBackup {
             lastHashes.put(uuid, hash);
         }
     }
+
     public void createSingularBackup(BackpackInstance instance) {
         if (singularBackupDir == null || !Configuration.instance().allow_backups) return;
         backupDirsUUID.computeIfAbsent(instance.uuid(), k -> singularBackupDir.resolve(instance.uuid().toString()));
@@ -124,19 +124,28 @@ public class BackpackDataBackup {
 
         if (backupDir != null) {
             Path finalBackupDir = backupDir;
-            executor.execute(() -> saveBackup(createTimestampedDir(finalBackupDir), instance, lastSingularHashes));
+            executor.submit(() -> saveBackup(createTimestampedDir(finalBackupDir), instance, lastSingularHashes));
         }
     }
 
     public void createBackup() {
         if (fullBackupDir == null || !Configuration.instance().allow_backups) return;
+
         final List<BackpackInstance> finalStoredInventories = data.getBackpackInstances().stream()
                 .filter(Objects::nonNull)
                 .toList();
 
-        executor.execute(() -> {
-            Path currentDir = createTimestampedDir(fullBackupDir);
-            for (BackpackInstance instance : finalStoredInventories) saveBackup(currentDir, instance, lastFullHashes);
+        Path currentDir = createTimestampedDir(fullBackupDir);
+
+        try {
+            Files.createDirectories(currentDir);
+        } catch (IOException e) {
+            ServerBackpacks.LOGGER.error("Failed to create timestamped backup directory {}", currentDir, e);
+            return;
+        }
+
+        executor.submit(() -> {
+            for (BackpackInstance instance : finalStoredInventories) data.saveSingleToDisk(instance, currentDir);
         });
     }
 }

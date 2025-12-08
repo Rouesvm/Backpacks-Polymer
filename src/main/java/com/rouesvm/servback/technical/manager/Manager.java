@@ -12,7 +12,7 @@ public interface Manager {
     MinecraftServer server();
     RegistryOps<NbtElement> nbtOps();
 
-    Set<BackpackInstance> toBackpackInstances();
-    Set<UUID> discoveredBackpackUUIDs();
+    Set<BackpackInstance> getBackpackInstances();
+    Set<UUID> getBackpackUUIDs();
 
 }

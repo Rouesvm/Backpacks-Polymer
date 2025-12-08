@@ -109,16 +109,16 @@ public class BackpackCommands {
         int endIndex = Math.min(startIndex + pageSize, instances.size());
         List<UUID> pageInstances = instances.subList(startIndex, endIndex);
 
-        sendToPlayer(context, Text.literal(String.format("-== Backpacks Instances (Page %d/%d) ==-", page, totalPages))
-                .formatted(Formatting.WHITE, Formatting.BOLD));
+        context.getSource().sendFeedback(() -> Text.literal(String.format("=== Backpacks Instances (Page %d/%d) ===", page, totalPages))
+                .formatted(Formatting.WHITE, Formatting.BOLD), false);
 
         for (UUID uuid : pageInstances) {
-            sendToPlayer(context, Text.literal("* " + uuid)
-                    .formatted(Formatting.AQUA)
+            context.getSource().sendFeedback(() -> Text.literal("* " + uuid)
+                    .formatted(Formatting.WHITE)
                     .styled(style -> style
                             .withClickEvent(new ClickEvent.SuggestCommand("/backpacks open " + uuid))
                             .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to open UUID")))
-                    ));
+                    ), false);
         }
 
         MutableText footer = Text.literal("");
@@ -137,16 +137,9 @@ public class BackpackCommands {
                     .styled(style -> style.withClickEvent(new ClickEvent.RunCommand("/backpacks list " + (page + 1)))));
         }
 
-        sendToPlayer(context, footer);
+        context.getSource().sendFeedback(() -> footer, false);
 
         return 1;
     }
 
-    private static void sendToPlayer(CommandContext<ServerCommandSource> context, Text text) {
-        if (context.getSource().getPlayer() != null) {
-            context.getSource().getPlayer().sendMessage(text, false);
-        } else {
-            context.getSource().sendFeedback(() -> text, false);
-        }
-    }
 }

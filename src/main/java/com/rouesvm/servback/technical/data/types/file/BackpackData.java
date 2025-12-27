@@ -5,13 +5,13 @@ import com.mojang.serialization.DataResult;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.technical.data.BackpackDFU;
 import com.rouesvm.servback.technical.data.BackpackInstance;
+import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.types.Data;
 import com.rouesvm.servback.technical.manager.Manager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.*;
 import net.minecraft.util.WorldSavePath;
@@ -30,19 +30,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class BackpackData implements Data {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "ServerBackpacks-Data");
         t.setDaemon(true);
         return t;
     });
 
+    private final Set<UUID> availableUUIDS = new ObjectOpenHashSet<>();
     private final Map<UUID, BackpackInstance> loadedBackpacks = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
-    private final Set<UUID> discoveredBackpackUUIDs = ObjectSets.synchronize(new ObjectOpenHashSet<>());
 
     private final Manager manager;
     private final Path saveDir;
 
-    private  final BackpackDataBackup dataBackup;
+    private final BackpackDataBackup dataBackup;
 
     public BackpackData(Manager manager) {
         this.manager = manager;
@@ -71,7 +71,7 @@ public class BackpackData implements Data {
 
     @Override
     public Set<UUID> getUUIDs() {
-        return new HashSet<>(discoveredBackpackUUIDs);
+        return new HashSet<>(availableUUIDS);
     }
 
     @Override
@@ -99,7 +99,10 @@ public class BackpackData implements Data {
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
             NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
-            BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, SharedConstants.getGameVersion().dataVersion().id());
+            Optional<Integer> data_version = nbt.getInt("data_version");
+
+            int latest = SharedConstants.getGameVersion().dataVersion().id();
+            BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, data_version.orElse(latest), latest);
 
             DataResult<Pair<BackpackInstanceData, NbtElement>> data =
                     BackpackInstanceData.CODEC.decode(manager.nbtOps(), nbt);
@@ -111,14 +114,18 @@ public class BackpackData implements Data {
     }
 
     @Override
-    public boolean loadData(boolean hasLoaded) {
-        if (!hasLoaded) {
-            return loadData() && !discoveredBackpackUUIDs.isEmpty();
-        }
-        return false;
+    public boolean initializeData(boolean hasLoaded) {
+        if (!hasLoaded)
+            return scanAndLoadUUIDs() && !availableUUIDS.isEmpty();
+        else return false;
     }
 
-    private boolean loadData() {
+    @Override
+    public DATA_TYPE getType() {
+        return DATA_TYPE.FILE_DATA;
+    }
+
+    private boolean scanAndLoadUUIDs() {
         try {
             Files.createDirectories(saveDir);
 
@@ -126,11 +133,11 @@ public class BackpackData implements Data {
                 paths.filter(p -> p.toString().endsWith(".dat"))
                         .forEach(p -> {
                             String filename = p.getFileName().toString().replace(".dat", "");
-                            discoveredBackpackUUIDs.add(UUID.fromString(filename));
+                            availableUUIDS.add(UUID.fromString(filename));
                         });
             }
 
-            return !discoveredBackpackUUIDs.isEmpty();
+            return !availableUUIDS.isEmpty();
         } catch (IOException e) {
             ServerBackpacks.LOGGER.error("Failed to check backpack directory", e);
             return false;
@@ -146,7 +153,7 @@ public class BackpackData implements Data {
             try {
                 Files.createDirectories(saveDir);
             } catch (IOException e) {
-                ServerBackpacks.LOGGER.error("Error while creating directory {}", e.getMessage());
+                ServerBackpacks.LOGGER.error("Error while creating directory ", e);
             }
         }
 
@@ -160,19 +167,21 @@ public class BackpackData implements Data {
                     backpackData
             );
 
-            Optional<NbtElement> result = data.result();
+            Optional<NbtElement> result = data.resultOrPartial(err ->
+                    ServerBackpacks.LOGGER.error("Inventory failed to encode: {}", err));
+
             if (result.isPresent() && result.get().asCompound().isPresent()) {
                 try (OutputStream os = Files.newOutputStream(tempFile,
                         StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
                     NbtIo.writeCompressed(result.get().asCompound().get(), os);
                 }
 
-                Files.move(tempFile, targetFile,
+                if (Files.exists(tempFile)) Files.move(tempFile, targetFile,
                         StandardCopyOption.REPLACE_EXISTING,
                         StandardCopyOption.ATOMIC_MOVE);
             }
         } catch (IOException e) {
-            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e.getStackTrace());
+            ServerBackpacks.LOGGER.error("Failed to save backpack {}: {}", instance.uuid(), e);
             try {
                 Files.deleteIfExists(tempFile);
             } catch (IOException cleanupError) {
@@ -184,23 +193,21 @@ public class BackpackData implements Data {
 
     @Override
     public void saveSingleToDisk(BackpackInstance instance) {
-        discoveredBackpackUUIDs.add(instance.uuid());
-
+        availableUUIDS.add(instance.uuid());
         BackpackInstance finalInstance = instance.copy();
-        executor.execute(() -> saveSingleToDisk(finalInstance, saveDir));
+
+        executor.submit(() -> saveSingleToDisk(finalInstance, saveDir));
     }
 
     @Override
-    public void saveAllToDisk() {
-        final List<BackpackInstance> finalStoredInventories = manager.toBackpackInstances().stream()
-                .filter(Objects::nonNull)
-                .toList();
+    public void saveAllToDisk(Set<BackpackInstance> backpackInstances) {
+        final List<BackpackInstance> finalStoredInventories = new ArrayList<>();
+        backpackInstances.forEach(backpackInstance -> finalStoredInventories.add(backpackInstance.copy()));
 
-        executor.execute(() -> {
+        executor.submit(() -> {
             for (BackpackInstance instance : finalStoredInventories) {
                 saveSingleToDisk(instance, saveDir);
             }
-            ServerBackpacks.LOGGER.info("Saving data for Server Backpacks.");
         });
     }
 

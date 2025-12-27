@@ -58,7 +58,7 @@ public record UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
                             if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
                                 persistentUpgrade.writeView(data);
                             }
-                            out.put(upgrade.getType().id().toString(), data.getNbt());
+                            out.put(upgrade.getType().getId().toString(), data.getNbt());
                         }
                         return out;
                     }

@@ -2,6 +2,7 @@ package com.rouesvm.servback.registry;
 
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.content.component.LinkScrollerComponent;
+import com.rouesvm.servback.content.component.UpgradeComponent;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
 import net.minecraft.component.ComponentType;
@@ -29,6 +30,11 @@ public class BackpackDataComponentTypes {
     public static final ComponentType<UpgradeContainerComponent> UPGRADE_CONTAINER = register(
             ComponentType.<UpgradeContainerComponent>builder().codec(UpgradeContainerComponent.CODEC).packetCodec(UpgradeContainerComponent.PACKET_CODEC).build(),
             "upgrade_container"
+    );
+
+    public static final ComponentType<UpgradeComponent> UPGRADE = register(
+            ComponentType.<UpgradeComponent>builder().codec(UpgradeComponent.CODEC).packetCodec(UpgradeComponent.PACKET_CODEC).build(),
+            "upgrade"
     );
 
     public static final ComponentType<UUID> BACKPACK_UUID = register(

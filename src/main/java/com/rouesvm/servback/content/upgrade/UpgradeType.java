@@ -5,7 +5,14 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public record UpgradeType<T extends Upgrade>(Identifier id, UpgradeFactory<T> factory) {
+public class UpgradeType<T extends Upgrade> {
+    private final Identifier id;
+    private final UpgradeFactory<T> factory;
+
+    public UpgradeType(Identifier id, UpgradeFactory<T> factory) {
+        this.id = id;
+        this.factory = factory;
+    }
 
     public Item getItem() {
         return Registries.ITEM.get(id.withSuffixedPath("_upgrade"));
@@ -13,6 +20,10 @@ public record UpgradeType<T extends Upgrade>(Identifier id, UpgradeFactory<T> fa
 
     public T create() {
         return factory.create();
+    }
+
+    public Identifier getId() {
+        return id;
     }
 
     public Text getTranslationKey() {

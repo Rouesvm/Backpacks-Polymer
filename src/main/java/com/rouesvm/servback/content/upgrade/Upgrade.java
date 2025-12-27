@@ -15,7 +15,7 @@ public class Upgrade implements FunctionalUpgrade {
 
     @Override
     public String toString() {
-        return type.getId().toString();
+        return type.id().toString();
     }
 
     @Override

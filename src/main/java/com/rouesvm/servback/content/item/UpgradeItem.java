@@ -2,7 +2,7 @@ package com.rouesvm.servback.content.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockItem;
-import com.rouesvm.servback.content.component.UpgradeComponent;
+import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
@@ -35,11 +35,16 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
-        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId().withSuffixedPath("_upgrade")))
-                        .component(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgradeType.create())),
+        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.id().withSuffixedPath("_upgrade")))
+                        .component(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(List.of(upgradeType.create()))),
                 Items.POISONOUS_POTATO, true
         );
         this.upgradeType = upgradeType;
+    }
+
+    @Override
+    public ItemStack getDefaultStack() {
+        return super.getDefaultStack();
     }
 
     @Override
@@ -97,8 +102,11 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     }
 
     public Upgrade getUpgrade(ItemStack stack) {
-        UpgradeComponent component = UpgradeComponent.of(upgradeType.create());
-        UpgradeComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE, component);
-        return stackComponent.upgrade();
+        UpgradeContainerComponent containerComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(List.of(upgradeType.create())));
+        if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) == null) {
+            stack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, containerComponent);
+        }
+
+        return containerComponent.baseUpgrades().getFirst();
     }
 }

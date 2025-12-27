@@ -1,6 +1,5 @@
 package com.rouesvm.servback.technical.ui;
 
-import com.rouesvm.servback.content.component.UpgradeComponent;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
@@ -67,11 +66,13 @@ public class UpgradeContainerGui extends SimpleGui {
         for (i=0; i < upgradeList.size(); i++) {
             Upgrade upgrade = upgradeList.get(i);
             UpgradeType<? extends Upgrade> upgradeType = upgrade.getType();
-            if (upgradeType == null || upgradeType.getItem() == null) continue;
+            if (upgradeType == null) {
+                continue;
+            }
 
             Item item = upgradeType.getItem();
             ItemStack upgradeStack = item.getDefaultStack();
-            upgradeStack.set(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgrade));
+            upgradeStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(List.of(upgrade)));
 
             this.setSlot(i, upgradeStack);
         }

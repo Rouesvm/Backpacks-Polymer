@@ -35,8 +35,7 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     private final UpgradeType<? extends Upgrade> upgradeType;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
-        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId().withSuffixedPath("_upgrade")))
-                        .component(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgradeType.create())),
+        super(settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, upgradeType.getId().withSuffixedPath("_upgrade"))),
                 Items.POISONOUS_POTATO, true
         );
         this.upgradeType = upgradeType;
@@ -99,6 +98,9 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     public Upgrade getUpgrade(ItemStack stack) {
         UpgradeComponent component = UpgradeComponent.of(upgradeType.create());
         UpgradeComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE, component);
+        if (stack.get(BackpackDataComponentTypes.UPGRADE) == null) {
+            stack.set(BackpackDataComponentTypes.UPGRADE, stackComponent);
+        }
         return stackComponent.upgrade();
     }
 }

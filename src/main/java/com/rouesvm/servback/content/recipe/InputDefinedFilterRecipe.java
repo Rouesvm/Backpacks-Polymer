@@ -1,6 +1,6 @@
 package com.rouesvm.servback.content.recipe;
 
-import com.rouesvm.servback.content.component.UpgradeComponent;
+import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.content.upgrade.FilterableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
@@ -25,6 +25,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
+import java.util.List;
 import java.util.Set;
 
 public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
@@ -67,7 +68,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         ItemStack stack = findUpgradeStack(input);
         if (stack.isEmpty()) return ItemStack.EMPTY;
 
-        UpgradeComponent oldComponent = stack.get(BackpackDataComponentTypes.UPGRADE);
+        UpgradeContainerComponent oldComponent = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
         if (oldComponent == null) return ItemStack.EMPTY;
 
         Set<String> uniqueItems = extractFilterKeysFromInput(stack, input);
@@ -76,8 +77,8 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         return getResultStack(oldComponent, stack, uniqueItems);
     }
 
-    private ItemStack getResultStack(UpgradeComponent oldComponent, ItemStack center, Set<String> uniqueItems) {
-        Upgrade oldUpgrade = oldComponent.upgrade();
+    private ItemStack getResultStack(UpgradeContainerComponent oldComponent, ItemStack center, Set<String> uniqueItems) {
+        Upgrade oldUpgrade = oldComponent.baseUpgrades().getFirst();
         Upgrade upgrade = oldUpgrade.getType().create();
         if (!(upgrade instanceof FilterableUpgrade newUpgrade)) return ItemStack.EMPTY;
 
@@ -86,7 +87,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         filter.setMode(((FilterableUpgrade) oldUpgrade).getFilter().getMode());
 
         ItemStack result = center.copy();
-        result.set(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgrade));
+        result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, UpgradeContainerComponent.of(List.of(upgrade)));
 
         return result;
     }
@@ -95,8 +96,8 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         for (ItemStack stack : input.getStacks()) {
             if (stack.isEmpty()) continue;
 
-            UpgradeComponent component = stack.get(BackpackDataComponentTypes.UPGRADE);
-            if (component != null && component.upgrade() instanceof FilterableUpgrade
+            UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+            if (component != null && component.baseUpgrades().getFirst() instanceof FilterableUpgrade
             ) return stack;
         }
 

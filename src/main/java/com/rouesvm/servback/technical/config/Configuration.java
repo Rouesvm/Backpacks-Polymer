@@ -175,5 +175,8 @@ public class Configuration {
 
         @SerializedName("display_back")
         public boolean display_back = true;
+
+        @SerializedName("allow_skulker_boxes_in_backpacks")
+        public boolean allow_shulker_boxes_in_backpacks = false;
     }
 }

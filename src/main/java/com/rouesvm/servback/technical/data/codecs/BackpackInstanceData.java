@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.util.Uuids;
+import net.minecraft.core.UUIDUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public record BackpackInstanceData(Optional<UUID> uuid, Optional<InventoryData> inventoryData, Optional<Long> last_accessed, Optional<Integer> size, Optional<Integer> data_version) {
     public static final Codec<BackpackInstanceData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Uuids.INT_STREAM_CODEC.optionalFieldOf("uuid").forGetter(BackpackInstanceData::uuid),
+            UUIDUtil.CODEC.optionalFieldOf("uuid").forGetter(BackpackInstanceData::uuid),
             InventoryData.CODEC.optionalFieldOf("contents").forGetter(BackpackInstanceData::inventoryData),
             Codec.LONG.optionalFieldOf("last_accessed").forGetter(BackpackInstanceData::last_accessed),
             Codec.INT.optionalFieldOf("size").forGetter(BackpackInstanceData::size),

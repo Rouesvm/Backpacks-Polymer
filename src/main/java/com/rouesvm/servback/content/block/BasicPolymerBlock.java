@@ -3,48 +3,48 @@ package com.rouesvm.servback.content.block;
 import com.mojang.serialization.MapCodec;
 import com.rouesvm.servback.ServerBackpacks;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class BasicPolymerBlock extends HorizontalFacingBlock implements PolymerBlock {
-    public static final MapCodec<BasicPolymerBlock> CODEC = createCodec(BasicPolymerBlock::new);
+public class BasicPolymerBlock extends HorizontalDirectionalBlock implements PolymerBlock {
+    public static final MapCodec<BasicPolymerBlock> CODEC = simpleCodec(BasicPolymerBlock::new);
 
-    public BasicPolymerBlock(Settings settings) {
-        super(settings.nonOpaque());
-        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+    public BasicPolymerBlock(Properties settings) {
+        super(settings.noOcclusion());
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         if (context != null && ServerBackpacks.isBedrock(context.getPlayer()))
             return state;
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         if (context != null && ServerBackpacks.isBedrock(context.getPlayer()))
             return state;
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
-    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        return this.getDefaultState().with(FACING, context.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 }

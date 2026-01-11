@@ -21,11 +21,11 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.enchantment.Enchantment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +36,9 @@ public class ServerBackpacks implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final RegistryKey<Enchantment> CAPACITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "capacity"));
+	public static final ResourceKey<Enchantment> CAPACITY = ResourceKey.create(Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(MOD_ID, "capacity"));
 
-	private static final Set<ServerPlayerEntity> BEDROCK_PLAYERS = new ObjectOpenHashSet<>();
+	private static final Set<ServerPlayer> BEDROCK_PLAYERS = new ObjectOpenHashSet<>();
 
 	public static boolean hasGeyserLoaded;
 	public static boolean hasTrinketLoaded;
@@ -79,7 +79,7 @@ public class ServerBackpacks implements ModInitializer {
 
 	private static void serverEvents() {
 		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, a, b) -> {
-			ServerPlayerEntity player = serverPlayNetworkHandler.getPlayer();
+			ServerPlayer player = serverPlayNetworkHandler.getPlayer();
 			if (isBedrock(player)) BEDROCK_PLAYERS.add(player);
 		});
 
@@ -104,7 +104,7 @@ public class ServerBackpacks implements ModInitializer {
 		ServerPlayerEvents.LEAVE.register((p0) -> BackpackManager.createBackupAndSave());
 	}
 
-	public static boolean isBedrock(ServerPlayerEntity player) {
+	public static boolean isBedrock(ServerPlayer player) {
 		return hasGeyserLoaded && player != null && (
 						ServerBackpacks.BEDROCK_PLAYERS.contains(player) ||
 						BackpackGeyser.isPlayerOnBedrock(player));

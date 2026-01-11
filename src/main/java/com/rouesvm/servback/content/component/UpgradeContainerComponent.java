@@ -7,12 +7,12 @@ import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,15 +29,15 @@ public record UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
         baseUpgrades.add(upgrade);
     }
 
-    public static final PacketCodec<ByteBuf, UpgradeContainerComponent> PACKET_CODEC = null;
+    public static final StreamCodec<ByteBuf, UpgradeContainerComponent> PACKET_CODEC = null;
 
     public static final Codec<UpgradeContainerComponent> CODEC =
-            Codec.unboundedMap(Codec.STRING, NbtCompound.CODEC).xmap(
+            Codec.unboundedMap(Codec.STRING, CompoundTag.CODEC).xmap(
                     map -> {
                         List<Upgrade> upgrades = new ArrayList<>();
-                        for (Map.Entry<String, NbtCompound> entry : map.entrySet()) {
+                        for (Map.Entry<String, CompoundTag> entry : map.entrySet()) {
                             Identifier id = Identifier.tryParse(entry.getKey());
-                            NbtCompound data = entry.getValue();
+                            CompoundTag data = entry.getValue();
                             if (id == null || data == null) continue;
 
                             UpgradeType<? extends Upgrade> upgradeType = BackpackUpgradeRegistry.get(id);
@@ -45,20 +45,20 @@ public record UpgradeContainerComponent(List<Upgrade> baseUpgrades) {
 
                             Upgrade upgrade = upgradeType.create();
                             if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
-                                persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance().server().getRegistryManager(), data));
+                                persistentUpgrade.readView(TagValueInput.create(ProblemReporter.DISCARDING, BackpackManager.instance().server().registryAccess(), data));
                             }
                             upgrades.add(upgrade);
                         }
                         return UpgradeContainerComponent.of(upgrades);
                     },
                     upgradeContainer -> {
-                        Map<String, NbtCompound> out = new HashMap<>();
+                        Map<String, CompoundTag> out = new HashMap<>();
                         for (Upgrade upgrade : upgradeContainer.baseUpgrades) {
-                            NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
+                            TagValueOutput data = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
                             if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
                                 persistentUpgrade.writeView(data);
                             }
-                            out.put(upgrade.getType().getId().toString(), data.getNbt());
+                            out.put(upgrade.getType().getId().toString(), data.buildResult());
                         }
                         return out;
                     }

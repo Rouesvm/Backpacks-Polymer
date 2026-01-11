@@ -1,7 +1,7 @@
 package com.rouesvm.servback.mixin.compat;
 
 import lol.sylvie.bedframe.geyser.translator.ItemTranslator;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

@@ -1,21 +1,21 @@
 package com.rouesvm.servback.content.upgrade;
 
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
 public interface FunctionalUpgrade {
-    default boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
+    default boolean onUsed(Level world, ServerPlayer player, ItemStack stack) {
         return false;
     }
 
-    default void tick(World world, Vec3d pos, BackpackInventory inventory) {}
+    default void tick(Level world, Vec3 pos, BackpackInventory inventory) {}
 
-    default void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {}
+    default void addTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {}
 }

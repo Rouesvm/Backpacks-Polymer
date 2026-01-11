@@ -9,11 +9,11 @@ import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.types.FallbackData;
 import com.rouesvm.servback.technical.manager.Manager;
 import net.minecraft.SharedConstants;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class BackpackListData extends FallbackData {
 
     public boolean initializeData(boolean hasLoaded) {
         if (!hasLoaded) {
-            saveDir = manager().server().getSavePath(WorldSavePath.ROOT).resolve("data/serverbackpacks.data");
+            saveDir = manager().server().getWorldPath(LevelResource.ROOT).resolve("data/serverbackpacks.data");
 
             try {
                 hasLoaded = loadExistingData(manager().server());
@@ -54,13 +54,13 @@ public class BackpackListData extends FallbackData {
         return DATA_TYPE.LIST_FILE_DATA;
     }
 
-    private void applyFixToNestedItemStacks(MinecraftServer server, NbtCompound root, int oldVersion, int newVersion) {
-        Optional<NbtList> backpacksOptional = root.getList("backpackContents");
+    private void applyFixToNestedItemStacks(MinecraftServer server, CompoundTag root, int oldVersion, int newVersion) {
+        Optional<ListTag> backpacksOptional = root.getList("backpackContents");
         if (backpacksOptional.isEmpty()) return;
 
-        NbtList backpacks = backpacksOptional.get();
+        ListTag backpacks = backpacksOptional.get();
         for (int i = 0; i < backpacks.size(); ++i) {
-            Optional<NbtCompound> backpackEntry = backpacks.getCompound(i);
+            Optional<CompoundTag> backpackEntry = backpacks.getCompound(i);
             backpackEntry.ifPresent(nbtCompound ->
                     BackpackDFU.applyDataFixToItemStacks(server, nbtCompound, oldVersion, newVersion));
         }
@@ -68,9 +68,9 @@ public class BackpackListData extends FallbackData {
 
     private boolean loadExistingData(MinecraftServer server) throws IOException {
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(saveDir))) {
-            NbtCompound compound = NbtIo.readCompound(dis);
+            CompoundTag compound = NbtIo.read(dis);
 
-            int newDataVersion = SharedConstants.getGameVersion().dataVersion().id();
+            int newDataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
             int oldDataVersion = 4440;
 
             applyFixToNestedItemStacks(server, compound, oldDataVersion, newDataVersion);

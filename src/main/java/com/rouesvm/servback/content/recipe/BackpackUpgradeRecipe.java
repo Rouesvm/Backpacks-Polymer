@@ -8,17 +8,17 @@ import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.display.RecipeDisplay;
-import net.minecraft.recipe.display.SlotDisplay;
-import net.minecraft.recipe.display.SmithingRecipeDisplay;
-import net.minecraft.recipe.input.SmithingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+import net.minecraft.world.item.crafting.display.SmithingRecipeDisplay;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -28,23 +28,23 @@ import java.util.Optional;
 public class BackpackUpgradeRecipe implements SmithingRecipe {
     final Ingredient base;
     final Optional<Ingredient> addition;
-    final TransmuteRecipeResult result;
+    final TransmuteResult result;
     @Nullable
-    private IngredientPlacement ingredientPlacement;
+    private PlacementInfo ingredientPlacement;
 
     public static final BackpackUpgradeRecipe.Serializer SERIALIZER = new BackpackUpgradeRecipe.Serializer();
 
-    public BackpackUpgradeRecipe(Ingredient base, Optional<Ingredient> addition, TransmuteRecipeResult result) {
+    public BackpackUpgradeRecipe(Ingredient base, Optional<Ingredient> addition, TransmuteResult result) {
         this.base = base;
         this.addition = addition;
         this.result = result;
     }
 
     @Override
-    public boolean matches(SmithingRecipeInput input, World world) {
-        boolean baseMatch = Ingredient.matches(this.template(), input.template())
-                && this.base().test(input.base())
-                && Ingredient.matches(this.addition(), input.addition());
+    public boolean matches(SmithingRecipeInput input, @NotNull Level world) {
+        boolean baseMatch = Ingredient.testOptionalIngredient(this.templateIngredient(), input.template())
+                && this.baseIngredient().test(input.base())
+                && Ingredient.testOptionalIngredient(this.additionIngredient(), input.addition());
 
         if (!baseMatch) return false;
 
@@ -66,9 +66,9 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     }
 
     @Override
-    public ItemStack craft(SmithingRecipeInput smithingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup) {
-        ItemStack base = smithingRecipeInput.base();
-        ItemStack addition = smithingRecipeInput.addition();
+    public @NotNull ItemStack assemble(SmithingRecipeInput recipeInput, HolderLookup.@NotNull Provider provider) {
+        ItemStack base = recipeInput.base();
+        ItemStack addition = recipeInput.addition();
 
         ItemStack resultStack = base.copy();
 
@@ -92,59 +92,59 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
         return resultStack;
     }
 
-    public TransmuteRecipeResult result() {
+    public TransmuteResult result() {
         return result;
     }
 
-    public Optional<Ingredient> template() {
+    public @NotNull Optional<Ingredient> templateIngredient() {
         return Optional.empty();
     }
 
-    public Ingredient base() {
+    public @NotNull Ingredient baseIngredient() {
         return this.base;
     }
 
-    public Optional<Ingredient> addition() {
+    public @NotNull Optional<Ingredient> additionIngredient() {
         return this.addition;
     }
 
-    public RecipeSerializer<BackpackUpgradeRecipe> getSerializer() {
+    public @NotNull RecipeSerializer<@NotNull BackpackUpgradeRecipe> getSerializer() {
         return BackpackRecipeRegistry.BACKPACK_UPGRADE_RECIPE;
     }
 
-    public IngredientPlacement getIngredientPlacement() {
+    public @NotNull PlacementInfo placementInfo() {
         if (this.ingredientPlacement == null) {
-            this.ingredientPlacement = IngredientPlacement.forMultipleSlots(List.of(Optional.empty(), Optional.of(this.base), this.addition));
+            this.ingredientPlacement = PlacementInfo.createFromOptionals(List.of(Optional.empty(), Optional.of(this.base), this.addition));
         }
 
         return this.ingredientPlacement;
     }
 
-    public List<RecipeDisplay> getDisplays() {
-        return List.of(new SmithingRecipeDisplay(Ingredient.toDisplay(Optional.empty()), this.base.toDisplay(), Ingredient.toDisplay(this.addition), this.result.createSlotDisplay(), new SlotDisplay.ItemSlotDisplay(Items.SMITHING_TABLE)));
+    public @NotNull List<RecipeDisplay> display() {
+        return List.of(new SmithingRecipeDisplay(Ingredient.optionalIngredientToDisplay(Optional.empty()), this.base.display(), Ingredient.optionalIngredientToDisplay(this.addition), this.result.display(), new SlotDisplay.ItemSlotDisplay(Items.SMITHING_TABLE)));
     }
 
-    public static class Serializer implements RecipeSerializer<BackpackUpgradeRecipe> {
+    public static class Serializer implements RecipeSerializer<@NotNull BackpackUpgradeRecipe> {
         private static final MapCodec<BackpackUpgradeRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) ->
-                instance.group(Ingredient.CODEC.fieldOf("base").forGetter(BackpackUpgradeRecipe::base),
-                        Ingredient.CODEC.optionalFieldOf("addition").forGetter(BackpackUpgradeRecipe::addition),
-                        TransmuteRecipeResult.CODEC.fieldOf("result").forGetter(BackpackUpgradeRecipe::result))
+                instance.group(Ingredient.CODEC.fieldOf("base").forGetter(BackpackUpgradeRecipe::baseIngredient),
+                        Ingredient.CODEC.optionalFieldOf("addition").forGetter(BackpackUpgradeRecipe::additionIngredient),
+                        TransmuteResult.CODEC.fieldOf("result").forGetter(BackpackUpgradeRecipe::result))
                         .apply(instance, BackpackUpgradeRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, BackpackUpgradeRecipe> PACKET_CODEC;
+        public static final StreamCodec<@NotNull RegistryFriendlyByteBuf, @NotNull BackpackUpgradeRecipe> PACKET_CODEC;
 
         public MapCodec<BackpackUpgradeRecipe> codec() {
             return CODEC;
         }
 
-        public PacketCodec<RegistryByteBuf, BackpackUpgradeRecipe> packetCodec() {
+        public @NotNull StreamCodec<@NotNull RegistryFriendlyByteBuf, @NotNull BackpackUpgradeRecipe> streamCodec() {
             return PACKET_CODEC;
         }
 
         static {
-            PACKET_CODEC = PacketCodec.tuple(Ingredient.PACKET_CODEC, BackpackUpgradeRecipe::base,
-                    Ingredient.OPTIONAL_PACKET_CODEC, BackpackUpgradeRecipe::addition,
-                    TransmuteRecipeResult.PACKET_CODEC, BackpackUpgradeRecipe::result,
+            PACKET_CODEC = StreamCodec.composite(Ingredient.CONTENTS_STREAM_CODEC, BackpackUpgradeRecipe::baseIngredient,
+                    Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC, BackpackUpgradeRecipe::additionIngredient,
+                    TransmuteResult.STREAM_CODEC, BackpackUpgradeRecipe::result,
                     BackpackUpgradeRecipe::new);
         }
     }

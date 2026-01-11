@@ -12,40 +12,40 @@ import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 public class BackpackCommands {
     public static void initialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> init(dispatcher));
     }
 
-    private static final Permission ADMIN_PERMISSION = new Permission.Level(PermissionLevel.ADMINS);
+    private static final Permission ADMIN_PERMISSION = new Permission.HasCommandLevel(PermissionLevel.ADMINS);
 
-    public static void init(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void init(CommandDispatcher<CommandSourceStack> dispatcher) {
         if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
 
         dispatcher.register(literal("backpacks")
-                .requires(source -> source.getPermissions().hasPermission(ADMIN_PERMISSION))
+                .requires(source -> source.permissions().hasPermission(ADMIN_PERMISSION))
                 .executes(context -> {
-                    context.getSource().sendFeedback(() -> Text.literal("Server Backpacks! by Rouesvm"), false);
+                    context.getSource().sendSuccess(() -> Component.literal("Server Backpacks! by Rouesvm"), false);
                     return 1;
                 }).then(literal("backup").executes(context -> {
-                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.backup"), false);
+                    context.getSource().sendSuccess(() -> Component.translatable("command.serverbackpacks.backup"), false);
                     BackpackManager.createBackupAndSave();
                     return 1;
                 })).then(literal("list").executes(context -> listBackpacks(context, 1))
@@ -58,7 +58,7 @@ public class BackpackCommands {
                     if (!search.isEmpty()) {
                         if (search.length() != 36) throw new CommandSyntaxException(
                                     CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
-                                    Text.translatable("command.serverbackpacks.incorrect_uuid"));
+                                    Component.translatable("command.serverbackpacks.incorrect_uuid"));
 
                         UUID uuid = UUID.fromString(search);
                         Optional<BackpackInstance> instance = BackpackManager.getInstance(uuid);
@@ -67,41 +67,41 @@ public class BackpackCommands {
                             new BackpackGui(context.getSource().getPlayer(), instance.get());
                         } else throw new CommandSyntaxException(
                                     CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
-                                    Text.translatable("command.serverbackpacks.incorrect_uuid"));
+                                    Component.translatable("command.serverbackpacks.incorrect_uuid"));
                     } else throw new CommandSyntaxException(
                                 CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
-                                Text.translatable("command.serverbackpacks.empty"));
+                                Component.translatable("command.serverbackpacks.empty"));
                     return 1;
                 })).then(configCommand())
         ));
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> configCommand() {
+    private static LiteralArgumentBuilder<CommandSourceStack> configCommand() {
         return literal("config")
                 .then(literal("reset").executes(context -> {
                     Configuration.manager.instance = new Configuration.Instance();
-                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.reset"), true);
+                    context.getSource().sendSuccess(() -> Component.translatable("command.serverbackpacks.reset"), true);
                     return 1;
                 })).then(literal("reload").executes(context -> {
                     Configuration.manager.load();
-                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.reload"), true);
+                    context.getSource().sendSuccess(() -> Component.translatable("command.serverbackpacks.reload"), true);
                     return 1;
                 }))
                 .then(literal("save").executes(context -> {
                     Configuration.manager.save();
-                    context.getSource().sendFeedback(() -> Text.translatable("command.serverbackpacks.save"), true);
+                    context.getSource().sendSuccess(() -> Component.translatable("command.serverbackpacks.save"), true);
                     return 1;
                 }));
     }
 
-    public static int listBackpacks(CommandContext<ServerCommandSource> context, int page) {
+    public static int listBackpacks(CommandContext<CommandSourceStack> context, int page) {
         List<UUID> instances = new ArrayList<>(BackpackManager.instance().getBackpackUUIDs());
 
         int pageSize = 10;
         int totalPages = (int) Math.ceil(instances.size() / (double) pageSize);
 
         if (page < 1 || page > totalPages) {
-            context.getSource().sendError(Text.literal("Invalid page number. Valid pages: 1-" + totalPages));
+            context.getSource().sendFailure(Component.literal("Invalid page number. Valid pages: 1-" + totalPages));
             return 0;
         }
 
@@ -109,35 +109,35 @@ public class BackpackCommands {
         int endIndex = Math.min(startIndex + pageSize, instances.size());
         List<UUID> pageInstances = instances.subList(startIndex, endIndex);
 
-        context.getSource().sendFeedback(() -> Text.literal(String.format("=== Backpacks Instances (Page %d/%d) ===", page, totalPages))
-                .formatted(Formatting.WHITE, Formatting.BOLD), false);
+        context.getSource().sendSuccess(() -> Component.literal(String.format("=== Backpacks Instances (Page %d/%d) ===", page, totalPages))
+                .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD), false);
 
         for (UUID uuid : pageInstances) {
-            context.getSource().sendFeedback(() -> Text.literal("* " + uuid)
-                    .formatted(Formatting.WHITE)
-                    .styled(style -> style
+            context.getSource().sendSuccess(() -> Component.literal("* " + uuid)
+                    .withStyle(ChatFormatting.WHITE)
+                    .withStyle(style -> style
                             .withClickEvent(new ClickEvent.SuggestCommand("/backpacks open " + uuid))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to open UUID")))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to open UUID")))
                     ), false);
         }
 
-        MutableText footer = Text.literal("");
+        MutableComponent footer = Component.literal("");
 
         if (page > 1) {
-            footer.append(Text.literal("[< Previous] ")
-                    .formatted(Formatting.YELLOW)
-                    .styled(style -> style.withClickEvent(new ClickEvent.RunCommand("/backpacks list " + (page - 1)))));
+            footer.append(Component.literal("[< Previous] ")
+                    .withStyle(ChatFormatting.YELLOW)
+                    .withStyle(style -> style.withClickEvent(new ClickEvent.RunCommand("/backpacks list " + (page - 1)))));
         }
 
-        footer.append(Text.literal(String.format("Page %d/%d ", page, totalPages)).formatted(Formatting.GRAY));
+        footer.append(Component.literal(String.format("Page %d/%d ", page, totalPages)).withStyle(ChatFormatting.GRAY));
 
         if (page < totalPages) {
-            footer.append(Text.literal("[Next >]")
-                    .formatted(Formatting.YELLOW)
-                    .styled(style -> style.withClickEvent(new ClickEvent.RunCommand("/backpacks list " + (page + 1)))));
+            footer.append(Component.literal("[Next >]")
+                    .withStyle(ChatFormatting.YELLOW)
+                    .withStyle(style -> style.withClickEvent(new ClickEvent.RunCommand("/backpacks list " + (page + 1)))));
         }
 
-        context.getSource().sendFeedback(() -> footer, false);
+        context.getSource().sendSuccess(() -> footer, false);
 
         return 1;
     }

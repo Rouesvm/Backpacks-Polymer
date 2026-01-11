@@ -4,8 +4,8 @@ import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import com.rouesvm.servback.technical.data.codecs.InventoryData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.SharedConstants;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class BackpackInstance {
     }
 
     public int size() {
-        return inventory.size();
+        return inventory.getContainerSize();
     }
 
     public long lastAccessed() {
@@ -52,12 +52,12 @@ public class BackpackInstance {
         return inventory;
     }
 
-    public DefaultedList<ItemStack> heldInventory() {
+    public NonNullList<ItemStack> heldInventory() {
         return inventory.heldStacks();
     }
 
     public BackpackInstance copy() {
-        BackpackInventory target = new BackpackInventory(inventory.size());
+        BackpackInventory target = new BackpackInventory(inventory.getContainerSize());
         inventory.copyTo(target);
         return new BackpackInstance(this.uuid, target);
     }
@@ -80,7 +80,7 @@ public class BackpackInstance {
                 Optional.of(InventoryData.stacksListToData(this.heldInventory())),
                 Optional.of(this.lastAccessed()),
                 Optional.of(this.size()),
-                Optional.of(SharedConstants.getGameVersion().dataVersion().id())
+                Optional.of(SharedConstants.getCurrentVersion().dataVersion().version())
         );
     }
 }

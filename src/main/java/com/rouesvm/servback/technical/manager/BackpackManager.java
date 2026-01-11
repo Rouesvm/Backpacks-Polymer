@@ -12,9 +12,9 @@ import com.rouesvm.servback.technical.data.types.state.BackpackPersistentStateDa
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,11 +53,11 @@ public class BackpackManager implements Manager {
 
     private final MinecraftServer server;
 
-    private final RegistryOps<NbtElement> nbtOps;
+    private final RegistryOps<Tag> nbtOps;
 
     public BackpackManager(MinecraftServer server) {
         this.server = server;
-        this.nbtOps = server.getRegistryManager().getOps(NbtOps.INSTANCE);
+        this.nbtOps = server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
         this.storageHandler = new BackpackData(this);
         this.dataHandler = storageHandler;
 
@@ -135,7 +135,7 @@ public class BackpackManager implements Manager {
     }
 
     public static void saveData(BackpackInstance backpackInstance) {
-        if (instance.server().isStopping() || instance.server().isSaving()) return;
+        if (instance.server().isShutdown() || instance.server().isCurrentlySaving()) return;
 
         Data storageHandler = instance.storageHandler();
         storageHandler.replaceStoredInventory(backpackInstance);
@@ -233,7 +233,7 @@ public class BackpackManager implements Manager {
     }
 
     @Override
-    public RegistryOps<NbtElement> nbtOps() {
+    public RegistryOps<Tag> nbtOps() {
         return this.nbtOps;
     }
 

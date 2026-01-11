@@ -5,26 +5,26 @@ import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.block.BasicPolymerBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
 public class BlockHolder extends ElementHolder {
     public final ItemDisplayElement main;
     public final BlockPos pos;
-    public final ServerWorld world;
+    public final ServerLevel world;
 
     public boolean alreadySetItem = false;
 
-    public BlockHolder(ServerWorld world, BlockState state, BlockPos pos) {
+    public BlockHolder(ServerLevel world, BlockState state, BlockPos pos) {
         this.main = new ItemDisplayElement();
-        this.main.setYaw(state.get(BasicPolymerBlock.FACING).getPositiveHorizontalDegrees());
+        this.main.setYaw(state.getValue(BasicPolymerBlock.FACING).toYRot());
         this.main.ignorePositionUpdates();
         this.addElement(main);
 
@@ -44,13 +44,13 @@ public class BlockHolder extends ElementHolder {
     }
 
     @Override
-    public boolean startWatching(ServerPlayNetworkHandler client) {
+    public boolean startWatching(ServerGamePacketListenerImpl client) {
         return !ServerBackpacks.isBedrock(client.getPlayer()) && super.startWatching(client);
     }
 
     public void setMain(ItemStack stack) {
-        CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
-        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
+        CustomModelData component = new CustomModelData(List.of(), List.of(), List.of("model"), List.of());
+        stack.set(DataComponents.CUSTOM_MODEL_DATA, component);
         this.main.setItem(stack);
     }
 }

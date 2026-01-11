@@ -4,45 +4,45 @@ import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.DyeColor;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-public class BackpackBlock extends BaseBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
-    public static final BooleanProperty HAS_DYE = BooleanProperty.of("has_dye");
-    public static final EnumProperty<DyeColor> DYE_COLOR = EnumProperty.of("dye_color", DyeColor.class);
-    public static final IntProperty SLOTS = IntProperty.of("slots", 1, 3);
+public class BackpackBlock extends BaseBackpackBlock implements EntityBlock, BlockWithElementHolder, BedrockBlock {
+    public static final BooleanProperty HAS_DYE = BooleanProperty.create("has_dye");
+    public static final EnumProperty<DyeColor> DYE_COLOR = EnumProperty.create("dye_color", DyeColor.class);
+    public static final IntegerProperty SLOTS = IntegerProperty.create("slots", 1, 3);
 
     public BackpackBlock() {
         super("backpack");
-        this.setDefaultState(this.getStateManager().getDefaultState()
-                .with(HAS_DYE, false)
-                .with(DYE_COLOR, DyeColor.BROWN)
-                .with(SLOTS, 1)
+        this.registerDefaultState(this.getStateDefinition().any()
+                .setValue(HAS_DYE, false)
+                .setValue(DYE_COLOR, DyeColor.BROWN)
+                .setValue(SLOTS, 1)
         );
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        ContainerItem item = (ContainerItem) context.getStack().getItem();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        ContainerItem item = (ContainerItem) context.getItemInHand().getItem();
         DyeColor color = BackpackItemJsonRegistry.getBackpackDyeColor(item);
 
         int size = item.getSize() / 9;
         if (size > 3) size = 3;
 
-        return super.getPlacementState(context)
-                .with(DYE_COLOR, color != null ? color : DyeColor.BROWN)
-                .with(HAS_DYE, color != null)
-                .with(SLOTS, size);
+        return super.getStateForPlacement(context)
+                .setValue(DYE_COLOR, color != null ? color : DyeColor.BROWN)
+                .setValue(HAS_DYE, color != null)
+                .setValue(SLOTS, size);
     }
 
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING).add(HAS_DYE).add(DYE_COLOR).add(SLOTS);
     }
 }

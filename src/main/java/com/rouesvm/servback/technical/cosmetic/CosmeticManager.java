@@ -1,8 +1,8 @@
 package com.rouesvm.servback.technical.cosmetic;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,25 +31,25 @@ public class CosmeticManager {
         }
     }
 
-    public boolean hasInstance(ServerPlayerEntity player) {
-        return manager.storedInstances.get(player.getUuid()) != null;
+    public boolean hasInstance(ServerPlayer player) {
+        return manager.storedInstances.get(player.getUUID()) != null;
     }
 
-    public Optional<BackHolder> getInstance(ServerPlayerEntity player) {
-        return Optional.ofNullable(manager.storedInstances.getOrDefault(player.getUuid(), null));
+    public Optional<BackHolder> getInstance(ServerPlayer player) {
+        return Optional.ofNullable(manager.storedInstances.getOrDefault(player.getUUID(), null));
     }
 
-    public BackHolder getOrCreateInstance(ServerPlayerEntity player, ItemStack stack) {
+    public BackHolder getOrCreateInstance(ServerPlayer player, ItemStack stack) {
         Optional<BackHolder> holder = getInstance(player);
         if (holder.isEmpty()) {
             holder = Optional.of(BackHolder.createDisplay(stack, player));
-            manager.storedInstances.put(player.getUuid(), holder.get());
+            manager.storedInstances.put(player.getUUID(), holder.get());
         }
 
         return holder.get();
     }
 
-    public void removeInstance(ServerPlayerEntity player) {
-        getInstance(player).ifPresent(h -> manager.storedInstances.remove(player.getUuid()));
+    public void removeInstance(ServerPlayer player) {
+        getInstance(player).ifPresent(h -> manager.storedInstances.remove(player.getUUID()));
     }
 }

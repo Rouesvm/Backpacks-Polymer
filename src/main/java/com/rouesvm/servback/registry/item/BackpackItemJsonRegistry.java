@@ -5,8 +5,8 @@ import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.technical.config.BackpackItemConfiguration;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.item.Item;
-import net.minecraft.util.DyeColor;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 
 import java.util.HashSet;
 import java.util.List;

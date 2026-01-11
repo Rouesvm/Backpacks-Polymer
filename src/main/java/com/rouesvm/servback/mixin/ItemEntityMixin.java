@@ -1,8 +1,8 @@
 package com.rouesvm.servback.mixin;
 
 import com.rouesvm.servback.technical.BackpackGlobalLinker;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,7 +13,7 @@ public class ItemEntityMixin {
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
         ItemEntity source = (ItemEntity) (Object) this;
-        World world = source.getEntityWorld();
+        Level world = source.level();
         BackpackGlobalLinker.testLink(source, world);
     }
 }

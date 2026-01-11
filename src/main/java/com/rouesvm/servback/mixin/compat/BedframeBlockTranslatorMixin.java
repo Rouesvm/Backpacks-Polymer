@@ -1,6 +1,6 @@
 package com.rouesvm.servback.mixin.compat;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

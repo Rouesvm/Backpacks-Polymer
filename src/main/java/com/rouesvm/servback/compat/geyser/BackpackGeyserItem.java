@@ -2,31 +2,31 @@ package com.rouesvm.servback.compat.geyser;
 
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
 import org.geysermc.geyser.api.item.custom.NonVanillaCustomItemData;
 
 public class BackpackGeyserItem {
     public static void onGeyserDefineCustomItemsEvent(GeyserDefineCustomItemsEvent event) {
-        Registries.ITEM.getEntrySet().stream()
+        BuiltInRegistries.ITEM.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof BedrockItem)
                 .forEach(entry -> {
                     Item item = entry.getValue();
-                    int id = Registries.ITEM.getRawId(item);
-                    Identifier identifier = entry.getKey().getValue();
+                    int id = BuiltInRegistries.ITEM.getId(item);
+                    Identifier identifier = entry.getKey().identifier();
                     String stringIdentifier = identifier.toString();
 
                     NonVanillaCustomItemData.Builder customItemData = NonVanillaCustomItemData.builder()
-                            .displayName(Text.translatable(item.getTranslationKey()).getString())
+                            .displayName(Component.translatable(item.getDescriptionId()).getString())
                             .name(identifier.getPath())
                             .javaId(id)
                             .identifier(stringIdentifier)
                             .allowOffhand(true)
                             .displayHandheld(item instanceof BundleGuiItem)
-                            .stackSize(item.getMaxCount())
+                            .stackSize(item.getDefaultMaxStackSize())
                             .icon(stringIdentifier)
                             .creativeCategory(3);
 

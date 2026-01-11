@@ -1,37 +1,37 @@
 package com.rouesvm.servback.technical.ui.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeFinder;
-import net.minecraft.recipe.RecipeInputProvider;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedItemContents;
+import net.minecraft.world.inventory.StackedContentsCompatible;
+import net.minecraft.world.item.ItemStack;
 
-public class BaseInventory implements Inventory, RecipeInputProvider {
-    private DefaultedList<ItemStack> heldStacks;
+public class BaseInventory implements Container, StackedContentsCompatible {
+    private NonNullList<ItemStack> heldStacks;
 
     public BaseInventory(int size) {
-        this.heldStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
+        this.heldStacks = NonNullList.withSize(size, ItemStack.EMPTY);
     }
 
-    public BaseInventory(DefaultedList<ItemStack> stacks) {
+    public BaseInventory(NonNullList<ItemStack> stacks) {
         this.heldStacks = stacks;
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         return canInsert(stack);
     }
 
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : ItemStack.EMPTY;
     }
 
-    public ItemStack removeStack(int slot, int amount) {
-        ItemStack itemStack = Inventories.splitStack(this.heldStacks, slot, amount);
+    public ItemStack removeItem(int slot, int amount) {
+        ItemStack itemStack = ContainerHelper.removeItem(this.heldStacks, slot, amount);
         if (!itemStack.isEmpty()) {
-            this.markDirty();
+            this.setChanged();
         }
 
         return itemStack;
@@ -45,7 +45,7 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return BaseInventory.canInsert(stack, this);
     }
 
-    public ItemStack removeStack(int slot) {
+    public ItemStack removeItemNoUpdate(int slot) {
         ItemStack itemStack = this.heldStacks.get(slot);
         if (itemStack.isEmpty()) {
             return ItemStack.EMPTY;
@@ -55,13 +55,13 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         }
     }
 
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         this.heldStacks.set(slot, stack);
-        stack.capCount(this.getMaxCount(stack));
-        this.markDirty();
+        stack.limitSize(this.getMaxStackSize(stack));
+        this.setChanged();
     }
 
-    public int size() {
+    public int getContainerSize() {
         return this.heldStacks.size();
     }
 
@@ -75,21 +75,21 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return true;
     }
 
-    public void markDirty() {}
+    public void setChanged() {}
 
-    public boolean canPlayerUse(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return true;
     }
 
-    public void clear() {
+    public void clearContent() {
         this.heldStacks.clear();
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder finder) {
+    public void fillStackedContents(StackedItemContents finder) {
         for(ItemStack itemStack : this.heldStacks) {
-            finder.addInput(itemStack);
+            finder.accountStack(itemStack);
         }
     }
 
@@ -97,15 +97,15 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return (this.heldStacks.stream().filter((stack) -> !stack.isEmpty()).toList()).toString();
     }
 
-    public DefaultedList<ItemStack> heldStacks() {
+    public NonNullList<ItemStack> heldStacks() {
         return this.heldStacks;
     }
 
-    public void setInventoryDirectly(DefaultedList<ItemStack> inventory) {
+    public void setInventoryDirectly(NonNullList<ItemStack> inventory) {
         this.heldStacks = inventory;
     }
 
-    public static ItemStack addStack(ItemStack stack, Inventory inventory) {
+    public static ItemStack addStack(ItemStack stack, Container inventory) {
         if (stack.isEmpty()) {
             return ItemStack.EMPTY;
         } else if (!canInsert(stack, inventory)) {
@@ -122,21 +122,21 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         }
     }
 
-    private static void addToNewSlot(ItemStack stack, Inventory inventory) {
-        for(int i = 0; i < inventory.size(); ++i) {
-            ItemStack itemStack = inventory.getStack(i);
+    private static void addToNewSlot(ItemStack stack, Container inventory) {
+        for(int i = 0; i < inventory.getContainerSize(); ++i) {
+            ItemStack itemStack = inventory.getItem(i);
             if (itemStack.isEmpty()) {
-                inventory.setStack(i, stack.copyAndEmpty());
+                inventory.setItem(i, stack.copyAndClear());
                 return;
             }
         }
 
     }
 
-    private static void addToExistingSlot(ItemStack stack, Inventory inventory) {
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack itemStack = inventory.getStack(i);
-            if (ItemStack.areItemsAndComponentsEqual(itemStack, stack)) {
+    private static void addToExistingSlot(ItemStack stack, Container inventory) {
+        for (int i = 0; i < inventory.getContainerSize(); ++i) {
+            ItemStack itemStack = inventory.getItem(i);
+            if (ItemStack.isSameItemSameComponents(itemStack, stack)) {
                 BaseInventory.transfer(stack, itemStack, inventory);
                 if (stack.isEmpty()) {
                     return;
@@ -146,26 +146,26 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
     }
 
     @Override
-    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
+    public boolean canTakeItem(Container hopperInventory, int slot, ItemStack stack) {
         return canInsert(stack);
     }
 
-    public static boolean isFull(Inventory inventory) {
+    public static boolean isFull(Container inventory) {
         for (ItemStack stack : inventory) {
-            if (stack.isEmpty() || stack.getCount() < stack.getMaxCount()) {
+            if (stack.isEmpty() || stack.getCount() < stack.getMaxStackSize()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean canInsert(ItemStack stack, Inventory inventory) {
+    public static boolean canInsert(ItemStack stack, Container inventory) {
         boolean bl = false;
 
-        if (!stack.getItem().canBeNested()) return false;
+        if (!stack.getItem().canFitInsideContainerItems()) return false;
 
         for(ItemStack itemStack : inventory) {
-            if (itemStack.isEmpty()  || ItemStack.areItemsAndComponentsEqual(itemStack, stack) && itemStack.getCount() < itemStack.getMaxCount()) {
+            if (itemStack.isEmpty()  || ItemStack.isSameItemSameComponents(itemStack, stack) && itemStack.getCount() < itemStack.getMaxStackSize()) {
                 bl = true;
                 break;
             }
@@ -174,13 +174,13 @@ public class BaseInventory implements Inventory, RecipeInputProvider {
         return bl;
     }
 
-    private static void transfer(ItemStack source, ItemStack target, Inventory inventory) {
-        int i = inventory.getMaxCount(target);
+    private static void transfer(ItemStack source, ItemStack target, Container inventory) {
+        int i = inventory.getMaxStackSize(target);
         int j = Math.min(source.getCount(), i - target.getCount());
         if (j > 0) {
-            target.increment(j);
-            source.decrement(j);
-            inventory.markDirty();
+            target.grow(j);
+            source.shrink(j);
+            inventory.setChanged();
         }
     }
 }

@@ -6,46 +6,46 @@ import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
 
 public class BackpackGlobalLinker {
-    public static void testLink(ItemEntity source, World world) {
-        if (world.isClient()) return;
-        if (source.age < 60) return;
+    public static void testLink(ItemEntity source, Level world) {
+        if (world.isClientSide()) return;
+        if (source.tickCount < 60) return;
         if (source.isRemoved()) return;
 
-        ItemStack stack = source.getStack();
+        ItemStack stack = source.getItem();
 
-        boolean isBackpack = stack.isOf(BackpackItemRegistry.GLOBAL_BACKPACK);
+        boolean isBackpack = stack.is(BackpackItemRegistry.GLOBAL_BACKPACK);
 
         if (!isBackpack) return;
 
-        Box area = source.getBoundingBox().expand(2);
+        AABB area = source.getBoundingBox().inflate(2);
 
-        List<ItemEntity> backpackEntities = world.getEntitiesByClass(ItemEntity.class, area, (itemEntity ->
+        List<ItemEntity> backpackEntities = world.getEntitiesOfClass(ItemEntity.class, area, (itemEntity ->
                 itemEntity != source &&
-                        itemEntity.age > 10 &&
-                        itemEntity.getStack().isOf(BackpackItemRegistry.GLOBAL_BACKPACK)));
+                        itemEntity.tickCount > 10 &&
+                        itemEntity.getItem().is(BackpackItemRegistry.GLOBAL_BACKPACK)));
 
-        List<ItemEntity> enderPearlsEntities = world.getEntitiesByClass(ItemEntity.class, area, (itemEntity ->
+        List<ItemEntity> enderPearlsEntities = world.getEntitiesOfClass(ItemEntity.class, area, (itemEntity ->
                 itemEntity != source &&
-                        itemEntity.age > 10 &&
-                        itemEntity.getStack().isOf(Items.ENDER_PEARL)));
+                        itemEntity.tickCount > 10 &&
+                        itemEntity.getItem().is(Items.ENDER_PEARL)));
 
         backpackEntities.add(source);
         ItemEntity enderPearl = enderPearlsEntities.isEmpty() ? null : enderPearlsEntities.getFirst();
@@ -53,16 +53,16 @@ public class BackpackGlobalLinker {
         int globalBackpacks = backpackEntities.size();
         if (globalBackpacks < 2) return;
 
-        if (enderPearl != null && source.isOnGround()) {
+        if (enderPearl != null && source.onGround()) {
             link(backpackEntities, enderPearl);
-        } else if (source.isSubmergedInWater()) unlink(backpackEntities);
+        } else if (source.isUnderWater()) unlink(backpackEntities);
     }
 
     public static void unlink(List<ItemEntity> entities) {
         if (entities.size() < 2) return;
 
-        UUID firstUUID = BackpackUUID.getStackUUID(entities.getFirst().getStack());
-        UUID secondUUID = BackpackUUID.getStackUUID(entities.get(1).getStack());
+        UUID firstUUID = BackpackUUID.getStackUUID(entities.getFirst().getItem());
+        UUID secondUUID = BackpackUUID.getStackUUID(entities.get(1).getItem());
 
         if (firstUUID == null) return;
         if (secondUUID == null) return;
@@ -75,7 +75,7 @@ public class BackpackGlobalLinker {
         ItemEntity backpackEntity = null;
 
         for (ItemEntity entity : entities) {
-            ItemStack stack = entity.getStack();
+            ItemStack stack = entity.getItem();
             UpgradeContainerComponent containerComponent = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
 
             if (containerComponent == null || containerComponent.baseUpgrades().isEmpty()) {
@@ -95,10 +95,10 @@ public class BackpackGlobalLinker {
         if (backpackToUnlink != null) {
             BackpackUUID.createNewUUID(backpackToUnlink);
 
-            World world = backpackEntity.getEntityWorld();
-            Vec3d pos = backpackEntity.getEntityPos();
+            Level world = backpackEntity.level();
+            Vec3 pos = backpackEntity.position();
 
-            applyEffects((ServerWorld) world, pos);
+            applyEffects((ServerLevel) world, pos);
         }
 
         if (sourceBackpack != null) {
@@ -114,8 +114,8 @@ public class BackpackGlobalLinker {
     public static void link(List<ItemEntity> entities, ItemEntity catalyst) {
         if (entities.size() < 2) return;
 
-        UUID firstUUID = BackpackUUID.getStackUUID(entities.get(0).getStack());
-        UUID secondUUID = BackpackUUID.getStackUUID(entities.get(1).getStack());
+        UUID firstUUID = BackpackUUID.getStackUUID(entities.get(0).getItem());
+        UUID secondUUID = BackpackUUID.getStackUUID(entities.get(1).getItem());
 
         if (firstUUID != null && firstUUID.equals(secondUUID)) return;
 
@@ -123,8 +123,8 @@ public class BackpackGlobalLinker {
         ItemStack targetBackpack = null;
 
         for (ItemEntity entity : entities) {
-            ItemStack stack = entity.getStack();
-            DefaultedList<ItemStack> inventory = BackpackUtils.getItemList(stack);
+            ItemStack stack = entity.getItem();
+            NonNullList<ItemStack> inventory = BackpackUtils.getItemList(stack);
 
             if (inventory.isEmpty()) {
                 if (targetBackpack == null) targetBackpack = stack;
@@ -132,21 +132,21 @@ public class BackpackGlobalLinker {
         }
 
         if (performLink(entities, sourceBackpack, targetBackpack)) {
-            World world = catalyst.getEntityWorld();
-            Vec3d pos = catalyst.getEntityPos();
+            Level world = catalyst.level();
+            Vec3 pos = catalyst.position();
 
             catalyst.discard();
-            applyEffects((ServerWorld) world, pos);
+            applyEffects((ServerLevel) world, pos);
         }
     }
 
     private static boolean performLink(List<ItemEntity> entities, ItemStack sourceBackpack, ItemStack targetBackpack) {
         if (sourceBackpack == null) {
-            sourceBackpack = entities.getFirst().getStack();
+            sourceBackpack = entities.getFirst().getItem();
         }
 
         if (targetBackpack == null) {
-            targetBackpack = entities.get(1).getStack();
+            targetBackpack = entities.get(1).getItem();
         }
 
         int sourceCount = sourceBackpack.getOrDefault(BackpackDataComponentTypes.LINK_COUNT, 0);
@@ -179,22 +179,22 @@ public class BackpackGlobalLinker {
         return true;
     }
 
-    private static void applyEffects(ServerWorld world, Vec3d pos) {
-        world.spawnParticles(ParticleTypes.PORTAL, pos.x, pos.y + 0.5, pos.z,
+    private static void applyEffects(ServerLevel world, Vec3 pos) {
+        world.sendParticles(ParticleTypes.PORTAL, pos.x, pos.y + 0.5, pos.z,
                 100, 0.5, 0.5, 0.5, 0.5);
 
         world.playSound(null, pos.x, pos.y, pos.z,
-                SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE,
-                SoundCategory.BLOCKS, 1.0f, 1.2f);
+                SoundEvents.ENCHANTMENT_TABLE_USE,
+                SoundSource.BLOCKS, 1.0f, 1.2f);
     }
 
     private static void applyVisuals(@Nullable ItemStack toApply) {
         if (toApply == null) return;
-        toApply.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        toApply.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
     }
 
     private static void removeVisuals(@Nullable ItemStack toApply) {
         if (toApply == null) return;
-        toApply.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
+        toApply.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, false);
     }
 }

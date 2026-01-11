@@ -5,18 +5,18 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.codecs.BackpackInstanceData;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.PersistentStateType;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
-public class BackpackPersistentState extends PersistentState {
+public class BackpackPersistentState extends SavedData {
     public final Set<BackpackInstanceData> storedInventories;
 
     private static final Codec<BackpackPersistentState> SAVE_CODEC = RecordCodecBuilder.create(
@@ -24,7 +24,7 @@ public class BackpackPersistentState extends PersistentState {
                       BackpackInstanceData.CODEC.listOf().fieldOf("backpackContents").forGetter(BackpackPersistentState::getStoredInventories)
                     ).apply(instance, BackpackPersistentState::new));
 
-    private static final PersistentStateType<BackpackPersistentState> type = new PersistentStateType<>(
+    private static final SavedDataType<BackpackPersistentState> type = new SavedDataType<>(
             MOD_ID + "-v2",
             BackpackPersistentState::new,
             SAVE_CODEC,
@@ -41,11 +41,11 @@ public class BackpackPersistentState extends PersistentState {
     }
 
     public static BackpackPersistentState getServerState(MinecraftServer server) {
-        ServerWorld world = server.getWorld(World.OVERWORLD);
+        ServerLevel world = server.getLevel(Level.OVERWORLD);
         if (world != null) {
-            PersistentStateManager persistentStateManager = world.getPersistentStateManager();
-            BackpackPersistentState state = persistentStateManager.getOrCreate(type);
-            state.markDirty();
+            DimensionDataStorage persistentStateManager = world.getDataStorage();
+            BackpackPersistentState state = persistentStateManager.computeIfAbsent(type);
+            state.setDirty();
 
             return state;
         } else return null;

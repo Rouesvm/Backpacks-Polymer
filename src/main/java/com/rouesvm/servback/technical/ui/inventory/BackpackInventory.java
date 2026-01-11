@@ -1,9 +1,9 @@
 package com.rouesvm.servback.technical.ui.inventory;
 
 import com.rouesvm.servback.technical.manager.BackpackManager;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.UUID;
 
@@ -14,19 +14,19 @@ public class BackpackInventory extends BaseInventory {
         super(slots);
     }
 
-    public BackpackInventory(DefaultedList<ItemStack> stacks) {
+    public BackpackInventory(NonNullList<ItemStack> stacks) {
         super(stacks);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
-        super.setStack(slot, stack);
-        if (entity != null) entity.markDirty();
+    public void setItem(int slot, ItemStack stack) {
+        super.setItem(slot, stack);
+        if (entity != null) entity.setChanged();
     }
 
-    public boolean insertItems(DefaultedList<ItemStack> target) {
+    public boolean insertItems(NonNullList<ItemStack> target) {
         if (target != null && !target.isEmpty()) {
-            markDirty();
+            setChanged();
             target.forEach(this::addStack);
             return true;
         }
@@ -35,19 +35,19 @@ public class BackpackInventory extends BaseInventory {
     }
 
     public void copyTo(BackpackInventory target) {
-        for (int i = 0; i < target.size(); ++i) {
-            ItemStack itemStack = i < this.size() ? this.getStack(i) : ItemStack.EMPTY;
-            target.setStack(i, itemStack.copy());
+        for (int i = 0; i < target.getContainerSize(); ++i) {
+            ItemStack itemStack = i < this.getContainerSize() ? this.getItem(i) : ItemStack.EMPTY;
+            target.setItem(i, itemStack.copy());
         }
     }
 
     public void resize(int newSize) {
-        if (this.size() != newSize) {
-            DefaultedList<ItemStack> copy = DefaultedList.ofSize(newSize, ItemStack.EMPTY);
-            int limit = Math.min(this.size(), newSize);
+        if (this.getContainerSize() != newSize) {
+            NonNullList<ItemStack> copy = NonNullList.withSize(newSize, ItemStack.EMPTY);
+            int limit = Math.min(this.getContainerSize(), newSize);
 
             for (int i = 0; i < limit; ++i) {
-                copy.set(i, this.getStack(i).copy());
+                copy.set(i, this.getItem(i).copy());
             }
 
             setInventoryDirectly(copy);

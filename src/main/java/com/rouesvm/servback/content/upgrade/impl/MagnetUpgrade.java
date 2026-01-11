@@ -9,21 +9,21 @@ import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.ArrayList;
@@ -53,64 +53,64 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     }
 
     @Override
-    public void readView(ReadView data) {
+    public void readView(ValueInput data) {
         itemFilter.readView(data);
     }
 
     @Override
-    public void writeView(WriteView data) {
+    public void writeView(ValueOutput data) {
         itemFilter.writeView(data);
     }
 
     @Override
-    public void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
-        tooltip.add(Text.translatable("info.serverbackpacks.mode")
+    public void addTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
+        tooltip.add(Component.translatable("info.serverbackpacks.mode")
                 .append(": ")
-                .formatted(Formatting.GRAY)
-                .append(Text.translatable("info.serverbackpacks.mode" + "." + this.itemFilter.getMode().toString().toLowerCase())
+                .withStyle(ChatFormatting.GRAY)
+                .append(Component.translatable("info.serverbackpacks.mode" + "." + this.itemFilter.getMode().toString().toLowerCase())
                             .copy()
-                            .formatted(Formatting.GREEN)));
+                            .withStyle(ChatFormatting.GREEN)));
 
         if (this.itemFilter.filterList().isEmpty()) return;
 
-        tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
+        tooltip.add(Component.translatable("info.serverbackpacks.contains").withStyle(ChatFormatting.GRAY));
         for (String string : this.itemFilter.filterList()) {
-            tooltip.add(Text.literal(" ")
+            tooltip.add(Component.literal(" ")
                             .append(string).copy()
-                            .formatted(Formatting.DARK_AQUA));
+                            .withStyle(ChatFormatting.DARK_AQUA));
         }
     }
 
     @Override
-    public boolean onUsed(World world, ServerPlayerEntity player, ItemStack stack) {
+    public boolean onUsed(Level world, ServerPlayer player, ItemStack stack) {
         ItemFilter.MODE[] modes = ItemFilter.MODE.values();
 
         int nextOrdinal = (this.itemFilter.getMode().ordinal() + 1) % modes.length;
         this.itemFilter.setMode(modes[nextOrdinal]);
 
-        player.sendMessage(Text.translatable("info.serverbackpacks.mode")
+        player.displayClientMessage(Component.translatable("info.serverbackpacks.mode")
                 .append(": ")
-                .formatted(Formatting.GRAY)
-                .append(Text.translatable("info.serverbackpacks.mode" + "." + this.itemFilter.getMode().toString().toLowerCase())
+                .withStyle(ChatFormatting.GRAY)
+                .append(Component.translatable("info.serverbackpacks.mode" + "." + this.itemFilter.getMode().toString().toLowerCase())
                         .copy()
-                        .formatted(Formatting.GREEN)
+                        .withStyle(ChatFormatting.GREEN)
                 ), true);
 
-        player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), 1, 1);
+        player.playSound(SoundEvents.NOTE_BLOCK_CHIME.value(), 1, 1);
 
         return true;
     }
 
     @Override
-    public boolean onClicked(ServerPlayerEntity player, ItemStack stack, Slot slot, ClickType clickType, boolean inContainer) {
-        if ((clickType == ClickType.RIGHT) != inContainer) {
-            return onUsed(player.getEntityWorld(), player, stack);
+    public boolean onClicked(ServerPlayer player, ItemStack stack, Slot slot, ClickAction clickType, boolean inContainer) {
+        if ((clickType == ClickAction.SECONDARY) != inContainer) {
+            return onUsed(player.level(), player, stack);
         } else return ClickableUpgrade.super.onClicked(player, stack, slot, clickType, inContainer);
     }
 
     @Override
-    public void tick(World world, Vec3d pos, BackpackInventory inventory) {
-        if (inventory == null || !(world instanceof ServerWorld serverWorld)) return;
+    public void tick(Level world, Vec3 pos, BackpackInventory inventory) {
+        if (inventory == null || !(world instanceof ServerLevel serverWorld)) return;
 
         tick++;
 
@@ -120,34 +120,34 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         }
     }
 
-    private void moveItemsToTarget(Vec3d pos) {
+    private void moveItemsToTarget(Vec3 pos) {
         if (queue.isEmpty()) return;
 
-        Vec3d target = new Vec3d(pos.toVector3f());
+        Vec3 target = new Vec3(pos.toVector3f());
 
         queue.forEach(item -> {
-            Vec3d current = item.getEntityPos();
-            Vec3d delta = target.subtract(current);
+            Vec3 current = item.position();
+            Vec3 delta = target.subtract(current);
 
             double distance = delta.length();
             if (distance >= MAX_ITEM_ENTITY_DISTANCE_TO_PLAYER) {
                 double speed = Math.min(0.6, distance * 0.6);
-                Vec3d velocity = delta.normalize().multiply(speed);
+                Vec3 velocity = delta.normalize().scale(speed);
 
-                Vec3d smooth = item.getVelocity().lerp(velocity, 0.4);
-                item.setVelocity(smooth);
-            } else item.setVelocity(Vec3d.ZERO);
+                Vec3 smooth = item.getDeltaMovement().lerp(velocity, 0.4);
+                item.setDeltaMovement(smooth);
+            } else item.setDeltaMovement(Vec3.ZERO);
 
-            item.velocityDirty = true;
-            item.setPickupDelay(100);
+            item.needsSync = true;
+            item.setPickUpDelay(100);
         });
     }
 
-    private boolean pickUpItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
+    private boolean pickUpItems(ServerLevel world, Vec3 pos, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
         if (BackpackInventory.isFull(inventory)) {
-            queue.forEach(entity -> entity.setPickupDelay(0));
+            queue.forEach(entity -> entity.setPickUpDelay(0));
             return false;
         }
 
@@ -163,46 +163,46 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
                 return false;
             }
 
-            if (next.squaredDistanceTo(pos) > MAX_DISTANCE_TO_PLAYER_SQUARED
+            if (next.distanceToSqr(pos) > MAX_DISTANCE_TO_PLAYER_SQUARED
             ) return false;
 
-            ItemStack stack = next.getStack();
+            ItemStack stack = next.getItem();
             if (!inventory.canInsert(stack)) {
-                next.setPickupDelay(0);
+                next.setPickUpDelay(0);
                 iterator.remove();
                 return iterator.hasNext();
             }
 
             ItemStack remainder = inventory.addStack(stack);
-            ContainerItem.playInsertSound(world, BlockPos.ofFloored(pos), 1);
+            ContainerItem.playInsertSound(world, BlockPos.containing(pos), 1);
 
             if (remainder.isEmpty()) {
                 next.discard();
                 iterator.remove();
                 return true;
-            } else next.setStack(remainder);
+            } else next.setItem(remainder);
         }
 
         return true;
     }
 
-    private void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
-        Box area = new Box(pos.add(-MAX_RANGE), pos.add(MAX_RANGE));
+    private void checkForItems(ServerLevel world, Vec3 pos, BackpackInventory inventory) {
+        AABB area = new AABB(pos.add(-MAX_RANGE), pos.add(MAX_RANGE));
 
-        world.getEntitiesByClass(ItemEntity.class, area, (entity ->
+        world.getEntitiesOfClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)
-                        && !entity.cannotPickup()
+                        && !entity.hasPickUpDelay()
                         && checkFilterForItem(entity, inventory)
-                        && inventory.canInsert(entity.getStack())
+                        && inventory.canInsert(entity.getItem())
                 )).forEach(item -> {
                     queue.add(item);
-                    item.setPickupDelay(100);
+                    item.setPickUpDelay(100);
                 });
     }
 
     private boolean checkFilterForItem(ItemEntity entity, BackpackInventory inventory) {
         if (!entity.isAlive()) return false;
-        ItemStack stack = entity.getStack();
+        ItemStack stack = entity.getItem();
 
         return switch (itemFilter.getMode()) {
             case BLACKLIST -> !itemFilter.matches(stack);

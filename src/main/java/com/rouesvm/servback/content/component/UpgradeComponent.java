@@ -8,12 +8,12 @@ import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 
 public record UpgradeComponent(Upgrade upgrade) {
 
@@ -21,25 +21,25 @@ public record UpgradeComponent(Upgrade upgrade) {
         return new UpgradeComponent(upgrade);
     }
 
-    public static final PacketCodec<ByteBuf, UpgradeComponent> PACKET_CODEC = null;
+    public static final StreamCodec<ByteBuf, UpgradeComponent> PACKET_CODEC = null;
 
     public static final Codec<UpgradeComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Identifier.CODEC.fieldOf("id").forGetter(component ->
-                    BackpackUpgradeRegistry.getRegistry().getId(component.upgrade().getType())),
-            NbtCompound.CODEC.fieldOf("data").forGetter(component -> {
-                NbtWriteView data = NbtWriteView.create(ErrorReporter.EMPTY);
+                    BackpackUpgradeRegistry.getRegistry().getKey(component.upgrade().getType())),
+            CompoundTag.CODEC.fieldOf("data").forGetter(component -> {
+                TagValueOutput data = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
                 Upgrade upgrade = component.upgrade();
                 if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
                     persistentUpgrade.writeView(data);
                 }
 
-                return data.getNbt();
+                return data.buildResult();
             })
             ).apply(instance, (id, data) -> {
                 UpgradeType<? extends Upgrade> type = BackpackUpgradeRegistry.get(id);
                 Upgrade upgrade = type.create();
                 if (upgrade instanceof PersistentUpgrade persistentUpgrade) {
-                    persistentUpgrade.readView(NbtReadView.create(ErrorReporter.EMPTY, BackpackManager.instance().server().getRegistryManager(), data));
+                    persistentUpgrade.readView(TagValueInput.create(ProblemReporter.DISCARDING, BackpackManager.instance().server().registryAccess(), data));
                 }
 
                 return UpgradeComponent.of(upgrade);

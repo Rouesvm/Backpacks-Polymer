@@ -7,12 +7,12 @@ import com.rouesvm.servback.content.upgrade.impl.CraftingUpgrade;
 import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
 import com.rouesvm.servback.content.upgrade.impl.VoidUpgrade;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 public class BackpackUpgradeRegistry {
-    private static final RegistryKey<Registry<UpgradeType<?>>> UPGRADES_REGISTRY_KEY = RegistryKey.ofRegistry(Identifier.of(ServerBackpacks.MOD_ID, "upgrades"));
+    private static final ResourceKey<Registry<UpgradeType<?>>> UPGRADES_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, "upgrades"));
     private static final Registry<UpgradeType<?>> UPGRADES = FabricRegistryBuilder.createSimple(
             UPGRADES_REGISTRY_KEY).buildAndRegister();
 
@@ -21,7 +21,7 @@ public class BackpackUpgradeRegistry {
     public static final UpgradeType<CraftingUpgrade> CRAFTING = register("crafting", CraftingUpgrade::new);
 
     public static <T extends Upgrade> UpgradeType<T> register(String name, UpgradeType.UpgradeFactory<T> factory) {
-        Identifier id = Identifier.of(ServerBackpacks.MOD_ID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name);
         return Registry.register(UPGRADES, id, new UpgradeType<>(id, factory));
     }
 
@@ -30,7 +30,7 @@ public class BackpackUpgradeRegistry {
     }
 
     public static UpgradeType<?> get(Identifier id) {
-        return UPGRADES.get(id);
+        return UPGRADES.getValue(id);
     }
 
     public static void initialize() {}

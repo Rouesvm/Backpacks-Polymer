@@ -1,11 +1,11 @@
 package com.rouesvm.servback.mixin;
 
 import com.rouesvm.servback.technical.config.Configuration;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,16 +18,16 @@ public class ShapedRecipeMixin {
     @Shadow @Final
     ItemStack result;
 
-    @Inject(method = "matches(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/world/World;)Z", at = @At("HEAD"), cancellable = true)
-    public void matches(CraftingRecipeInput craftingRecipeInput, World world, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "matches(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/world/level/Level;)Z", at = @At("HEAD"), cancellable = true)
+    public void matches(CraftingInput craftingRecipeInput, Level world, CallbackInfoReturnable<Boolean> cir) {
         if (Configuration.isDisabled(this.result.getItem())) {
             cir.setReturnValue(false);
             cir.cancel();
         }
     }
 
-    @Inject(method = "craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)
-    public void craft(CraftingRecipeInput craftingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup, CallbackInfoReturnable<ItemStack> cir) {
+    @Inject(method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;", at = @At("HEAD"), cancellable = true)
+    public void craft(CraftingInput craftingRecipeInput, HolderLookup.Provider wrapperLookup, CallbackInfoReturnable<ItemStack> cir) {
         if (Configuration.isDisabled(this.result.getItem())) {
             cir.setReturnValue(ItemStack.EMPTY);
             cir.cancel();

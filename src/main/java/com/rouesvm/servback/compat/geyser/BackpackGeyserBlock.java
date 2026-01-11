@@ -2,17 +2,17 @@ package com.rouesvm.servback.compat.geyser;
 
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.content.block.impl.BackpackBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.registry.Registries;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.geysermc.geyser.api.block.custom.CustomBlockData;
 import org.geysermc.geyser.api.block.custom.CustomBlockPermutation;
 import org.geysermc.geyser.api.block.custom.CustomBlockState;
@@ -27,8 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BackpackGeyserBlock {
-    public static final List<String> dye_colors = Arrays.stream(DyeColor.values()).map(DyeColor::asString).toList();
-    public static final List<String> facing = HorizontalFacingBlock.FACING.getValues().stream().map(Direction::asString).toList();
+    public static final List<String> dye_colors = Arrays.stream(DyeColor.values()).map(DyeColor::getSerializedName).toList();
+    public static final List<String> facing = HorizontalDirectionalBlock.FACING.getPossibleValues().stream().map(Direction::getSerializedName).toList();
     public static final List<Integer> slots = new ArrayList<>();
 
     static {
@@ -40,10 +40,10 @@ public class BackpackGeyserBlock {
     public static final String STATE_CONDITION = "query.block_property('%s') == %s";
 
     public static void onGeyserDefineCustomBlocksEvent(GeyserDefineCustomBlocksEvent event) {
-        Registries.BLOCK.getEntrySet().stream()
+        BuiltInRegistries.BLOCK.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof BedrockBlock)
                 .forEach(entry -> {
-                    Identifier location = entry.getKey().getValue();
+                    Identifier location = entry.getKey().identifier();
                     Block block = entry.getValue();
 
                     NonVanillaCustomBlockData customBlockData = createHorizontalBlock(block, location)
@@ -58,16 +58,16 @@ public class BackpackGeyserBlock {
     }
 
     public static void registerForBlockState(GeyserDefineCustomBlocksEvent event, NonVanillaCustomBlockData customBlockData, Block block, Identifier location) {
-        int blockId = Registries.BLOCK.getRawId(block);
-        for (BlockState state : block.getStateManager().getStates()) {
+        int blockId = BuiltInRegistries.BLOCK.getId(block);
+        for (BlockState state : block.getStateDefinition().getPossibleStates()) {
             CustomBlockState.Builder stateBuilder = blockStateBuilder(customBlockData, state);
 
             JavaBlockState javaBlockState = JavaBlockState.builder()
                     .identifier(location.toString())
-                    .blockHardness(block.getHardness())
+                    .blockHardness(block.defaultDestroyTime())
                     .canBreakWithHand(true)
                     .collision(new JavaBoundingBox[]{new JavaBoundingBox(0, 0, 0, 1, 1, 1)})
-                    .javaId(Block.getRawIdFromState(state))
+                    .javaId(Block.getId(state))
                     .stateGroupId(blockId)
                     .build();
 
@@ -79,12 +79,12 @@ public class BackpackGeyserBlock {
         CustomBlockState.Builder stateBuilder = customBlockData.blockStateBuilder();
         for (Property<?> property : state.getProperties()) {
             switch (property) {
-                case IntProperty intProperty ->
-                        stateBuilder.intProperty(property.getName(), state.get(intProperty));
+                case IntegerProperty intProperty ->
+                        stateBuilder.intProperty(property.getName(), state.getValue(intProperty));
                 case BooleanProperty booleanProperty ->
-                        stateBuilder.booleanProperty(property.getName(), state.get(booleanProperty));
+                        stateBuilder.booleanProperty(property.getName(), state.getValue(booleanProperty));
                 case EnumProperty<?> enumProperty ->
-                        stateBuilder.stringProperty(enumProperty.getName(), state.get(enumProperty).asString());
+                        stateBuilder.stringProperty(enumProperty.getName(), state.getValue(enumProperty).getSerializedName());
                 default -> throw new IllegalArgumentException("Unknown property type: " + property.getClass().getName());
             }
         }
@@ -121,10 +121,10 @@ public class BackpackGeyserBlock {
                         .build())
                 .collisionBox(collisionBox)
                 .selectionBox(selectionBox)
-                .lightEmission(block.getDefaultState().getLuminance())
-                .lightDampening(block.getDefaultState().getOpacity())
-                .destructibleByMining(block.getHardness())
-                .friction(Math.min(1 - block.getSlipperiness(), 0.9f))
+                .lightEmission(block.defaultBlockState().getLightEmission())
+                .lightDampening(block.defaultBlockState().getLightBlock())
+                .destructibleByMining(block.defaultDestroyTime())
+                .friction(Math.min(1 - block.getFriction(), 0.9f))
                 .build();
 
         return NonVanillaCustomBlockData.builder()

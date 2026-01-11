@@ -11,146 +11,146 @@ import com.rouesvm.servback.technical.cosmetic.BlockHolder;
 import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class BasicBackpackBlock extends BasicPolymerBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
+public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock, BlockWithElementHolder, BedrockBlock {
     public BasicBackpackBlock(String name) {
-        super(Settings.create()
-                .registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(ServerBackpacks.MOD_ID, name)))
+        super(Properties.of()
+                .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name)))
                 .noCollision()
-                .breakInstantly()
-                .pistonBehavior(PistonBehavior.DESTROY)
-                .allowsSpawning(Blocks::never)
-                .nonOpaque()
-                .solidBlock(Blocks::never)
+                .instabreak()
+                .pushReaction(PushReaction.DESTROY)
+                .isValidSpawn(Blocks::never)
+                .noOcclusion()
+                .isRedstoneConductor(Blocks::never)
         );
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(
+    protected BlockState updateShape(
             BlockState state,
-            WorldView world,
-            ScheduledTickView tickView,
+            LevelReader world,
+            ScheduledTickAccess tickView,
             BlockPos pos,
             Direction direction,
             BlockPos neighborPos,
             BlockState neighborState,
-            Random random
+            RandomSource random
     ) {
-        return (Configuration.instance().breaks_with_flow && world.getFluidState(neighborPos).canFlowTo(world, pos))
-                ? Blocks.AIR.getDefaultState()
-                : super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return (Configuration.instance().breaks_with_flow && world.getFluidState(neighborPos).shouldRenderBackwardUpFace(world, pos))
+                ? Blocks.AIR.defaultBlockState()
+                : super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    protected int getOpacity(BlockState state) {
+    protected int getLightBlock(BlockState state) {
         return 1;
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new BlockHolder(world, initialBlockState, pos);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        ItemStack pickStack = super.getPickStack(world, pos, state, includeData);
-        if (!world.isClient()) {
+    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        ItemStack pickStack = super.getCloneItemStack(world, pos, state, includeData);
+        if (!world.isClientSide()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
             if (entity == null) return pickStack;
 
             ItemStack stack = entity.getDefaultStack();
             if (includeData)
                 return stack.copy();
-            else return stack.getItem().getDefaultStack();
+            else return stack.getItem().getDefaultInstance();
         }
         return pickStack;
     }
 
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        onStacksDropped(state, (ServerWorld) world, pos, null, false);
-        return super.onBreak(world, pos, state, player);
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        spawnAfterBreak(state, (ServerLevel) world, pos, null, false);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 
     @Override
-    protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
+    protected void spawnAfterBreak(BlockState state, ServerLevel world, BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
         BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
         if (entity == null) return;
 
         ItemStack stack = entity.getDefaultStack().copy();
         BackpackUtils.addCustomData(world, stack);
-        dropStack(world, pos, stack);
+        popResource(world, pos, stack);
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient()) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!world.isClientSide()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
-            if (entity == null) return ActionResult.PASS;
+            if (entity == null) return InteractionResult.PASS;
 
             if (ServerBackpacks.hasTrinketLoaded
-                    && player.isSneaking()
-                    && trinketInteraction(entity, (ServerPlayerEntity) player, world, pos))
-                return ActionResult.SUCCESS;
+                    && player.isShiftKeyDown()
+                    && trinketInteraction(entity, (ServerPlayer) player, world, pos))
+                return InteractionResult.SUCCESS;
 
-            onOpenGui((ServerPlayerEntity) player, entity);
-            return ActionResult.SUCCESS;
+            onOpenGui((ServerPlayer) player, entity);
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
-    public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
+    public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayer player, Level world, BlockPos pos) {
         if (BackpackTrinket.isBackSlotOccupied(player)) return false;
 
         ItemStack stack = entity.getDefaultStack().copy();
         BackpackTrinket.equipStack(player, stack);
-        world.breakBlock(pos, false);
+        world.destroyBlock(pos, false);
         return true;
     }
 
-    public void onOpenGui(ServerPlayerEntity player, BlockEntity entity) {
+    public void onOpenGui(ServerPlayer player, BlockEntity entity) {
         ContainerItem.playOpenSound(player);
         openGui(player, entity);
     }
 
-    public void openGui(ServerPlayerEntity player, BlockEntity entity) {
+    public void openGui(ServerPlayer player, BlockEntity entity) {
         new BasicInventoryGui(player, null, getInventory(player, entity));
     }
 
-    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
+    public Container getInventory(@Nullable ServerPlayer player, @Nullable BlockEntity entity) {
         return null;
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return BackpackBlockEntityRegistry.BASIC_BACKPACK_BLOCK_ENTITY.instantiate(pos, state);
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return BackpackBlockEntityRegistry.BASIC_BACKPACK_BLOCK_ENTITY.create(pos, state);
     }
 }

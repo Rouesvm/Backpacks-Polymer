@@ -10,20 +10,20 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import eu.pb4.polymer.virtualentity.impl.EntityExt;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -47,8 +47,8 @@ public class BackHolder extends ElementHolder {
         this.entity = entity;
         this.element = new ItemDisplayElement();
 
-        CustomModelDataComponent component = new CustomModelDataComponent(List.of(), List.of(), List.of("model"), List.of());
-        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, component);
+        CustomModelData component = new CustomModelData(List.of(), List.of(), List.of("model"), List.of());
+        stack.set(DataComponents.CUSTOM_MODEL_DATA, component);
 
         this.element.setItem(stack);
 
@@ -70,15 +70,15 @@ public class BackHolder extends ElementHolder {
 
     @Override
     protected void onTick() {
-        if (entity.isDead() || entity.isRemoved()) {
+        if (entity.isDeadOrDying() || entity.isRemoved()) {
             destroy();
         }
 
-        boolean facingDown = entity.getFacing() == Direction.DOWN;
-        boolean isSpectator = entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.isSpectator();
+        boolean facingDown = entity.getNearestViewDirection() == Direction.DOWN;
+        boolean isSpectator = entity instanceof ServerPlayer serverPlayer && serverPlayer.isSpectator();
 
-        EntityPose pose = entity.getPose();
-        boolean isHiddenPose = facingDown || pose == EntityPose.SWIMMING || pose == EntityPose.SLEEPING || isSpectator;
+        Pose pose = entity.getPose();
+        boolean isHiddenPose = facingDown || pose == Pose.SWIMMING || pose == Pose.SLEEPING || isSpectator;
 
         if (isHiddenPose) {
             if (!hidden) {
@@ -93,7 +93,7 @@ public class BackHolder extends ElementHolder {
                 hidden = false;
             }
 
-            boolean sneaking = entity.isSneaking();
+            boolean sneaking = entity.isShiftKeyDown();
 
             this.element.setYaw(((BackInterface) entity).backpacks$bodyYaw() - cosmeticRotation);
             this.element.setPitch(sneaking ? cosmeticPitchWhenSneaking : 0);
@@ -101,7 +101,7 @@ public class BackHolder extends ElementHolder {
             float y = sneaking ? cosmeticPosition.y - 0.02f : cosmeticPosition.y;
             float z = sneaking ? cosmeticPosition.z - 0.10f : cosmeticPosition.z;
 
-            if (!entity.getEquippedStack(EquipmentSlot.CHEST).isEmpty()) {
+            if (!entity.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
                 z += 0.05f;
             }
 
@@ -119,10 +119,10 @@ public class BackHolder extends ElementHolder {
     }
 
     @Override
-    protected void notifyElementsOfPositionUpdate(Vec3d newPos, Vec3d delta) {
+    protected void notifyElementsOfPositionUpdate(Vec3 newPos, Vec3 delta) {
     }
 
-    public static BackHolder createDisplay(ItemStack stack, ServerPlayerEntity entity) {
+    public static BackHolder createDisplay(ItemStack stack, ServerPlayer entity) {
         var model = new BackHolder(stack.copy(), entity);
 
         EntityAttachment.ofTicking(model, entity);
@@ -137,19 +137,19 @@ public class BackHolder extends ElementHolder {
     }
 
     public static void hideForAll(ElementHolder elementHolder) {
-        for (ServerPlayNetworkHandler player : elementHolder.getWatchingPlayers()) {
-            player.sendPacket(new EntitiesDestroyS2CPacket(elementHolder.getEntityIds()));
+        for (ServerGamePacketListenerImpl player : elementHolder.getWatchingPlayers()) {
+            player.send(new ClientboundRemoveEntitiesPacket(elementHolder.getEntityIds()));
         }
     }
 
     public static void showForAll(ElementHolder elementHolder) {
-        for (ServerPlayNetworkHandler player : elementHolder.getWatchingPlayers()) {
-            var packets = new ObjectArrayList<Packet<? super ClientPlayPacketListener>>();
+        for (ServerGamePacketListenerImpl player : elementHolder.getWatchingPlayers()) {
+            var packets = new ObjectArrayList<Packet<? super ClientGamePacketListener>>();
             for (VirtualElement e : elementHolder.getElements()) {
                 Objects.requireNonNull(packets);
                 e.startWatching(player.player, packets::add);
             }
-            player.sendPacket(new BundleS2CPacket(packets));
+            player.send(new ClientboundBundlePacket(packets));
         }
     }
 }

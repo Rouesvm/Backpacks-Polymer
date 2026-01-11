@@ -1,9 +1,9 @@
 package com.rouesvm.servback.content.upgrade;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public interface PersistentUpgrade {
-    void readView(ReadView data);
-    void writeView(WriteView data);
+    void readView(ValueInput data);
+    void writeView(ValueOutput data);
 }

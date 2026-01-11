@@ -1,7 +1,7 @@
 package com.rouesvm.servback.technical.manager;
 
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

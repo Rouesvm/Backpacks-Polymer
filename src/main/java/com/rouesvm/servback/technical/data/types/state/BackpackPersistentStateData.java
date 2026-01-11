@@ -21,7 +21,7 @@ public class BackpackPersistentStateData extends FallbackData {
             if (stateInstances != null && !stateInstances.isEmpty()) {
                 addBackpackInstances(stateInstances);
                 state.clearBackpackInstances();
-                state.markDirty();
+                state.setDirty();
                 return true;
             }
         }

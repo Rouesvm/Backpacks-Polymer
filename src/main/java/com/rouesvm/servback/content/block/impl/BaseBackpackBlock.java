@@ -11,46 +11,46 @@ import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import static com.rouesvm.servback.technical.BackpackUtils.resize;
 
-public class BaseBackpackBlock extends BasicBackpackBlock implements BlockEntityProvider, BlockWithElementHolder, BedrockBlock {
+public class BaseBackpackBlock extends BasicBackpackBlock implements EntityBlock, BlockWithElementHolder, BedrockBlock {
     public BaseBackpackBlock(String name) {
         super(name);
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return TickableBlockEntity.getTicker(world);
     }
 
     @Override
-    protected boolean hasComparatorOutput(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
-        return ScreenHandler.calculateComparatorOutput(getInventory(
+    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
+        return AbstractContainerMenu.getRedstoneSignalFromContainer(getInventory(
                 null, world.getBlockEntity(pos, BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY).get()
         ));
     }
 
     @Override
-    public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayerEntity player, World world, BlockPos pos) {
+    public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayer player, Level world, BlockPos pos) {
         if (BackpackTrinket.isBackSlotOccupied(player)) return false;
 
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
@@ -58,12 +58,12 @@ public class BaseBackpackBlock extends BasicBackpackBlock implements BlockEntity
         ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
         BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
         BackpackTrinket.equipStack(player, stack);
-        world.breakBlock(pos, false);
+        world.destroyBlock(pos, false);
         return true;
     }
 
     @Override
-    public void openGui(ServerPlayerEntity player, BlockEntity entity) {
+    public void openGui(ServerPlayer player, BlockEntity entity) {
         if (!(entity instanceof BackpackBlockEntity backpackBlockEntity)) return;
 
         BackpackInstance instance = backpackBlockEntity.getInstance();
@@ -73,7 +73,7 @@ public class BaseBackpackBlock extends BasicBackpackBlock implements BlockEntity
     }
 
     @Override
-    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable BlockEntity entity) {
+    public Container getInventory(@Nullable ServerPlayer player, @Nullable BlockEntity entity) {
         if (entity == null) return null;
 
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
@@ -81,7 +81,7 @@ public class BaseBackpackBlock extends BasicBackpackBlock implements BlockEntity
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY.instantiate(pos, state);
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY.create(pos, state);
     }
 }

@@ -4,7 +4,7 @@ import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 import java.io.File;
 import java.io.FileReader;

@@ -5,19 +5,19 @@ import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.Holder;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import static com.rouesvm.servback.ServerBackpacks.CAPACITY;
 
 public class BackpackUtils {
-    public static String hashBackpackContents(DefaultedList<ItemStack> items) {
+    public static String hashBackpackContents(NonNullList<ItemStack> items) {
         Map<String, Integer> contents = new HashMap<>();
 
         for (ItemStack stack : items) {
@@ -51,50 +51,50 @@ public class BackpackUtils {
 
         if (!(stack.getItem() instanceof ContainerItem item)) return;
         if (!inventory.isEmpty()) return;
-        if (stack.get(DataComponentTypes.CONTAINER) == null) return;
+        if (stack.get(DataComponents.CONTAINER) == null) return;
 
-        DefaultedList<ItemStack> itemStacks = item.getComponentItemList(stack);
+        NonNullList<ItemStack> itemStacks = item.getComponentItemList(stack);
         if (inventory.insertItems(itemStacks)) {
             instance.copyToInventory(inventory);
             BackpackManager.addBackpack(instance);
         }
 
-        stack.set(DataComponentTypes.CONTAINER, null);
+        stack.set(DataComponents.CONTAINER, null);
     }
 
-    public static DefaultedList<ItemStack> getItemList(ItemStack stack) {
+    public static NonNullList<ItemStack> getItemList(ItemStack stack) {
         UUID uuid = BackpackUUID.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
 
         if (inventory != null) {
-            DefaultedList<ItemStack> stacks = DefaultedList.ofSize(inventory.size());
+            NonNullList<ItemStack> stacks = NonNullList.createWithCapacity(inventory.getContainerSize());
             stacks.addAll(inventory.heldStacks());
             return stacks;
         }
 
-        return DefaultedList.of();
+        return NonNullList.create();
     }
 
     public static int getExtendedSlots(ItemStack stack) {
-        NbtComponent component = stack.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
-        NbtCompound compound = component.copyNbt();
-        return 9 * compound.getInt("level", 0);
+        CustomData component = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        CompoundTag compound = component.copyTag();
+        return 9 * compound.getIntOr("level", 0);
     }
 
-    public static int addCustomData(ServerWorld world, ItemStack stack) {
-        DynamicRegistryManager registryManager = world.getRegistryManager();
-        Optional<Registry<Enchantment>> enchantmentReference = registryManager.getOptional(RegistryKeys.ENCHANTMENT);
+    public static int addCustomData(ServerLevel world, ItemStack stack) {
+        RegistryAccess registryManager = world.registryAccess();
+        Optional<Registry<Enchantment>> enchantmentReference = registryManager.lookup(Registries.ENCHANTMENT);
 
         int level = 0;
         if (enchantmentReference.isPresent()) {
-            Optional<RegistryEntry.Reference<Enchantment>> capacity = enchantmentReference.get().getOptional(CAPACITY);
+            Optional<Holder.Reference<Enchantment>> capacity = enchantmentReference.get().get(CAPACITY);
 
             if (capacity.isPresent()) {
                 level = stack.getEnchantments().getLevel(capacity.get());
 
-                NbtCompound compound = new NbtCompound();
+                CompoundTag compound = new CompoundTag();
                 compound.putInt("level", level);
-                stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(compound));
+                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(compound));
 
             }
         }
@@ -102,22 +102,22 @@ public class BackpackUtils {
         return 9 * level;
     }
 
-    public static void resizeIfIncorrectSize(ServerPlayerEntity player, ItemStack stack, int maxBackpackSlot) {
+    public static void resizeIfIncorrectSize(ServerPlayer player, ItemStack stack, int maxBackpackSlot) {
         UUID uuid = BackpackUUID.getStackUUID(stack);
         BackpackInventory inventory = BackpackManager.getInventory(uuid);
         if (inventory != null) resize(player, uuid, inventory,
-                    maxBackpackSlot + addCustomData(player.getEntityWorld(), stack));
+                    maxBackpackSlot + addCustomData(player.level(), stack));
     }
 
     public static void dropItems(Entity entity, BackpackInventory target, int totalSlots) {
-        for (int i = target.size() - 1; i >= totalSlots; i--) {
+        for (int i = target.getContainerSize() - 1; i >= totalSlots; i--) {
             ItemStack excessItem =  i < target.heldStacks().size() ? target.heldStacks().get(i) : ItemStack.EMPTY;
-            entity.dropStack((ServerWorld) entity.getEntityWorld(), excessItem);
+            entity.spawnAtLocation((ServerLevel) entity.level(), excessItem);
         }
     }
 
-    public static void resize(ServerPlayerEntity player, UUID uuid, BackpackInventory target, int totalSlots) {
-        if (target.size() != totalSlots) {
+    public static void resize(ServerPlayer player, UUID uuid, BackpackInventory target, int totalSlots) {
+        if (target.getContainerSize() != totalSlots) {
             dropItems(player, target, totalSlots);
             ContainerItem.playDropContentsSound(player, -0.2F);
             BackpackInventory.resizeInventory(uuid, totalSlots);

@@ -1,9 +1,9 @@
 package com.rouesvm.servback.content.upgrade;
 
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 
 public class UpgradeType<T extends Upgrade> {
     private final Identifier id;
@@ -15,7 +15,7 @@ public class UpgradeType<T extends Upgrade> {
     }
 
     public Item getItem() {
-        return Registries.ITEM.get(id.withSuffixedPath("_upgrade"));
+        return BuiltInRegistries.ITEM.getValue(id.withSuffix("_upgrade"));
     }
 
     public T create() {
@@ -26,8 +26,8 @@ public class UpgradeType<T extends Upgrade> {
         return id;
     }
 
-    public Text getTranslationKey() {
-        return Text.translatable(id.toTranslationKey("upgrade"));
+    public Component getTranslationKey() {
+        return Component.translatable(id.toLanguageKey("upgrade"));
     }
 
     public interface UpgradeFactory<T extends Upgrade> {

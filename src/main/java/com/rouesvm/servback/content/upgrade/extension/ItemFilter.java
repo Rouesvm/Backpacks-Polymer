@@ -3,13 +3,13 @@ package com.rouesvm.servback.content.upgrade.extension;
 import com.mojang.serialization.Codec;
 import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.Set;
 
@@ -28,43 +28,43 @@ public class ItemFilter implements PersistentUpgrade {
     }
 
     public boolean matches(ItemStack stack, BackpackInventory inventory) {
-        return inventory.containsAny(inventoryStack -> inventoryStack.isOf(stack.getItem()));
+        return inventory.hasAnyMatching(inventoryStack -> inventoryStack.is(stack.getItem()));
     }
 
     public static boolean matchesFilter(String filterID, Item item) {
-        var itemRegistry = Registries.ITEM;
-        var itemEntry = itemRegistry.getEntry(item);
+        var itemRegistry = BuiltInRegistries.ITEM;
+        var itemEntry = itemRegistry.wrapAsHolder(item);
 
         if (filterID.startsWith("#")) {
             Identifier tagId = Identifier.tryParse(filterID.substring(1));
             if (tagId == null) return false;
 
-            TagKey<Item> tag = TagKey.of(itemRegistry.getKey(), tagId);
-            return itemEntry.isIn(tag);
+            TagKey<Item> tag = TagKey.create(itemRegistry.key(), tagId);
+            return itemEntry.is(tag);
         }
 
-        String itemId = itemEntry.getIdAsString();
+        String itemId = itemEntry.getRegisteredName();
         return itemId.equals(filterID);
     }
 
     @Override
-    public void readView(ReadView data) {
-        this.mode = MODE.values()[data.getInt("mode", 0)];
+    public void readView(ValueInput data) {
+        this.mode = MODE.values()[data.getIntOr("mode", 0)];
 
-        ReadView.TypedListReadView<String> listReadView = data.getTypedListView("Items", Codec.STRING);
+        ValueInput.TypedInputList<String> listReadView = data.listOrEmpty("Items", Codec.STRING);
         listReadView.forEach(filterList::add);
     }
 
     @Override
-    public void writeView(WriteView data) {
+    public void writeView(ValueOutput data) {
         if (this.mode != null) data.putInt("mode", mode.ordinal());
 
-        WriteView.ListAppender<String> listAppender = data.getListAppender("Items", Codec.STRING);
+        ValueOutput.TypedOutputList<String> listAppender = data.list("Items", Codec.STRING);
         filterList.stream()
                 .filter((string) -> !string.isEmpty())
                 .forEach(listAppender::add);
 
-        if (listAppender.isEmpty()) data.remove("Items");
+        if (listAppender.isEmpty()) data.discard("Items");
     }
 
     public Set<String> filterList() {

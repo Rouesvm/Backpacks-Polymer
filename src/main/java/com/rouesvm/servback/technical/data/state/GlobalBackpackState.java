@@ -5,16 +5,16 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.technical.data.codecs.SlotData;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.PersistentStateType;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
-public class GlobalBackpackState extends PersistentState {
+public class GlobalBackpackState extends SavedData {
     public static final int GLOBAL_SIZE = 9 * 3;
     public static final Codec<GlobalBackpackState> CODEC = RecordCodecBuilder.create(
             (instance) ->
@@ -22,7 +22,7 @@ public class GlobalBackpackState extends PersistentState {
                             SlotData.CODEC.listOf().fieldOf("itemStacks").forGetter(GlobalBackpackState::getInventory)
                     ).apply(instance, GlobalBackpackState::new));
 
-    private static final PersistentStateType<GlobalBackpackState> type = new PersistentStateType<>(
+    private static final SavedDataType<GlobalBackpackState> type = new SavedDataType<>(
             MOD_ID + "-v2-global",
             GlobalBackpackState::new,
             CODEC,
@@ -44,9 +44,9 @@ public class GlobalBackpackState extends PersistentState {
     }
 
     public static GlobalBackpackState getServerState(MinecraftServer server) {
-        PersistentStateManager persistentStateManager = server.getOverworld().getPersistentStateManager();
-        GlobalBackpackState state = persistentStateManager.getOrCreate(type);
-        state.markDirty();
+        DimensionDataStorage persistentStateManager = server.overworld().getDataStorage();
+        GlobalBackpackState state = persistentStateManager.computeIfAbsent(type);
+        state.setDirty();
         return state;
     }
 

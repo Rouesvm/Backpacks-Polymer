@@ -2,24 +2,24 @@ package com.rouesvm.servback.content.block;
 
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.Optional;
 
 public class BasicBackpackBlockEntity extends BlockEntity {
     private int size = 9;
-    private Text customName;
+    private Component customName;
 
     private Item item;
 
@@ -32,7 +32,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         view.putInt("size", size);
 
         if (item != null)
@@ -41,24 +41,24 @@ public class BasicBackpackBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void readData(ReadView view) {
-        size = view.getInt("size", 9);
+    protected void loadAdditional(ValueInput view) {
+        size = view.getIntOr("size", 9);
 
         if (item == null) {
-            Optional<String> itemString = view.getOptionalString("item");
+            Optional<String> itemString = view.getString("item");
             item = itemString.map(Identifier::tryParse)
-                    .map(Registries.ITEM::get)
+                    .map(BuiltInRegistries.ITEM::getValue)
                     .orElseGet(() -> {
-                        int rawId = view.getInt("item", Registries.ITEM.getRawId(BackpackItemJsonRegistry.getBackpackByName("small")));
-                        return Registries.ITEM.get(rawId);
+                        int rawId = view.getIntOr("item", BuiltInRegistries.ITEM.getId(BackpackItemJsonRegistry.getBackpackByName("small")));
+                        return BuiltInRegistries.ITEM.byId(rawId);
                     });
         }
     }
 
     public ItemStack getDefaultStack() {
-        ItemStack stack = item != null ? item.getDefaultStack()
-                : BackpackItemJsonRegistry.getBackpackByName("small").getDefaultStack();
-        if (customName != null) stack.set(DataComponentTypes.CUSTOM_NAME, customName);
+        ItemStack stack = item != null ? item.getDefaultInstance()
+                : BackpackItemJsonRegistry.getBackpackByName("small").getDefaultInstance();
+        if (customName != null) stack.set(DataComponents.CUSTOM_NAME, customName);
         return stack;
     }
 
@@ -74,7 +74,7 @@ public class BasicBackpackBlockEntity extends BlockEntity {
         this.item = item;
     }
 
-    public void setCustomName(Text customName) {
+    public void setCustomName(Component customName) {
         this.customName = customName;
     }
 }

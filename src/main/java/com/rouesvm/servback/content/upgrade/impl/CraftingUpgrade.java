@@ -4,12 +4,12 @@ import com.rouesvm.servback.content.upgrade.ClickableUpgrade;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.VirtualCraftingScreenHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ClickType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
     public CraftingUpgrade() {
@@ -17,15 +17,15 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
     }
 
     @Override
-    public boolean onClicked(ServerPlayerEntity serverPlayer, ItemStack stack, Slot slot, ClickType clickType, boolean inContainer) {
-        return openGui(serverPlayer, clickType == ClickType.RIGHT, inContainer);
+    public boolean onClicked(ServerPlayer serverPlayer, ItemStack stack, Slot slot, ClickAction clickType, boolean inContainer) {
+        return openGui(serverPlayer, clickType == ClickAction.SECONDARY, inContainer);
     }
 
-    public boolean openGui(ServerPlayerEntity serverPlayer, boolean isRight, boolean inContainer) {
+    public boolean openGui(ServerPlayer serverPlayer, boolean isRight, boolean inContainer) {
         if (isRight != inContainer) {
-            serverPlayer.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) ->
+            serverPlayer.openMenu(new SimpleMenuProvider((syncId, inventory, player) ->
                     new VirtualCraftingScreenHandler(syncId, inventory),
-                    Text.translatable("container.crafting")
+                    Component.translatable("container.crafting")
             ));
             return true;
         }

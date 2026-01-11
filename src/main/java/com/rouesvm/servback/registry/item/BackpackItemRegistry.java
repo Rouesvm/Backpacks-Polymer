@@ -7,14 +7,14 @@ import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
@@ -26,37 +26,37 @@ public class BackpackItemRegistry {
     public static final Item GLOBAL_BACKPACK = register(new ContainerItem("global", 54, BackpackBlockRegistry.GLOBAL_BACKPACK));
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
-            new Item.Settings().maxCount(1),
+            new Item.Properties().stacksTo(1),
             BackpackUpgradeRegistry.VOID
     ));
 
     public static final Item MAGNET_UPGRADE = register("magnet_upgrade", new UpgradeItem(
-            new Item.Settings().maxCount(1),
+            new Item.Properties().stacksTo(1),
             BackpackUpgradeRegistry.MAGNET
     ));
 
     public static final Item CRAFTING_UPGRADE = register("crafting_upgrade", new UpgradeItem(
-            new Item.Settings().maxCount(1),
+            new Item.Properties().stacksTo(1),
             BackpackUpgradeRegistry.CRAFTING
     ));
 
     public static UpgradeItem register(String name, UpgradeItem item) {
-        return Registry.register(Registries.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name), item);
+        return Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name), item);
     }
 
-    public static Item registerBackpack(String id, Block block, BiFunction<@Nullable ServerPlayerEntity, @Nullable ItemStack, Inventory> inventoryProvider) {
+    public static Item registerBackpack(String id, Block block, BiFunction<@Nullable ServerPlayer, @Nullable ItemStack, Container> inventoryProvider) {
         var item = new BundleGuiItem(id, block) {
             @Override
-            public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
+            public Container getInventory(@Nullable ServerPlayer player, @Nullable ItemStack stack) {
                 return inventoryProvider.apply(player, stack);
             }
         };
 
-        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
+        return Registry.register(BuiltInRegistries.ITEM, item.getIdentifier(), item);
     }
 
     public static <T extends BasicPolymerBlockItem> T register(T item) {
-        return Registry.register(Registries.ITEM, item.getIdentifier(), item);
+        return Registry.register(BuiltInRegistries.ITEM, item.getIdentifier(), item);
     }
 
     public static void initialize() {}

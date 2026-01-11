@@ -2,43 +2,43 @@ package com.rouesvm.servback.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup.Entries;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.CreativeModeTab.Output;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class BackpackItemGroup {
-    public static void addItems(Entries entries) {
+    public static void addItems(Output entries) {
         var entrySet = BackpackItemJsonRegistry.NAME_TO_BACKPACK;
 
         String[] baseTypes = {"small", "medium", "large"};
         for (String type : baseTypes) {
             Item item = entrySet.get(type);
-            if (item != null) entries.add(item);
+            if (item != null) entries.accept(item);
         }
 
         for (DyeColor color : DyeColor.values()) {
             for (String type : baseTypes) {
-                Item item = entrySet.get(color.asString().toLowerCase() + "_" + type);
-                if (item != null) entries.add(item);
+                Item item = entrySet.get(color.getSerializedName().toLowerCase() + "_" + type);
+                if (item != null) entries.accept(item);
             }
         }
 
-        entries.add(BackpackItemRegistry.GLOBAL_BACKPACK);
-        entries.add(BackpackItemRegistry.ENDER_BACKPACK);
+        entries.accept(BackpackItemRegistry.GLOBAL_BACKPACK);
+        entries.accept(BackpackItemRegistry.ENDER_BACKPACK);
 
-        entries.add(BackpackItemRegistry.VOID_UPGRADE);
-        entries.add(BackpackItemRegistry.MAGNET_UPGRADE);
-        entries.add(BackpackItemRegistry.CRAFTING_UPGRADE);
+        entries.accept(BackpackItemRegistry.VOID_UPGRADE);
+        entries.accept(BackpackItemRegistry.MAGNET_UPGRADE);
+        entries.accept(BackpackItemRegistry.CRAFTING_UPGRADE);
     }
 
     public static void initialize() {
-        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ServerBackpacks.MOD_ID + "items"), PolymerItemGroupUtils.builder()
+        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.parse(ServerBackpacks.MOD_ID + "items"), PolymerItemGroupUtils.builder()
                 .icon(() -> new ItemStack(BackpackItemRegistry.GLOBAL_BACKPACK))
-                .displayName(Text.translatable("item.serverbackpacks.gui_backpacks"))
-                .entries(((context, entries) -> addItems(entries))).build()
+                .title(Component.translatable("item.serverbackpacks.gui_backpacks"))
+                .displayItems(((context, entries) -> addItems(entries))).build()
         );
     }
 }

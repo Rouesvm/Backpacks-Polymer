@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.*;
-import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class BackpackData implements Data {
         this.manager = manager;
         this.dataBackup = new BackpackDataBackup(manager, this);
 
-        this.saveDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
+        this.saveDir = manager.server().getWorldPath(LevelResource.ROOT).resolve("data/backpacks");
         Runtime.getRuntime().addShutdownHook(new Thread(this::onRuntimeEnded));
     }
 
@@ -98,16 +98,16 @@ public class BackpackData implements Data {
         if (!Files.exists(file)) return Optional.empty();
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
-            NbtCompound nbt = NbtIo.readCompressed(dis, NbtSizeTracker.ofUnlimitedBytes());
+            CompoundTag nbt = NbtIo.readCompressed(dis, NbtAccounter.unlimitedHeap());
             Optional<Integer> data_version = nbt.getInt("data_version");
 
-            int latest = SharedConstants.getGameVersion().dataVersion().id();
+            int latest = SharedConstants.getCurrentVersion().dataVersion().version();
             BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, data_version.orElse(latest), latest);
 
-            DataResult<Pair<BackpackInstanceData, NbtElement>> data =
+            DataResult<Pair<BackpackInstanceData, Tag>> data =
                     BackpackInstanceData.CODEC.decode(manager.nbtOps(), nbt);
             return data.result().map(pair -> pair.getFirst().toInstance(uuid));
-        } catch (IOException | NbtCrashException e) {
+        } catch (IOException | ReportedNbtException e) {
             ServerBackpacks.LOGGER.error("Failed to load single backpack {}", uuid, e);
             return Optional.empty();
         }
@@ -149,7 +149,7 @@ public class BackpackData implements Data {
         if (instance == null) return;
 
         if (!Files.exists(saveDir)) {
-            saveDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/backpacks");
+            saveDir = manager.server().getWorldPath(LevelResource.ROOT).resolve("data/backpacks");
             try {
                 Files.createDirectories(saveDir);
             } catch (IOException e) {
@@ -162,12 +162,12 @@ public class BackpackData implements Data {
 
         try {
             BackpackInstanceData backpackData = instance.toCodec();
-            DataResult<NbtElement> data = BackpackInstanceData.CODEC.encodeStart(
+            DataResult<Tag> data = BackpackInstanceData.CODEC.encodeStart(
                     manager.nbtOps(),
                     backpackData
             );
 
-            Optional<NbtElement> result = data.resultOrPartial(err ->
+            Optional<Tag> result = data.resultOrPartial(err ->
                     ServerBackpacks.LOGGER.error("Inventory failed to encode: {}", err));
 
             if (result.isPresent() && result.get().asCompound().isPresent()) {

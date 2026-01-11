@@ -9,40 +9,40 @@ import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
 import java.util.Set;
 
-public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
+public class InputDefinedFilterRecipe extends CustomRecipe {
     public static final RecipeSerializer<InputDefinedFilterRecipe> SERIALIZER = new InputDefinedFilterRecipe.Serializer(InputDefinedFilterRecipe::new);
 
-    public InputDefinedFilterRecipe(CraftingRecipeCategory category) {
+    public InputDefinedFilterRecipe(CraftingBookCategory category) {
         super(category);
     }
 
     @Override
-    public boolean matches(CraftingRecipeInput input, World world) {
+    public boolean matches(CraftingInput input, Level world) {
         if (input.isEmpty()) return false;
-        if (input.getStackCount() > MagnetUpgrade.MAX_SIZE + 1) return false;
+        if (input.ingredientCount() > MagnetUpgrade.MAX_SIZE + 1) return false;
 
         int magnetCount = 0;
         Set<String> seenItems = new ObjectOpenHashSet<>(MagnetUpgrade.MAX_SIZE);
 
-        for (ItemStack stack : input.getStacks()) {
+        for (ItemStack stack : input.items()) {
             if (stack.isEmpty()) continue;
 
             Item item = stack.getItem();
@@ -63,7 +63,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         ItemStack stack = findUpgradeStack(input);
         if (stack.isEmpty()) return ItemStack.EMPTY;
 
@@ -91,8 +91,8 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         return result;
     }
 
-    private ItemStack findUpgradeStack(CraftingRecipeInput input) {
-        for (ItemStack stack : input.getStacks()) {
+    private ItemStack findUpgradeStack(CraftingInput input) {
+        for (ItemStack stack : input.items()) {
             if (stack.isEmpty()) continue;
 
             UpgradeComponent component = stack.get(BackpackDataComponentTypes.UPGRADE);
@@ -103,13 +103,13 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
         return ItemStack.EMPTY;
     }
 
-    private Set<String> extractFilterKeysFromInput(ItemStack filterStack, CraftingRecipeInput input) {
+    private Set<String> extractFilterKeysFromInput(ItemStack filterStack, CraftingInput input) {
         Set<String> uniqueItems = new ObjectOpenHashSet<>(MagnetUpgrade.MAX_SIZE);
 
-        for (ItemStack stack : input.getStacks()) {
+        for (ItemStack stack : input.items()) {
             if (uniqueItems.size() >= MagnetUpgrade.MAX_SIZE) break;
             if (stack.isEmpty()) continue;
-            if (stack.isOf(filterStack.getItem())) continue;
+            if (stack.is(filterStack.getItem())) continue;
 
             uniqueItems.add(getItemKey(stack));
         }
@@ -118,22 +118,22 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
     }
 
     private String parseTagNameFromStack(ItemStack stack) {
-        String tagString = stack.getName().getString();
+        String tagString = stack.getHoverName().getString();
         if (!tagString.startsWith("#")) return null;
 
         Identifier tagId = Identifier.tryParse(tagString.substring(1));
         if (tagId == null) return null;
 
-        TagKey<Item> tag = TagKey.of(RegistryKeys.ITEM, tagId);
-        var tagKey = Registries.ITEM.getOptional(tag);
+        TagKey<Item> tag = TagKey.create(Registries.ITEM, tagId);
+        var tagKey = BuiltInRegistries.ITEM.get(tag);
         if (tagKey.isEmpty()) return null;
-        if (!stack.isIn(tagKey.get())) return null;
+        if (!stack.is(tagKey.get())) return null;
 
         return tagString;
     }
 
     private String getItemKey(ItemStack stack) {
-        Identifier itemId = Registries.ITEM.getId(stack.getItem());
+        Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
         String itemKey = itemId.toString();
         String tagKey = parseTagNameFromStack(stack);
         return (hasCustomName(stack) && tagKey != null) ? tagKey : itemKey;
@@ -144,14 +144,14 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public DefaultedList<ItemStack> getRecipeRemainders(CraftingRecipeInput input) {
-        DefaultedList<ItemStack> remainders = DefaultedList.ofSize(input.size(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
+        NonNullList<ItemStack> remainders = NonNullList.withSize(input.size(), ItemStack.EMPTY);
 
         for (int i = 0; i < input.size(); i++) {
-            ItemStack stack = input.getStackInSlot(i);
+            ItemStack stack = input.getItem(i);
             if (stack.getItem() instanceof UpgradeItem) continue;
 
-            remainders.set(i, stack.copyAndEmpty());
+            remainders.set(i, stack.copyAndClear());
         }
 
         return remainders;
@@ -163,17 +163,17 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public CraftingRecipeCategory getCategory() {
-        return CraftingRecipeCategory.MISC;
+    public CraftingBookCategory category() {
+        return CraftingBookCategory.MISC;
     }
 
-    public static class Serializer extends SpecialRecipeSerializer<InputDefinedFilterRecipe> {
+    public static class Serializer extends net.minecraft.world.item.crafting.CustomRecipe.Serializer<InputDefinedFilterRecipe> {
         public Serializer(Factory<InputDefinedFilterRecipe> factory) {
             super(factory);
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, InputDefinedFilterRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, InputDefinedFilterRecipe> streamCodec() {
             return null;
         }
     }

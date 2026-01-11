@@ -6,17 +6,17 @@ import com.rouesvm.servback.technical.data.DATA_TYPE;
 import com.rouesvm.servback.technical.data.types.FallbackData;
 import com.rouesvm.servback.technical.manager.Manager;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.TagValueInput;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -47,14 +47,14 @@ public class BackpackPersistentData extends FallbackData {
     }
 
     private boolean isDataPresent() {
-        Path path = manager().server().getSavePath(WorldSavePath.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
+        Path path = manager().server().getWorldPath(LevelResource.ROOT).resolve(Path.of("data/serverbackpacks.dat"));
         if (!path.toFile().exists()) return false;
 
-        NbtCompound oldData = null;
+        CompoundTag oldData = null;
 
         try (DataInputStream dataInputStream = new DataInputStream(
                 new GZIPInputStream(new FileInputStream(path.toFile())))) {
-            oldData = NbtIo.readCompound(dataInputStream);
+            oldData = NbtIo.read(dataInputStream);
         } catch (Exception ignored) {}
 
         if (oldData != null) {
@@ -73,30 +73,30 @@ public class BackpackPersistentData extends FallbackData {
         return false;
     }
 
-    private Set<BackpackInstance> convertToV2Format(NbtCompound nbt) {
+    private Set<BackpackInstance> convertToV2Format(CompoundTag nbt) {
         Set<BackpackInstance> instances = new HashSet<>();
 
         var data = nbt.get("data");
-        if (data instanceof NbtCompound compound) {
-            Optional<NbtList> list = compound.getList("backpackContents");
+        if (data instanceof CompoundTag compound) {
+            Optional<ListTag> list = compound.getList("backpackContents");
 
             list.ifPresent(nbtElements -> nbtElements.forEach(element ->
-                    instances.add(load((NbtCompound) element, manager().server().getRegistryManager()))));
+                    instances.add(load((CompoundTag) element, manager().server().registryAccess()))));
         }
 
         return instances;
     }
 
-    private static BackpackInstance load(NbtCompound compound, RegistryWrapper.WrapperLookup registryLookup) {
+    private static BackpackInstance load(CompoundTag compound, HolderLookup.Provider registryLookup) {
         return new BackpackInstance(
-                Uuids.toUuid(compound.getIntArray("uuid").get()),
+                UUIDUtil.uuidFromIntArray(compound.getIntArray("uuid").get()),
                 loadInventory(compound.getCompound("contents").get(), registryLookup)
         );
     }
 
-    private static BackpackInventory loadInventory(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup registryLookup) {
-        DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(9 * 6, ItemStack.EMPTY);
-        Inventories.readData(NbtReadView.create(new ErrorReporter.Logging(ServerBackpacks.LOGGER), registryLookup, nbtCompound), itemStacks);
+    private static BackpackInventory loadInventory(CompoundTag nbtCompound, HolderLookup.Provider registryLookup) {
+        NonNullList<ItemStack> itemStacks = NonNullList.withSize(9 * 6, ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(TagValueInput.create(new ProblemReporter.ScopedCollector(ServerBackpacks.LOGGER), registryLookup, nbtCompound), itemStacks);
         return new BackpackInventory(itemStacks);
     }
 }

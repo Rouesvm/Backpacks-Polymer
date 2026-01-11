@@ -1,25 +1,20 @@
 package com.rouesvm.servback.technical.ui;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.CraftingResultInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.CraftingResultSlot;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.*;
 
-public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
-    private final CraftingInventory craftingInventory = new CraftingInventory(this, 3, 3);
-    private final CraftingResultInventory resultInventory = new CraftingResultInventory();
+public class VirtualCraftingScreenHandler extends CraftingMenu {
+    private final TransientCraftingContainer craftingInventory = new TransientCraftingContainer(this, 3, 3);
+    private final ResultContainer resultInventory = new ResultContainer();
 
-    public VirtualCraftingScreenHandler(int syncId, PlayerInventory playerInventory) {
+    public VirtualCraftingScreenHandler(int syncId, Inventory playerInventory) {
         super(syncId, playerInventory);
 
         this.slots.clear();
-        this.addSlot(new CraftingResultSlot(this.getPlayer(), craftingInventory, resultInventory, 0, 124, 35));
+        this.addSlot(new ResultSlot(this.owner(), craftingInventory, resultInventory, 0, 124, 35));
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
@@ -39,29 +34,29 @@ public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
     }
 
     @Override
-    public void onContentChanged(Inventory inventory) {
-        CraftingScreenHandler.updateResult(
+    public void slotsChanged(Container inventory) {
+        CraftingMenu.slotChangedCraftingGrid(
                 this,
-                (ServerWorld) this.getPlayer().getEntityWorld(),
-                this.getPlayer(),
+                (ServerLevel) this.owner().level(),
+                this.owner(),
                 craftingInventory, resultInventory,
                 null
         );
     }
 
     @Override
-    public void onClosed(PlayerEntity player) {
-        ScreenHandler handler = this.getPlayer().currentScreenHandler;
+    public void removed(Player player) {
+        AbstractContainerMenu handler = this.owner().containerMenu;
 
-        handler.enableSyncing();
-        handler.sendContentUpdates();
+        handler.resumeRemoteUpdates();
+        handler.broadcastChanges();
 
-        super.onClosed(player);
-        this.dropInventory(player, craftingInventory);
+        super.removed(player);
+        this.clearContainer(player, craftingInventory);
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return true;
     }
 }

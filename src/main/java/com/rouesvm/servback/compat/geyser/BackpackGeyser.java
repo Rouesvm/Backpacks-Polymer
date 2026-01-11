@@ -2,7 +2,7 @@ package com.rouesvm.servback.compat.geyser;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import org.geysermc.event.subscribe.Subscribe;
 import org.geysermc.geyser.api.GeyserApi;
 import org.geysermc.geyser.api.event.EventRegistrar;
@@ -57,8 +57,8 @@ public class BackpackGeyser implements EventRegistrar {
         if (GEYSER_PACK != null && GEYSER_PACK.toFile().exists()) event.register(ResourcePack.create(PackCodec.path(GEYSER_PACK)));
     }
 
-    public static boolean isPlayerOnBedrock(ServerPlayerEntity player) {
+    public static boolean isPlayerOnBedrock(ServerPlayer player) {
         if (geyser == null || player == null) return false;
-        return geyser.isBedrockPlayer(player.getUuid());
+        return geyser.isBedrockPlayer(player.getUUID());
     }
 }

@@ -8,24 +8,20 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.RawShapedRecipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 
 public class BackpackRecipe extends ShapedRecipe {
-    public final RawShapedRecipe raw;
+    public final ShapedRecipePattern raw;
     public final ItemStack result;
 
-    public static final Serializer SERIALIZER = new Serializer();
+    public static final com.rouesvm.servback.content.recipe.BackpackRecipe.Serializer SERIALIZER = new com.rouesvm.servback.content.recipe.BackpackRecipe.Serializer();
 
-    public BackpackRecipe(String group, CraftingRecipeCategory category, RawShapedRecipe raw, ItemStack result, boolean showNotification) {
+    public BackpackRecipe(String group, CraftingBookCategory category, ShapedRecipePattern raw, ItemStack result, boolean showNotification) {
         super(group, category, raw, result, showNotification);
         this.raw = raw;
         this.result = result;
@@ -36,15 +32,15 @@ public class BackpackRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput craftingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup) {
-        ItemStack resultStack = super.craft(craftingRecipeInput, wrapperLookup);
+    public ItemStack assemble(CraftingInput craftingRecipeInput, HolderLookup.Provider wrapperLookup) {
+        ItemStack resultStack = super.assemble(craftingRecipeInput, wrapperLookup);
 
-        ItemStack stack = craftingRecipeInput.getStackInSlot(4);
+        ItemStack stack = craftingRecipeInput.getItem(4);
         if (stack.getItem() instanceof ContainerItem backpack) {
-            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackUpgrade(backpack).getDefaultStack();
+            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackUpgrade(backpack).getDefaultInstance();
             upgradeStack = upgradeStack.copy();
             upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(stack));
-            upgradeStack.set(DataComponentTypes.ENCHANTMENTS, stack.get(DataComponentTypes.ENCHANTMENTS));
+            upgradeStack.set(DataComponents.ENCHANTMENTS, stack.get(DataComponents.ENCHANTMENTS));
 
             resultStack = upgradeStack;
         }
@@ -52,7 +48,7 @@ public class BackpackRecipe extends ShapedRecipe {
         return resultStack;
     }
 
-    public RawShapedRecipe getRaw() {
+    public ShapedRecipePattern getRaw() {
         return raw;
     }
 
@@ -63,37 +59,37 @@ public class BackpackRecipe extends ShapedRecipe {
     public static class Serializer implements RecipeSerializer<BackpackRecipe> {
         public static final MapCodec<BackpackRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 (instance) ->
-                        instance.group(Codec.STRING.optionalFieldOf("group", "").forGetter(BackpackRecipe::getGroup),
-                                CraftingRecipeCategory.CODEC.fieldOf("category").orElse(CraftingRecipeCategory.MISC).forGetter(BackpackRecipe::getCategory),
-                                RawShapedRecipe.CODEC.forGetter(BackpackRecipe::getRaw),
-                                ItemStack.VALIDATED_CODEC.fieldOf("result").forGetter(BackpackRecipe::getResult),
+                        instance.group(Codec.STRING.optionalFieldOf("group", "").forGetter(BackpackRecipe::group),
+                                CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(BackpackRecipe::category),
+                                ShapedRecipePattern.MAP_CODEC.forGetter(BackpackRecipe::getRaw),
+                                ItemStack.STRICT_CODEC.fieldOf("result").forGetter(BackpackRecipe::getResult),
                                 Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(BackpackRecipe::showNotification))
                                 .apply(instance, BackpackRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, BackpackRecipe> PACKET_CODEC = PacketCodec.ofStatic(BackpackRecipe.Serializer::write, BackpackRecipe.Serializer::read);
+        public static final StreamCodec<RegistryFriendlyByteBuf, BackpackRecipe> PACKET_CODEC = StreamCodec.of(BackpackRecipe.Serializer::write, BackpackRecipe.Serializer::read);
 
         public MapCodec<BackpackRecipe> codec() {
             return CODEC;
         }
 
-        public PacketCodec<RegistryByteBuf, BackpackRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, BackpackRecipe> streamCodec() {
             return PACKET_CODEC;
         }
 
-        private static BackpackRecipe read(RegistryByteBuf buf) {
-            String string = buf.readString();
-            CraftingRecipeCategory craftingRecipeCategory = buf.readEnumConstant(CraftingRecipeCategory.class);
-            RawShapedRecipe rawShapedRecipe = RawShapedRecipe.PACKET_CODEC.decode(buf);
-            ItemStack itemStack = ItemStack.PACKET_CODEC.decode(buf);
+        private static BackpackRecipe read(RegistryFriendlyByteBuf buf) {
+            String string = buf.readUtf();
+            CraftingBookCategory craftingRecipeCategory = buf.readEnum(CraftingBookCategory.class);
+            ShapedRecipePattern rawShapedRecipe = ShapedRecipePattern.STREAM_CODEC.decode(buf);
+            ItemStack itemStack = ItemStack.STREAM_CODEC.decode(buf);
             boolean bl = buf.readBoolean();
             return new BackpackRecipe(string, craftingRecipeCategory, rawShapedRecipe, itemStack, bl);
         }
 
-        private static void write(RegistryByteBuf buf, BackpackRecipe recipe) {
-            buf.writeString(recipe.getGroup());
-            buf.writeEnumConstant(recipe.getCategory());
-            RawShapedRecipe.PACKET_CODEC.encode(buf, recipe.getRaw());
-            ItemStack.PACKET_CODEC.encode(buf, recipe.getResult());
+        private static void write(RegistryFriendlyByteBuf buf, BackpackRecipe recipe) {
+            buf.writeUtf(recipe.group());
+            buf.writeEnum(recipe.category());
+            ShapedRecipePattern.STREAM_CODEC.encode(buf, recipe.getRaw());
+            ItemStack.STREAM_CODEC.encode(buf, recipe.getResult());
             buf.writeBoolean(recipe.showNotification());
         }
     }

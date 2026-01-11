@@ -13,24 +13,24 @@ import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
 import com.rouesvm.servback.technical.ui.BackpackGui;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -55,15 +55,15 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    public boolean canBeNested() {
+    public boolean canFitInsideContainerItems() {
         return false;
     }
 
     @Override
-    public void modifyClientTooltip(List<Text> tooltip, ItemStack polymerStack, PacketContext context) {
+    public void modifyClientTooltip(List<Component> tooltip, ItemStack polymerStack, PacketContext context) {
         UUID uuid = polymerStack.get(BackpackDataComponentTypes.BACKPACK_UUID);
         if (ServerBackpacks.isDevEnvironment
-        && uuid != null) tooltip.add(Text.of("UUID: " + BackpackUUID.getStackUUID(polymerStack)));
+        && uuid != null) tooltip.add(Component.nullToEmpty("UUID: " + BackpackUUID.getStackUUID(polymerStack)));
 
         addUpgradeTooltip(tooltip, polymerStack);
         addInventoryTooltip(tooltip, polymerStack);
@@ -72,18 +72,18 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
-        if (entity instanceof ServerPlayerEntity player) {
+    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
+        if (entity instanceof ServerPlayer player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
             if (component != null) component.baseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player.getEntityWorld(), player.getEntityPos(), (BackpackInventory) getInventory(player, stack)));
+                    upgrade.tick(player.level(), player.position(), (BackpackInventory) getInventory(player, stack)));
         }
     }
 
     @Override
-    protected boolean postPlacement(BlockPos pos, World world, @Nullable PlayerEntity player, ItemStack stack, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack stack, BlockState state) {
         if (world.getBlockEntity(pos) instanceof BackpackBlockEntity blockEntity) {
-            BackpackUtils.resizeIfIncorrectSize((ServerPlayerEntity) player, stack, this.slots);
+            BackpackUtils.resizeIfIncorrectSize((ServerPlayer) player, stack, this.slots);
 
             blockEntity.setItem(this);
             blockEntity.setSize(this.slots);
@@ -101,21 +101,21 @@ public class ContainerItem extends BundleGuiItem {
             if (stack.getCustomName() != null
             ) blockEntity.setCustomName(stack.getCustomName());
 
-            blockEntity.markDirty();
+            blockEntity.setChanged();
 
-            ContainerItem.playOpenSound((ServerPlayerEntity) player);
+            ContainerItem.playOpenSound((ServerPlayer) player);
         }
 
-        return writeNbtToBlockEntity(world, player, pos, stack);
+        return updateCustomBlockEntityTag(world, player, pos, stack);
     }
 
     @Override
-    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
+    public Container getInventory(@Nullable ServerPlayer player, @Nullable ItemStack stack) {
         return stack != null ? BackpackManager.getInventory(BackpackUUID.getStackUUID(stack)) : null;
     }
 
     @Override
-    public void openGui(ServerPlayerEntity player, ItemStack stack) {
+    public void openGui(ServerPlayer player, ItemStack stack) {
         BackpackUUID.getUUIDOrCreateNew(stack);
         BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
 
@@ -127,42 +127,42 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    public void afterChanged(ItemStack stack, Inventory inventory) {
+    public void afterChanged(ItemStack stack, Container inventory) {
         UUID uuid = BackpackUUID.getStackUUID(stack);
         if (uuid != null) BackpackManager.addBackpack(uuid, (BackpackInventory) inventory);
     }
 
-    public DefaultedList<ItemStack> getComponentItemList(ItemStack stack) {
-        DefaultedList<ItemStack> list = DefaultedList.ofSize(this.slots, ItemStack.EMPTY);
-        stack.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT).copyTo(list);
+    public NonNullList<ItemStack> getComponentItemList(ItemStack stack) {
+        NonNullList<ItemStack> list = NonNullList.withSize(this.slots, ItemStack.EMPTY);
+        stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(list);
         return list;
     }
 
-    public static void addUpgradeTooltip(List<Text> tooltip, ItemStack stack) {
+    public static void addUpgradeTooltip(List<Component> tooltip, ItemStack stack) {
         UpgradeContainerComponent upgradeContainer = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
         if (upgradeContainer == null) return;
         if (upgradeContainer.baseUpgrades().isEmpty()) return;
 
-        tooltip.add(Text.translatable("info.serverbackpacks.upgrades")
+        tooltip.add(Component.translatable("info.serverbackpacks.upgrades")
                 .append(":")
-                .formatted(Formatting.GRAY)
+                .withStyle(ChatFormatting.GRAY)
         );
 
         for (Upgrade upgrade : upgradeContainer.baseUpgrades()) {
-            tooltip.add(Text.literal(" ")
+            tooltip.add(Component.literal(" ")
                     .append(upgrade.getType().getTranslationKey())
-                    .formatted(Formatting.DARK_GREEN)
+                    .withStyle(ChatFormatting.DARK_GREEN)
             );
         }
     }
 
-    public static void addInventoryTooltip(List<Text> tooltip, ItemStack stack) {
-        DefaultedList<ItemStack> itemList = BackpackUtils.getItemList(stack);
+    public static void addInventoryTooltip(List<Component> tooltip, ItemStack stack) {
+        NonNullList<ItemStack> itemList = BackpackUtils.getItemList(stack);
         if (itemList.isEmpty()) return;
 
-        tooltip.add(Text.translatable("info.serverbackpacks.contains")
+        tooltip.add(Component.translatable("info.serverbackpacks.contains")
                 .append(":")
-                .formatted(Formatting.GRAY)
+                .withStyle(ChatFormatting.GRAY)
         );
 
         int capacityMaxShow = 0;
@@ -175,39 +175,39 @@ public class ContainerItem extends BundleGuiItem {
             if (capacityMaxShow > 4) continue;
 
             capacityMaxShow++;
-            tooltip.add(Text.literal(" ")
-                    .append(Text.translatable(
+            tooltip.add(Component.literal(" ")
+                    .append(Component.translatable(
                             "item.container.item_count",
-                            itemStack.getName(),
+                            itemStack.getHoverName(),
                             itemStack.getCount()
-                    )).formatted(Formatting.DARK_AQUA)
+                    )).withStyle(ChatFormatting.DARK_AQUA)
             );
         }
 
         if (capacityAmount - capacityMaxShow > 0) tooltip.add(
-                Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
-                        .formatted(Formatting.ITALIC).formatted(Formatting.DARK_AQUA));
+                Component.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
+                        .withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.DARK_AQUA));
     }
 
-    public static void playOpenSound(ServerPlayerEntity player) {
-        player.playSound(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
-        player.playSound(SoundEvents.ITEM_BUNDLE_INSERT, 0.8F, 0.8F + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
+    public static void playOpenSound(ServerPlayer player) {
+        player.playSound(SoundEvents.BUNDLE_DROP_CONTENTS, 0.8F, 0.8F + player.level().getRandom().nextFloat() * 0.4F);
+        player.playSound(SoundEvents.BUNDLE_INSERT, 0.8F, 0.8F + player.level().getRandom().nextFloat() * 0.4F);
     }
 
-    public static void playInsertSound(World world, BlockPos pos, float pitch) {
-        world.playSound(null, pos, SoundEvents.ITEM_BUNDLE_INSERT, SoundCategory.UI, 0.8F, pitch + world.getRandom().nextFloat() * 0.4F);
+    public static void playInsertSound(Level world, BlockPos pos, float pitch) {
+        world.playSound(null, pos, SoundEvents.BUNDLE_INSERT, SoundSource.UI, 0.8F, pitch + world.getRandom().nextFloat() * 0.4F);
     }
 
-    public static void playInsertSound(ServerPlayerEntity player, float pitch) {
-        playInsertSound(player.getEntityWorld(), player.getBlockPos(), pitch);
+    public static void playInsertSound(ServerPlayer player, float pitch) {
+        playInsertSound(player.level(), player.blockPosition(), pitch);
     }
 
-    public static void playDropContentsSound(ServerPlayerEntity player, float pitch) {
-        player.playSound(SoundEvents.ITEM_BUNDLE_DROP_CONTENTS, 0.8F, pitch + player.getEntityWorld().getRandom().nextFloat() * 0.4F);
+    public static void playDropContentsSound(ServerPlayer player, float pitch) {
+        player.playSound(SoundEvents.BUNDLE_DROP_CONTENTS, 0.8F, pitch + player.level().getRandom().nextFloat() * 0.4F);
     }
 
-    public static void playInsertFailSound(ServerPlayerEntity player) {
-        player.playSound(SoundEvents.ITEM_BUNDLE_INSERT_FAIL, 1.0F, 1.0F);
+    public static void playInsertFailSound(ServerPlayer player) {
+        player.playSound(SoundEvents.BUNDLE_INSERT_FAIL, 1.0F, 1.0F);
     }
 
 }

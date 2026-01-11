@@ -7,16 +7,16 @@ import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.HashSet;
@@ -47,30 +47,30 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
     }
 
     @Override
-    public void readView(ReadView data) {
+    public void readView(ValueInput data) {
         itemFilter.readView(data);
     }
 
     @Override
-    public void writeView(WriteView data) {
+    public void writeView(ValueOutput data) {
         itemFilter.writeView(data);
     }
 
     @Override
-    public void addTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
+    public void addTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
         if (this.itemFilter.filterList().isEmpty()) return;
 
-        tooltip.add(Text.translatable("info.serverbackpacks.contains").formatted(Formatting.GRAY));
+        tooltip.add(Component.translatable("info.serverbackpacks.contains").withStyle(ChatFormatting.GRAY));
         for (String string : this.itemFilter.filterList()) {
-            tooltip.add(Text.literal(" ")
+            tooltip.add(Component.literal(" ")
                             .append(string).copy()
-                            .formatted(Formatting.DARK_AQUA));
+                            .withStyle(ChatFormatting.DARK_AQUA));
         }
     }
 
     @Override
-    public void tick(World world, Vec3d pos, BackpackInventory inventory) {
-        if (inventory == null || !(world instanceof ServerWorld serverWorld)) return;
+    public void tick(Level world, Vec3 pos, BackpackInventory inventory) {
+        if (inventory == null || !(world instanceof ServerLevel serverWorld)) return;
 
         tick++;
         moveItemsToTarget(pos);
@@ -78,34 +78,34 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
         ) checkForItems(serverWorld, pos, inventory);
     }
 
-    private void moveItemsToTarget(Vec3d pos) {
+    private void moveItemsToTarget(Vec3 pos) {
         if (queue.isEmpty()) return;
 
-        Vec3d target = new Vec3d(pos.toVector3f());
+        Vec3 target = new Vec3(pos.toVector3f());
 
         queue.forEach(item -> {
-            Vec3d current = item.getEntityPos();
-            Vec3d delta = target.subtract(current);
+            Vec3 current = item.position();
+            Vec3 delta = target.subtract(current);
 
             double distance = delta.length();
             if (distance >= MAX_ITEM_ENTITY_DISTANCE_TO_PLAYER) {
                 double speed = Math.min(0.6, distance * 0.8);
-                Vec3d velocity = delta.normalize().multiply(speed);
+                Vec3 velocity = delta.normalize().scale(speed);
 
-                Vec3d smooth = item.getVelocity().lerp(velocity, 0.4);
-                item.setVelocity(smooth);
-            } else item.setVelocity(Vec3d.ZERO);
+                Vec3 smooth = item.getDeltaMovement().lerp(velocity, 0.4);
+                item.setDeltaMovement(smooth);
+            } else item.setDeltaMovement(Vec3.ZERO);
 
-            item.velocityDirty = true;
-            item.setPickupDelay(100);
+            item.needsSync = true;
+            item.setPickUpDelay(100);
         });
     }
 
-    private boolean voidItems(Vec3d pos, BackpackInventory inventory) {
+    private boolean voidItems(Vec3 pos, BackpackInventory inventory) {
         if (queue.isEmpty()) return false;
 
         if (BackpackInventory.isFull(inventory)) {
-            queue.forEach(entity -> entity.setPickupDelay(0));
+            queue.forEach(entity -> entity.setPickUpDelay(0));
             return false;
         }
 
@@ -114,38 +114,38 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
             if (!iterator.hasNext()) return false;
 
             ItemEntity next = iterator.next();
-            if (next == null || !next.isAlive() || next.squaredDistanceTo(pos) > MAX_RANGE) {
+            if (next == null || !next.isAlive() || next.distanceToSqr(pos) > MAX_RANGE) {
                 iterator.remove();
                 return false;
             }
 
-            if (next.squaredDistanceTo(pos)
+            if (next.distanceToSqr(pos)
                     > MAX_DISTANCE_TO_PLAYER_SQUARED
             ) return false;
 
 
-            next.setDespawnImmediately();
+            next.makeFakeItem();
         }
 
         return true;
     }
 
-    private void checkForItems(ServerWorld world, Vec3d pos, BackpackInventory inventory) {
-        Box area = new Box(pos.add(-MAX_RANGE), pos.add(MAX_RANGE));
+    private void checkForItems(ServerLevel world, Vec3 pos, BackpackInventory inventory) {
+        AABB area = new AABB(pos.add(-MAX_RANGE), pos.add(MAX_RANGE));
 
-        world.getEntitiesByClass(ItemEntity.class, area, (entity ->
+        world.getEntitiesOfClass(ItemEntity.class, area, (entity ->
                 !queue.contains(entity)
-                        && inventory.canInsert(entity.getStack())
+                        && inventory.canInsert(entity.getItem())
                         && checkFilterForItem(entity))
                 ).forEach(item -> {
                     queue.add(item);
-                    item.setPickupDelay(100);
+                    item.setPickUpDelay(100);
                 });
     }
 
     private boolean checkFilterForItem(ItemEntity entity) {
         if (!entity.isAlive()) return false;
-        ItemStack stack = entity.getStack();
+        ItemStack stack = entity.getItem();
         return itemFilter.matches(stack);
     }
 }

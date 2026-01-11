@@ -9,27 +9,27 @@ import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import com.rouesvm.servback.technical.ui.UpgradeContainerGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
 import eu.pb4.common.protection.api.CommonProtection;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.CraftingResultSlot;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -41,15 +41,15 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
-    public void modifyClientTooltip(List<Text> tooltip, ItemStack stack, PacketContext context) {
+    public void modifyClientTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
         if (Configuration.isDisabled(stack.getItem())
-        ) tooltip.add(Text.translatable("tooltip.serverbackpacks.disabled")
-                .formatted(Formatting.BOLD)
-                .formatted(Formatting.RED));
+        ) tooltip.add(Component.translatable("tooltip.serverbackpacks.disabled")
+                .withStyle(ChatFormatting.BOLD)
+                .withStyle(ChatFormatting.RED));
     }
 
     @Override
-    protected boolean postPlacement(BlockPos pos, World world, @Nullable PlayerEntity player, ItemStack stack, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack stack, BlockState state) {
         if (world.getBlockEntity(pos) instanceof BasicBackpackBlockEntity blockEntity) {
             blockEntity.setItem(this);
             blockEntity.setSize(BackpackUtils.getExtendedSlots(stack));
@@ -57,68 +57,68 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             if (stack.getCustomName() != null
             ) blockEntity.setCustomName(stack.getCustomName());
 
-            blockEntity.markDirty();
-            ContainerItem.playOpenSound((ServerPlayerEntity) player);
+            blockEntity.setChanged();
+            ContainerItem.playOpenSound((ServerPlayer) player);
         }
 
-        return writeNbtToBlockEntity(world, player, pos, stack);
+        return updateCustomBlockEntityTag(world, player, pos, stack);
     }
 
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
-        var cast = player.raycast(5,0,false);
-        if (!(player instanceof ServerPlayerEntity serverPlayer)
-        ) return ActionResult.PASS;
+        var cast = player.pick(5,0,false);
+        if (!(player instanceof ServerPlayer serverPlayer)
+        ) return InteractionResult.PASS;
 
         if (cast.getType() == HitResult.Type.BLOCK
-        ) return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        ) return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        if (player.isSneaking()) {
+        if (player.isShiftKeyDown()) {
             if (stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null) {
                 new UpgradeContainerGui(serverPlayer, stack);
-                return ActionResult.SUCCESS;
-            } else return ActionResult.PASS;
+                return InteractionResult.SUCCESS;
+            } else return InteractionResult.PASS;
         }
         
         onOpenGui(serverPlayer, stack);
-        player.swingHand(hand, true);
-        return ActionResult.SUCCESS;
+        player.swing(hand, true);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected boolean canPlace(ItemPlacementContext context, BlockState state) {
+    protected boolean canPlace(BlockPlaceContext context, BlockState state) {
         return Configuration.instance().placeable && super.canPlace(context, state);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (!(context.getPlayer() instanceof ServerPlayerEntity serverPlayer)
-        ) return ActionResult.PASS;
+    public InteractionResult useOn(UseOnContext context) {
+        if (!(context.getPlayer() instanceof ServerPlayer serverPlayer)
+        ) return InteractionResult.PASS;
         if (Configuration.instance().placeable
-                && CommonProtection.canPlaceBlock(context.getWorld(), context.getBlockPos(), serverPlayer.getGameProfile(), serverPlayer)
-                && serverPlayer.isSneaking()
-        ) return super.useOnBlock(context);
+                && CommonProtection.canPlaceBlock(context.getLevel(), context.getClickedPos(), serverPlayer.getGameProfile(), serverPlayer)
+                && serverPlayer.isShiftKeyDown()
+        ) return super.useOn(context);
 
-        onOpenGui(serverPlayer, context.getStack());
-        serverPlayer.swingHand(context.getHand(), true);
-        return ActionResult.SUCCESS;
+        onOpenGui(serverPlayer, context.getItemInHand());
+        serverPlayer.swing(context.getHand(), true);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public boolean onStackClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player) {
-        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-        Inventory inventory = getInventory(serverPlayer, stack);
+    public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction clickType, Player player) {
+        ServerPlayer serverPlayer = (ServerPlayer) player;
+        Container inventory = getInventory(serverPlayer, stack);
 
         if (inventory != null) {
-            ItemStack itemStack = slot.getStack();
+            ItemStack itemStack = slot.getItem();
 
-            if (slot instanceof CraftingResultSlot) return false;
-            if (!itemStack.getItem().canBeNested()) return false;
+            if (slot instanceof ResultSlot) return false;
+            if (!itemStack.getItem().canFitInsideContainerItems()) return false;
 
-            if (clickType == ClickType.LEFT && !itemStack.isEmpty()) {
+            if (clickType == ClickAction.PRIMARY && !itemStack.isEmpty()) {
                 if (BaseInventory.canInsert(itemStack, inventory)) {
                     itemStack = BaseInventory.addStack(itemStack, inventory);
                     ContainerItem.playInsertSound(serverPlayer, 0.8F);
@@ -127,7 +127,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                     return false;
                 }
 
-                slot.setStack(itemStack);
+                slot.setByPlayer(itemStack);
                 afterChanged(stack, inventory);
                 onContentChanged(player);
                 return true;
@@ -136,22 +136,22 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
-    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
-        if (clickType == ClickType.LEFT && otherStack.isEmpty()) {
+    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack otherStack, Slot slot, ClickAction clickType, Player player, SlotAccess cursorStackReference) {
+        if (clickType == ClickAction.PRIMARY && otherStack.isEmpty()) {
         } else {
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            Inventory inventory = getInventory(serverPlayer, stack);
+            ServerPlayer serverPlayer = (ServerPlayer) player;
+            Container inventory = getInventory(serverPlayer, stack);
 
-            if (slot instanceof CraftingResultSlot) return false;
-            if (!otherStack.getItem().canBeNested()) return false;
+            if (slot instanceof ResultSlot) return false;
+            if (!otherStack.getItem().canFitInsideContainerItems()) return false;
 
-            if (clickType == ClickType.RIGHT) {
+            if (clickType == ClickAction.SECONDARY) {
                 onOpenGui(serverPlayer, stack);
                 return true;
             }
 
             if (inventory != null) {
-                if (clickType == ClickType.LEFT && !otherStack.isEmpty()) {
+                if (clickType == ClickAction.PRIMARY && !otherStack.isEmpty()) {
                     if (BaseInventory.canInsert(otherStack, inventory)) {
                         otherStack = BaseInventory.addStack(otherStack, inventory);
                         ContainerItem.playInsertSound(serverPlayer, 0.8F);
@@ -170,25 +170,25 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         return false;
     }
 
-    public Inventory getInventory(@Nullable ServerPlayerEntity player, @Nullable ItemStack stack) {
+    public Container getInventory(@Nullable ServerPlayer player, @Nullable ItemStack stack) {
         return null;
     }
 
-    public void afterChanged(ItemStack stack, Inventory inventory) {
+    public void afterChanged(ItemStack stack, Container inventory) {
     }
 
-    public void onContentChanged(PlayerEntity user) {
-        ScreenHandler screenHandler = user.currentScreenHandler;
+    public void onContentChanged(Player user) {
+        AbstractContainerMenu screenHandler = user.containerMenu;
         if (screenHandler != null
-        ) screenHandler.onContentChanged(user.getInventory());
+        ) screenHandler.slotsChanged(user.getInventory());
     }
 
-    public void onOpenGui(ServerPlayerEntity player, ItemStack stack) {
+    public void onOpenGui(ServerPlayer player, ItemStack stack) {
         ContainerItem.playOpenSound(player);
         openGui(player, stack);
     }
 
-    public void openGui(ServerPlayerEntity player, ItemStack stack) {
+    public void openGui(ServerPlayer player, ItemStack stack) {
         new BasicInventoryGui(player, stack, getInventory(player, stack));
     }
 }

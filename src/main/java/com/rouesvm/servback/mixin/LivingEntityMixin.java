@@ -1,9 +1,9 @@
 package com.rouesvm.servback.mixin;
 
 import com.rouesvm.servback.technical.cosmetic.BackInterface;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,11 +19,11 @@ public class LivingEntityMixin implements BackInterface {
     @Inject(method = "tick", at = @At("RETURN"))
     private void rotationTick(CallbackInfo ci) {
         var self = LivingEntity.class.cast(this);
-        var isPlayer = (self instanceof PlayerEntity);
+        var isPlayer = (self instanceof Player);
 
         if ((prevX != 0 && prevZ != 0) && isPlayer)
             backpacks$tickMovement(self);
-        else this.customBodyYaw = self.bodyYaw;
+        else this.customBodyYaw = self.yBodyRot;
 
         prevX = self.getX();
         prevZ = self.getZ();
@@ -31,7 +31,7 @@ public class LivingEntityMixin implements BackInterface {
 
     @Unique
     private void backpacks$tickMovement(final LivingEntity entity) {
-        float currentYaw = entity.getYaw();
+        float currentYaw = entity.getYRot();
         double dx = entity.getX() - this.prevX;
         double dz = entity.getZ() - this.prevZ;
         double moveSq = dx * dx + dz * dz;
@@ -39,8 +39,8 @@ public class LivingEntityMixin implements BackInterface {
         float targetYaw = this.customBodyYaw;
 
         if (moveSq > 0.0025) {
-            float movementYaw = (float) (Math.atan2(dz, dx) * MathHelper.DEGREES_PER_RADIAN) - 90.0f;
-            float yawDiff = MathHelper.wrapDegrees(currentYaw - movementYaw);
+            float movementYaw = (float) (Math.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0f;
+            float yawDiff = Mth.wrapDegrees(currentYaw - movementYaw);
 
             if (yawDiff > 95f && yawDiff < 265f) movementYaw -= 180f;
             targetYaw = movementYaw;
@@ -51,11 +51,11 @@ public class LivingEntityMixin implements BackInterface {
 
     @Unique
     public void backpacks$turnBody(float bodyRotation, float yaw) {
-        float diff = MathHelper.wrapDegrees(bodyRotation - this.customBodyYaw);
+        float diff = Mth.wrapDegrees(bodyRotation - this.customBodyYaw);
         this.customBodyYaw += diff * 0.3f;
 
-        float clampDiff = MathHelper.wrapDegrees(yaw - this.customBodyYaw);
-        clampDiff = MathHelper.clamp(clampDiff, -75f, 75f);
+        float clampDiff = Mth.wrapDegrees(yaw - this.customBodyYaw);
+        clampDiff = Mth.clamp(clampDiff, -75f, 75f);
 
         this.customBodyYaw = yaw - clampDiff;
 

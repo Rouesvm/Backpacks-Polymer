@@ -7,18 +7,17 @@ import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
 import eu.pb4.sgui.api.ClickType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class BackpackGui extends BasicInventoryGui {
     private boolean markDirty = false;
     protected final BackpackInstance instance;
     protected final BackpackInstance frozenInstance;
 
-    public BackpackGui(ServerPlayerEntity player, ItemStack stack, BackpackInstance instance) {
+    public BackpackGui(ServerPlayer player, ItemStack stack, BackpackInstance instance) {
         super(player, stack, instance.inventory());
 
         this.frozenInstance = instance.copy();
@@ -27,17 +26,17 @@ public class BackpackGui extends BasicInventoryGui {
         if (stack != null) BackpackUtils.convertComponentToBackpackData(instance, stack);
     }
 
-    public BackpackGui(ServerPlayerEntity player, BackpackInstance instance) {
+    public BackpackGui(ServerPlayer player, BackpackInstance instance) {
         this(player, null, instance);
     }
 
     @Override
-    public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+    public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
         if (index < 0) return true;
 
         Slot slot = this.screenHandler.getSlot(index);
-        if (slot.hasStack()
-                && slot.getStack().getItem() instanceof ContainerItem
+        if (slot.hasItem()
+                && slot.getItem().getItem() instanceof ContainerItem
                 && stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null
                 && type.shift
                 && type.isRight
@@ -59,10 +58,10 @@ public class BackpackGui extends BasicInventoryGui {
     public void onClose() {
         if (stack != null) stack.set(BackpackDataComponentTypes.IS_OPENED, false);
 
-        ScreenHandler handler = this.getPlayer().currentScreenHandler;
+        AbstractContainerMenu handler = this.getPlayer().containerMenu;
 
-        handler.enableSyncing();
-        handler.sendContentUpdates();
+        handler.resumeRemoteUpdates();
+        handler.broadcastChanges();
 
         if (markDirty) {
             String before = BackpackUtils.hashBackpackContents(frozenInstance.heldInventory());

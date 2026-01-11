@@ -5,13 +5,13 @@ import com.rouesvm.servback.compat.geyser.bedrock.BedrockItem;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -20,11 +20,11 @@ public class BasicPolymerBlockItem extends BlockItem implements PolymerItem, Pol
     private final Item vanillaItem;
 
     public BasicPolymerBlockItem(String name, Item vanillaItem, Block block) {
-        super(block, new Settings()
-                .maxCount(1)
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ServerBackpacks.MOD_ID, name)))
+        super(block, new Properties()
+                .stacksTo(1)
+                .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name)))
         );
-        this.id = Identifier.of(ServerBackpacks.MOD_ID, name);
+        this.id = Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name);
         this.vanillaItem = vanillaItem;
     }
 

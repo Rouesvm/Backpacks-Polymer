@@ -7,7 +7,7 @@ import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.data.types.Data;
 import com.rouesvm.servback.technical.manager.Manager;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -64,7 +64,7 @@ public class BackpackDataBackup {
     }
 
     public void createBackupDirs() {
-        Path backupDir = manager.server().getSavePath(WorldSavePath.ROOT).resolve("data/backpacks-backups");
+        Path backupDir = manager.server().getWorldPath(LevelResource.ROOT).resolve("data/backpacks-backups");
 
         try {
             Files.createDirectories(backupDir);

@@ -20,8 +20,8 @@ import org.jspecify.annotations.NonNull;
 public class BasicInventoryGui extends SimpleGui {
     private static final String BEDROCK_ROW_MARKER = "chest.row.";
 
-    private static final int EXISTING_SMALL_CHEST_SIZE = 9*3;
-    private static final int EXISTING_LARGE_CHEST_SIZE = 9*6;
+    private static final int EXISTING_SMALL_CHEST_SIZE = 3;
+    private static final int EXISTING_LARGE_CHEST_SIZE = 6;
 
     protected final ItemStack stack;
     protected final Container inventory;
@@ -49,10 +49,11 @@ public class BasicInventoryGui extends SimpleGui {
                     .append(")");
         }
 
+        int rows = (int) Math.ceil(slots / 9.0);
         if (ServerBackpacks.isBedrock(player) && (
-                this.slots != EXISTING_SMALL_CHEST_SIZE
-                && this.slots != EXISTING_LARGE_CHEST_SIZE
-        )) title = title.copy().append(BEDROCK_ROW_MARKER + this.slots/9);
+                rows != EXISTING_SMALL_CHEST_SIZE
+                && rows != EXISTING_LARGE_CHEST_SIZE
+        )) title = title.copy().append(BEDROCK_ROW_MARKER + rows);
 
         this.setTitle(Component.translationArg(title));
 

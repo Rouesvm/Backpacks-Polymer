@@ -74,9 +74,24 @@ public class BackpackGui extends BasicInventoryGui {
     }
 
     @Override
-    public void fillChest() {
-        for (int i = 0; i < this.slots(); i++)
-            this.setSlotRedirect(i, new BackpackSlot(this.inventory, i, i, 0));
-    }
+    public void fillSlots() {
+        int slots = inventory.getContainerSize();
+        int rows = (int) Math.ceil(slots / 9.0);
 
+        int amountToPad = (int) Math.ceil((double) slots / rows);
+        for (int row = 0; row < rows; row++) {
+            int startIndex = row * 9;
+            int endIndex = startIndex + 9;
+
+            int rowPadding = 9 - amountToPad;
+
+            int leftPadding = rowPadding / 2;
+            int rightPadding = rowPadding - leftPadding;
+
+            for (int i = startIndex + leftPadding; i < endIndex - rightPadding; i++) {
+                int inventoryIndex = (row * amountToPad) + (i - (startIndex + leftPadding));
+                this.setSlotRedirect(i, new BackpackSlot(this.inventory, inventoryIndex, i, 0));
+            }
+        }
+    }
 }

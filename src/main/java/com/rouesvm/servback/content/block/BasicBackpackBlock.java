@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock, BlockWithElementHolder, BedrockBlock {
     public BasicBackpackBlock(String name) {
@@ -48,15 +49,15 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    protected BlockState updateShape(
-            BlockState state,
-            LevelReader world,
-            ScheduledTickAccess tickView,
-            BlockPos pos,
-            Direction direction,
-            BlockPos neighborPos,
-            BlockState neighborState,
-            RandomSource random
+    protected @NonNull BlockState updateShape(
+            @NonNull BlockState state,
+            @NonNull LevelReader world,
+            @NonNull ScheduledTickAccess tickView,
+            @NonNull BlockPos pos,
+            @NonNull Direction direction,
+            @NonNull BlockPos neighborPos,
+            @NonNull BlockState neighborState,
+            @NonNull RandomSource random
     ) {
         return (Configuration.instance().breaks_with_flow && world.getFluidState(neighborPos).shouldRenderBackwardUpFace(world, pos))
                 ? Blocks.AIR.defaultBlockState()
@@ -64,7 +65,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    protected int getLightBlock(BlockState state) {
+    protected int getLightBlock(@NonNull BlockState state) {
         return 1;
     }
 
@@ -79,7 +80,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+    protected ItemStack getCloneItemStack(@NonNull LevelReader world, @NonNull BlockPos pos, BlockState state, boolean includeData) {
         ItemStack pickStack = super.getCloneItemStack(world, pos, state, includeData);
         if (!world.isClientSide()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);

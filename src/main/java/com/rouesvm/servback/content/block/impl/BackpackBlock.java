@@ -2,9 +2,11 @@ package com.rouesvm.servback.content.block.impl;
 
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.datagen.ModItemTags;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -30,16 +32,21 @@ public class BackpackBlock extends BaseBackpackBlock implements EntityBlock, Blo
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        ContainerItem item = (ContainerItem) context.getItemInHand().getItem();
+        ItemStack itemStack = context.getItemInHand();
+        ContainerItem item = (ContainerItem) itemStack.getItem();
         DyeColor color = BackpackItemJsonRegistry.getBackpackDyeColor(item);
 
-        int size = item.getSize() / 9;
-        if (size > 3) size = 3;
+        int slot = 1;
+        if (itemStack.is(ModItemTags.MEDIUM_BACKPACKS)) {
+            slot = 2;
+        } else if (itemStack.is(ModItemTags.LARGE_BACKPACKS)) {
+            slot = 3;
+        }
 
         return super.getStateForPlacement(context)
                 .setValue(DYE_COLOR, color != null ? color : DyeColor.BROWN)
                 .setValue(HAS_DYE, color != null)
-                .setValue(SLOTS, size);
+                .setValue(SLOTS, slot);
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

@@ -3,14 +3,19 @@ package com.rouesvm.servback.technical.ui;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.slots.NonBackpackSlot;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import org.jspecify.annotations.NonNull;
 
 public class BasicInventoryGui extends SimpleGui {
     private static final String BEDROCK_ROW_MARKER = "chest.row.";
@@ -51,7 +56,7 @@ public class BasicInventoryGui extends SimpleGui {
 
         this.setTitle(Component.translationArg(title));
 
-        this.fillChest();
+        this.fillSlots();
         this.open();
 
         this.afterOpened();
@@ -64,31 +69,22 @@ public class BasicInventoryGui extends SimpleGui {
     public void slotUpdate() {}
 
     public void afterOpened() {
-        if (stack != null) this.lockSlot();
+        if (stack != null) {
+            this.lockSlot();
+            this.limitSlots();
+        }
 
         this.getPlayer().containerMenu.addSlotListener(new ContainerListener() {
             @Override
-            public void slotChanged(AbstractContainerMenu handler, int slotId, ItemStack stackSlot) {
+            public void slotChanged(@NonNull AbstractContainerMenu handler, int slotId, @NonNull ItemStack stackSlot) {
                 slotUpdate();
                 if (stackIndex != -1 && stack != null && handler.getSlot(stackIndex).getItem() != stack) outOfSlot = true;
             }
             @Override
-            public void dataChanged(AbstractContainerMenu handler, int property, int value) {
+            public void dataChanged(@NonNull AbstractContainerMenu handler, int property, int value) {
 
             }
         });
-    }
-
-    public void lockSlot() {
-        for(int j = 0; j <= 3; ++j) {
-            for(int k = 0; k < 9; ++k) {
-                final int index = j == 0 ? k + (9 * 4 + this.slots) - 9 : this.slots + (k + j * 9) - 9 ;
-                if (ItemStack.isSameItemSameComponents(this.screenHandler.getSlot(index).getItem(), this.stack)) {
-                    this.stackIndex = index;
-                    break;
-                }
-            }
-        }
     }
 
     @Override
@@ -97,7 +93,9 @@ public class BasicInventoryGui extends SimpleGui {
     }
 
     public static MenuType<?> getHandler(int slots) {
-        return switch (slots/9) {
+        int rows = (int) Math.ceil(slots / 9.0);
+
+        return switch (rows) {
             case 1 -> MenuType.GENERIC_9x1;
             case 2 -> MenuType.GENERIC_9x2;
             case 3 -> MenuType.GENERIC_9x3;
@@ -107,8 +105,63 @@ public class BasicInventoryGui extends SimpleGui {
         };
     }
 
-    public void fillChest() {
-        for (int i = 0; i < this.slots; i++)
-            this.setSlotRedirect(i, new NonBackpackSlot(this.inventory, i, i, 0));
+    public void lockSlot() {
+        for(int y = 0; y <= 3; ++y) {
+            for(int x = 0; x < 9; ++x) {
+                final int index = y == 0 ? x + (9 * 4 + this.slots) - 9 : this.slots + (x + y * 9) - 9 ;
+                if (ItemStack.isSameItemSameComponents(this.screenHandler.getSlot(index).getItem(), this.stack)) {
+                    this.stackIndex = index;
+                    break;
+                }
+            }
+        }
+    }
+
+    public void limitSlots() {
+        int slots = inventory.getContainerSize();
+        int rows = (int) Math.ceil(slots / 9.0);
+
+        int amountToPad = (int) Math.ceil((double) slots / rows);
+        for (int row = 0; row < rows; row++) {
+            int startIndex = row * 9;
+            int endIndex = startIndex + 9;
+
+            int rowPadding = 9 - amountToPad;
+
+            int leftPadding = rowPadding / 2;
+            int rightPadding = rowPadding - leftPadding;
+
+            for (int i = startIndex; i < startIndex + leftPadding; i++) {
+                setSlot(i, new GuiElementBuilder()
+                        .setItem(Items.BARRIER)
+                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
+                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
+            }
+
+            for (int i = endIndex - rightPadding; i < endIndex; i++) {
+                setSlot(i, new GuiElementBuilder()
+                        .setItem(Items.BARRIER)
+                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
+                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
+            }
+        }
+    }
+
+    public void fillSlots() {
+        int slots = inventory.getContainerSize();
+        int rows = (int) Math.ceil(slots / 9.0);
+
+        for (int row = 0; row < rows; row++) {
+            int startIndex = row * 9;
+
+            int rowSlotsRemaining = Math.min(slots - startIndex, 9);
+            int rowPadding = 9 - rowSlotsRemaining;
+
+            int leftPadding = rowPadding / 2;
+
+            for (int i = startIndex + leftPadding; i < startIndex + leftPadding; i++) {
+                this.setSlotRedirect(i, new NonBackpackSlot(this.inventory, i - (startIndex + leftPadding), i, 0));
+            }
+        }
     }
 }

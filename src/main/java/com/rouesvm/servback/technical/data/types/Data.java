@@ -11,7 +11,6 @@ import java.util.UUID;
 public interface Data {
     Set<UUID> getUUIDs();
 
-
     Set<BackpackInstance> getBackpackInstances();
 
     Optional<BackpackInstance> getOrLoadBackpack(UUID uuid);

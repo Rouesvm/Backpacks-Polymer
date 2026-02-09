@@ -1,4 +1,4 @@
-{
+ {
   "parent": "item/handheld",
   "textures": {
     "layer0": "serverbackpacks:item/ui/arrowleft"

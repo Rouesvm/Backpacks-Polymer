@@ -178,5 +178,8 @@ public class Configuration {
 
         @SerializedName("allow_skulker_boxes_in_backpacks")
         public boolean allow_shulker_boxes_in_backpacks = false;
+
+        @SerializedName("global_backpack_size")
+        public int global_backpack_size = 54;
     }
 }

@@ -7,7 +7,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import org.geysermc.geyser.api.event.lifecycle.GeyserDefineCustomItemsEvent;
-import org.geysermc.geyser.api.item.custom.NonVanillaCustomItemData;
+import org.geysermc.geyser.api.item.custom.v2.NonVanillaCustomItemDefinition;
+import org.geysermc.geyser.api.item.custom.v2.component.geyser.GeyserBlockPlacer;
+import org.geysermc.geyser.api.item.custom.v2.component.geyser.GeyserItemDataComponents;
+import org.geysermc.geyser.api.item.custom.v2.component.java.JavaItemDataComponents;
 
 public class BackpackGeyserItem {
     public static void onGeyserDefineCustomItemsEvent(GeyserDefineCustomItemsEvent event) {
@@ -19,18 +22,19 @@ public class BackpackGeyserItem {
                     Identifier identifier = entry.getKey().identifier();
                     String stringIdentifier = identifier.toString();
 
-                    NonVanillaCustomItemData.Builder customItemData = NonVanillaCustomItemData.builder()
-                            .displayName(Component.translatable(item.getDescriptionId()).getString())
-                            .name(identifier.getPath())
-                            .javaId(id)
-                            .identifier(stringIdentifier)
-                            .allowOffhand(true)
-                            .displayHandheld(item instanceof BundleGuiItem)
-                            .stackSize(item.getDefaultMaxStackSize())
-                            .icon(stringIdentifier)
-                            .creativeCategory(3);
+                    NonVanillaCustomItemDefinition.Builder builder = NonVanillaCustomItemDefinition.builder(
+                            org.geysermc.geyser.api.util.Identifier.of(stringIdentifier), id)
+                            .component(JavaItemDataComponents.MAX_STACK_SIZE, item.getDefaultMaxStackSize())
+                            .displayName(Component.translatable(item.getDescriptionId()).getString());
 
-                    event.register(customItemData.build());
+                    if (item instanceof BundleGuiItem gui) {
+                        builder.component(GeyserItemDataComponents.BLOCK_PLACER, GeyserBlockPlacer.builder()
+                                .block(org.geysermc.geyser.api.util.Identifier.of(BuiltInRegistries.BLOCK.getKey(gui.getBlock()).toString()))
+                                .useBlockIcon(false)
+                                .build());
+                    }
+
+                    event.register(builder.build());
                 });
     }
 }

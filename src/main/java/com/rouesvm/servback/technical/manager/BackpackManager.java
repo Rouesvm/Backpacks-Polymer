@@ -55,7 +55,7 @@ public class BackpackManager implements Manager {
 
     private final RegistryOps<Tag> nbtOps;
 
-    public BackpackManager(MinecraftServer server) {
+    private BackpackManager(MinecraftServer server) {
         this.server = server;
         this.nbtOps = server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
         this.storageHandler = new BackpackData(this);

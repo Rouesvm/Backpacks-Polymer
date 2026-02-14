@@ -30,6 +30,7 @@ public class BasicInventoryGui extends SimpleGui {
     protected boolean outOfSlot = false;
 
     private final int slots;
+    private final int containerSize;
 
     public BasicInventoryGui(ServerPlayer player, ItemStack stack, Container inventory) {
         super(getHandler(inventory.getContainerSize()), player, false);
@@ -54,6 +55,8 @@ public class BasicInventoryGui extends SimpleGui {
                 rows != EXISTING_SMALL_CHEST_SIZE
                 && rows != EXISTING_LARGE_CHEST_SIZE
         )) title = title.copy().append(BEDROCK_ROW_MARKER + rows);
+
+        this.containerSize = rows * 9;
 
         this.setTitle(Component.translationArg(title));
 
@@ -123,6 +126,10 @@ public class BasicInventoryGui extends SimpleGui {
         int rows = (int) Math.ceil(slots / 9.0);
 
         int amountToPad = (int) Math.ceil((double) slots / rows);
+
+        int slotsToFill = containerSize - slots;
+        int emptySlots = 0;
+
         for (int row = 0; row < rows; row++) {
             int startIndex = row * 9;
             int endIndex = startIndex + 9;
@@ -132,14 +139,28 @@ public class BasicInventoryGui extends SimpleGui {
             int leftPadding = rowPadding / 2;
             int rightPadding = rowPadding - leftPadding;
 
+            System.out.println(leftPadding);
+            System.out.println(rightPadding);
+
             for (int i = startIndex; i < startIndex + leftPadding; i++) {
                 setSlot(i, new GuiElementBuilder()
                         .setItem(Items.BARRIER)
                         .setItemName(Component.translatable("info.serverbackpacks.blocked"))
                         .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
+                emptySlots++;
             }
 
             for (int i = endIndex - rightPadding; i < endIndex; i++) {
+                setSlot(i, new GuiElementBuilder()
+                        .setItem(Items.BARRIER)
+                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
+                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
+                emptySlots++;
+            }
+        }
+
+        if (emptySlots < slotsToFill) {
+            for (int i = (containerSize - slotsToFill); i < containerSize; i++) {
                 setSlot(i, new GuiElementBuilder()
                         .setItem(Items.BARRIER)
                         .setItemName(Component.translatable("info.serverbackpacks.blocked"))

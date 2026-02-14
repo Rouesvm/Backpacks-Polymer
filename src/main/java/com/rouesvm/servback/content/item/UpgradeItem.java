@@ -27,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
@@ -61,7 +62,14 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     }
 
     @Override
-    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack otherStack, Slot slot, ClickAction clickType, Player player, SlotAccess cursorStackReference) {
+    public boolean overrideOtherStackedOnMe(
+            ItemStack stack,
+            @NonNull ItemStack otherStack,
+            @NonNull Slot slot,
+            @NonNull ClickAction clickType,
+            @NonNull Player player,
+            @NonNull SlotAccess cursorStackReference
+    ) {
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
 
         Upgrade upgrade = upgradeItem.getUpgrade(stack);
@@ -75,7 +83,7 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
     }
 
     @Override
-    public InteractionResult use(Level world, Player player, InteractionHand hand) {
+    public @NonNull InteractionResult use(@NonNull Level world, Player player, @NonNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         UpgradeItem upgradeItem = (UpgradeItem) stack.getItem();
 

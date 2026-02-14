@@ -43,9 +43,10 @@ public class BackpackTrinket implements Trinket {
 
             if (uuid == null) return;
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            if (component != null) component.baseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player.level(), player.position(), BackpackManager.getInventory(uuid))
-            );
+            if (component != null) component.baseUpgrades().forEach((upgrade) -> {
+                upgrade.tick(player.level(), player.position(), BackpackManager.getInventory(uuid));
+                upgrade.tick(player, BackpackManager.getInventory(uuid));
+            });
         }
     }
 

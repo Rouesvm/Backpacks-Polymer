@@ -65,7 +65,6 @@ public class BackpackData implements Data {
         } catch (InterruptedException e) {
             ServerBackpacks.LOGGER.error("Error while stopping thread {}", e.getMessage());
             executor.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -196,6 +195,11 @@ public class BackpackData implements Data {
         availableUUIDS.add(instance.uuid());
         BackpackInstance finalInstance = instance.copy();
 
+        if (executor.isTerminated() || executor.isShutdown()) {
+            ServerBackpacks.LOGGER.error("Cannot create backup due to executor being terminated.");
+            return;
+        }
+
         executor.submit(() -> saveSingleToDisk(finalInstance, saveDir));
     }
 
@@ -203,6 +207,11 @@ public class BackpackData implements Data {
     public void saveAllToDisk(Set<BackpackInstance> backpackInstances) {
         final List<BackpackInstance> finalStoredInventories = new ArrayList<>();
         backpackInstances.forEach(backpackInstance -> finalStoredInventories.add(backpackInstance.copy()));
+
+        if (executor.isTerminated() || executor.isShutdown()) {
+            ServerBackpacks.LOGGER.error("Cannot create backup due to executor being terminated.");
+            return;
+        }
 
         executor.submit(() -> {
             for (BackpackInstance instance : finalStoredInventories) {

@@ -41,6 +41,11 @@ public class BackpackItemRegistry {
             BackpackUpgradeRegistry.CRAFTING
     ));
 
+    public static final Item JUKEBOX_UPGRADE = register("jukebox_upgrade", new UpgradeItem(
+            new Item.Properties().stacksTo(1),
+            BackpackUpgradeRegistry.JUKEBOX
+    ));
+
     public static UpgradeItem register(String name, UpgradeItem item) {
         return Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name), item);
     }

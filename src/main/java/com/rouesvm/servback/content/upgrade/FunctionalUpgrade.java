@@ -16,6 +16,7 @@ public interface FunctionalUpgrade {
     }
 
     default void tick(Level world, Vec3 pos, BackpackInventory inventory) {}
+    default void tick(ServerPlayer player, BackpackInventory inventory) {}
 
     default void addTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {}
 }

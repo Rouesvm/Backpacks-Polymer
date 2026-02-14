@@ -39,7 +39,6 @@ public class BackpackDataBackup {
         } catch (InterruptedException e) {
             ServerBackpacks.LOGGER.error("Error while stopping thread {}", e.getMessage());
             executor.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -124,6 +123,12 @@ public class BackpackDataBackup {
 
         if (backupDir != null) {
             Path finalBackupDir = backupDir;
+
+            if (executor.isTerminated() || executor.isShutdown()) {
+                ServerBackpacks.LOGGER.error("Cannot create backup due to executor being terminated.");
+                return;
+            }
+
             executor.submit(() -> saveBackup(createTimestampedDir(finalBackupDir), instance, lastSingularHashes));
         }
     }
@@ -141,6 +146,11 @@ public class BackpackDataBackup {
             Files.createDirectories(currentDir);
         } catch (IOException e) {
             ServerBackpacks.LOGGER.error("Failed to create timestamped backup directory {}", currentDir, e);
+            return;
+        }
+
+        if (executor.isTerminated() || executor.isShutdown()) {
+            ServerBackpacks.LOGGER.error("Cannot create backup due to executor being terminated.");
             return;
         }
 

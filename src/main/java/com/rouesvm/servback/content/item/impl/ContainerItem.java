@@ -75,8 +75,10 @@ public class ContainerItem extends BundleGuiItem {
     public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
         if (entity instanceof ServerPlayer player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            if (component != null) component.baseUpgrades().forEach((upgrade) ->
-                    upgrade.tick(player.level(), player.position(), (BackpackInventory) getInventory(player, stack)));
+            if (component != null) component.baseUpgrades().forEach((upgrade) -> {
+                upgrade.tick(player.level(), player.position(), (BackpackInventory) getInventory(player, stack));
+                upgrade.tick(player, (BackpackInventory) getInventory(player, stack));
+            });
         }
     }
 
@@ -190,8 +192,10 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public static void playOpenSound(ServerPlayer player) {
-        player.playSound(SoundEvents.BUNDLE_DROP_CONTENTS, 0.8F, 0.8F + player.level().getRandom().nextFloat() * 0.4F);
-        player.playSound(SoundEvents.BUNDLE_INSERT, 0.8F, 0.8F + player.level().getRandom().nextFloat() * 0.4F);
+        player.level().playSound(null, player.blockPosition(), SoundEvents.BUNDLE_DROP_CONTENTS, SoundSource.UI, 0.8F, 0.8F
+                + player.level().getRandom().nextFloat() * 0.4F);
+        player.level().playSound(null, player.blockPosition(), SoundEvents.BUNDLE_INSERT, SoundSource.UI, 0.8F, 0.8F
+                + player.level().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertSound(Level world, BlockPos pos, float pitch) {
@@ -203,11 +207,12 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     public static void playDropContentsSound(ServerPlayer player, float pitch) {
-        player.playSound(SoundEvents.BUNDLE_DROP_CONTENTS, 0.8F, pitch + player.level().getRandom().nextFloat() * 0.4F);
+        player.level().playSound(null, player.blockPosition(), SoundEvents.BUNDLE_DROP_CONTENTS, SoundSource.UI, 0.8F, pitch
+                + player.level().getRandom().nextFloat() * 0.4F);
     }
 
     public static void playInsertFailSound(ServerPlayer player) {
-        player.playSound(SoundEvents.BUNDLE_INSERT_FAIL, 1.0F, 1.0F);
+        player.level().playSound(null, player.blockPosition(), SoundEvents.BUNDLE_DROP_CONTENTS, SoundSource.UI, 1.0F, 1.0F);
     }
 
 }

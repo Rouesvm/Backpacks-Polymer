@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
@@ -49,7 +50,13 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack stack, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(
+            @NonNull BlockPos pos,
+            Level world,
+            @Nullable Player player,
+            @NonNull ItemStack stack,
+            @NonNull BlockState state
+    ) {
         if (world.getBlockEntity(pos) instanceof BasicBackpackBlockEntity blockEntity) {
             blockEntity.setItem(this);
             blockEntity.setSize(BackpackUtils.getExtendedSlots(stack));
@@ -66,7 +73,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
 
     @Override
-    public InteractionResult use(Level world, Player player, InteractionHand hand) {
+    public @NonNull InteractionResult use(@NonNull Level world, Player player, @NonNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         var cast = player.pick(5,0,false);
@@ -89,12 +96,12 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
-    protected boolean canPlace(BlockPlaceContext context, BlockState state) {
+    protected boolean canPlace(@NonNull BlockPlaceContext context, @NonNull BlockState state) {
         return Configuration.instance().placeable && super.canPlace(context, state);
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public @NonNull InteractionResult useOn(UseOnContext context) {
         if (!(context.getPlayer() instanceof ServerPlayer serverPlayer)
         ) return InteractionResult.PASS;
         if (Configuration.instance().placeable
@@ -136,7 +143,14 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
-    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack otherStack, Slot slot, ClickAction clickType, Player player, SlotAccess cursorStackReference) {
+    public boolean overrideOtherStackedOnMe(
+            @NonNull ItemStack stack,
+            @NonNull ItemStack otherStack,
+            @NonNull Slot slot,
+            @NonNull ClickAction clickType,
+            @NonNull Player player,
+            @NonNull SlotAccess cursorStackReference
+    ) {
         if (clickType == ClickAction.PRIMARY && otherStack.isEmpty()) {
         } else {
             ServerPlayer serverPlayer = (ServerPlayer) player;
@@ -179,8 +193,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
 
     public void onContentChanged(Player user) {
         AbstractContainerMenu screenHandler = user.containerMenu;
-        if (screenHandler != null
-        ) screenHandler.slotsChanged(user.getInventory());
+        screenHandler.slotsChanged(user.getInventory());
     }
 
     public void onOpenGui(ServerPlayer player, ItemStack stack) {

@@ -32,6 +32,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
@@ -83,7 +84,7 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack stack, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(@NonNull BlockPos pos, Level world, @Nullable Player player, @NonNull ItemStack stack, @NonNull BlockState state) {
         if (world.getBlockEntity(pos) instanceof BackpackBlockEntity blockEntity) {
             BackpackUtils.resizeIfIncorrectSize((ServerPlayer) player, stack, this.slots);
 

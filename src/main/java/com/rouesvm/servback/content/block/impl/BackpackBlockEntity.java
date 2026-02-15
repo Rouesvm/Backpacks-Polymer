@@ -52,9 +52,9 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
     @Override
     public void tick(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (uuid == null) return;
-        if (upgradeList != null && !upgradeList.isEmpty()) upgradeList.forEach((upgrade) ->
-                upgrade.tick(world, pos.getCenter(), instance.inventory())
-        );
+        if (upgradeList != null && !upgradeList.isEmpty()) upgradeList.forEach((upgrade) -> {
+            upgrade.tick(null, null, (ServerLevel) world, pos.getCenter(), instance.inventory());
+        });
     }
 
     @Override

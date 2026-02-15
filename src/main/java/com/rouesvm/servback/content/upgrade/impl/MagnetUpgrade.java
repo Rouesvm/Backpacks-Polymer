@@ -109,7 +109,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     }
 
     @Override
-    public void tick(Level world, Vec3 pos, BackpackInventory inventory) {
+    public void tick(ServerPlayer player, ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
         if (inventory == null || !(world instanceof ServerLevel serverWorld)) return;
 
         tick++;

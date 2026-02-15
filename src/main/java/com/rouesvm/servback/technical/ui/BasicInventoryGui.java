@@ -73,10 +73,9 @@ public class BasicInventoryGui extends SimpleGui {
     public void slotUpdate() {}
 
     public void afterOpened() {
-        if (stack != null) {
-            this.lockSlot();
-            this.limitSlots();
-        }
+        if (stack != null) this.lockSlot();
+
+        this.limitSlots();
 
         this.getPlayer().containerMenu.addSlotListener(new ContainerListener() {
             @Override
@@ -138,9 +137,6 @@ public class BasicInventoryGui extends SimpleGui {
 
             int leftPadding = rowPadding / 2;
             int rightPadding = rowPadding - leftPadding;
-
-            System.out.println(leftPadding);
-            System.out.println(rightPadding);
 
             for (int i = startIndex; i < startIndex + leftPadding; i++) {
                 setSlot(i, new GuiElementBuilder()

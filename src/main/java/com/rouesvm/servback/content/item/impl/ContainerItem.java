@@ -73,12 +73,12 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
+    public void inventoryTick(@NonNull ItemStack stack, @NonNull ServerLevel world, @NonNull Entity entity, @Nullable EquipmentSlot slot) {
         if (entity instanceof ServerPlayer player) {
             UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+
             if (component != null) component.baseUpgrades().forEach((upgrade) -> {
-                upgrade.tick(player.level(), player.position(), (BackpackInventory) getInventory(player, stack));
-                upgrade.tick(player, (BackpackInventory) getInventory(player, stack));
+                upgrade.tick(player, stack, world, player.position(), (BackpackInventory) getInventory(player, stack));
             });
         }
     }

@@ -10,9 +10,9 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -69,7 +69,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
     }
 
     @Override
-    public void tick(Level world, Vec3 pos, BackpackInventory inventory) {
+    public void tick(ServerPlayer player, ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
         if (inventory == null || !(world instanceof ServerLevel serverWorld)) return;
 
         tick++;

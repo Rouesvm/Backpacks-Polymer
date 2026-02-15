@@ -94,6 +94,17 @@
   "upgrade.serverbackpacks.void": "Void",
   "upgrade.serverbackpacks.magnet": "Serapan",
   "upgrade.serverbackpacks.crafting": "Pertukangan",
+  "upgrade.serverbackpacks.jukebox": "Peti Lagu",
 
-  "tooltip.serverbackpacks.disabled": "Item ini telah dimatikan!"
+  "tooltip.serverbackpacks.disabled": "Item ini telah dimatikan!",
+
+  "info.serverbackpacks.blocked": "Slot disekatkan",
+
+  "tag.item.serverbackpacks.backpacks": "Beg",
+  "tag.item.serverbackpacks.blacklisted": "Senarai Larangan",
+  "tag.item.serverbackpacks.large_backpacks": "Beg Besar",
+  "tag.item.serverbackpacks.medium_backpacks": "Beg Sederhana",
+  "tag.item.serverbackpacks.small_backpacks": "Beg Kecil",
+  "tag.item.serverbackpacks.supported_backpacks": "Beg Yang Disokong",
+  "tag.item.serverbackpacks.upgradeable_backpacks": "Beg Boleh Dinaik Taraf"
 }

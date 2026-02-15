@@ -23,7 +23,7 @@ public class BackpackGeyser implements EventRegistrar {
     public static Path PACKS_FOLDER;
     public static Path GEYSER_PACK;
 
-    static GeyserApi geyser;
+    private static GeyserApi geyser;
 
     public static void initialize() {
         loadResourcePack();

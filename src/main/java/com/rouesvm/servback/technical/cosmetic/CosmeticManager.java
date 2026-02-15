@@ -26,6 +26,7 @@ public class CosmeticManager {
     public static void destroy() {
         if (manager != null) {
             manager.storedInstances.forEach((uuid, backHolder) -> backHolder.destroy());
+            manager.storedInstances.clear();
             manager.storedInstances = new HashMap<>();
             manager = null;
         }

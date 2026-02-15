@@ -89,13 +89,10 @@ public class ServerBackpacks implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::initialize);
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> BackpackManager.loadOnServerStarted());
 
+		ServerLifecycleEvents.SERVER_STOPPING.register((a) -> BackpackManager.backupSaveLog());
 		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 
-		ServerLifecycleEvents.BEFORE_SAVE.register((minecraftServer, b, b1) -> {
-			if (BackpackManager.instance() != null) {
-				BackpackManager.createBackupAndSave();
-			}
-		});
+		ServerLifecycleEvents.BEFORE_SAVE.register((a, b, b1) -> BackpackManager.createBackupAndSave());
 
 		backupEvents();
 	}

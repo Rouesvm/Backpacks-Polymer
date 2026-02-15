@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.StackedContentsCompatible;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 
 public class BaseInventory implements Container, StackedContentsCompatible {
     private NonNullList<ItemStack> heldStacks;
@@ -20,15 +21,15 @@ public class BaseInventory implements Container, StackedContentsCompatible {
     }
 
     @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, @NonNull ItemStack stack) {
         return canInsert(stack);
     }
 
-    public ItemStack getItem(int slot) {
+    public @NonNull ItemStack getItem(int slot) {
         return slot >= 0 && slot < this.heldStacks.size() ? this.heldStacks.get(slot) : ItemStack.EMPTY;
     }
 
-    public ItemStack removeItem(int slot, int amount) {
+    public @NonNull ItemStack removeItem(int slot, int amount) {
         ItemStack itemStack = ContainerHelper.removeItem(this.heldStacks, slot, amount);
         if (!itemStack.isEmpty()) {
             this.setChanged();
@@ -45,7 +46,7 @@ public class BaseInventory implements Container, StackedContentsCompatible {
         return BaseInventory.canInsert(stack, this);
     }
 
-    public ItemStack removeItemNoUpdate(int slot) {
+    public @NonNull ItemStack removeItemNoUpdate(int slot) {
         ItemStack itemStack = this.heldStacks.get(slot);
         if (itemStack.isEmpty()) {
             return ItemStack.EMPTY;
@@ -55,7 +56,7 @@ public class BaseInventory implements Container, StackedContentsCompatible {
         }
     }
 
-    public void setItem(int slot, ItemStack stack) {
+    public void setItem(int slot, @NonNull ItemStack stack) {
         this.heldStacks.set(slot, stack);
         stack.limitSize(this.getMaxStackSize(stack));
         this.setChanged();
@@ -77,7 +78,7 @@ public class BaseInventory implements Container, StackedContentsCompatible {
 
     public void setChanged() {}
 
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NonNull Player player) {
         return true;
     }
 
@@ -87,7 +88,7 @@ public class BaseInventory implements Container, StackedContentsCompatible {
     }
 
     @Override
-    public void fillStackedContents(StackedItemContents finder) {
+    public void fillStackedContents(@NonNull StackedItemContents finder) {
         for(ItemStack itemStack : this.heldStacks) {
             finder.accountStack(itemStack);
         }
@@ -146,7 +147,7 @@ public class BaseInventory implements Container, StackedContentsCompatible {
     }
 
     @Override
-    public boolean canTakeItem(Container hopperInventory, int slot, ItemStack stack) {
+    public boolean canTakeItem(@NonNull Container hopperInventory, int slot, @NonNull ItemStack stack) {
         return canInsert(stack);
     }
 

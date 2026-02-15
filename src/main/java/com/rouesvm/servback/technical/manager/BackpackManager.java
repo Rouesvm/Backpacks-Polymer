@@ -30,12 +30,7 @@ public class BackpackManager implements Manager {
 
     public static void destroy(MinecraftServer ignoredServer) {
         CosmeticManager.destroy();
-
-        if (instance != null) {
-            ServerBackpacks.LOGGER.info("Saving Server Backpacks's data!");
-            createBackupAndSave();
-            instance = null;
-        }
+        if (instance != null) instance = null;
     }
 
     private final Map<UUID, BackpackInstance> storedInstances = new Object2ObjectOpenHashMap<>();
@@ -118,9 +113,16 @@ public class BackpackManager implements Manager {
         }
     }
 
+    public static void backupSaveLog() {
+        ServerBackpacks.LOGGER.info("Saving Server Backpack's data...");
+        createBackupAndSave();
+    }
+
     public static void createBackupAndSave() {
-        saveData();
-        instance.storageHandler().createBackup();
+        if (instance() != null) {
+            saveData();
+            instance.storageHandler().createBackup();
+        }
     }
 
     public static void createSingularBackupAndSave(BackpackInstance backpackInstance) {

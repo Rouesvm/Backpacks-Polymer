@@ -4,6 +4,7 @@ import com.rouesvm.servback.technical.manager.BackpackManager;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ public class BackpackInventory extends BaseInventory {
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
+    public void setItem(int slot, @NonNull ItemStack stack) {
         super.setItem(slot, stack);
         if (entity != null) entity.setChanged();
     }

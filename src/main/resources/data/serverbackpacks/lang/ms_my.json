@@ -59,6 +59,7 @@
   "item.serverbackpacks.void_upgrade" : "Modul Void",
   "item.serverbackpacks.magnet_upgrade" : "Modul Serapan",
   "item.serverbackpacks.crafting_upgrade" : "Modul Pertukangan",
+  "item.serverbackpacks.jukebox_upgrade" : "Modul Peti Lagu",
 
   "item.serverbackpacks.gui_backpacks" : "Beg",
   "item.serverbackpacks.gui_backpack" : "Beg",

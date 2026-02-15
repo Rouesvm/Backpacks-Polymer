@@ -21,6 +21,7 @@ import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -33,7 +34,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-    protected RecipeProvider createRecipeProvider(HolderLookup.Provider wrapperLookup, RecipeOutput recipeExporter) {
+protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wrapperLookup, RecipeOutput recipeExporter) {
         return new RecipeProvider(wrapperLookup, recipeExporter) {
             @Override
             public void buildRecipes() {
@@ -43,7 +44,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-    protected Identifier getRecipeIdentifier(Identifier identifier) {
+    protected @NonNull Identifier getRecipeIdentifier(Identifier identifier) {
         return Identifier.fromNamespaceAndPath(MOD_ID, identifier.getPath());
     }
 
@@ -131,6 +132,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .unlockedBy("get_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
                 .save(exporter);
 
+        ShapedRecipeBuilder.shaped(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.JUKEBOX_UPGRADE, 1)
+                .pattern("#L#")
+                .pattern("LEL")
+                .pattern("#L#")
+                .define('#', ItemTags.PLANKS).define('L', Items.LEATHER)
+                .define('E', Items.JUKEBOX)
+                .unlockedBy("get_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
+                .save(exporter);
+
         BackpackUpgradeRecipeJsonBuilder.create(
                         Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.of(BackpackItemRegistry.VOID_UPGRADE),
@@ -138,6 +148,14 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         BackpackItemJsonRegistry.getBackpackByName("small"))
                 .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
                 .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "void_upgrade_backpack")));
+
+        BackpackUpgradeRecipeJsonBuilder.create(
+                        Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
+                        Ingredient.of(BackpackItemRegistry.JUKEBOX_UPGRADE),
+                        RecipeCategory.TOOLS,
+                        BackpackItemJsonRegistry.getBackpackByName("small"))
+                .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "jukebox_upgrade_backpack")));
 
         BackpackUpgradeRecipeJsonBuilder.create(
                         Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),

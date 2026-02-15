@@ -25,7 +25,7 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        run: chmod +x ./gradlew
       - name: runDatagen
         run: ./gradlew runDatagen
       - name: compress png

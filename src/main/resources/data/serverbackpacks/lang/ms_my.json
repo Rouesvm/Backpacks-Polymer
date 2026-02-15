@@ -83,6 +83,10 @@
   "info.serverbackpacks.contains": "Kandungan",
   "info.serverbackpacks.mode": "Mod",
 
+  "info.serverbackpacks.stopped": "Dihentikan",
+  "info.serverbackpacks.playing": "Sedang dimainkan",
+  "info.serverbackpacks.looped": "Diulang",
+
   "info.serverbackpacks.remove": "Keluarkan",
   "info.serverbackpacks.use": "Guna",
 
@@ -106,5 +110,5 @@
   "tag.item.serverbackpacks.medium_backpacks": "Beg Sederhana",
   "tag.item.serverbackpacks.small_backpacks": "Beg Kecil",
   "tag.item.serverbackpacks.supported_backpacks": "Beg Yang Disokong",
-  "tag.item.serverbackpacks.upgradeable_backpacks": "Beg Boleh Dinaik Taraf"
+  "tag.item.serverbackpacks.upgradeable_backpacks": "Beg Boleh Dinaik Taraf",
 }

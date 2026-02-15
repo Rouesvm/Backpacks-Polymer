@@ -37,11 +37,6 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
     }
 
     @Override
-    public boolean onClicked(ServerPlayer serverPlayer, ItemStack stack, Slot slot, ClickAction clickType, boolean inContainer) {
-        return openGui(serverPlayer, clickType == ClickAction.SECONDARY, inContainer);
-    }
-
-    @Override
     public void tick(ServerPlayer player, ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
         if (playing) {
             if (song != null && song.hasFinished(tick)
@@ -97,7 +92,8 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
         }
     }
 
-    public boolean openGui(ServerPlayer serverPlayer, boolean isRight, boolean inContainer) {
+    @Override
+    public boolean onClicked(ServerPlayer serverPlayer, ItemStack stack, Slot slot, ClickAction clickType, boolean inContainer) {
         if (song == null) {
             song = new JukeboxPlayable(new EitherHolder(JukeboxSongs.CREATOR_MUSIC_BOX)).song().unwrap(serverPlayer.level().registryAccess())
                     .orElse(null).value();
@@ -111,13 +107,13 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
 
         if (!playing) {
             playing = true;
-            this.attacher.play(song.soundEvent());
+            tick = 0;
         } else {
             playing = false;
             this.attacher.stop();
         }
 
-        return false;
+        return true;
     }
 
     @Override

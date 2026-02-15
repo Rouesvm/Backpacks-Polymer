@@ -76,7 +76,7 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
 
         if (upgrade instanceof ClickableUpgrade clickableUpgrade) {
             if (cursorStackReference.get().isEmpty()) cursorStackReference.set(ItemStack.EMPTY);
-            return clickableUpgrade.onClicked((ServerPlayer) player, stack, slot, clickType, false);
+            return clickableUpgrade.onClicked((ServerPlayer) player, stack, otherStack, slot, clickType, false);
         }
 
         return false;

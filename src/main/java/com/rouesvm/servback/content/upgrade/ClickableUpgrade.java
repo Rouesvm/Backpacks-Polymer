@@ -6,13 +6,13 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public interface ClickableUpgrade {
-    default boolean onClicked(ServerPlayer player, ItemStack stack, Slot slot, ClickAction clickType, boolean inContainer) {
+    default boolean onClicked(ServerPlayer player, ItemStack stack, ItemStack otherStack, Slot slot, ClickAction clickType, boolean inContainer) {
         return false;
     }
 
-    default boolean onClicked(ServerPlayer player, ItemStack stack, Slot slot, eu.pb4.sgui.api.ClickType clickType, boolean inContainer) {
+    default boolean onClicked(ServerPlayer player, ItemStack stack, ItemStack otherStack, Slot slot, eu.pb4.sgui.api.ClickType clickType, boolean inContainer) {
         ClickAction mapped = clickType.isLeft ? ClickAction.PRIMARY :
                 clickType.isRight ? ClickAction.SECONDARY : ClickAction.PRIMARY;
-        return onClicked(player, stack, slot, mapped, inContainer);
+        return onClicked(player, stack, otherStack, slot, mapped, inContainer);
     }
 }

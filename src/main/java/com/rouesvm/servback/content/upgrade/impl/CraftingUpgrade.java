@@ -17,7 +17,7 @@ public class CraftingUpgrade extends Upgrade implements ClickableUpgrade {
     }
 
     @Override
-    public boolean onClicked(ServerPlayer serverPlayer, ItemStack stack, Slot slot, ClickAction clickType, boolean inContainer) {
+    public boolean onClicked(ServerPlayer serverPlayer, ItemStack stack, ItemStack otherStack, Slot slot, ClickAction clickType, boolean inContainer) {
         return openGui(serverPlayer, clickType == ClickAction.SECONDARY, inContainer);
     }
 

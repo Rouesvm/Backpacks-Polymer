@@ -102,10 +102,10 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
     }
 
     @Override
-    public boolean onClicked(ServerPlayer player, ItemStack stack, Slot slot, ClickAction clickType, boolean inContainer) {
+    public boolean onClicked(ServerPlayer player, ItemStack stack, ItemStack otherStack, Slot slot, ClickAction clickType, boolean inContainer) {
         if ((clickType == ClickAction.SECONDARY) != inContainer) {
             return onUsed(player.level(), player, stack);
-        } else return ClickableUpgrade.super.onClicked(player, stack, slot, clickType, inContainer);
+        } else return ClickableUpgrade.super.onClicked(player, stack, otherStack, slot, clickType, inContainer);
     }
 
     @Override

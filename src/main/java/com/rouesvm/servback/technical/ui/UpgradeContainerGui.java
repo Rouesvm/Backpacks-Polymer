@@ -87,7 +87,6 @@ public class UpgradeContainerGui extends SimpleGui {
         open();
     }
 
-
     @Override
     public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
         if (index < 0 || index >= this.size) return true;
@@ -116,7 +115,7 @@ public class UpgradeContainerGui extends SimpleGui {
             }
         } else {
             if (upgrade instanceof ClickableUpgrade clickableUpgrade)
-                clickableUpgrade.onClicked(player, stack, slot, type, true);
+                clickableUpgrade.onClicked(player, stack, screenHandler.getCarried(), slot, type, true);
         }
 
         return true;

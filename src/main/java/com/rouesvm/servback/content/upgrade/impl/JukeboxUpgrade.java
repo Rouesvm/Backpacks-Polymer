@@ -34,7 +34,11 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
     private SoundAttacher attacher;
     private JukeboxSong song;
 
+    private static final int DOUBLE_CLICK_COUNT = 4;
+
     private int tick = 0;
+    private int clickTimer = 0;
+    private int clickCounter = 0;
 
     private boolean playing = false;
     private boolean looped = false;
@@ -50,6 +54,15 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
 
     @Override
     public void tick(ServerPlayer player, ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
+        if (clickCounter > 0) {
+            clickTimer++;
+
+            if (clickTimer > DOUBLE_CLICK_COUNT) {
+                clickCounter = 0;
+                clickTimer = 0;
+            }
+        }
+
         if (song == null && musicDisc != null && !musicDisc.isEmpty() && world != null) {
             JukeboxPlayable jukebox = musicDisc.get(DataComponents.JUKEBOX_PLAYABLE);
             if (jukebox != null) song = jukebox.song().unwrap(world.registryAccess())
@@ -128,7 +141,6 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
         if (!playing) {
             playing = true;
             tick = 0;
-            return true;
         } else {
             if (!looped) {
                 looped = true;
@@ -136,9 +148,10 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
             }
             looped = false;
             playing = false;
-            this.attacher.stop();
-            return true;
+            if (attacher != null) this.attacher.stop();
         }
+
+        return true;
     }
 
     @Override
@@ -150,6 +163,8 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
             ClickAction clickType,
             boolean inContainer
     ) {
+        boolean doubleClick = false;
+
         if (this.attacher == null) {
             this.attacher = new SoundAttacher();
             EntityAttachment.ofTicking(attacher, serverPlayer);
@@ -158,6 +173,17 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
 
         if ((clickType == ClickAction.SECONDARY) == inContainer) return false;
 
+        if (clickCounter == 1 && clickTimer <= DOUBLE_CLICK_COUNT) {
+            doubleClick = true;
+        }
+
+        if (clickCounter == 0) {
+            clickCounter = 1;
+            clickTimer = 0;
+        } else {
+            clickCounter = 0;
+        }
+
         if (otherStack != null && !otherStack.isEmpty()) {
             musicDisc = otherStack.has(DataComponents.JUKEBOX_PLAYABLE) ? otherStack.copyAndClear() : null;
 
@@ -165,10 +191,15 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
                 JukeboxPlayable jukebox = musicDisc.get(DataComponents.JUKEBOX_PLAYABLE);
                 if (jukebox != null) song = jukebox.song().unwrap(serverPlayer.level().registryAccess())
                         .orElse(null).value();
+
+                clickCounter = 0;
+                clickTimer = 0;
             }
 
             return true;
-        } else if (musicDisc != null &&
+        } else if (
+                doubleClick &&
+                musicDisc != null &&
                 !musicDisc.isEmpty() &&
                 !ItemStack.isSameItem(serverPlayer.getInventory().getSelectedItem(), stack)
         ) {
@@ -177,23 +208,11 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
             playing = false;
             looped = false;
             tick = 0;
+            if (attacher != null) this.attacher.stop();
             return true;
         }
 
-        if (!playing) {
-            playing = true;
-            tick = 0;
-            return true;
-        } else {
-            if (!looped) {
-                looped = true;
-                return true;
-            }
-            looped = false;
-            playing = false;
-            this.attacher.stop();
-            return true;
-        }
+        return onUsed(serverPlayer.level(), serverPlayer, stack);
     }
 
     @Override

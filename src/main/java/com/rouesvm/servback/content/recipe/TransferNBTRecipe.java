@@ -13,6 +13,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import org.jspecify.annotations.NonNull;
 
 public class TransferNBTRecipe extends ShapedRecipe {
     public final ShapedRecipePattern raw;
@@ -26,12 +27,12 @@ public class TransferNBTRecipe extends ShapedRecipe {
         this.result = result;
     }
 
-    public RecipeSerializer<? extends ShapedRecipe> getSerializer() {
+    public @NonNull RecipeSerializer<? extends ShapedRecipe> getSerializer() {
         return BackpackRecipeRegistry.TRANSFER_NBT_RECIPE;
     }
 
     @Override
-    public ItemStack assemble(CraftingInput craftingRecipeInput, HolderLookup.Provider wrapperLookup) {
+    public @NonNull ItemStack assemble(@NonNull CraftingInput craftingRecipeInput, HolderLookup.@NonNull Provider wrapperLookup) {
         ItemStack resultStack = super.assemble(craftingRecipeInput, wrapperLookup);
 
         ItemStack stack = craftingRecipeInput.getItem(4);

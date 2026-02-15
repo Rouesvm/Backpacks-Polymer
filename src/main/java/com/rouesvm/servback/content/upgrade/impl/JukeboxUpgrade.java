@@ -10,9 +10,11 @@ import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -34,7 +36,7 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
     private SoundAttacher attacher;
     private JukeboxSong song;
 
-    private static final int DOUBLE_CLICK_COUNT = 4;
+    private static final int DOUBLE_CLICK_COUNT = 3;
 
     private int tick = 0;
     private int clickTimer = 0;
@@ -73,7 +75,9 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
             if (song != null && attacher != null && tick == 0
             ) this.attacher.play(song.soundEvent());
 
-            tick++;
+            if (song != null && attacher != null) {
+                tick++;
+            } else tick = 0;
 
             if (song != null && song.hasFinished(tick)
             ) {
@@ -97,6 +101,12 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
             blockEntity = true;
             return;
         }  else {
+            if (this.attacher == null && player != null) {
+                this.attacher = new SoundAttacher();
+                EntityAttachment.ofTicking(attacher, player);
+                this.attacher.startWatching(player);
+            }
+
             blockEntity = false;
         }
 
@@ -115,25 +125,21 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
         if (song != null && !playing && wasDropped && player != null) {
             wasDropped = false;
             playing = true;
-
-            if (attacher == null) {
-                this.attacher = new SoundAttacher();
-                EntityAttachment.ofTicking(attacher, player);
-                this.attacher.startWatching(player);
-            }
-
             tick = 0;
         }
     }
 
     @Override
     public void addTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
-        if (!playing) tooltip.add(Component.translatable("info.serverbackpacks.stopped"));
-        if (playing && looped)
-            tooltip.add(Component.translatable("info.serverbackpacks.looped"));
-        else if (playing) tooltip.add(Component.translatable("info.serverbackpacks.playing"));
+        MutableComponent component = Component.empty();
 
-        if (song != null) tooltip.add(song.description());
+        if (!playing) component = (Component.translatable("info.serverbackpacks.stopped").withStyle(ChatFormatting.RED));
+        if (playing && looped)
+            component = (Component.translatable("info.serverbackpacks.looped").withStyle(ChatFormatting.GREEN));
+        else if (playing) component = (Component.translatable("info.serverbackpacks.playing").withStyle(ChatFormatting.GREEN));
+
+        tooltip.add(component.copy());
+        if (song != null) tooltip.add(song.description().copy().withStyle(ChatFormatting.GRAY));
     }
 
     @Override
@@ -164,12 +170,6 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
             boolean inContainer
     ) {
         boolean doubleClick = false;
-
-        if (this.attacher == null) {
-            this.attacher = new SoundAttacher();
-            EntityAttachment.ofTicking(attacher, serverPlayer);
-            this.attacher.startWatching(serverPlayer);
-        }
 
         if ((clickType == ClickAction.SECONDARY) == inContainer) return false;
 

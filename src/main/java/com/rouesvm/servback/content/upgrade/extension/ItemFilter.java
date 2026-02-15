@@ -1,7 +1,6 @@
 package com.rouesvm.servback.content.upgrade.extension;
 
 import com.mojang.serialization.Codec;
-import com.rouesvm.servback.content.upgrade.PersistentUpgrade;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -13,7 +12,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.Set;
 
-public class ItemFilter implements PersistentUpgrade {
+public class ItemFilter {
     private MODE mode;
     private final Set<String> filterList;
 
@@ -47,7 +46,6 @@ public class ItemFilter implements PersistentUpgrade {
         return itemId.equals(filterID);
     }
 
-    @Override
     public void readView(ValueInput data) {
         this.mode = MODE.values()[data.getIntOr("mode", 0)];
 
@@ -55,7 +53,6 @@ public class ItemFilter implements PersistentUpgrade {
         listReadView.forEach(filterList::add);
     }
 
-    @Override
     public void writeView(ValueOutput data) {
         if (this.mode != null) data.putInt("mode", mode.ordinal());
 

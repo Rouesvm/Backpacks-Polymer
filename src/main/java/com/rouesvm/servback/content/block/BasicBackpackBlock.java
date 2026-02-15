@@ -80,7 +80,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    protected ItemStack getCloneItemStack(@NonNull LevelReader world, @NonNull BlockPos pos, BlockState state, boolean includeData) {
+    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader world, @NonNull BlockPos pos, BlockState state, boolean includeData) {
         ItemStack pickStack = super.getCloneItemStack(world, pos, state, includeData);
         if (!world.isClientSide()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
@@ -95,13 +95,13 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+    public @NonNull BlockState playerWillDestroy(@NonNull Level world, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Player player) {
         spawnAfterBreak(state, (ServerLevel) world, pos, null, false);
         return super.playerWillDestroy(world, pos, state, player);
     }
 
     @Override
-    protected void spawnAfterBreak(BlockState state, ServerLevel world, BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
+    protected void spawnAfterBreak(@NonNull BlockState state, ServerLevel world, @NonNull BlockPos pos, @Nullable ItemStack tool, boolean dropExperience) {
         BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
         if (entity == null) return;
 
@@ -111,7 +111,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    protected @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, Level world, @NonNull BlockPos pos, @NonNull Player player, @NonNull BlockHitResult hit) {
         if (!world.isClientSide()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
             if (entity == null) return InteractionResult.PASS;
@@ -151,7 +151,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
         return BackpackBlockEntityRegistry.BASIC_BACKPACK_BLOCK_ENTITY.create(pos, state);
     }
 }

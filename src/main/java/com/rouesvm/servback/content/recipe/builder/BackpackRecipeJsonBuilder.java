@@ -21,6 +21,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,7 +38,6 @@ public class BackpackRecipeJsonBuilder implements RecipeBuilder {
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
     @Nullable
     private String group;
-    private final boolean showNotification = true;
 
     private BackpackRecipeJsonBuilder(HolderGetter<Item> registryLookup, RecipeCategory category, ItemLike output, int count) {
         this.registryLookup = registryLookup;
@@ -82,32 +82,33 @@ public class BackpackRecipeJsonBuilder implements RecipeBuilder {
         }
     }
 
-    public BackpackRecipeJsonBuilder unlockedBy(String string, Criterion<?> advancementCriterion) {
+    public @NonNull BackpackRecipeJsonBuilder unlockedBy(@NonNull String string, @NonNull Criterion<?> advancementCriterion) {
         this.criteria.put(string, advancementCriterion);
         return this;
     }
 
-    public BackpackRecipeJsonBuilder group(@Nullable String string) {
+    public @NonNull BackpackRecipeJsonBuilder group(@Nullable String string) {
         this.group = string;
         return this;
     }
 
     @Override
-    public Item getResult() {
+    public @NonNull Item getResult() {
         return this.output;
     }
 
     @Override
-    public void save(RecipeOutput exporter, ResourceKey<Recipe<?>> recipeKey) {
+    public void save(RecipeOutput exporter, @NonNull ResourceKey<Recipe<?>> recipeKey) {
         ShapedRecipePattern rawShapedRecipe = this.validate(recipeKey);
         Advancement.Builder builder = exporter.advancement().addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeKey)).rewards(AdvancementRewards.Builder.recipe(recipeKey)).requirements(AdvancementRequirements.Strategy.OR);
         Objects.requireNonNull(builder);
         this.criteria.forEach(builder::addCriterion);
+        boolean showNotification = true;
         BackpackRecipe shapedRecipe = new BackpackRecipe(
                 Objects.requireNonNullElse(this.group, ""),
                 RecipeBuilder.determineBookCategory(this.category),
                 rawShapedRecipe,
-                new ItemStack(this.output, this.count), this.showNotification
+                new ItemStack(this.output, this.count), showNotification
         );
         exporter.accept(recipeKey, shapedRecipe, builder.build(recipeKey.identifier().withPrefix("recipes/" + this.category.getFolderName() + "/")));
     }

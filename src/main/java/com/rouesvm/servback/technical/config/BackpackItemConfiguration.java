@@ -56,7 +56,7 @@ public class BackpackItemConfiguration {
     public Path configDir;
     public List<BackpackDefinedType> backpackTypes;
 
-    public BackpackItemConfiguration() {
+    private BackpackItemConfiguration() {
         configDir = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/backpacks/");
 
         try {

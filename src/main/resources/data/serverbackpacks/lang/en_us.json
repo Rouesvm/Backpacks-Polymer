@@ -97,5 +97,13 @@
   "upgrade.serverbackpacks.magnet": "Vacuum",
   "upgrade.serverbackpacks.crafting": "Crafting",
 
-  "tooltip.serverbackpacks.disabled": "This item is disabled!"
+  "tooltip.serverbackpacks.disabled": "This item is disabled!",
+
+  "tag.item.serverbackpacks.backpacks": "Backpacks",
+  "tag.item.serverbackpacks.blacklisted": "Blacklisted",
+  "tag.item.serverbackpacks.large_backpacks": "Large Backpacks",
+  "tag.item.serverbackpacks.medium_backpacks": "Medium Backpacks",
+  "tag.item.serverbackpacks.small_backpacks": "Small Backpacks",
+  "tag.item.serverbackpacks.supported_backpacks": "Supported Backpacks",
+  "tag.item.serverbackpacks.upgradeable_backpacks": "Upgradeable Backpacks"
 }

@@ -14,6 +14,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import org.jspecify.annotations.NonNull;
 
 public class BackpackRecipe extends ShapedRecipe {
     public final ShapedRecipePattern raw;
@@ -27,12 +28,12 @@ public class BackpackRecipe extends ShapedRecipe {
         this.result = result;
     }
 
-    public RecipeSerializer<? extends ShapedRecipe> getSerializer() {
+    public @NonNull RecipeSerializer<? extends ShapedRecipe> getSerializer() {
         return BackpackRecipeRegistry.BACKPACK_CRAFTING_RECIPE;
     }
 
     @Override
-    public ItemStack assemble(CraftingInput craftingRecipeInput, HolderLookup.Provider wrapperLookup) {
+    public @NonNull ItemStack assemble(@NonNull CraftingInput craftingRecipeInput, HolderLookup.@NonNull Provider wrapperLookup) {
         ItemStack resultStack = super.assemble(craftingRecipeInput, wrapperLookup);
 
         ItemStack stack = craftingRecipeInput.getItem(4);
@@ -68,11 +69,11 @@ public class BackpackRecipe extends ShapedRecipe {
 
         public static final StreamCodec<RegistryFriendlyByteBuf, BackpackRecipe> PACKET_CODEC = StreamCodec.of(BackpackRecipe.Serializer::write, BackpackRecipe.Serializer::read);
 
-        public MapCodec<BackpackRecipe> codec() {
+        public @NonNull MapCodec<BackpackRecipe> codec() {
             return CODEC;
         }
 
-        public StreamCodec<RegistryFriendlyByteBuf, BackpackRecipe> streamCodec() {
+        public @NonNull StreamCodec<RegistryFriendlyByteBuf, BackpackRecipe> streamCodec() {
             return PACKET_CODEC;
         }
 

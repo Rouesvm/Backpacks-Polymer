@@ -71,7 +71,7 @@ Resource pack will be located in your server folder as polymer-resourcepack.zip 
 ![Small Backpack](https://cdn.modrinth.com/data/E7IsBILg/images/55b280b5523d01d6a5c34479ec36f5d07ca24c5c.png)
 
 ## Credits
-Fork based on [Server Backpacks](https://modrinth.com/mod/servback) by [Octal](https://modrinth.com/user/Octal), although as of right now, all of the code is rewritten.
+Fork based on [Server Backpacks](https://modrinth.com/mod/servback) by [Octal](https://modrinth.com/user/Octal), but as of right now, all of the code is rewritten and way too different.
 
 Taken code from and what code:
 * Cosmetic display entity code from ([Filament](https://modrinth.com/mod/filament))

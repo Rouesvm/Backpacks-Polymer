@@ -169,6 +169,9 @@
     },
     "serverbackpacks:crafting_upgrade" : {
       "textures" : "textures/serverbackpacks/item/crafting_upgrade"
+    },
+    "serverbackpacks:jukebox_upgrade" : {
+      "textures" : "textures/serverbackpacks/item/jukebox_upgrade"
     }
   }
 }

@@ -36,14 +36,19 @@ public class BackpackItemRegistry {
             BackpackUpgradeRegistry.MAGNET
     ));
 
+    public static final Item JUKEBOX_UPGRADE = register("jukebox_upgrade", new UpgradeItem(
+            new Item.Properties().stacksTo(1),
+            BackpackUpgradeRegistry.JUKEBOX
+    ));
+
     public static final Item CRAFTING_UPGRADE = register("crafting_upgrade", new UpgradeItem(
             new Item.Properties().stacksTo(1),
             BackpackUpgradeRegistry.CRAFTING
     ));
 
-    public static final Item JUKEBOX_UPGRADE = register("jukebox_upgrade", new UpgradeItem(
+    public static final Item STONECUTTER_UPGRADE = register("stonecutter_upgrade", new UpgradeItem(
             new Item.Properties().stacksTo(1),
-            BackpackUpgradeRegistry.JUKEBOX
+            BackpackUpgradeRegistry.STONECUTTER
     ));
 
     public static UpgradeItem register(String name, UpgradeItem item) {

@@ -3,10 +3,7 @@ package com.rouesvm.servback.registry;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.content.upgrade.UpgradeType;
-import com.rouesvm.servback.content.upgrade.impl.CraftingUpgrade;
-import com.rouesvm.servback.content.upgrade.impl.JukeboxUpgrade;
-import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
-import com.rouesvm.servback.content.upgrade.impl.VoidUpgrade;
+import com.rouesvm.servback.content.upgrade.impl.*;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
@@ -19,8 +16,10 @@ public class BackpackUpgradeRegistry {
 
     public static final UpgradeType<VoidUpgrade> VOID = register("void", VoidUpgrade::new);
     public static final UpgradeType<MagnetUpgrade> MAGNET = register("magnet", MagnetUpgrade::new);
-    public static final UpgradeType<CraftingUpgrade> CRAFTING = register("crafting", CraftingUpgrade::new);
     public static final UpgradeType<JukeboxUpgrade> JUKEBOX = register("jukebox", JukeboxUpgrade::new);
+
+    public static final UpgradeType<CraftingUpgrade> CRAFTING = register("crafting", CraftingUpgrade::new);
+    public static final UpgradeType<StonecutterUpgrade> STONECUTTER = register("stonecutter", StonecutterUpgrade::new);
 
     public static <T extends Upgrade> UpgradeType<T> register(String name, UpgradeType.UpgradeFactory<T> factory) {
         Identifier id = Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name);

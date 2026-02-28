@@ -31,8 +31,10 @@ public class BackpackItemGroup {
 
         entries.accept(BackpackItemRegistry.VOID_UPGRADE);
         entries.accept(BackpackItemRegistry.MAGNET_UPGRADE);
-        entries.accept(BackpackItemRegistry.CRAFTING_UPGRADE);
         entries.accept(BackpackItemRegistry.JUKEBOX_UPGRADE);
+
+        entries.accept(BackpackItemRegistry.CRAFTING_UPGRADE);
+        entries.accept(BackpackItemRegistry.STONECUTTER_UPGRADE);
     }
 
     public static void initialize() {

@@ -91,6 +91,7 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
                 if (this.attacher != null) {
                     this.attacher.stop();
                     this.attacher.destroy();
+                    this.attacher = null;
                 }
 
                 this.attacher = new SoundAttacher();
@@ -107,7 +108,15 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
                 this.attacher.startWatching(player);
             }
 
-            blockEntity = false;
+            if (blockEntity) {
+                if (this.attacher != null) {
+                    this.attacher.stop();
+                    this.attacher.destroy();
+                    this.attacher = null;
+                }
+
+                blockEntity = false;
+            }
         }
 
         if (song != null && playing && !wasDropped && player == null) {

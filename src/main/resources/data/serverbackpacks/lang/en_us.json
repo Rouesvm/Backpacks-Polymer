@@ -59,6 +59,7 @@
   "item.serverbackpacks.void_upgrade": "Void Module",
   "item.serverbackpacks.magnet_upgrade" : "Vacuum Module",
   "item.serverbackpacks.crafting_upgrade" : "Crafting Module",
+  "item.serverbackpacks.stonecutter_upgrade" : "Stonecutter Module",
   "item.serverbackpacks.jukebox_upgrade" : "Jukebox Module",
 
   "item.serverbackpacks.gui_backpacks" : "Backpacks",

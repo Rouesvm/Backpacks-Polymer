@@ -172,6 +172,9 @@
     },
     "serverbackpacks:jukebox_upgrade" : {
       "textures" : "textures/serverbackpacks/item/jukebox_upgrade"
+    },
+    "serverbackpacks:stonecutter_upgrade" : {
+      "textures" : "textures/serverbackpacks/item/stonecutter_upgrade"
     }
   }
 }

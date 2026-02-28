@@ -132,6 +132,15 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
                 .unlockedBy("get_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
                 .save(exporter);
 
+        ShapedRecipeBuilder.shaped(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.STONECUTTER_UPGRADE, 1)
+                .pattern("#L#")
+                .pattern("LEL")
+                .pattern("#L#")
+                .define('#', Items.IRON_INGOT).define('L', Items.LEATHER)
+                .define('E', Items.STONECUTTER)
+                .unlockedBy("get_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
+                .save(exporter);
+
         ShapedRecipeBuilder.shaped(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.JUKEBOX_UPGRADE, 1)
                 .pattern("#L#")
                 .pattern("LEL")

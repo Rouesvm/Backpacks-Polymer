@@ -181,6 +181,14 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
                         BackpackItemJsonRegistry.getBackpackByName("small"))
                 .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
                 .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "crafting_upgrade_backpack")));
+
+        BackpackUpgradeRecipeJsonBuilder.create(
+                        Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
+                        Ingredient.of(BackpackItemRegistry.STONECUTTER_UPGRADE),
+                        RecipeCategory.TOOLS,
+                        BackpackItemJsonRegistry.getBackpackByName("small"))
+                .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "stonecutter_upgrade_backpack")));
     }
 
     private void dyedBackpackRecipes(HolderLookup.RegistryLookup<Item> itemWrap, RecipeOutput exporter) {

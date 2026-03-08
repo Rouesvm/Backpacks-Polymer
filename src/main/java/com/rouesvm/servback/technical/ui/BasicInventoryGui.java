@@ -3,18 +3,14 @@ package com.rouesvm.servback.technical.ui;
 import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.slots.NonBackpackSlot;
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.jspecify.annotations.NonNull;
 
 public class BasicInventoryGui extends SimpleGui {
@@ -30,7 +26,7 @@ public class BasicInventoryGui extends SimpleGui {
     protected boolean outOfSlot = false;
 
     private final int slots;
-    private final int containerSize;
+    public final int containerSize;
 
     public BasicInventoryGui(ServerPlayer player, ItemStack stack, Container inventory) {
         super(getHandler(inventory.getContainerSize()), player, false);
@@ -75,8 +71,6 @@ public class BasicInventoryGui extends SimpleGui {
     public void afterOpened() {
         if (stack != null) this.lockSlot();
 
-        this.limitSlots();
-
         this.getPlayer().containerMenu.addSlotListener(new ContainerListener() {
             @Override
             public void slotChanged(@NonNull AbstractContainerMenu handler, int slotId, @NonNull ItemStack stackSlot) {
@@ -120,66 +114,9 @@ public class BasicInventoryGui extends SimpleGui {
         }
     }
 
-    public void limitSlots() {
-        int slots = inventory.getContainerSize();
-        int rows = (int) Math.ceil(slots / 9.0);
-
-        int amountToPad = (int) Math.ceil((double) slots / rows);
-
-        int slotsToFill = containerSize - slots;
-        int emptySlots = 0;
-
-        for (int row = 0; row < rows; row++) {
-            int startIndex = row * 9;
-            int endIndex = startIndex + 9;
-
-            int rowPadding = 9 - amountToPad;
-
-            int leftPadding = rowPadding / 2;
-            int rightPadding = rowPadding - leftPadding;
-
-            for (int i = startIndex; i < startIndex + leftPadding; i++) {
-                setSlot(i, new GuiElementBuilder()
-                        .setItem(Items.BARRIER)
-                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
-                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
-                emptySlots++;
-            }
-
-            for (int i = endIndex - rightPadding; i < endIndex; i++) {
-                setSlot(i, new GuiElementBuilder()
-                        .setItem(Items.BARRIER)
-                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
-                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
-                emptySlots++;
-            }
-        }
-
-        if (emptySlots < slotsToFill) {
-            for (int i = (containerSize - slotsToFill); i < containerSize; i++) {
-                setSlot(i, new GuiElementBuilder()
-                        .setItem(Items.BARRIER)
-                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
-                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
-            }
-        }
-    }
-
     public void fillSlots() {
-        int slots = inventory.getContainerSize();
-        int rows = (int) Math.ceil(slots / 9.0);
-
-        for (int row = 0; row < rows; row++) {
-            int startIndex = row * 9;
-
-            int rowSlotsRemaining = Math.min(slots - startIndex, 9);
-            int rowPadding = 9 - rowSlotsRemaining;
-
-            int leftPadding = rowPadding / 2;
-
-            for (int i = startIndex + leftPadding; i < startIndex + leftPadding; i++) {
-                this.setSlotRedirect(i, new NonBackpackSlot(this.inventory, i - (startIndex + leftPadding), i, 0));
-            }
+        for (int slot = 0; slot < containerSize; slot++) {
+            this.setSlotRedirect(slot, new NonBackpackSlot(this.inventory, slot, slot, 0));
         }
     }
 }

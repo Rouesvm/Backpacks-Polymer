@@ -1,5 +1,6 @@
 package com.rouesvm.servback.technical.ui;
 
+import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.BackpackUtils;
@@ -7,10 +8,15 @@ import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.slots.BackpackSlot;
 import eu.pb4.sgui.api.ClickType;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class BackpackGui extends BasicInventoryGui {
     private boolean markDirty = false;
@@ -69,6 +75,57 @@ public class BackpackGui extends BasicInventoryGui {
 
             if (!before.equals(after)) {
                 BackpackManager.createSingularBackupAndSave(instance);
+            }
+        }
+    }
+
+    @Override
+    public void afterOpened() {
+        limitSlots();
+        super.afterOpened();
+    }
+
+    public void limitSlots() {
+        int slots = inventory.getContainerSize();
+        int rows = (int) Math.ceil(slots / 9.0);
+
+        int amountToPad = (int) Math.ceil((double) slots / rows);
+
+        int slotsToFill = containerSize - slots;
+        int emptySlots = 0;
+
+        for (int row = 0; row < rows; row++) {
+            int startIndex = row * 9;
+            int endIndex = startIndex + 9;
+
+            int rowPadding = 9 - amountToPad;
+
+            int leftPadding = rowPadding / 2;
+            int rightPadding = rowPadding - leftPadding;
+
+            for (int i = startIndex; i < startIndex + leftPadding; i++) {
+                setSlot(i, new GuiElementBuilder()
+                        .setItem(Items.BARRIER)
+                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
+                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
+                emptySlots++;
+            }
+
+            for (int i = endIndex - rightPadding; i < endIndex; i++) {
+                setSlot(i, new GuiElementBuilder()
+                        .setItem(Items.BARRIER)
+                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
+                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
+                emptySlots++;
+            }
+        }
+
+        if (emptySlots < slotsToFill) {
+            for (int i = (containerSize - slotsToFill); i < containerSize; i++) {
+                setSlot(i, new GuiElementBuilder()
+                        .setItem(Items.BARRIER)
+                        .setItemName(Component.translatable("info.serverbackpacks.blocked"))
+                        .setComponent(DataComponents.ITEM_MODEL, Identifier.tryBuild(ServerBackpacks.MOD_ID, "slot")));
             }
         }
     }

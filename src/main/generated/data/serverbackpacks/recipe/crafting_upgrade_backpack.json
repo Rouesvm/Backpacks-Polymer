@@ -1,8 +1,0 @@
-{
-  "type": "serverbackpacks:backpack_upgrading",
-  "addition": "serverbackpacks:crafting_upgrade",
-  "base": "#serverbackpacks:upgradeable_backpacks",
-  "result": {
-    "id": "serverbackpacks:small"
-  }
-}

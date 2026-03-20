@@ -1,9 +1,0 @@
-{
-  "values": [
-    "serverbackpacks:global",
-    {
-      "id": "#serverbackpacks:supported_backpacks",
-      "required": false
-    }
-  ]
-}

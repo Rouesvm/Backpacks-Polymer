@@ -8,6 +8,9 @@
     "serverbackpacks:ender_backpack": {
       "textures": "textures/serverbackpacks/block/ender"
     },
+    "serverbackpacks:lava_backpack": {
+      "textures": "textures/serverbackpacks/block/lava"
+    },
     "serverbackpacks:1": {
       "textures": "textures/serverbackpacks/block/small/small"
     },

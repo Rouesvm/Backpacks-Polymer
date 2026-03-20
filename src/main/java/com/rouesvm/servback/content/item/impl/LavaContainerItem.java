@@ -8,6 +8,8 @@ import com.rouesvm.servback.technical.ui.LavaBackpackGui;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -33,7 +35,9 @@ public class LavaContainerItem extends ContainerItem {
         if (entity instanceof ServerPlayer player) {
             Container inventory = getInventory(player, stack);
             if (inventory instanceof BackpackInventory backpackInventory) {
-                clearOldItems(backpackInventory);
+                if (clearOldItems(backpackInventory)) {
+                    playBurnSound(player);
+                }
             }
         }
     }
@@ -58,10 +62,15 @@ public class LavaContainerItem extends ContainerItem {
         instance.ifPresent(backpackInstance -> new LavaBackpackGui(player, stack, backpackInstance));
     }
 
-    public static void clearOldItems(BackpackInventory inventory) {
+    public static void playBurnSound(ServerPlayer player) {
+        player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_BURN, SoundSource.PLAYERS, 0.4F,
+                2.0F + player.level().getRandom().nextFloat() * 0.4F);
+    }
+
+    public static boolean clearOldItems(BackpackInventory inventory) {
         int size = inventory.getContainerSize();
         for (int i = 0; i < size; i++) {
-            if (inventory.getItem(i).isEmpty()) return;
+            if (inventory.getItem(i).isEmpty()) return false;
         }
         for (int i = 0; i < size - 9; i++) {
             inventory.setItem(i, inventory.getItem(i + 9));
@@ -69,5 +78,6 @@ public class LavaContainerItem extends ContainerItem {
         for (int i = size - 9; i < size; i++) {
             inventory.setItem(i, ItemStack.EMPTY);
         }
+        return true;
     }
 }

@@ -18,7 +18,9 @@ public class LavaBackpackGui extends BackpackGui {
         super.slotUpdate();
         if (!isClearing && inventory instanceof BackpackInventory backpackInventory) {
             isClearing = true;
-            LavaContainerItem.clearOldItems(backpackInventory);
+            if (LavaContainerItem.clearOldItems(backpackInventory)) {
+                LavaContainerItem.playBurnSound(this.getPlayer());
+            }
             isClearing = false;
         }
     }

@@ -55,6 +55,7 @@
 
   "item.serverbackpacks.global" : "GlobalPack",
   "item.serverbackpacks.ender" : "EnderPack",
+  "item.serverbackpacks.lava_backpack" : "Lava Backpack",
 
   "item.serverbackpacks.void_upgrade": "Void Module",
   "item.serverbackpacks.magnet_upgrade" : "Vacuum Module",

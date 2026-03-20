@@ -28,6 +28,7 @@ public class BackpackItemGroup {
 
         entries.accept(BackpackItemRegistry.GLOBAL_BACKPACK);
         entries.accept(BackpackItemRegistry.ENDER_BACKPACK);
+        entries.accept(BackpackItemRegistry.LAVA_BACKPACK);
 
         entries.accept(BackpackItemRegistry.VOID_UPGRADE);
         entries.accept(BackpackItemRegistry.MAGNET_UPGRADE);

@@ -69,6 +69,7 @@
   "block.serverbackpacks.backpack" : "Backpack",
   "block.serverbackpacks.global_backpack" : "GlobalPack",
   "block.serverbackpacks.ender_backpack" : "EnderPack",
+  "block.serverbackpacks.lava_backpack" : "Lava Backpack",
 
   "enchantment.serverbackpacks.capacity" : "Capacity",
 

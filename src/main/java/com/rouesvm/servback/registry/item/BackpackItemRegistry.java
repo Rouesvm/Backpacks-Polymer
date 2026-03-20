@@ -27,7 +27,7 @@ public class BackpackItemRegistry {
 
     public static final Item GLOBAL_BACKPACK = register(new ContainerItem("global", Configuration.instance().global_backpack_size, BackpackBlockRegistry.GLOBAL_BACKPACK));
 
-    public static final Item LAVA_BACKPACK = register(new LavaContainerItem("lava_backpack", 18));
+    public static final Item LAVA_BACKPACK = register(new LavaContainerItem("lava_backpack", Configuration.instance().lava_backpack_size, BackpackBlockRegistry.LAVA_BACKPACK));
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
             new Item.Properties().stacksTo(1),

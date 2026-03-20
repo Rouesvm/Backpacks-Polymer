@@ -1,0 +1,8 @@
+{
+  "type": "serverbackpacks:backpack_upgrading",
+  "addition": "serverbackpacks:magnet_upgrade",
+  "base": "#serverbackpacks:upgradeable_backpacks",
+  "result": {
+    "id": "serverbackpacks:small"
+  }
+}

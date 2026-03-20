@@ -1,0 +1,20 @@
+{
+  "type": "serverbackpacks:backpack_crafting",
+  "category": "misc",
+  "key": {
+    "0": "#serverbackpacks:medium_backpacks",
+    "B": "minecraft:ender_eye",
+    "L": "minecraft:leather",
+    "S": "minecraft:string",
+    "i": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "LSL",
+    "i0i",
+    "SBS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "serverbackpacks:large"
+  }
+}

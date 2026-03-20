@@ -1,0 +1,72 @@
+{
+  "values": [
+    {
+      "id": "serverbackpacks:light_gray_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:brown_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:orange_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:green_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:cyan_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:red_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:pink_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:purple_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:magenta_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:gray_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:lime_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:blue_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:yellow_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:black_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:white_large",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:light_blue_large",
+      "required": false
+    }
+  ]
+}

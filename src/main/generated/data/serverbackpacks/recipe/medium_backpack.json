@@ -1,0 +1,20 @@
+{
+  "type": "serverbackpacks:backpack_crafting",
+  "category": "misc",
+  "key": {
+    "0": "#serverbackpacks:small_backpacks",
+    "L": "minecraft:leather",
+    "O": "#minecraft:planks",
+    "S": "minecraft:string",
+    "i": "minecraft:gold_ingot"
+  },
+  "pattern": [
+    "iLi",
+    "S0S",
+    "LOL"
+  ],
+  "result": {
+    "count": 1,
+    "id": "serverbackpacks:medium"
+  }
+}

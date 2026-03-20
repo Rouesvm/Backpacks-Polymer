@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": "minecraft:iron_ingot",
+    "E": "minecraft:ender_pearl",
+    "L": "minecraft:leather",
+    "S": "minecraft:string"
+  },
+  "pattern": [
+    "#S#",
+    "LEL",
+    "#S#"
+  ],
+  "result": {
+    "count": 1,
+    "id": "serverbackpacks:magnet_upgrade"
+  }
+}

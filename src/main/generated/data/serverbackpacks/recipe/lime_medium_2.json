@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_transmute",
+  "category": "misc",
+  "group": "medium_dyed_backpacks",
+  "input": "#serverbackpacks:medium_backpacks",
+  "material": "minecraft:lime_dye",
+  "result": {
+    "id": "serverbackpacks:lime_medium"
+  }
+}

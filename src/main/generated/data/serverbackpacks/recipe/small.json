@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": "minecraft:leather",
+    "C": "minecraft:chest",
+    "S": "minecraft:string",
+    "i": "minecraft:copper_ingot"
+  },
+  "pattern": [
+    "SiS",
+    "#C#",
+    " S "
+  ],
+  "result": {
+    "count": 1,
+    "id": "serverbackpacks:small"
+  }
+}

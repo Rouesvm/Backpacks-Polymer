@@ -1,0 +1,28 @@
+{
+  "values": [
+    {
+      "id": "serverbackpacks:global",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:ender",
+      "required": false
+    },
+    {
+      "id": "serverbackpacks:lava_backpack",
+      "required": false
+    },
+    {
+      "id": "#serverbackpacks:small_backpacks",
+      "required": false
+    },
+    {
+      "id": "#serverbackpacks:medium_backpacks",
+      "required": false
+    },
+    {
+      "id": "#serverbackpacks:large_backpacks",
+      "required": false
+    }
+  ]
+}

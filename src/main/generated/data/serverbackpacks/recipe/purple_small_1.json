@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_transmute",
+  "category": "misc",
+  "group": "small_dyed_backpacks",
+  "input": "#serverbackpacks:small_backpacks",
+  "material": "minecraft:purple_dye",
+  "result": {
+    "id": "serverbackpacks:purple_small"
+  }
+}

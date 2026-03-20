@@ -20,6 +20,7 @@ public class BackpackBlockRegistry {
             (player, entity) -> player != null ? player.getEnderChestInventory() : null);
 
     public static final Block GLOBAL_BACKPACK = register("global_backpack", new BaseBackpackBlock("global_backpack"));
+    public static final Block LAVA_BACKPACK = register("lava_backpack", new BaseBackpackBlock("lava_backpack"));
     public static final Block BACKPACK = register("backpack", new BackpackBlock());
 
     private static Block registerBackpack(String id, BiFunction<@Nullable ServerPlayer, @Nullable BlockEntity, Container> inventoryProvider) {

@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
 
@@ -45,22 +45,21 @@ configurations {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
 
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation ("eu.pb4:polymer-core:${project.polymer}")
-    modImplementation ("eu.pb4:polymer-blocks:${project.polymer}")
-    modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
-    modImplementation ("eu.pb4:polymer-virtual-entity:${project.polymer}")
+    implementation ("eu.pb4:polymer-core:${project.polymer}")
+    implementation ("eu.pb4:polymer-blocks:${project.polymer}")
+    implementation ("eu.pb4:polymer-resource-pack:${project.polymer}")
+    implementation ("eu.pb4:polymer-virtual-entity:${project.polymer}")
 
-    modImplementation include("eu.pb4:sgui:${project.sgui}")
-    modImplementation include("eu.pb4:common-protection-api:1.0.0")
-    modImplementation include("xyz.nucleoid:server-translations-api:${project.server_translations}")
+    implementation include("eu.pb4:sgui:${project.sgui}")
+    implementation include("eu.pb4:common-protection-api:1.0.0")
+    implementation include("xyz.nucleoid:server-translations-api:${project.server_translations}")
 
-    modCompileOnly ("maven.modrinth:bedframe:0.1.1")
-    modCompileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
+    compileOnly ("maven.modrinth:bedframe:0.1.1")
+    compileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
     compileOnly("org.geysermc.geyser:api:${project.geyser}")
 }
 
@@ -73,7 +72,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
@@ -81,9 +80,6 @@ java {
     // if it is present.
     // If you remove this line, sources will not be generated.
     withSourcesJar()
-
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

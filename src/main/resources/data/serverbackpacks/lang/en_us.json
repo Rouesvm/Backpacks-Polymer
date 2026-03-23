@@ -55,7 +55,7 @@
 
   "item.serverbackpacks.global" : "GlobalPack",
   "item.serverbackpacks.ender" : "EnderPack",
-  "item.serverbackpacks.lava_backpack" : "Lava Backpack",
+  "item.serverbackpacks.lava_backpack" : "LavaPack",
 
   "item.serverbackpacks.void_upgrade": "Void Module",
   "item.serverbackpacks.magnet_upgrade" : "Vacuum Module",
@@ -69,7 +69,7 @@
   "block.serverbackpacks.backpack" : "Backpack",
   "block.serverbackpacks.global_backpack" : "GlobalPack",
   "block.serverbackpacks.ender_backpack" : "EnderPack",
-  "block.serverbackpacks.lava_backpack" : "Lava Backpack",
+  "block.serverbackpacks.lava_backpack" : "LavaPack",
 
   "enchantment.serverbackpacks.capacity" : "Capacity",
 

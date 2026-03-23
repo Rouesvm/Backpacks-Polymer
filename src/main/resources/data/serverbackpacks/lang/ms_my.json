@@ -55,6 +55,7 @@
 
   "item.serverbackpacks.global" : "Beg Global",
   "item.serverbackpacks.ender" : "Beg Ender",
+  "item.serverbackpacks.lava_backpack" : "Beg Lahar",
 
   "item.serverbackpacks.void_upgrade" : "Modul Void",
   "item.serverbackpacks.magnet_upgrade" : "Modul Serapan",
@@ -70,6 +71,7 @@
   "block.serverbackpacks.backpack": "Beg",
   "block.serverbackpacks.global_backpack": "Beg Global",
   "block.serverbackpacks.ender_backpack": "Beg Ender",
+  "block.serverbackpacks.lava_backpack" : "Beg Lahar",
 
   "command.serverbackpacks.empty": "Nilai yang dimasukkan adalah kosong!",
   "command.serverbackpacks.incorrect_uuid": "UUID tidak wujud atau tidak ditemui!",
@@ -111,5 +113,6 @@
   "tag.item.serverbackpacks.medium_backpacks": "Beg Sederhana",
   "tag.item.serverbackpacks.small_backpacks": "Beg Kecil",
   "tag.item.serverbackpacks.supported_backpacks": "Beg Yang Disokong",
-  "tag.item.serverbackpacks.upgradeable_backpacks": "Beg Boleh Dinaik Taraf"
+  "tag.item.serverbackpacks.upgradeable_backpacks": "Beg Boleh Dinaik Taraf",
+  "block.serverbackpacks.lava_backpack": "Lava Backpack"
 }

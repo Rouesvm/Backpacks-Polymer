@@ -5,6 +5,7 @@ import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.content.item.impl.LavaContainerItem;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
@@ -25,6 +26,8 @@ public class BackpackItemRegistry {
             (player, stack) -> player != null ? player.getEnderChestInventory() : null);
 
     public static final Item GLOBAL_BACKPACK = register(new ContainerItem("global", Configuration.instance().global_backpack_size, BackpackBlockRegistry.GLOBAL_BACKPACK));
+
+    public static final Item LAVA_BACKPACK = register(new LavaContainerItem("lava_backpack", Configuration.instance().lava_backpack_size, BackpackBlockRegistry.LAVA_BACKPACK));
 
     public static final Item VOID_UPGRADE = register("void_upgrade", new UpgradeItem(
             new Item.Properties().stacksTo(1),

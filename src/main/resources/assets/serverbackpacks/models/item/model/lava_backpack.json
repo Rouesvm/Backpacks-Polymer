@@ -1,0 +1,6 @@
+{
+  "parent": "serverbackpacks:item/base_medium",
+  "textures": {
+    "layer0": "serverbackpacks:item/model/lava_backpack"
+  }
+}

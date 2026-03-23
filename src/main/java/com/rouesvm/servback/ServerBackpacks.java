@@ -82,7 +82,7 @@ public class ServerBackpacks implements ModInitializer {
 	private static void serverEvents() {
 		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, a, b) -> {
 			ServerPlayer player = serverPlayNetworkHandler.getPlayer();
-			if (!BEDROCK_PLAYERS.contains(player.getUUID()) && (hasGeyserLoaded && BackpackGeyser.isPlayerOnBedrock(player))) BEDROCK_PLAYERS.add(player.getUUID());
+			if (!BEDROCK_PLAYERS.contains(player.getUUID()) && isBedrock(player)) BEDROCK_PLAYERS.add(player.getUUID());
 		});
 
 		ServerPlayConnectionEvents.DISCONNECT.register((serverPlayNetworkHandler, a) ->
@@ -101,6 +101,10 @@ public class ServerBackpacks implements ModInitializer {
 
 	private static void backupEvents() {
 		ServerPlayerEvents.LEAVE.register((p0) -> BackpackManager.createBackupAndSave());
+	}
+
+	public static boolean isBedrock(ServerPlayer player) {
+		return hasGeyserLoaded && BackpackGeyser.isPlayerOnBedrock(player);
 	}
 
 	public static boolean isBedrock(UUID player) {

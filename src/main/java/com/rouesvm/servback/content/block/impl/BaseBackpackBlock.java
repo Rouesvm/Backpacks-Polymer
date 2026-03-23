@@ -1,7 +1,6 @@
 package com.rouesvm.servback.content.block.impl;
 
 import com.rouesvm.servback.compat.geyser.bedrock.BedrockBlock;
-import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.block.BasicBackpackBlock;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.block.TickableBlockEntity;
@@ -52,13 +51,13 @@ public class BaseBackpackBlock extends BasicBackpackBlock implements EntityBlock
 
     @Override
     public boolean trinketInteraction(BasicBackpackBlockEntity entity, ServerPlayer player, Level world, BlockPos pos) {
-        if (BackpackTrinket.isBackSlotOccupied(player)) return false;
+        //if (BackpackTrinket.isBackSlotOccupied(player)) return false;
 
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 
         ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
         BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
-        BackpackTrinket.equipStack(player, stack);
+        //BackpackTrinket.equipStack(player, stack);
         world.destroyBlock(pos, false);
         return true;
     }

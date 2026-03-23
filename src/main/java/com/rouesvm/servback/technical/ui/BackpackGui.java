@@ -68,7 +68,7 @@ public class BackpackGui extends BasicInventoryGui {
 
     @Override
     public void onPlayerClose(boolean success) {
-        onClose();
+        if (success) onClose();
     }
 
     public void onClose() {

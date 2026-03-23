@@ -75,7 +75,7 @@ public class BasicInventoryGui extends SimpleGui {
             @Override
             public void slotChanged(@NonNull AbstractContainerMenu handler, int slotId, @NonNull ItemStack stackSlot) {
                 slotUpdate();
-                if (stackIndex != -1 && stack != null && handler.getSlot(stackIndex).getItem() != stack) outOfSlot = true;
+                if (stack != null && ItemStack.isSameItemSameComponents(stackSlot, stack)) outOfSlot = true;
             }
             @Override
             public void dataChanged(@NonNull AbstractContainerMenu handler, int property, int value) {
@@ -106,7 +106,7 @@ public class BasicInventoryGui extends SimpleGui {
         for(int y = 0; y <= 3; ++y) {
             for(int x = 0; x < 9; ++x) {
                 final int index = y == 0 ? x + (9 * 4 + this.slots) - 9 : this.slots + (x + y * 9) - 9 ;
-                if (ItemStack.isSameItemSameComponents(this.wrappedMenu.getSlot(index).getItem(), this.stack)) {
+                if (ItemStack.isSameItemSameComponents(this.inventory.getItem(index), this.stack)) {
                     this.stackIndex = index;
                     break;
                 }

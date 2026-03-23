@@ -6,7 +6,7 @@ import com.rouesvm.servback.content.recipe.builder.BackpackUpgradeRecipeJsonBuil
 import com.rouesvm.servback.content.recipe.builder.TransferNBTJsonBuilder;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
@@ -17,7 +17,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -29,7 +28,7 @@ import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 import static com.rouesvm.servback.datagen.ModItemTags.*;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
-    public ModRecipeProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    public ModRecipeProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
 
@@ -60,13 +59,13 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
                 .unlockedBy("get_obsidian", InventoryChangeTrigger.TriggerInstance.hasItems(Items.OBSIDIAN))
                 .save(exporter);
 
-        TransferNBTJsonBuilder.create(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
+        TransferNBTJsonBuilder.shaped(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.GLOBAL_BACKPACK, 1)
                 .pattern("#i#")
                 .pattern("SES")
                 .pattern(" N ")
-                .input('#', Items.ENDER_EYE).input('S', Items.STRING)
-                .input('i', Items.IRON_INGOT).input('E', LARGE_BACKPACKS)
-                .input('N', Items.NETHER_STAR)
+                .define('#', Items.ENDER_EYE).define('S', Items.STRING)
+                .define('i', Items.IRON_INGOT).define('E', LARGE_BACKPACKS)
+                .define('N', Items.NETHER_STAR)
                 .unlockedBy("get_eye", InventoryChangeTrigger.TriggerInstance.hasItems(Items.ENDER_EYE))
                 .save(exporter);
 
@@ -79,24 +78,24 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
                 .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
                 .save(exporter);
 
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByName("medium"), 1)
+        BackpackRecipeJsonBuilder.shaped(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByName("medium"), 1)
                 .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
                 .pattern("iLi")
                 .pattern("S0S")
                 .pattern("LOL")
-                .input('L', Items.LEATHER).input('S', Items.STRING)
-                .input('i', Items.GOLD_INGOT).input('O', ItemTags.PLANKS)
-                .input('0', Ingredient.of(itemWrap.getOrThrow(SMALL_BACKPACKS)))
+                .define('L', Items.LEATHER).define('S', Items.STRING)
+                .define('i', Items.GOLD_INGOT).define('O', ItemTags.PLANKS)
+                .define('0', Ingredient.of(itemWrap.getOrThrow(SMALL_BACKPACKS)))
                 .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "medium_backpack")));
 
-        BackpackRecipeJsonBuilder.create(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByName("large"), 1)
+        BackpackRecipeJsonBuilder.shaped(itemWrap, RecipeCategory.TRANSPORTATION, BackpackItemJsonRegistry.getBackpackByName("large"), 1)
                 .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
                 .pattern("LSL")
                 .pattern("i0i")
                 .pattern("SBS")
-                .input('S', Items.STRING).input('i', Items.IRON_INGOT)
-                .input('B', Items.ENDER_EYE).input('L', Items.LEATHER)
-                .input('0', Ingredient.of(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
+                .define('S', Items.STRING).define('i', Items.IRON_INGOT)
+                .define('B', Items.ENDER_EYE).define('L', Items.LEATHER)
+                .define('0', Ingredient.of(itemWrap.getOrThrow(MEDIUM_BACKPACKS)))
                 .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "large_backpack")));
 
         upgradeRecipes(itemWrap, exporter);
@@ -191,6 +190,25 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
                 .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "stonecutter_upgrade_backpack")));
     }
 
+    private static final Item[] DYE_ITEMS = {
+            Items.WHITE_DYE,
+            Items.ORANGE_DYE,
+            Items.MAGENTA_DYE,
+            Items.LIGHT_BLUE_DYE,
+            Items.YELLOW_DYE,
+            Items.LIME_DYE,
+            Items.PINK_DYE,
+            Items.GRAY_DYE,
+            Items.LIGHT_GRAY_DYE,
+            Items.CYAN_DYE,
+            Items.PURPLE_DYE,
+            Items.BLUE_DYE,
+            Items.BROWN_DYE,
+            Items.GREEN_DYE,
+            Items.RED_DYE,
+            Items.BLACK_DYE
+    };
+
     private void dyedBackpackRecipes(HolderLookup.RegistryLookup<Item> itemWrap, RecipeOutput exporter) {
         for (int i = 1; i <= 3; i++) {
             HolderSet<Item> matchingBackpacks = switch (i) {
@@ -210,7 +228,7 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
             for (DyeColor color : DyeColor.values()) {
                 ContainerItem dyedBackpack = (ContainerItem) BackpackItemJsonRegistry.getBackpackByName(color.toString().toLowerCase() + "_" + tierName);
                 String dyeName = color.name().toLowerCase();
-                Item dye = DyeItem.byColor(color);
+                Item dye = DYE_ITEMS[color.ordinal()];
 
                 String transmuteId = String.format("%s_%s_%d", dyeName, baseBackpack.getIdentifier().getPath(), i);
                 createTransmuteRecipe(exporter, matchingBackpacks, dye, dyedBackpack, baseBackpack, tierName, transmuteId);
@@ -229,7 +247,7 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "recipes";
     }
 }

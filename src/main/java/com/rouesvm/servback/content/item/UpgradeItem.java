@@ -9,6 +9,7 @@ import com.rouesvm.servback.content.upgrade.UpgradeType;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.config.Configuration;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
@@ -28,7 +29,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class UpgradeItem extends SimplePolymerItem implements BedrockItem {
 
     @Override
     public Item getPolymerItem(ItemStack stack, PacketContext context) {
-        if (ServerBackpacks.isBedrock(context.getPlayer()))
+        if (ServerBackpacks.isBedrock(context.orElse(PacketContext.GAME_PROFILE, ServerBackpacks.NIL).id()))
             return this;
         else return super.getPolymerItem(stack, context);
     }

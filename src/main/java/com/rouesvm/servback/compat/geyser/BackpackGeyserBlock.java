@@ -122,7 +122,7 @@ public class BackpackGeyserBlock {
                 .collisionBox(collisionBox)
                 .selectionBox(selectionBox)
                 .lightEmission(block.defaultBlockState().getLightEmission())
-                .lightDampening(block.defaultBlockState().getLightBlock())
+                .lightDampening(block.defaultBlockState().getLightDampening())
                 .destructibleByMining(block.defaultDestroyTime())
                 .friction(Math.min(1 - block.getFriction(), 0.9f))
                 .build();

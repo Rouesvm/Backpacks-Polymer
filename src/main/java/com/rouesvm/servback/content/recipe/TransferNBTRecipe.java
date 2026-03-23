@@ -13,38 +13,43 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 
-public class TransferNBTRecipe extends CustomRecipe {
-    public static final MapCodec<ShapedRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
+public class TransferNBTRecipe extends NormalCraftingRecipe {
+    public static final MapCodec<TransferNBTRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
             (i) -> i.group(CommonInfo.MAP_CODEC.forGetter((o) -> o.commonInfo),
                     CraftingBookInfo.MAP_CODEC.forGetter((o) -> o.bookInfo),
                     ShapedRecipePattern.MAP_CODEC.forGetter((o) -> o.pattern),
                     ItemStackTemplate.CODEC.fieldOf("result").forGetter((o) -> o.result))
-                    .apply(i, ShapedRecipe::new)
+                    .apply(i, TransferNBTRecipe::new)
     );
 
-    public final ShapedRecipePattern raw;
-    public final ItemStack result;
+    public final ShapedRecipePattern pattern;
+    public final ItemStackTemplate result;
 
     public static final RecipeSerializer<TransferNBTRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, null);
 
-    public TransferNBTRecipe(String group, CraftingBookCategory category, ShapedRecipePattern raw, ItemStack result, boolean showNotification) {
-        super();
-        this.raw = raw;
+    public TransferNBTRecipe(final Recipe.CommonInfo commonInfo, final CraftingRecipe.CraftingBookInfo bookInfo, final ShapedRecipePattern raw, final ItemStackTemplate result) {
+        super(commonInfo, bookInfo);
+        this.pattern = raw;
         this.result = result;
     }
 
-    public @NonNull RecipeSerializer<? extends CustomRecipe> getSerializer() {
+    @Override
+    protected @NonNull PlacementInfo createPlacementInfo() {
+        return PlacementInfo.createFromOptionals(this.pattern.ingredients());
+    }
+
+    public @NonNull RecipeSerializer<TransferNBTRecipe> getSerializer() {
         return BackpackRecipeRegistry.TRANSFER_NBT_RECIPE;
     }
 
     @Override
     public boolean matches(CraftingInput input, Level level) {
-        return this.raw.matches(input);
+        return this.pattern.matches(input);
     }
 
     @Override
     public @NonNull ItemStack assemble(@NonNull CraftingInput craftingRecipeInput) {
-        ItemStack resultStack = this.result.copy();
+        ItemStack resultStack = this.result.create();
 
         ItemStack stack = craftingRecipeInput.getItem(4);
         if (stack.getItem() instanceof ContainerItem) {
@@ -53,13 +58,5 @@ public class TransferNBTRecipe extends CustomRecipe {
         }
 
         return resultStack;
-    }
-
-    public ShapedRecipePattern getRaw() {
-        return raw;
-    }
-
-    public ItemStack getResult() {
-        return result;
     }
 }

@@ -55,7 +55,6 @@ dependencies {
     implementation ("eu.pb4:polymer-virtual-entity:${project.polymer}")
 
     implementation include("eu.pb4:sgui:${project.sgui}")
-    implementation include("eu.pb4:common-protection-api:1.0.0")
     implementation include("xyz.nucleoid:server-translations-api:${project.server_translations}")
 
     compileOnly ("maven.modrinth:bedframe:0.1.1")

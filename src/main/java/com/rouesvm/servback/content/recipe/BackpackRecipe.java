@@ -64,12 +64,4 @@ public class BackpackRecipe extends NormalCraftingRecipe {
 
         return resultStack;
     }
-
-    public ShapedRecipePattern getPattern() {
-        return pattern;
-    }
-
-    public ItemStack getResult() {
-        return result.create();
-    }
 }

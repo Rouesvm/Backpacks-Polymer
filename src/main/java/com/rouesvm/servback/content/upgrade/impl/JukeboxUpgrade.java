@@ -10,6 +10,7 @@ import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -67,8 +67,8 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
 
         if (song == null && musicDisc != null && !musicDisc.isEmpty() && world != null) {
             JukeboxPlayable jukebox = musicDisc.get(DataComponents.JUKEBOX_PLAYABLE);
-            if (jukebox != null) song = jukebox.song().unwrap(world.registryAccess())
-                    .orElse(null).value();
+            if (jukebox != null) song = jukebox.song().unwrap().right()
+                    .orElse(null);
         }
 
         if (playing) {
@@ -198,8 +198,8 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
 
             if (song == null && musicDisc != null && !musicDisc.isEmpty()) {
                 JukeboxPlayable jukebox = musicDisc.get(DataComponents.JUKEBOX_PLAYABLE);
-                if (jukebox != null) song = jukebox.song().unwrap(serverPlayer.level().registryAccess())
-                        .orElse(null).value();
+                if (jukebox != null) song = jukebox.song().unwrap().right()
+                        .orElse(null);
 
                 clickCounter = 0;
                 clickTimer = 0;
@@ -252,7 +252,7 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
         public void play(Holder<SoundEvent> event) {
             this.stop();
             this.addElement(element);
-            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(
+            this.sendPacket(VirtualEntityUtils.createClientboundSoundEntityPacket(
                     this.element.getEntityId(),
                     event,
                     SoundSource.RECORDS,

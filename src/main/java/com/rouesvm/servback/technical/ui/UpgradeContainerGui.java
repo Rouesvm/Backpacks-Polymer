@@ -14,6 +14,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
@@ -88,9 +89,9 @@ public class UpgradeContainerGui extends SimpleGui {
     }
 
     @Override
-    public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
+    public boolean onAnyClick(int index, ClickType type, ContainerInput action) {
         if (index < 0 || index >= this.size) return true;
-        Slot slot = this.screenHandler.getSlot(index);
+        Slot slot = this.wrappedMenu.getSlot(index);
         if (!slot.hasItem()) return true;
 
         ItemStack stack = slot.getItem();
@@ -99,7 +100,7 @@ public class UpgradeContainerGui extends SimpleGui {
         Upgrade upgrade = item.getUpgrade(stack);
 
         if (remove) {
-            this.screenHandler.setCarried(stack.copyAndClear());
+            this.wrappedMenu.setCarried(stack.copyAndClear());
 
             ItemStack barrier = Items.BARRIER.getDefaultInstance();
             barrier.set(DataComponents.CUSTOM_NAME, Component.translatable("info.serverbackpacks.empty"));
@@ -115,7 +116,7 @@ public class UpgradeContainerGui extends SimpleGui {
             }
         } else {
             if (upgrade instanceof ClickableUpgrade clickableUpgrade)
-                clickableUpgrade.onClicked(player, stack, screenHandler.getCarried(), slot, type, true);
+                clickableUpgrade.onClicked(player, stack, wrappedMenu.getCarried(), slot, type, true);
         }
 
         return true;

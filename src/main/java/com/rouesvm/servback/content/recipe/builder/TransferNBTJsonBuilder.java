@@ -3,121 +3,107 @@ package com.rouesvm.servback.content.recipe.builder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.rouesvm.servback.content.recipe.TransferNBTRecipe;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementRequirements;
-import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeUnlockAdvancementBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.ItemLike;
-import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class TransferNBTJsonBuilder implements RecipeBuilder {
-    private final HolderGetter<Item> registryLookup;
+    private final HolderGetter<Item> items;
     private final RecipeCategory category;
-    private final Item output;
-    private final int count;
-    private final List<String> pattern = Lists.newArrayList();
-    private final Map<Character, Ingredient> inputs = Maps.newLinkedHashMap();
-    private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
-    @Nullable
-    private String group;
-    private final boolean showNotification = true;
+    private final ItemStackTemplate result;
+    private final List<String> rows;
+    private final Map<Character, Ingredient> key;
+    private final RecipeUnlockAdvancementBuilder advancementBuilder;
+    private @org.jspecify.annotations.Nullable String group;
+    private boolean showNotification;
 
-    private TransferNBTJsonBuilder(HolderGetter<Item> registryLookup, RecipeCategory category, ItemLike output, int count) {
-        this.registryLookup = registryLookup;
+    private TransferNBTJsonBuilder(final HolderGetter<Item> items, final RecipeCategory category, final ItemStackTemplate result) {
+        this.rows = Lists.newArrayList();
+        this.key = Maps.newLinkedHashMap();
+        this.advancementBuilder = new RecipeUnlockAdvancementBuilder();
+        this.showNotification = true;
+        this.items = items;
         this.category = category;
-        this.output = output.asItem();
-        this.count = count;
+        this.result = result;
     }
 
-    public static TransferNBTJsonBuilder create(HolderGetter<Item> registryLookup, RecipeCategory category, ItemLike output) {
-        return create(registryLookup, category, output, 1);
+    private TransferNBTJsonBuilder(final HolderGetter<Item> items, final RecipeCategory category, final ItemLike result, final int count) {
+        this(items, category, new ItemStackTemplate(result.asItem(), count));
     }
 
-    public static TransferNBTJsonBuilder create(HolderGetter<Item> registryLookup, RecipeCategory category, ItemLike output, int count) {
-        return new TransferNBTJsonBuilder(registryLookup, category, output, count);
+    public static TransferNBTJsonBuilder shaped(final HolderGetter<Item> items, final RecipeCategory category, final ItemLike item) {
+        return shaped(items, category, item, 1);
     }
 
-    public TransferNBTJsonBuilder input(Character c, TagKey<Item> tag) {
-        return this.input(c, Ingredient.of(this.registryLookup.getOrThrow(tag)));
+    public static TransferNBTJsonBuilder shaped(final HolderGetter<Item> items, final RecipeCategory category, final ItemLike item, final int count) {
+        return new TransferNBTJsonBuilder(items, category, item, count);
     }
 
-    public TransferNBTJsonBuilder input(Character c, ItemLike item) {
-        return this.input(c, Ingredient.of(item));
+    public TransferNBTJsonBuilder define(final Character symbol, final TagKey<Item> tag) {
+        return this.define(symbol, Ingredient.of(this.items.getOrThrow(tag)));
     }
 
-    public TransferNBTJsonBuilder input(Character c, Ingredient ingredient) {
-        if (this.inputs.containsKey(c)) {
-            throw new IllegalArgumentException("Symbol '" + c + "' is already defined!");
-        } else if (c == ' ') {
+    public TransferNBTJsonBuilder define(final Character symbol, final ItemLike item) {
+        return this.define(symbol, Ingredient.of(item));
+    }
+
+    public TransferNBTJsonBuilder define(final Character symbol, final Ingredient ingredient) {
+        if (this.key.containsKey(symbol)) {
+            throw new IllegalArgumentException("Symbol '" + symbol + "' is already defined!");
+        } else if (symbol == ' ') {
             throw new IllegalArgumentException("Symbol ' ' (whitespace) is reserved and cannot be defined");
         } else {
-            this.inputs.put(c, ingredient);
+            this.key.put(symbol, ingredient);
             return this;
         }
     }
 
-    public TransferNBTJsonBuilder pattern(String patternStr) {
-        if (!this.pattern.isEmpty() && patternStr.length() != this.pattern.getFirst().length()) {
+    public TransferNBTJsonBuilder pattern(final String row) {
+        if (!this.rows.isEmpty() && row.length() != ((String)this.rows.get(0)).length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
         } else {
-            this.pattern.add(patternStr);
+            this.rows.add(row);
             return this;
         }
     }
 
-    public TransferNBTJsonBuilder unlockedBy(String string, Criterion<?> advancementCriterion) {
-        this.criteria.put(string, advancementCriterion);
+    public TransferNBTJsonBuilder unlockedBy(final String name, final Criterion<?> criterion) {
+        this.advancementBuilder.unlockedBy(name, criterion);
         return this;
     }
 
-    public TransferNBTJsonBuilder group(@Nullable String string) {
-        this.group = string;
+    public TransferNBTJsonBuilder group(final @Nullable String group) {
+        this.group = group;
         return this;
     }
 
-    @Override
-    public Item getResult() {
-        return this.output;
+    public TransferNBTJsonBuilder showNotification(final boolean showNotification) {
+        this.showNotification = showNotification;
+        return this;
     }
 
-    @Override
-    public void save(RecipeOutput exporter, @NonNull ResourceKey<Recipe<?>> recipeKey) {
-        ShapedRecipePattern rawShapedRecipe = this.validate(recipeKey);
-        Advancement.Builder builder = exporter.advancement().addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeKey)).rewards(AdvancementRewards.Builder.recipe(recipeKey)).requirements(AdvancementRequirements.Strategy.OR);
-        Objects.requireNonNull(builder);
-        this.criteria.forEach(builder::addCriterion);
-        TransferNBTRecipe shapedRecipe = new TransferNBTRecipe(
-                Objects.requireNonNullElse(this.group, ""),
-                RecipeBuilder.determineCraftingBookCategory(this.category),
-                rawShapedRecipe,
-                new ItemStack(this.output, this.count), this.showNotification
-        );
-        exporter.accept(recipeKey, shapedRecipe, builder.build(recipeKey.identifier().withPrefix("recipes/" + this.category.getFolderName() + "/")));
+    public ResourceKey<Recipe<?>> defaultId() {
+        return RecipeBuilder.getDefaultRecipeId(this.result);
     }
 
-    private ShapedRecipePattern validate(ResourceKey<Recipe<?>> recipeKey) {
-        if (this.criteria.isEmpty()) {
-            throw new IllegalStateException("No way of obtaining recipe " + recipeKey.identifier());
-        } else {
-            return ShapedRecipePattern.of(this.inputs, this.pattern);
-        }
+    public void save(final RecipeOutput output, final ResourceKey<Recipe<?>> id) {
+        ShapedRecipePattern pattern = ShapedRecipePattern.of(this.key, this.rows);
+        TransferNBTRecipe recipe = new TransferNBTRecipe(RecipeBuilder.createCraftingCommonInfo(this.showNotification), RecipeBuilder.createCraftingBookInfo(this.category, this.group), pattern, this.result);
+        output.accept(id, recipe, this.advancementBuilder.build(output, id, this.category));
     }
 }

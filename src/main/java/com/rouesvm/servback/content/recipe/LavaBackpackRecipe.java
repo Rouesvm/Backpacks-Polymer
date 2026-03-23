@@ -1,5 +1,7 @@
 package com.rouesvm.servback.content.recipe;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
@@ -21,7 +23,13 @@ import org.jspecify.annotations.NonNull;
 import java.util.Set;
 
 public class LavaBackpackRecipe extends CustomRecipe {
-    public static final RecipeSerializer<LavaBackpackRecipe> SERIALIZER = new RecipeSerializer<>(null, null);
+    public static final MapCodec<LavaBackpackRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
+            (i) -> i.group(
+                            CraftingBookInfo.MAP_CODEC.forGetter((o) -> new CraftingBookInfo(o.category(), "")))
+                    .apply(i, (c) -> new LavaBackpackRecipe())
+    );
+
+    public static final RecipeSerializer<LavaBackpackRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, null);
 
     public LavaBackpackRecipe() {
         super();

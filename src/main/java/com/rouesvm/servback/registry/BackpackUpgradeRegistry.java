@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceKey;
 
 public class BackpackUpgradeRegistry {
     private static final ResourceKey<Registry<UpgradeType<?>>> UPGRADES_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, "upgrades"));
-    private static final Registry<UpgradeType<?>> UPGRADES = FabricRegistryBuilder.createSimple(
+    private static final Registry<UpgradeType<?>> UPGRADES = FabricRegistryBuilder.create(
             UPGRADES_REGISTRY_KEY).buildAndRegister();
 
     public static final UpgradeType<VoidUpgrade> VOID = register("void", VoidUpgrade::new);

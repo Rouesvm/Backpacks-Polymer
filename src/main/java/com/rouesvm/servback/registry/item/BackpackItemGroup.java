@@ -1,7 +1,7 @@
 package com.rouesvm.servback.registry.item;
 
 import com.rouesvm.servback.ServerBackpacks;
-import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
+import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab.Output;
@@ -39,7 +39,7 @@ public class BackpackItemGroup {
     }
 
     public static void initialize() {
-        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.parse(ServerBackpacks.MOD_ID + "items"), PolymerItemGroupUtils.builder()
+        PolymerCreativeModeTabUtils.registerPolymerCreativeModeTab(Identifier.parse(ServerBackpacks.MOD_ID + "items"), PolymerCreativeModeTabUtils.builder()
                 .icon(() -> new ItemStack(BackpackItemRegistry.GLOBAL_BACKPACK))
                 .title(Component.translatable("item.serverbackpacks.gui_backpacks"))
                 .displayItems(((context, entries) -> addItems(entries))).build()

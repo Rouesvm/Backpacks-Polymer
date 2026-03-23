@@ -111,7 +111,7 @@ public class BackHolder extends ElementHolder {
     }
 
     private void sendRidePacket() {
-        var packet = VirtualEntityUtils.createRidePacket(
+        var packet = VirtualEntityUtils.createClientboundSetPassengersPacket(
                 entity.getId(),
                 ((EntityExt) entity).polymerVE$getVirtualRidden()
         );
@@ -130,7 +130,7 @@ public class BackHolder extends ElementHolder {
 
         VirtualEntityUtils.addVirtualPassenger(entity, model.getEntityIds().toIntArray());
 
-        var packet = VirtualEntityUtils.createRidePacket(entity.getId(), ((EntityExt)entity).polymerVE$getVirtualRidden());
+        var packet = VirtualEntityUtils.createClientboundSetPassengersPacket(entity.getId(), ((EntityExt)entity).polymerVE$getVirtualRidden());
         model.sendPacket(packet);
 
         return model;

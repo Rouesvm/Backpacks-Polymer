@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -37,10 +38,10 @@ public class BackpackGui extends BasicInventoryGui {
     }
 
     @Override
-    public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
+    public boolean onAnyClick(int index, ClickType type, ContainerInput action) {
         if (index < 0) return true;
 
-        Slot slot = this.screenHandler.getSlot(index);
+        Slot slot = this.wrappedMenu.getSlot(index);
         if (slot.hasItem()
                 && slot.getItem().getItem() instanceof ContainerItem
                 && stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER) != null
@@ -61,6 +62,15 @@ public class BackpackGui extends BasicInventoryGui {
     }
 
     @Override
+    public void onManualClose() {
+        onClose();
+    }
+
+    @Override
+    public void onPlayerClose(boolean success) {
+        onClose();
+    }
+
     public void onClose() {
         if (stack != null) stack.set(BackpackDataComponentTypes.IS_OPENED, false);
 
@@ -147,7 +157,7 @@ public class BackpackGui extends BasicInventoryGui {
 
             for (int i = startIndex + leftPadding; i < endIndex - rightPadding; i++) {
                 int inventoryIndex = (row * amountToPad) + (i - (startIndex + leftPadding));
-                this.setSlotRedirect(i, new BackpackSlot(this.inventory, inventoryIndex, i, 0));
+                this.setSlot(i, new BackpackSlot(this.inventory, inventoryIndex, i, 0));
             }
         }
     }

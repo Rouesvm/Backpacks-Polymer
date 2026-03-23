@@ -45,7 +45,7 @@ public class BlockHolder extends ElementHolder {
 
     @Override
     public boolean startWatching(ServerGamePacketListenerImpl client) {
-        return !ServerBackpacks.isBedrock(client.getPlayer()) && super.startWatching(client);
+        return !ServerBackpacks.isBedrock(client.getPlayer().getUUID()) && super.startWatching(client);
     }
 
     public void setMain(ItemStack stack) {

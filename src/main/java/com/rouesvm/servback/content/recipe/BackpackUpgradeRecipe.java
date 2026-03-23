@@ -18,6 +18,7 @@ import net.minecraft.world.item.crafting.display.SmithingRecipeDisplay;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +31,9 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
                             ItemStackTemplate.CODEC.fieldOf("result").forGetter(BackpackUpgradeRecipe::getResult))
                     .apply(instance, BackpackUpgradeRecipe::new));
 
-    final Ingredient base;
-    final Optional<Ingredient> addition;
-    final ItemStackTemplate result;
+    private final Ingredient base;
+    private final Optional<Ingredient> addition;
+    private final ItemStackTemplate result;
     @Nullable
     private PlacementInfo ingredientPlacement;
 
@@ -102,8 +103,8 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     }
 
     @Override
-    public String group() {
-        return "";
+    public @NonNull String group() {
+        return RecipeBookCategories.SMITHING.toString();
     }
 
     public ItemStackTemplate getResult() {
@@ -135,6 +136,8 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     }
 
     public @NotNull List<RecipeDisplay> display() {
-        return List.of(new SmithingRecipeDisplay(Ingredient.optionalIngredientToDisplay(Optional.empty()), this.base.display(), Ingredient.optionalIngredientToDisplay(this.addition), this.result.display(), new SlotDisplay.ItemSlotDisplay(Items.SMITHING_TABLE)));
+        return List.of(new SmithingRecipeDisplay(Ingredient.optionalIngredientToDisplay(Optional.empty()),
+                this.base.display(), Ingredient.optionalIngredientToDisplay(this.addition),
+                new SlotDisplay.ItemSlotDisplay(this.result.item()), new SlotDisplay.ItemSlotDisplay(Items.SMITHING_TABLE)));
     }
 }

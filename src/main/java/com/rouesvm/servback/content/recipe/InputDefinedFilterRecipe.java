@@ -1,5 +1,7 @@
 package com.rouesvm.servback.content.recipe;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.component.UpgradeComponent;
 import com.rouesvm.servback.content.item.UpgradeItem;
 import com.rouesvm.servback.content.upgrade.FilterableUpgrade;
@@ -26,8 +28,14 @@ import org.jspecify.annotations.NonNull;
 import java.util.Set;
 
 public class InputDefinedFilterRecipe extends CustomRecipe {
+    public static final MapCodec<InputDefinedFilterRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
+            (i) -> i.group(
+                            CraftingBookInfo.MAP_CODEC.forGetter((o) -> new CraftingBookInfo(o.category(), "")))
+                    .apply(i, (c) -> new InputDefinedFilterRecipe(c.category()))
+    );
+
     public static final RecipeSerializer<InputDefinedFilterRecipe> SERIALIZER = new RecipeSerializer<>(
-            null, null
+            MAP_CODEC, null
     );
 
     public InputDefinedFilterRecipe(CraftingBookCategory category) {

@@ -1,7 +1,7 @@
 package com.rouesvm.servback;
 
+import com.mojang.authlib.GameProfile;
 import com.rouesvm.servback.compat.geyser.BackpackGeyser;
-import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.commands.BackpackCommands;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
@@ -21,6 +21,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class ServerBackpacks implements ModInitializer {
 	public static final String MOD_ID = "serverbackpacks";
@@ -38,7 +40,8 @@ public class ServerBackpacks implements ModInitializer {
 
 	public static final ResourceKey<Enchantment> CAPACITY = ResourceKey.create(Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(MOD_ID, "capacity"));
 
-	private static final Set<ServerPlayer> BEDROCK_PLAYERS = new ObjectOpenHashSet<>();
+	private static final Set<UUID> BEDROCK_PLAYERS = new ObjectOpenHashSet<>();
+	public static final GameProfile NIL = new GameProfile(UUIDUtil.createOfflinePlayerUUID("nil"), "nil");
 
 	public static boolean hasGeyserLoaded;
 	public static boolean hasTrinketLoaded;
@@ -72,7 +75,6 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackUpgradeRegistry.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
-		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		serverEvents();
 	}
@@ -80,11 +82,11 @@ public class ServerBackpacks implements ModInitializer {
 	private static void serverEvents() {
 		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, a, b) -> {
 			ServerPlayer player = serverPlayNetworkHandler.getPlayer();
-			if (isBedrock(player)) BEDROCK_PLAYERS.add(player);
+			//if (!BEDROCK_PLAYERS.contains(player.getUUID()) && BackpackGeyser.isPlayerOnBedrock(player)) BEDROCK_PLAYERS.add(player.getUUID());
 		});
 
 		ServerPlayConnectionEvents.DISCONNECT.register((serverPlayNetworkHandler, a) ->
-				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer()));
+				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer().getUUID()));
 
 		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::initialize);
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> BackpackManager.loadOnServerStarted());
@@ -101,9 +103,7 @@ public class ServerBackpacks implements ModInitializer {
 		ServerPlayerEvents.LEAVE.register((p0) -> BackpackManager.createBackupAndSave());
 	}
 
-	public static boolean isBedrock(ServerPlayer player) {
-		return hasGeyserLoaded && player != null && (
-						ServerBackpacks.BEDROCK_PLAYERS.contains(player) ||
-						BackpackGeyser.isPlayerOnBedrock(player));
+	public static boolean isBedrock(UUID player) {
+		return hasGeyserLoaded && player != null && ServerBackpacks.BEDROCK_PLAYERS.contains(player);
 	}
 }

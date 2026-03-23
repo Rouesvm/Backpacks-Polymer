@@ -47,7 +47,7 @@ public class BasicInventoryGui extends SimpleGui {
         }
 
         int rows = (int) Math.ceil(slots / 9.0);
-        if (ServerBackpacks.isBedrock(player) && (
+        if (ServerBackpacks.isBedrock(player.getUUID()) && (
                 rows != EXISTING_SMALL_CHEST_SIZE
                 && rows != EXISTING_LARGE_CHEST_SIZE
         )) title = title.copy().append(BEDROCK_ROW_MARKER + rows);
@@ -106,7 +106,7 @@ public class BasicInventoryGui extends SimpleGui {
         for(int y = 0; y <= 3; ++y) {
             for(int x = 0; x < 9; ++x) {
                 final int index = y == 0 ? x + (9 * 4 + this.slots) - 9 : this.slots + (x + y * 9) - 9 ;
-                if (ItemStack.isSameItemSameComponents(this.screenHandler.getSlot(index).getItem(), this.stack)) {
+                if (ItemStack.isSameItemSameComponents(this.wrappedMenu.getSlot(index).getItem(), this.stack)) {
                     this.stackIndex = index;
                     break;
                 }
@@ -116,7 +116,7 @@ public class BasicInventoryGui extends SimpleGui {
 
     public void fillSlots() {
         for (int slot = 0; slot < containerSize; slot++) {
-            this.setSlotRedirect(slot, new NonBackpackSlot(this.inventory, slot, slot, 0));
+            this.setSlot(slot, new NonBackpackSlot(this.inventory, slot, slot, 0));
         }
     }
 }

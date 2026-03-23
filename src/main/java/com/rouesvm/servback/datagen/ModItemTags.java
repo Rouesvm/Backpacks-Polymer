@@ -4,20 +4,21 @@ import com.rouesvm.servback.content.item.BasicPolymerBlockItem;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static com.rouesvm.servback.ServerBackpacks.MOD_ID;
 
-public class ModItemTags extends FabricTagProvider.ItemTagProvider {
+public class ModItemTags extends FabricTagsProvider.ItemTagsProvider {
     public static final TagKey<Item> SMALL_BACKPACKS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "small_backpacks"));
     public static final TagKey<Item> MEDIUM_BACKPACKS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "medium_backpacks"));
     public static final TagKey<Item> LARGE_BACKPACKS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "large_backpacks"));
@@ -28,12 +29,12 @@ public class ModItemTags extends FabricTagProvider.ItemTagProvider {
 
     public static final TagKey<Item> BACKPACKS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "backpacks"));
 
-    public ModItemTags(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    public ModItemTags(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider wrapperLookup) {
+    protected void addTags(HolderLookup.@NonNull Provider wrapperLookup) {
         Set<Item> small = BackpackItemJsonRegistry.getBackpacksByName("small");
         small.forEach((item) -> {
             Identifier itemID = ((ContainerItem) item).getIdentifier();

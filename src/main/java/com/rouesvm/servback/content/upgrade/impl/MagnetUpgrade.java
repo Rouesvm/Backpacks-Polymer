@@ -9,6 +9,7 @@ import com.rouesvm.servback.content.upgrade.extension.ItemFilter;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -88,7 +88,7 @@ public class MagnetUpgrade extends Upgrade implements PersistentUpgrade, Filtera
         int nextOrdinal = (this.itemFilter.getMode().ordinal() + 1) % modes.length;
         this.itemFilter.setMode(modes[nextOrdinal]);
 
-        player.displayClientMessage(Component.translatable("info.serverbackpacks.mode")
+        player.sendSystemMessage(Component.translatable("info.serverbackpacks.mode")
                 .append(": ")
                 .withStyle(ChatFormatting.GRAY)
                 .append(Component.translatable("info.serverbackpacks.mode" + "." + this.itemFilter.getMode().toString().toLowerCase())

@@ -12,9 +12,9 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.TransmuteResult;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class BackpackUpgradeRecipeJsonBuilder {
         Advancement.Builder builder = exporter.advancement().addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeKey)).rewards(AdvancementRewards.Builder.recipe(recipeKey)).requirements(AdvancementRequirements.Strategy.OR);
         Objects.requireNonNull(builder);
         this.criteria.forEach(builder::addCriterion);
-        BackpackUpgradeRecipe smithingTransformRecipe = new BackpackUpgradeRecipe(this.base, Optional.of(this.addition), new TransmuteResult(this.result));
+        BackpackUpgradeRecipe smithingTransformRecipe = new BackpackUpgradeRecipe(this.base, Optional.of(this.addition), new ItemStackTemplate(this.result));
         exporter.accept(recipeKey, smithingTransformRecipe, builder.build(recipeKey.identifier().withPrefix("recipes/" + this.category.getFolderName() + "/")));
     }
 

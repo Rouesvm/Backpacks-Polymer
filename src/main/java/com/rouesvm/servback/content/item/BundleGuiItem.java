@@ -8,7 +8,7 @@ import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import com.rouesvm.servback.technical.ui.UpgradeContainerGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
-import eu.pb4.common.protection.api.CommonProtection;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -105,7 +104,6 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         if (!(context.getPlayer() instanceof ServerPlayer serverPlayer)
         ) return InteractionResult.PASS;
         if (Configuration.instance().placeable
-                && CommonProtection.canPlaceBlock(context.getLevel(), context.getClickedPos(), serverPlayer.getGameProfile(), serverPlayer)
                 && serverPlayer.isShiftKeyDown()
         ) return super.useOn(context);
 

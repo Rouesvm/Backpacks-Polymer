@@ -8,10 +8,8 @@ import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
@@ -26,15 +24,21 @@ import java.util.List;
 import java.util.Optional;
 
 public class BackpackUpgradeRecipe implements SmithingRecipe {
+    private static final MapCodec<BackpackUpgradeRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) ->
+            instance.group(Ingredient.CODEC.fieldOf("base").forGetter(BackpackUpgradeRecipe::baseIngredient),
+                            Ingredient.CODEC.optionalFieldOf("addition").forGetter(BackpackUpgradeRecipe::additionIngredient),
+                            ItemStackTemplate.CODEC.fieldOf("result").forGetter(BackpackUpgradeRecipe::getResult))
+                    .apply(instance, BackpackUpgradeRecipe::new));
+
     final Ingredient base;
     final Optional<Ingredient> addition;
-    final TransmuteResult result;
+    final ItemStackTemplate result;
     @Nullable
     private PlacementInfo ingredientPlacement;
 
-    public static final BackpackUpgradeRecipe.Serializer SERIALIZER = new BackpackUpgradeRecipe.Serializer();
+    public static final RecipeSerializer<BackpackUpgradeRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, null);
 
-    public BackpackUpgradeRecipe(Ingredient base, Optional<Ingredient> addition, TransmuteResult result) {
+    public BackpackUpgradeRecipe(Ingredient base, Optional<Ingredient> addition, ItemStackTemplate result) {
         this.base = base;
         this.addition = addition;
         this.result = result;
@@ -66,7 +70,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
     }
 
     @Override
-    public @NotNull ItemStack assemble(SmithingRecipeInput recipeInput, HolderLookup.@NotNull Provider provider) {
+    public @NotNull ItemStack assemble(SmithingRecipeInput recipeInput) {
         ItemStack base = recipeInput.base();
         ItemStack addition = recipeInput.addition();
 
@@ -92,7 +96,17 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
         return resultStack;
     }
 
-    public TransmuteResult result() {
+    @Override
+    public boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    public String group() {
+        return "";
+    }
+
+    public ItemStackTemplate getResult() {
         return result;
     }
 
@@ -122,30 +136,5 @@ public class BackpackUpgradeRecipe implements SmithingRecipe {
 
     public @NotNull List<RecipeDisplay> display() {
         return List.of(new SmithingRecipeDisplay(Ingredient.optionalIngredientToDisplay(Optional.empty()), this.base.display(), Ingredient.optionalIngredientToDisplay(this.addition), this.result.display(), new SlotDisplay.ItemSlotDisplay(Items.SMITHING_TABLE)));
-    }
-
-    public static class Serializer implements RecipeSerializer<@NotNull BackpackUpgradeRecipe> {
-        private static final MapCodec<BackpackUpgradeRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) ->
-                instance.group(Ingredient.CODEC.fieldOf("base").forGetter(BackpackUpgradeRecipe::baseIngredient),
-                        Ingredient.CODEC.optionalFieldOf("addition").forGetter(BackpackUpgradeRecipe::additionIngredient),
-                        TransmuteResult.CODEC.fieldOf("result").forGetter(BackpackUpgradeRecipe::result))
-                        .apply(instance, BackpackUpgradeRecipe::new));
-
-        public static final StreamCodec<@NotNull RegistryFriendlyByteBuf, @NotNull BackpackUpgradeRecipe> PACKET_CODEC;
-
-        public MapCodec<BackpackUpgradeRecipe> codec() {
-            return CODEC;
-        }
-
-        public @NotNull StreamCodec<@NotNull RegistryFriendlyByteBuf, @NotNull BackpackUpgradeRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
-
-        static {
-            PACKET_CODEC = StreamCodec.composite(Ingredient.CONTENTS_STREAM_CODEC, BackpackUpgradeRecipe::baseIngredient,
-                    Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC, BackpackUpgradeRecipe::additionIngredient,
-                    TransmuteResult.STREAM_CODEC, BackpackUpgradeRecipe::result,
-                    BackpackUpgradeRecipe::new);
-        }
     }
 }

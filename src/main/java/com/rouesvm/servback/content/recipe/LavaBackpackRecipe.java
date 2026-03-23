@@ -6,11 +6,8 @@ import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -19,18 +16,19 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Set;
 
 public class LavaBackpackRecipe extends CustomRecipe {
-    public static final RecipeSerializer<LavaBackpackRecipe> SERIALIZER = new LavaBackpackRecipe.Serializer(LavaBackpackRecipe::new);
+    public static final RecipeSerializer<LavaBackpackRecipe> SERIALIZER = new RecipeSerializer<>(null, null);
 
-    public LavaBackpackRecipe(CraftingBookCategory category) {
-        super(category);
+    public LavaBackpackRecipe() {
+        super();
     }
 
     @Override
-    public boolean matches(CraftingInput input, Level world) {
+    public boolean matches(CraftingInput input, @NonNull Level world) {
         if (input.isEmpty()) return false;
 
         boolean hasBackpack = false;
@@ -60,7 +58,7 @@ public class LavaBackpackRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public @NonNull ItemStack assemble(CraftingInput input) {
         for (ItemStack stack : input.items()) {
             if (stack.isEmpty()) continue;
             if (stack.getItem() instanceof ContainerItem) {
@@ -80,7 +78,7 @@ public class LavaBackpackRecipe extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
+    public @NonNull NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
         NonNullList<ItemStack> remainders = NonNullList.withSize(input.size(), ItemStack.EMPTY);
         for (int i = 0; i < input.size(); i++) {
             if (input.getItem(i).is(Items.LAVA_BUCKET)) {
@@ -91,23 +89,12 @@ public class LavaBackpackRecipe extends CustomRecipe {
     }
 
     @Override
-    public RecipeSerializer<LavaBackpackRecipe> getSerializer() {
+    public @NonNull RecipeSerializer<LavaBackpackRecipe> getSerializer() {
         return BackpackRecipeRegistry.LAVA_BACKPACK_RECIPE;
     }
 
     @Override
-    public CraftingBookCategory category() {
+    public @NonNull CraftingBookCategory category() {
         return CraftingBookCategory.MISC;
-    }
-
-    public static class Serializer extends CustomRecipe.Serializer<LavaBackpackRecipe> {
-        public Serializer(Factory<LavaBackpackRecipe> factory) {
-            super(factory);
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, LavaBackpackRecipe> streamCodec() {
-            return null;
-        }
     }
 }

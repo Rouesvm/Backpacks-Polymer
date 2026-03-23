@@ -1,6 +1,5 @@
 package com.rouesvm.servback.content.recipe;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
@@ -8,33 +7,50 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 
-public class BackpackRecipe extends ShapedRecipe {
-    public final ShapedRecipePattern raw;
-    public final ItemStack result;
+public class BackpackRecipe extends NormalCraftingRecipe {
+    public static final MapCodec<BackpackRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
+            (i) -> i.group(CommonInfo.MAP_CODEC.forGetter((o) -> o.commonInfo),
+                            CraftingBookInfo.MAP_CODEC.forGetter((o) -> o.bookInfo),
+                            ShapedRecipePattern.MAP_CODEC.forGetter((o) -> o.pattern),
+                            ItemStackTemplate.CODEC.fieldOf("result").forGetter((o) -> o.result))
+                    .apply(i, BackpackRecipe::new)
+    );
 
-    public static final com.rouesvm.servback.content.recipe.BackpackRecipe.Serializer SERIALIZER = new com.rouesvm.servback.content.recipe.BackpackRecipe.Serializer();
+    private final ShapedRecipePattern pattern;
+    private final ItemStackTemplate result;
 
-    public BackpackRecipe(String group, CraftingBookCategory category, ShapedRecipePattern raw, ItemStack result, boolean showNotification) {
-        super(group, category, raw, result, showNotification);
-        this.raw = raw;
+    public static final RecipeSerializer<BackpackRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, null);
+
+    public BackpackRecipe(final Recipe.CommonInfo commonInfo, final CraftingRecipe.CraftingBookInfo bookInfo, final ShapedRecipePattern pattern, final ItemStackTemplate result) {
+        super(commonInfo, bookInfo);
+        this.pattern = pattern;
         this.result = result;
     }
 
-    public @NonNull RecipeSerializer<? extends ShapedRecipe> getSerializer() {
+    public @NonNull RecipeSerializer<BackpackRecipe> getSerializer() {
         return BackpackRecipeRegistry.BACKPACK_CRAFTING_RECIPE;
     }
 
     @Override
-    public @NonNull ItemStack assemble(@NonNull CraftingInput craftingRecipeInput, HolderLookup.@NonNull Provider wrapperLookup) {
-        ItemStack resultStack = super.assemble(craftingRecipeInput, wrapperLookup);
+    protected @NonNull PlacementInfo createPlacementInfo() {
+        return PlacementInfo.createFromOptionals(this.pattern.ingredients());
+    }
+
+    @Override
+    public boolean matches(CraftingInput input, @NonNull Level level) {
+        return this.pattern.matches(input);
+    }
+
+    @Override
+    public @NonNull ItemStack assemble(@NonNull CraftingInput craftingRecipeInput) {
+        ItemStack resultStack = this.result.create();
 
         ItemStack stack = craftingRecipeInput.getItem(4);
         if (stack.getItem() instanceof ContainerItem backpack) {
@@ -49,49 +65,11 @@ public class BackpackRecipe extends ShapedRecipe {
         return resultStack;
     }
 
-    public ShapedRecipePattern getRaw() {
-        return raw;
+    public ShapedRecipePattern getPattern() {
+        return pattern;
     }
 
     public ItemStack getResult() {
-        return result;
-    }
-
-    public static class Serializer implements RecipeSerializer<BackpackRecipe> {
-        public static final MapCodec<BackpackRecipe> CODEC = RecordCodecBuilder.mapCodec(
-                (instance) ->
-                        instance.group(Codec.STRING.optionalFieldOf("group", "").forGetter(BackpackRecipe::group),
-                                CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(BackpackRecipe::category),
-                                ShapedRecipePattern.MAP_CODEC.forGetter(BackpackRecipe::getRaw),
-                                ItemStack.STRICT_CODEC.fieldOf("result").forGetter(BackpackRecipe::getResult),
-                                Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(BackpackRecipe::showNotification))
-                                .apply(instance, BackpackRecipe::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, BackpackRecipe> PACKET_CODEC = StreamCodec.of(BackpackRecipe.Serializer::write, BackpackRecipe.Serializer::read);
-
-        public @NonNull MapCodec<BackpackRecipe> codec() {
-            return CODEC;
-        }
-
-        public @NonNull StreamCodec<RegistryFriendlyByteBuf, BackpackRecipe> streamCodec() {
-            return PACKET_CODEC;
-        }
-
-        private static BackpackRecipe read(RegistryFriendlyByteBuf buf) {
-            String string = buf.readUtf();
-            CraftingBookCategory craftingRecipeCategory = buf.readEnum(CraftingBookCategory.class);
-            ShapedRecipePattern rawShapedRecipe = ShapedRecipePattern.STREAM_CODEC.decode(buf);
-            ItemStack itemStack = ItemStack.STREAM_CODEC.decode(buf);
-            boolean bl = buf.readBoolean();
-            return new BackpackRecipe(string, craftingRecipeCategory, rawShapedRecipe, itemStack, bl);
-        }
-
-        private static void write(RegistryFriendlyByteBuf buf, BackpackRecipe recipe) {
-            buf.writeUtf(recipe.group());
-            buf.writeEnum(recipe.category());
-            ShapedRecipePattern.STREAM_CODEC.encode(buf, recipe.getRaw());
-            ItemStack.STREAM_CODEC.encode(buf, recipe.getResult());
-            buf.writeBoolean(recipe.showNotification());
-        }
+        return result.create();
     }
 }

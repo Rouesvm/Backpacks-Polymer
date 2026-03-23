@@ -10,7 +10,7 @@ import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -106,7 +106,7 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
         if (instance == null) instance = BackpackManager.getInstanceAndResize(uuid, extraSize + getSize()).get();
         if (storage == null) {
             instance.inventory().setEntity(this);
-            storage = InventoryStorage.of(instance.inventory(), null);
+            storage = ContainerStorage.of(instance.inventory(), null);
         }
     }
 

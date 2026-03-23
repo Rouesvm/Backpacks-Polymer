@@ -21,6 +21,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,14 +99,14 @@ public class TransferNBTJsonBuilder implements RecipeBuilder {
     }
 
     @Override
-    public void save(RecipeOutput exporter, ResourceKey<Recipe<?>> recipeKey) {
+    public void save(RecipeOutput exporter, @NonNull ResourceKey<Recipe<?>> recipeKey) {
         ShapedRecipePattern rawShapedRecipe = this.validate(recipeKey);
         Advancement.Builder builder = exporter.advancement().addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeKey)).rewards(AdvancementRewards.Builder.recipe(recipeKey)).requirements(AdvancementRequirements.Strategy.OR);
         Objects.requireNonNull(builder);
         this.criteria.forEach(builder::addCriterion);
         TransferNBTRecipe shapedRecipe = new TransferNBTRecipe(
                 Objects.requireNonNullElse(this.group, ""),
-                RecipeBuilder.determineBookCategory(this.category),
+                RecipeBuilder.determineCraftingBookCategory(this.category),
                 rawShapedRecipe,
                 new ItemStack(this.output, this.count), this.showNotification
         );

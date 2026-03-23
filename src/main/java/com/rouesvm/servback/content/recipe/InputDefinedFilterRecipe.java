@@ -9,12 +9,9 @@ import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -24,14 +21,17 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Set;
 
 public class InputDefinedFilterRecipe extends CustomRecipe {
-    public static final RecipeSerializer<InputDefinedFilterRecipe> SERIALIZER = new InputDefinedFilterRecipe.Serializer(InputDefinedFilterRecipe::new);
+    public static final RecipeSerializer<InputDefinedFilterRecipe> SERIALIZER = new RecipeSerializer<>(
+            null, null
+    );
 
     public InputDefinedFilterRecipe(CraftingBookCategory category) {
-        super(category);
+        super();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class InputDefinedFilterRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public @NonNull ItemStack assemble(CraftingInput input) {
         ItemStack stack = findUpgradeStack(input);
         if (stack.isEmpty()) return ItemStack.EMPTY;
 
@@ -158,23 +158,12 @@ public class InputDefinedFilterRecipe extends CustomRecipe {
     }
 
     @Override
-    public RecipeSerializer<InputDefinedFilterRecipe> getSerializer() {
+    public @NonNull RecipeSerializer<InputDefinedFilterRecipe> getSerializer() {
         return BackpackRecipeRegistry.MAGNET_FILTER_APPLIER_RECIPE;
     }
 
     @Override
-    public CraftingBookCategory category() {
+    public @NonNull CraftingBookCategory category() {
         return CraftingBookCategory.MISC;
-    }
-
-    public static class Serializer extends net.minecraft.world.item.crafting.CustomRecipe.Serializer<InputDefinedFilterRecipe> {
-        public Serializer(Factory<InputDefinedFilterRecipe> factory) {
-            super(factory);
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, InputDefinedFilterRecipe> streamCodec() {
-            return null;
-        }
     }
 }

@@ -106,7 +106,7 @@ public class BackpackRecipeJsonBuilder implements RecipeBuilder {
         boolean showNotification = true;
         BackpackRecipe shapedRecipe = new BackpackRecipe(
                 Objects.requireNonNullElse(this.group, ""),
-                RecipeBuilder.determineBookCategory(this.category),
+                RecipeBuilder.determineCraftingBookCategory(this.category),
                 rawShapedRecipe,
                 new ItemStack(this.output, this.count), showNotification
         );

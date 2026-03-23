@@ -35,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import xyz.nucleoid.packettweaker.PacketContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -163,14 +164,10 @@ public class ContainerItem extends BundleGuiItem {
         NonNullList<ItemStack> itemList = BackpackUtils.getItemList(stack);
         if (itemList.isEmpty()) return;
 
-        tooltip.add(Component.translatable("info.serverbackpacks.contains")
-                .append(":")
-                .withStyle(ChatFormatting.GRAY)
-        );
-
         int capacityMaxShow = 0;
         int capacityAmount = 0;
 
+        List<Component> toBeAdded = new ArrayList<>();
         for (ItemStack itemStack : itemList) {
             if (itemStack.isEmpty()) continue;
 
@@ -178,13 +175,21 @@ public class ContainerItem extends BundleGuiItem {
             if (capacityMaxShow > 4) continue;
 
             capacityMaxShow++;
-            tooltip.add(Component.literal(" ")
+            toBeAdded.add(Component.literal(" ")
                     .append(Component.translatable(
                             "item.container.item_count",
                             itemStack.getHoverName(),
                             itemStack.getCount()
                     )).withStyle(ChatFormatting.DARK_AQUA)
             );
+        }
+
+        if (!toBeAdded.isEmpty()) {
+            tooltip.add(Component.translatable("info.serverbackpacks.contains")
+                    .append(":")
+                    .withStyle(ChatFormatting.GRAY)
+            );
+            tooltip.addAll(toBeAdded);
         }
 
         if (capacityAmount - capacityMaxShow > 0) tooltip.add(

@@ -181,5 +181,8 @@ public class Configuration {
 
         @SerializedName("global_backpack_size")
         public int global_backpack_size = 54;
+
+        @SerializedName("lava_backpack_size")
+        public int lava_backpack_size = 18;
     }
 }

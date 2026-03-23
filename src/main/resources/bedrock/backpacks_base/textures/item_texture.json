@@ -161,6 +161,9 @@
     "serverbackpacks:ender" : {
       "textures" : "textures/serverbackpacks/item/ender"
     },
+    "serverbackpacks:lava_backpack" : {
+      "textures" : "textures/serverbackpacks/item/lava_backpack"
+    },
     "serverbackpacks:void_upgrade" : {
       "textures" : "textures/serverbackpacks/item/void_upgrade"
     },

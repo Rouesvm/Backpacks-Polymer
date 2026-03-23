@@ -161,6 +161,16 @@
           "minecraft:consumable": {},
           "minecraft:max_stack_size": 1
         }
+      },
+      {
+        "type": "definition",
+        "model": "serverbackpacks:lava_backpack",
+        "bedrock_identifier": "serverbackpacks:lava_backpack",
+        "display_name": "Lava Backpack",
+        "components": {
+          "minecraft:consumable": {},
+          "minecraft:max_stack_size": 1
+        }
       }
     ]
   }

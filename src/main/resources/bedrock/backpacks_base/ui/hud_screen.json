@@ -1,0 +1,15 @@
+{
+    "namespace": "hud",
+
+    "hud_screen@common.base_screen": {
+        "is_showing_menu": false,
+        "should_steal_mouse": true,
+        "low_frequency_rendering": true,
+        "absorbs_input": false,
+        "render_only_when_topmost": false,
+        "send_telemetry": false,
+        "always_accepts_input": true,
+        "$screen_animations": [],
+        "$background_animations": []
+    }
+}

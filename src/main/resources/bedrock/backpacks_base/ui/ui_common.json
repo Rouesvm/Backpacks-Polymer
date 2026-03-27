@@ -1,0 +1,23 @@
+{
+    "namespace": "common",
+
+    "toggle@common.toggle_visuals": {
+        "prevent_touch_input": true
+    },
+
+    "slider": {
+        "prevent_touch_input": true
+    },
+
+    "text_edit_box": {
+        "prevent_touch_input": true
+    },
+
+    "close_button": {
+        "prevent_touch_input": true
+    },
+    
+    "button": {
+      "prevent_touch_input":true
+    }
+}

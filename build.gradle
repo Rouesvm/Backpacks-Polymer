@@ -62,6 +62,7 @@ dependencies {
     modCompileOnly ("maven.modrinth:bedframe:0.1.1")
     modCompileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
     compileOnly("org.geysermc.geyser:api:${project.geyser}")
+    compileOnly('org.geysermc.floodgate:api:2.2.4-SNAPSHOT')
 }
 
 processResources {

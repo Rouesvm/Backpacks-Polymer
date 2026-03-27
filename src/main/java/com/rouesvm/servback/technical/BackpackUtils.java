@@ -35,7 +35,7 @@ public class BackpackUtils {
             if (stack.isEmpty()) continue;
 
             int componentHash = stack.getComponents().hashCode();
-            String key = stack.getItem().toString() + ":" + componentHash;
+            String key = stack.getItem() + ":" + componentHash;
 
             contents.merge(key, stack.getCount(), Integer::sum);
         }

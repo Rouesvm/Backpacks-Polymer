@@ -41,6 +41,7 @@ public class ServerBackpacks implements ModInitializer {
 	private static final Set<ServerPlayer> BEDROCK_PLAYERS = new ObjectOpenHashSet<>();
 
 	public static boolean hasGeyserLoaded;
+	public static boolean hasFloodgateLoaded;
 	public static boolean hasTrinketLoaded;
 	public static boolean isDevEnvironment;
 
@@ -50,6 +51,7 @@ public class ServerBackpacks implements ModInitializer {
 
 		hasTrinketLoaded = FabricLoader.getInstance().isModLoaded("trinkets");
 		hasGeyserLoaded = FabricLoader.getInstance().isModLoaded("geyser-fabric");
+		hasFloodgateLoaded = FabricLoader.getInstance().isModLoaded("floodgate");
 
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		PolymerResourcePackUtils.markAsRequired();

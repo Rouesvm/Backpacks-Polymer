@@ -9,9 +9,15 @@ import com.rouesvm.servback.technical.manager.BackpackUUID;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
+
+import java.util.List;
 
 public class TransferNBTRecipe extends NormalCraftingRecipe {
     public static final MapCodec<TransferNBTRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
@@ -31,6 +37,11 @@ public class TransferNBTRecipe extends NormalCraftingRecipe {
         super(commonInfo, bookInfo);
         this.pattern = raw;
         this.result = result;
+    }
+
+    @Override
+    public @NonNull List<RecipeDisplay> display() {
+        return List.of(new ShapedCraftingRecipeDisplay(this.pattern.width(), this.pattern.height(), this.pattern.ingredients().stream().map((e) -> e.map(Ingredient::display).orElse(SlotDisplay.Empty.INSTANCE)).toList(), new SlotDisplay.ItemStackSlotDisplay(this.result), new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)));
     }
 
     @Override

@@ -1,14 +1,12 @@
 {
   "required": true,
   "package": "com.rouesvm.servback.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "mixins": [
     "ItemEntityMixin",
     "LivingEntityMixin",
     "ShapedRecipeMixin",
-    "ShulkerBoxMixin",
-    "compat.BedframeBlockTranslatorMixin",
-    "compat.BedframeItemTranslatorMixin"
+    "ShulkerBoxMixin"
   ],
   "injectors": {
     "defaultRequire": 1

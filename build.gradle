@@ -57,7 +57,6 @@ dependencies {
     implementation include("eu.pb4:sgui:${project.sgui}")
     implementation include("xyz.nucleoid:server-translations-api:${project.server_translations}")
 
-    compileOnly ("maven.modrinth:bedframe:0.1.1")
     compileOnly("eu.pb4.polyport:trinkets:${project.trinkets}")
     compileOnly("org.geysermc.geyser:api:${project.geyser}")
 }

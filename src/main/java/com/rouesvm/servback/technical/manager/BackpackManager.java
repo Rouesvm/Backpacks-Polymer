@@ -260,7 +260,7 @@ public class BackpackManager implements Manager {
 
     public enum STORAGE_TYPE {
         DEFAULT("Default storage"),
-        SQL("SQL storage");
+        SQL("SQL storage (not implemented)");
 
         private final String description;
 

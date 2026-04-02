@@ -67,19 +67,25 @@ public class LavaBackpackRecipe extends CustomRecipe {
 
     @Override
     public @NonNull ItemStack assemble(CraftingInput input) {
-        for (ItemStack stack : input.items()) {
-            if (stack.isEmpty()) continue;
-            if (stack.getItem() instanceof ContainerItem) {
+        for (ItemStack inputStack : input.items()) {
+            if (inputStack.isEmpty()) continue;
+            if (inputStack.getItem() instanceof ContainerItem) {
                 ItemStack result = new ItemStack(BackpackItemRegistry.LAVA_BACKPACK);
-                result.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(stack));
-                result.set(DataComponents.ENCHANTMENTS, stack.get(DataComponents.ENCHANTMENTS));
-                if (stack.has(BackpackDataComponentTypes.UPGRADE_CONTAINER)) {
-                    result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER));
+                if (inputStack.has(BackpackDataComponentTypes.BACKPACK_UUID)) {
+                    result.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(inputStack));
                 }
-                if (stack.has(DataComponents.CUSTOM_NAME)) {
-                    result.set(DataComponents.CUSTOM_NAME, stack.get(DataComponents.CUSTOM_NAME));
+
+                if (inputStack.has(DataComponents.ENCHANTMENTS)) {
+                    result.set(DataComponents.ENCHANTMENTS, inputStack.get(DataComponents.ENCHANTMENTS));
                 }
-                return result;
+
+                if (inputStack.has(BackpackDataComponentTypes.UPGRADE_CONTAINER)) {
+                    result.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, inputStack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER));
+                }
+
+                if (inputStack.has(DataComponents.CUSTOM_NAME)) {
+                    result.set(DataComponents.CUSTOM_NAME, inputStack.get(DataComponents.CUSTOM_NAME));
+                }                return result;
             }
         }
         return ItemStack.EMPTY;

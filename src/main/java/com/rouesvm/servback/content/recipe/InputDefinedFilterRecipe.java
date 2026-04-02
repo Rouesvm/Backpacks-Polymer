@@ -43,7 +43,7 @@ public class InputDefinedFilterRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInput input, Level world) {
+    public boolean matches(CraftingInput input, @NonNull Level world) {
         if (input.isEmpty()) return false;
         if (input.ingredientCount() > MagnetUpgrade.MAX_SIZE + 1) return false;
 

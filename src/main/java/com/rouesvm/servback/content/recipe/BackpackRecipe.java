@@ -6,6 +6,7 @@ import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
@@ -56,6 +57,10 @@ public class BackpackRecipe extends NormalCraftingRecipe {
 
     @Override
     public boolean matches(CraftingInput input, @NonNull Level level) {
+        if (Configuration.isDisabled(this.result.item().value())) {
+            return false;
+        }
+
         return this.pattern.matches(input);
     }
 
@@ -63,14 +68,31 @@ public class BackpackRecipe extends NormalCraftingRecipe {
     public @NonNull ItemStack assemble(@NonNull CraftingInput craftingRecipeInput) {
         ItemStack resultStack = this.result.create();
 
-        ItemStack stack = craftingRecipeInput.getItem(4);
-        if (stack.getItem() instanceof ContainerItem backpack) {
-            ItemStack upgradeStack = BackpackItemJsonRegistry.getBackpackUpgrade(backpack).getDefaultInstance();
-            upgradeStack = upgradeStack.copy();
-            upgradeStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(stack));
-            upgradeStack.set(DataComponents.ENCHANTMENTS, stack.get(DataComponents.ENCHANTMENTS));
+        for (ItemStack inputStack : craftingRecipeInput.items()) {
+            if (inputStack.isEmpty()) continue;
+            if (inputStack.getItem() instanceof ContainerItem backpack) {
+                ItemStack upgradeResultStack = BackpackItemJsonRegistry.getBackpackUpgrade(backpack).getDefaultInstance();
 
-            resultStack = upgradeStack;
+                upgradeResultStack = upgradeResultStack.copy();
+
+                if (inputStack.has(BackpackDataComponentTypes.BACKPACK_UUID)) {
+                    upgradeResultStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(inputStack));
+                }
+
+                if (inputStack.has(DataComponents.ENCHANTMENTS)) {
+                    upgradeResultStack.set(DataComponents.ENCHANTMENTS, inputStack.get(DataComponents.ENCHANTMENTS));
+                }
+
+                if (inputStack.has(BackpackDataComponentTypes.UPGRADE_CONTAINER)) {
+                    upgradeResultStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, inputStack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER));
+                }
+
+                if (inputStack.has(DataComponents.CUSTOM_NAME)) {
+                    upgradeResultStack.set(DataComponents.CUSTOM_NAME, inputStack.get(DataComponents.CUSTOM_NAME));
+                }
+
+                resultStack = upgradeResultStack;
+            }
         }
 
         return resultStack;

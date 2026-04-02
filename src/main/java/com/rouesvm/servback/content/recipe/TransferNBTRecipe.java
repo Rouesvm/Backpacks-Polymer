@@ -62,10 +62,25 @@ public class TransferNBTRecipe extends NormalCraftingRecipe {
     public @NonNull ItemStack assemble(@NonNull CraftingInput craftingRecipeInput) {
         ItemStack resultStack = this.result.create();
 
-        ItemStack stack = craftingRecipeInput.getItem(4);
-        if (stack.getItem() instanceof ContainerItem) {
-            resultStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(stack));
-            resultStack.set(DataComponents.ENCHANTMENTS, stack.get(DataComponents.ENCHANTMENTS));
+        for (ItemStack inputStack : craftingRecipeInput.items()) {
+            if (inputStack.isEmpty()) continue;
+            if (inputStack.getItem() instanceof ContainerItem) {
+                if (inputStack.has(BackpackDataComponentTypes.BACKPACK_UUID)) {
+                    resultStack.set(BackpackDataComponentTypes.BACKPACK_UUID, BackpackUUID.getStackUUID(inputStack));
+                }
+
+                if (inputStack.has(DataComponents.ENCHANTMENTS)) {
+                    resultStack.set(DataComponents.ENCHANTMENTS, inputStack.get(DataComponents.ENCHANTMENTS));
+                }
+
+                if (inputStack.has(BackpackDataComponentTypes.UPGRADE_CONTAINER)) {
+                    resultStack.set(BackpackDataComponentTypes.UPGRADE_CONTAINER, inputStack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER));
+                }
+
+                if (inputStack.has(DataComponents.CUSTOM_NAME)) {
+                    resultStack.set(DataComponents.CUSTOM_NAME, inputStack.get(DataComponents.CUSTOM_NAME));
+                }
+            }
         }
 
         return resultStack;

@@ -101,7 +101,7 @@ public class BackpackTrinket implements TrinketCallback {
         return !TrinketsApi.getAttachment(player).isEquipped(ItemStack::isEmpty);
     }
 
-    private static ItemStack getStackInBackSlot(Player player) {
+    public static ItemStack getStackInBackSlot(Player player) {
         TrinketAttachment attachment = TrinketsApi.getAttachment(player);
         if (attachment.isEquipped(ItemStack::isEmpty))
             return ItemStack.EMPTY;

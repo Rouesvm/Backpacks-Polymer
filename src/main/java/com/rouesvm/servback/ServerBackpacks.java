@@ -2,6 +2,7 @@ package com.rouesvm.servback;
 
 import com.mojang.authlib.GameProfile;
 import com.rouesvm.servback.compat.geyser.BackpackGeyser;
+import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.commands.BackpackCommands;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
@@ -75,6 +76,7 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackUpgradeRegistry.initialize();
 
 		if (hasGeyserLoaded) BackpackGeyser.initialize();
+		if (hasTrinketLoaded) BackpackTrinket.initialize();
 
 		serverEvents();
 	}
@@ -89,12 +91,12 @@ public class ServerBackpacks implements ModInitializer {
 				BEDROCK_PLAYERS.remove(serverPlayNetworkHandler.getPlayer().getUUID()));
 
 		ServerLifecycleEvents.SERVER_STARTING.register(BackpackManager::initialize);
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> BackpackManager.loadOnServerStarted());
+		ServerLifecycleEvents.SERVER_STARTED.register(_ -> BackpackManager.loadOnServerStarted());
 
-		ServerLifecycleEvents.SERVER_STOPPING.register((a) -> BackpackManager.backupSaveLog());
+		ServerLifecycleEvents.SERVER_STOPPING.register((_) -> BackpackManager.backupSaveLog());
 		ServerLifecycleEvents.SERVER_STOPPED.register(BackpackManager::destroy);
 
-		ServerLifecycleEvents.BEFORE_SAVE.register((a, b, b1) -> BackpackManager.createBackupAndSave());
+		ServerLifecycleEvents.BEFORE_SAVE.register((_, _, _) -> BackpackManager.createBackupAndSave());
 
 		backupEvents();
 	}

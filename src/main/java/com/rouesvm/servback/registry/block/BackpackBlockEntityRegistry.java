@@ -15,7 +15,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 public class BackpackBlockEntityRegistry {
     public static final BlockEntityType<BackpackBlockEntity> BACKPACK_BLOCK_ENTITY = register(
             "backpack_block_entity",
-            FabricBlockEntityTypeBuilder.create(BackpackBlockEntity::new, BackpackBlockRegistry.BACKPACK, BackpackBlockRegistry.LAVA_BACKPACK, BackpackBlockRegistry.GLOBAL_BACKPACK).build());
+            FabricBlockEntityTypeBuilder.create(BackpackBlockEntity::new,
+                    BackpackBlockRegistry.BACKPACK,
+                    BackpackBlockRegistry.LAVA_BACKPACK,
+                    BackpackBlockRegistry.GLOBAL_BACKPACK).build());
 
     public static final BlockEntityType<BasicBackpackBlockEntity> BASIC_BACKPACK_BLOCK_ENTITY = register(
             "basic_backpack_block_entity",

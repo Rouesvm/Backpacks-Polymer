@@ -29,6 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
     }
 
     @Override
-    public void tick(ServerPlayer player, ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
+    public void tick(@Nullable ServerPlayer player, @Nullable ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
         if (clickCounter > 0) {
             clickTimer++;
 

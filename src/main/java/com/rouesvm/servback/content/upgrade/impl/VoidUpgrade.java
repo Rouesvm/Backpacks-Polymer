@@ -18,6 +18,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -69,7 +70,7 @@ public class VoidUpgrade extends Upgrade implements PersistentUpgrade, Filterabl
     }
 
     @Override
-    public void tick(ServerPlayer player, ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
+    public void tick(@Nullable ServerPlayer player, @Nullable ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {
         if (inventory == null || !(world instanceof ServerLevel serverWorld)) return;
 
         tick++;

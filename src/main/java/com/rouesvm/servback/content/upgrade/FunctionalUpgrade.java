@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface FunctionalUpgrade {
         return false;
     }
 
-    default void tick(ServerPlayer player, ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {}
+    default void tick(@Nullable ServerPlayer player, @Nullable ItemStack stack, ServerLevel world, Vec3 pos, BackpackInventory inventory) {}
 
     default void addTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {}
 }

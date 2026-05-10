@@ -62,7 +62,7 @@ public class BackpackListData extends FallbackData {
         for (int i = 0; i < backpacks.size(); ++i) {
             Optional<CompoundTag> backpackEntry = backpacks.getCompound(i);
             backpackEntry.ifPresent(nbtCompound ->
-                    BackpackDFU.applyDataFixToItemStacks(server, nbtCompound, oldVersion, newVersion));
+                    BackpackDFU.applyDataFixToItemStacks(server, nbtCompound, manager().nbtOps(), oldVersion, newVersion));
         }
     }
 

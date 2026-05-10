@@ -18,8 +18,12 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class BackpackDataBackup {
+    private static final int MAX_SINGULAR_BACKUPS = Configuration.instance().max_singular_backup_size;
+    private static final int MAX_FULL_BACKUPS = Configuration.instance().max_multiple_backup_size;
+
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "ServerBackpacks-DataBackup");
         t.setDaemon(true);
@@ -84,6 +88,45 @@ public class BackpackDataBackup {
         }
     }
 
+    private LocalDateTime parseTime(Path dir) {
+        try {
+            return LocalDateTime.parse(dir.getFileName().toString(), formatter);
+        } catch (Exception e) {
+            return LocalDateTime.MIN;
+        }
+    }
+
+    private void deleteDirectory(Path path) {
+        try (Stream<Path> walk = Files.walk(path)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .forEach(p -> {
+                        try {
+                            Files.deleteIfExists(p);
+                        } catch (IOException ignored) {}
+                    });
+        } catch (IOException e) {
+            ServerBackpacks.LOGGER.error("Failed deleting {}", path, e);
+        }
+    }
+
+    private void cleanupOldBackups(Path baseDir, int maxKeep) {
+        try (Stream<Path> stream = Files.list(baseDir)) {
+            List<Path> dirs = stream
+                    .filter(Files::isDirectory)
+                    .sorted(Comparator.comparing(this::parseTime).reversed())
+                    .toList();
+
+            if (dirs.size() <= maxKeep) return;
+
+            for (int i = maxKeep; i < dirs.size(); i++) {
+                deleteDirectory(dirs.get(i));
+            }
+
+        } catch (IOException e) {
+            ServerBackpacks.LOGGER.error("Failed cleanup for {}", baseDir, e);
+        }
+    }
+
     private Path createTimestampedDir(Path baseDir) {
         String formattedTime = LocalDateTime.now().format(formatter);
         return baseDir.resolve(formattedTime);
@@ -129,7 +172,10 @@ public class BackpackDataBackup {
                 return;
             }
 
-            executor.submit(() -> saveBackup(createTimestampedDir(finalBackupDir), instance, lastSingularHashes));
+            executor.submit(() -> {
+                saveBackup(createTimestampedDir(finalBackupDir), instance, lastSingularHashes);
+                cleanupOldBackups(finalBackupDir, MAX_SINGULAR_BACKUPS);
+            });
         }
     }
 
@@ -156,6 +202,7 @@ public class BackpackDataBackup {
 
         executor.submit(() -> {
             for (BackpackInstance instance : finalStoredInventories) data.saveSingleToDisk(instance, currentDir);
+            cleanupOldBackups(fullBackupDir, MAX_FULL_BACKUPS);
         });
     }
 }

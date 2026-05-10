@@ -179,6 +179,11 @@ public class Configuration {
         @SerializedName("allow_skulker_boxes_in_backpacks")
         public boolean allow_shulker_boxes_in_backpacks = false;
 
+        @SerializedName("max_singular_backup_size")
+        public int max_singular_backup_size = 15;
+        @SerializedName("max_multiple_backup_size")
+        public int max_multiple_backup_size = 50;
+
         @SerializedName("global_backpack_size")
         public int global_backpack_size = 54;
 

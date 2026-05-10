@@ -93,19 +93,20 @@ public class BackpackData implements Data {
     private Optional<BackpackInstance> loadSingle(Path saveDir, UUID uuid) {
         if (saveDir == null) return Optional.empty();
 
-        Path file = saveDir.resolve(uuid.toString() + ".dat");
+        Path file = saveDir.resolve(uuid + ".dat");
         if (!Files.exists(file)) return Optional.empty();
 
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file))) {
-            CompoundTag nbt = NbtIo.readCompressed(dis, NbtAccounter.unlimitedHeap());
+            CompoundTag nbt = NbtIo.readCompressed(dis, NbtAccounter.uncompressedQuota());
             Optional<Integer> data_version = nbt.getInt("data_version");
 
             int latest = SharedConstants.getCurrentVersion().dataVersion().version();
-            BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, data_version.orElse(latest), latest);
+            BackpackDFU.applyDataFixToItemStacks(manager.server(), nbt, manager.nbtOps(), data_version.orElse(latest), latest);
 
             DataResult<Pair<BackpackInstanceData, Tag>> data =
                     BackpackInstanceData.CODEC.decode(manager.nbtOps(), nbt);
-            return data.result().map(pair -> pair.getFirst().toInstance(uuid));
+
+            return data.resultOrPartial().map(pair -> pair.getFirst().toInstance(uuid));
         } catch (IOException | ReportedNbtException e) {
             ServerBackpacks.LOGGER.error("Failed to load single backpack {}", uuid, e);
             return Optional.empty();

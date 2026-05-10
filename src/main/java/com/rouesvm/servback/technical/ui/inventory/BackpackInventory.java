@@ -19,14 +19,6 @@ public class BackpackInventory extends BaseInventory {
         super(stacks);
     }
 
-    public boolean isPlaced() {
-        return entity != null;
-    }
-
-    public BlockEntity getEntity() {
-        return entity;
-    }
-
     @Override
     public void setItem(int slot, @NonNull ItemStack stack) {
         super.setItem(slot, stack);

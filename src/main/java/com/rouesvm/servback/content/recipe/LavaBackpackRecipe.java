@@ -7,6 +7,7 @@ import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
+import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
@@ -37,6 +38,10 @@ public class LavaBackpackRecipe extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput input, @NonNull Level world) {
+        if (Configuration.isDisabled(BackpackItemRegistry.LAVA_BACKPACK)) {
+            return false;
+        }
+
         if (input.isEmpty()) return false;
 
         boolean hasBackpack = false;
@@ -65,8 +70,11 @@ public class LavaBackpackRecipe extends CustomRecipe {
         return hasBackpack && hasLavaBucket;
     }
 
-    @Override
     public @NonNull ItemStack assemble(CraftingInput input) {
+        if (Configuration.isDisabled(BackpackItemRegistry.LAVA_BACKPACK)) {
+            return ItemStack.EMPTY;
+        }
+
         for (ItemStack inputStack : input.items()) {
             if (inputStack.isEmpty()) continue;
             if (inputStack.getItem() instanceof ContainerItem) {

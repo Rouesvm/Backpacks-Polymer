@@ -35,7 +35,7 @@ public class UpgradeItem extends SimplePolymerItem {
     private final PolymerModelData customModelId;
 
     public UpgradeItem(Settings settings, UpgradeType<? extends Upgrade> upgradeType) {
-        super(settings.component(BackpackDataComponentTypes.UPGRADE, UpgradeComponent.of(upgradeType.create())),
+        super(settings,
                 Items.POISONOUS_POTATO);
         this.upgradeType = upgradeType;
         this.customModelId = PolymerResourcePackUtils.requestModel(Items.POISONOUS_POTATO,  upgradeType.getId().withSuffixedPath("_upgrade").withPrefixedPath("item/"));
@@ -103,6 +103,7 @@ public class UpgradeItem extends SimplePolymerItem {
     public Upgrade getUpgrade(ItemStack stack) {
         UpgradeComponent component = UpgradeComponent.of(upgradeType.create());
         UpgradeComponent stackComponent = stack.getOrDefault(BackpackDataComponentTypes.UPGRADE, component);
+        stack.set(BackpackDataComponentTypes.UPGRADE, stackComponent);
         return stackComponent.upgrade();
     }
 }

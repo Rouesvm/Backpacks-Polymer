@@ -9,6 +9,7 @@ import com.rouesvm.servback.content.upgrade.impl.MagnetUpgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
+import eu.pb4.polymer.core.api.utils.PolymerObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
@@ -183,7 +184,7 @@ public class InputDefinedFilterRecipe extends SpecialCraftingRecipe implements P
         return CraftingRecipeCategory.MISC;
     }
 
-    public static class Serializer extends SpecialRecipeSerializer<InputDefinedFilterRecipe> {
+    public static class Serializer extends SpecialRecipeSerializer<InputDefinedFilterRecipe> implements PolymerObject {
         public Serializer(Factory<InputDefinedFilterRecipe> factory) {
             super(factory);
         }

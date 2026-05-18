@@ -176,7 +176,7 @@ public class ContainerItem extends BundleGuiItem {
             capacityMaxShow++;
             tooltip.add(Text.literal(" ")
                     .append(Text.translatable(
-                            "item.container.item_count",
+                            "container.shulkerBox.itemCount",
                             itemStack.getName(),
                             itemStack.getCount()
                     )).formatted(Formatting.DARK_AQUA)
@@ -184,7 +184,7 @@ public class ContainerItem extends BundleGuiItem {
         }
 
         if (capacityAmount - capacityMaxShow > 0) tooltip.add(
-                Text.translatable("item.container.more_items", capacityAmount - capacityMaxShow)
+                Text.translatable("container.shulkerBox.more", capacityAmount - capacityMaxShow)
                         .formatted(Formatting.ITALIC).formatted(Formatting.DARK_AQUA));
     }
 

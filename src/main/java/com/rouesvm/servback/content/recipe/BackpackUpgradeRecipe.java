@@ -9,6 +9,7 @@ import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
+import eu.pb4.polymer.core.api.utils.PolymerObject;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -40,12 +41,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe, PolymerRecipe {
 
     @Override
     public boolean matches(SmithingRecipeInput input, World world) {
-        ItemStack[] matchingStacks = this.addition().getMatchingStacks();
-        if (matchingStacks.length == 0) return false;
-        boolean baseMatch = this.base().test(input.base())
-                && ItemStack.areItemsAndComponentsEqual(matchingStacks[0], input.addition());
-
-        if (!baseMatch) return false;
+        if (!this.base.test(input.base()) || !this.addition.test(input.addition())) return false;
 
         ItemStack base = input.base();
         ItemStack addition = input.addition();
@@ -114,26 +110,26 @@ public class BackpackUpgradeRecipe implements SmithingRecipe, PolymerRecipe {
         return this.addition;
     }
 
+    @Override
     public RecipeSerializer<BackpackUpgradeRecipe> getSerializer() {
         return BackpackRecipeRegistry.BACKPACK_UPGRADE_RECIPE;
     }
 
     @Override
     public boolean testTemplate(ItemStack stack) {
-        return false;
+        return stack.isEmpty();
     }
 
-    @Override
     public boolean testBase(ItemStack stack) {
-        return false;
+        return this.base.test(stack);
     }
 
-    @Override
     public boolean testAddition(ItemStack stack) {
-        return false;
+        return this.addition.test(stack);
     }
 
-    public static class Serializer implements RecipeSerializer<BackpackUpgradeRecipe> {
+
+    public static class Serializer implements RecipeSerializer<BackpackUpgradeRecipe>, PolymerObject {
         private static final MapCodec<BackpackUpgradeRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) ->
                 instance.group(Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("base").forGetter(BackpackUpgradeRecipe::base),
                         Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("addition").forGetter(BackpackUpgradeRecipe::addition),
@@ -147,7 +143,7 @@ public class BackpackUpgradeRecipe implements SmithingRecipe, PolymerRecipe {
         }
 
         public PacketCodec<RegistryByteBuf, BackpackUpgradeRecipe> packetCodec() {
-            return PACKET_CODEC;
+            return null;
         }
 
         static {

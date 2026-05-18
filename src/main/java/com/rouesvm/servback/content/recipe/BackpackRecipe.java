@@ -36,6 +36,7 @@ public class BackpackRecipe extends ShapedRecipe implements PolymerRecipe {
         this.result = result;
     }
 
+
     public RecipeSerializer<? extends ShapedRecipe> getSerializer() {
         return BackpackRecipeRegistry.BACKPACK_CRAFTING_RECIPE;
     }

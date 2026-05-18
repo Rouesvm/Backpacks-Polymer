@@ -2,42 +2,17 @@ package com.rouesvm.servback.technical.ui;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.CraftingResultSlot;
-import net.minecraft.screen.slot.Slot;
 
 public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
-    private final CraftingInventory craftingInventory = new CraftingInventory(this, 3, 3);
-    private final CraftingResultInventory resultInventory = new CraftingResultInventory();
-
     private final PlayerEntity player;
 
     public VirtualCraftingScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(syncId, playerInventory);
         this.player = playerInventory.player;
-
-        this.slots.clear();
-        this.addSlot(new CraftingResultSlot(this.getPlayer(), craftingInventory, resultInventory, 0, 124, 35));
-
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                this.addSlot(new Slot(craftingInventory, j + i * 3, 30 + j * 18, 17 + i * 18));
-            }
-        }
-
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
-            }
-        }
-
-        for (int k = 0; k < 9; ++k) {
-            this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 142));
-        }
     }
 
     private PlayerEntity getPlayer() {
@@ -46,13 +21,7 @@ public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
 
     @Override
     public void onContentChanged(Inventory inventory) {
-        CraftingScreenHandler.updateResult(
-                this,
-                this.getPlayer().getEntityWorld(),
-                this.getPlayer(),
-                craftingInventory, resultInventory,
-                null
-        );
+        super.onContentChanged(inventory);
     }
 
     @Override
@@ -62,8 +31,14 @@ public class VirtualCraftingScreenHandler extends CraftingScreenHandler {
         handler.enableSyncing();
         handler.sendContentUpdates();
 
+        int i = 9;
+        for (ItemStack stack : handler.getStacks()) {
+            i--;
+            player.getInventory().offerOrDrop(stack);
+            if (i < 0) break;
+        }
+
         super.onClosed(player);
-        this.dropInventory(player, craftingInventory);
     }
 
     @Override

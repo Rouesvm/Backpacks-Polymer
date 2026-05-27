@@ -4,6 +4,7 @@ import com.rouesvm.servback.ServerBackpacks;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.ui.slots.NonBackpackSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.network.HashedStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -11,7 +12,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Objects;
 
 public class BasicInventoryGui extends SimpleGui {
     private static final String BEDROCK_ROW_MARKER = "chest.row.";
@@ -85,6 +89,20 @@ public class BasicInventoryGui extends SimpleGui {
     }
 
     @Override
+    public void onManualClose() {
+        onClose();
+    }
+
+    @Override
+    public void onPlayerClose(boolean success) {
+        if (success) onClose();
+    }
+
+    public void onClose() {
+        player.inventoryMenu.setRemoteCarried(HashedStack.create(Items.DIRT.getDefaultInstance(), Objects::hashCode));
+    }
+
+        @Override
     public void onTick() {
         if (outOfSlot) this.close();
     }

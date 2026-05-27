@@ -158,7 +158,10 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
             if (!otherStack.getItem().canFitInsideContainerItems()) return false;
 
             if (clickType == ClickAction.SECONDARY) {
+                serverPlayer.closeContainer();
                 onOpenGui(serverPlayer, stack);
+                serverPlayer.inventoryMenu.resumeRemoteUpdates();
+                serverPlayer.inventoryMenu.broadcastChanges();
                 return true;
             }
 

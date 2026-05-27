@@ -13,7 +13,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -62,22 +61,8 @@ public class BackpackGui extends BasicInventoryGui {
     }
 
     @Override
-    public void onManualClose() {
-        onClose();
-    }
-
-    @Override
-    public void onPlayerClose(boolean success) {
-        if (success) onClose();
-    }
-
     public void onClose() {
         if (stack != null) stack.set(BackpackDataComponentTypes.IS_OPENED, false);
-
-        AbstractContainerMenu handler = this.getPlayer().containerMenu;
-
-        handler.resumeRemoteUpdates();
-        handler.broadcastChanges();
 
         if (markDirty) {
             String before = BackpackUtils.hashBackpackContents(frozenInstance.heldInventory());
@@ -87,6 +72,8 @@ public class BackpackGui extends BasicInventoryGui {
                 BackpackManager.createSingularBackupAndSave(instance);
             }
         }
+
+        super.onClose();
     }
 
     @Override

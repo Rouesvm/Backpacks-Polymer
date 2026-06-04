@@ -125,6 +125,18 @@ public class BackpackData implements Data {
         return DATA_TYPE.FILE_DATA;
     }
 
+    public static boolean isValidUUID(String name) {
+        if (name.length() != 36) {
+            return false;
+        } else {
+            char ch1 = name.charAt(8);
+            char ch2 = name.charAt(13);
+            char ch3 = name.charAt(18);
+            char ch4 = name.charAt(23);
+            return ch1 == '-' && ch2 == '-' && ch3 == '-' && ch4 == '-';
+        }
+    }
+
     private boolean scanAndLoadUUIDs() {
         try {
             Files.createDirectories(saveDir);
@@ -133,7 +145,7 @@ public class BackpackData implements Data {
                 paths.filter(p -> p.toString().endsWith(".dat"))
                         .forEach(p -> {
                             String filename = p.getFileName().toString().replace(".dat", "");
-                            availableUUIDS.add(UUID.fromString(filename));
+                            if (isValidUUID(filename)) availableUUIDS.add(UUID.fromString(filename));
                         });
             }
 

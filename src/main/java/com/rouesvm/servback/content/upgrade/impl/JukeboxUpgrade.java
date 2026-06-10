@@ -23,7 +23,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.JukeboxPlayable;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -32,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, PersistentUpgrade {
     private SoundAttacher attacher;
@@ -67,9 +67,8 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
         }
 
         if (song == null && musicDisc != null && !musicDisc.isEmpty() && world != null) {
-            JukeboxPlayable jukebox = musicDisc.get(DataComponents.JUKEBOX_PLAYABLE);
-            if (jukebox != null) song = jukebox.song().unwrap().right()
-                    .orElse(null);
+            Optional<Holder<JukeboxSong>> jukebox = JukeboxSong.fromStack(musicDisc);
+            jukebox.ifPresent(jukeboxSongHolder -> song = jukeboxSongHolder.value());
         }
 
         if (playing) {
@@ -195,12 +194,11 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
         }
 
         if (otherStack != null && !otherStack.isEmpty()) {
+            if (musicDisc != null && !musicDisc.isEmpty()) return true;
             musicDisc = otherStack.has(DataComponents.JUKEBOX_PLAYABLE) ? otherStack.copyAndClear() : null;
-
             if (song == null && musicDisc != null && !musicDisc.isEmpty()) {
-                JukeboxPlayable jukebox = musicDisc.get(DataComponents.JUKEBOX_PLAYABLE);
-                if (jukebox != null) song = jukebox.song().unwrap().right()
-                        .orElse(null);
+                Optional<Holder<JukeboxSong>> jukebox = JukeboxSong.fromStack(musicDisc);
+                jukebox.ifPresent(jukeboxSongHolder -> song = jukeboxSongHolder.value());
 
                 clickCounter = 0;
                 clickTimer = 0;
@@ -246,7 +244,7 @@ public class JukeboxUpgrade extends Upgrade implements ClickableUpgrade, Persist
         private final ItemDisplayElement element = new ItemDisplayElement();
 
         private SoundAttacher() {
-            this.element.setInvisible(true);
+            this.element.setInvisible(false);
             this.element.setTeleportDuration(3);
         }
 

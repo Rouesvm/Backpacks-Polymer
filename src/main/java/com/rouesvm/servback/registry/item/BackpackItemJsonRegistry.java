@@ -49,7 +49,7 @@ public class BackpackItemJsonRegistry {
     }
 
     public static BackpackItemConfiguration.BackCosmetic getBackpackCosmetic(ContainerItem item) {
-        return ITEM_TO_BACK_COSMETIC.get(item);
+        return ITEM_TO_BACK_COSMETIC.getOrDefault(item, BackpackItemConfiguration.DEFAULT_COSMETIC);
     }
 
     private static ContainerItem create(String upgrade, String name, int slots) {

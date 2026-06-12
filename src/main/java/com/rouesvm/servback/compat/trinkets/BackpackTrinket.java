@@ -2,7 +2,6 @@ package com.rouesvm.servback.compat.trinkets;
 
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.BundleGuiItem;
-import com.rouesvm.servback.datagen.ModItemTags;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BackHolder;
@@ -16,6 +15,7 @@ import eu.pb4.trinkets.api.callback.TrinketCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -92,7 +92,8 @@ public class BackpackTrinket implements TrinketCallback {
     }
 
     public static void equipStack(Player player, ItemStack stack) {
-        TrinketsApi.getAttachment(player).forEach((trinketSlotAccess, _) -> {
+        TrinketAttachment attachment = TrinketsApi.getAttachment(player);
+        attachment.forEach((trinketSlotAccess, _) -> {
             if (trinketSlotAccess.slotType().getId().equals("chest/back")) {
                 trinketSlotAccess.set(stack);
             }
@@ -100,15 +101,29 @@ public class BackpackTrinket implements TrinketCallback {
     }
 
     public static boolean isBackSlotOccupied(Player player) {
-        return TrinketsApi.getAttachment(player).isEquipped(itemStack -> itemStack.is(ModItemTags.BACKPACKS));
+        TrinketAttachment attachment = TrinketsApi.getAttachment(player);
+        for (Tuple<TrinketSlotAccess, ItemStack> accessor : attachment.getAllEquipped()) {
+            TrinketSlotAccess access = accessor.getA();
+            if (access.slotType().getId().equals("chest/back")) {
+                if (!access.get().isEmpty()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static ItemStack getStackInBackSlot(Player player) {
         TrinketAttachment attachment = TrinketsApi.getAttachment(player);
-        if (attachment.isEquipped(ItemStack::isEmpty))
-            return ItemStack.EMPTY;
-        return attachment
-                .getEquipped((stack) -> stack.is(ModItemTags.BACKPACKS))
-                .getFirst().getA().get();
+
+        for (Tuple<TrinketSlotAccess, ItemStack> accessor : attachment.getAllEquipped()) {
+            TrinketSlotAccess access = accessor.getA();
+            if (access.slotType().getId().equals("chest/back")) {
+                return access.get();
+            }
+        }
+
+        return ItemStack.EMPTY;
     }
 }

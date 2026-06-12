@@ -2,6 +2,7 @@ package com.rouesvm.servback.compat.trinkets;
 
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.BundleGuiItem;
+import com.rouesvm.servback.datagen.ModItemTags;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BackHolder;
@@ -91,14 +92,15 @@ public class BackpackTrinket implements TrinketCallback {
     }
 
     public static void equipStack(Player player, ItemStack stack) {
-        TrinketsApi.getAttachment(player).getEquipped(ItemStack::isEmpty)
-                .getFirst()
-                .getA()
-                .set(stack);
+        TrinketsApi.getAttachment(player).forEach((trinketSlotAccess, _) -> {
+            if (trinketSlotAccess.slotType().getId().equals("chest/back")) {
+                trinketSlotAccess.set(stack);
+            }
+        });
     }
 
     public static boolean isBackSlotOccupied(Player player) {
-        return !TrinketsApi.getAttachment(player).isEquipped(ItemStack::isEmpty);
+        return TrinketsApi.getAttachment(player).isEquipped(itemStack -> itemStack.is(ModItemTags.BACKPACKS));
     }
 
     public static ItemStack getStackInBackSlot(Player player) {
@@ -106,7 +108,7 @@ public class BackpackTrinket implements TrinketCallback {
         if (attachment.isEquipped(ItemStack::isEmpty))
             return ItemStack.EMPTY;
         return attachment
-                .getEquipped((stack) -> (!stack.isEmpty() && stack.getItem() instanceof BundleGuiItem))
-                .getFirst().getB();
+                .getEquipped((stack) -> stack.is(ModItemTags.BACKPACKS))
+                .getFirst().getA().get();
     }
 }

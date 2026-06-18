@@ -3,7 +3,6 @@ package com.rouesvm.servback.content.recipe.builder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.rouesvm.servback.content.recipe.BackpackRecipe;
-import net.minecraft.advancements.Criterion;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -82,7 +81,8 @@ public class BackpackRecipeJsonBuilder implements RecipeBuilder {
         }
     }
 
-    public BackpackRecipeJsonBuilder unlockedBy(final String name, final Criterion<?> criterion) {
+    @Override
+    public RecipeBuilder unlockedBy(String name, net.minecraft.advancements.triggers.Criterion<?> criterion) {
         this.advancementBuilder.unlockedBy(name, criterion);
         return this;
     }

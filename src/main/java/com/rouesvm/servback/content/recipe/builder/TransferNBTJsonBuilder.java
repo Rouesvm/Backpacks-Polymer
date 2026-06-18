@@ -3,7 +3,7 @@ package com.rouesvm.servback.content.recipe.builder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.rouesvm.servback.content.recipe.TransferNBTRecipe;
-import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;

@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
     public void tick(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (uuid == null) return;
         if (upgradeList != null && !upgradeList.isEmpty()) upgradeList.forEach((upgrade) -> {
-            upgrade.tick(null, null, (ServerLevel) world, pos.getCenter(), instance.inventory());
+            upgrade.tick(null, null, (ServerLevel) world, Vec3.atCenterOf(pos), instance.inventory());
         });
     }
 

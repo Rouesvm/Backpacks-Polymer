@@ -9,13 +9,13 @@ import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
 import eu.pb4.trinkets.api.TrinketAttachment;
+import eu.pb4.trinkets.api.TrinketInventory;
 import eu.pb4.trinkets.api.TrinketSlotAccess;
 import eu.pb4.trinkets.api.TrinketsApi;
 import eu.pb4.trinkets.api.callback.TrinketCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -93,22 +93,28 @@ public class BackpackTrinket implements TrinketCallback {
 
     public static void equipStack(Player player, ItemStack stack) {
         TrinketAttachment attachment = TrinketsApi.getAttachment(player);
-        attachment.forEach((trinketSlotAccess, _) -> {
-            if (trinketSlotAccess.slotType().getId().equals("chest/back")) {
-                trinketSlotAccess.set(stack);
+        TrinketInventory inventory = attachment.getInventory("chest/back");
+
+        if (inventory == null) return;
+
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack trinket = inventory.getItem(i);
+            if (trinket.isEmpty()) {
+                inventory.setItem(i, stack);
+                break;
             }
-        });
+        }
     }
 
     public static boolean isBackSlotOccupied(Player player) {
         TrinketAttachment attachment = TrinketsApi.getAttachment(player);
-        for (Tuple<TrinketSlotAccess, ItemStack> accessor : attachment.getAllEquipped()) {
-            TrinketSlotAccess access = accessor.getA();
-            if (access.slotType().getId().equals("chest/back")) {
-                if (!access.get().isEmpty()) {
-                    return true;
-                }
-            }
+        TrinketInventory inventory = attachment.getInventory("chest/back");
+
+        if (inventory == null) return false;
+
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (!stack.isEmpty()) return true;
         }
 
         return false;
@@ -116,12 +122,13 @@ public class BackpackTrinket implements TrinketCallback {
 
     public static ItemStack getStackInBackSlot(Player player) {
         TrinketAttachment attachment = TrinketsApi.getAttachment(player);
+        TrinketInventory inventory = attachment.getInventory("chest/back");
 
-        for (Tuple<TrinketSlotAccess, ItemStack> accessor : attachment.getAllEquipped()) {
-            TrinketSlotAccess access = accessor.getA();
-            if (access.slotType().getId().equals("chest/back")) {
-                return access.get();
-            }
+        if (inventory == null) return ItemStack.EMPTY;
+
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (!stack.isEmpty()) return stack;
         }
 
         return ItemStack.EMPTY;

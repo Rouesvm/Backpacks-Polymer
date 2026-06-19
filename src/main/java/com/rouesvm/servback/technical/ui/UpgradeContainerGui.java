@@ -99,7 +99,7 @@ public class UpgradeContainerGui extends SimpleGui {
 
         Upgrade upgrade = item.getUpgrade(stack);
 
-        if (remove) {
+        if (remove && this.wrappedMenu.getCarried().isEmpty()) {
             this.wrappedMenu.setCarried(stack.copyAndClear());
 
             ItemStack barrier = Items.BARRIER.getDefaultInstance();

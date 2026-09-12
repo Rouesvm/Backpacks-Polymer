@@ -57,7 +57,7 @@ public class BaseBackpackBlock extends BasicBackpackBlock implements EntityBlock
         BackpackBlockEntity backpackBlockEntity = (BackpackBlockEntity) entity;
 
         ItemStack stack = backpackBlockEntity.getDefaultStack().copy();
-        BackpackUtils.resizeIfIncorrectSize(player, stack, backpackBlockEntity.getSize());
+        BackpackUtils.resizeIfIncorrectSize(player.level(), player.blockPosition(), stack, backpackBlockEntity.getSize());
         BackpackTrinket.equipStack(player, stack);
         world.destroyBlock(pos, false);
         return true;
@@ -68,7 +68,7 @@ public class BaseBackpackBlock extends BasicBackpackBlock implements EntityBlock
         if (!(entity instanceof BackpackBlockEntity backpackBlockEntity)) return;
 
         BackpackInstance instance = backpackBlockEntity.getInstance();
-        resize(player, backpackBlockEntity.getUuid(), instance.inventory(),
+        resize(player.level(), player.blockPosition(), backpackBlockEntity.getUuid(), instance.inventory(),
                 backpackBlockEntity.getSize() + backpackBlockEntity.getExtraSize());
         new BackpackGui(player, instance);
     }

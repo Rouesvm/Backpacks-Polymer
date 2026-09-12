@@ -1,14 +1,18 @@
 package com.rouesvm.servback.content.block;
 
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
+import com.rouesvm.servback.technical.BackpackUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -52,6 +56,29 @@ public class BasicBackpackBlockEntity extends BlockEntity {
                         int rawId = view.getIntOr("item", BuiltInRegistries.ITEM.getId(BackpackItemJsonRegistry.getBackpackByName("small")));
                         return BuiltInRegistries.ITEM.byId(rawId);
                     });
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        CustomData component = components.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        Optional<String> itemString = component.copyTag().getString("name");
+        ContainerItem item = (ContainerItem) itemString.map(Identifier::tryParse)
+                .map(BuiltInRegistries.ITEM::getValue)
+                .orElseGet(() -> BackpackItemJsonRegistry.getBackpackByName("small"));
+
+        setItem(item);
+        setSize(BackpackUtils.getExtendedSlots(components));
+
+        Component customName = components.get(DataComponents.CUSTOM_NAME);
+        if (customName != null) {
+            setCustomName(customName);
+        }
+
+        setChanged();
+
+        if (this.getLevel() != null) {
+            ContainerItem.playPlaceSound(this.getLevel(), getBlockPos());
         }
     }
 

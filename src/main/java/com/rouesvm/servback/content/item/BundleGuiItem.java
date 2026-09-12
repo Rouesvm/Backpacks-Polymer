@@ -1,16 +1,15 @@
 package com.rouesvm.servback.content.item;
 
-import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
-import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.ui.BasicInventoryGui;
 import com.rouesvm.servback.technical.ui.UpgradeContainerGui;
 import com.rouesvm.servback.technical.ui.inventory.BaseInventory;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -24,6 +23,8 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -49,29 +50,6 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(
-            @NonNull BlockPos pos,
-            Level world,
-            @Nullable Player player,
-            @NonNull ItemStack stack,
-            @NonNull BlockState state
-    ) {
-        if (world.getBlockEntity(pos) instanceof BasicBackpackBlockEntity blockEntity) {
-            blockEntity.setItem(this);
-            blockEntity.setSize(BackpackUtils.getExtendedSlots(stack));
-
-            if (stack.getCustomName() != null
-            ) blockEntity.setCustomName(stack.getCustomName());
-
-            blockEntity.setChanged();
-            ContainerItem.playOpenSound((ServerPlayer) player);
-        }
-
-        return updateCustomBlockEntityTag(world, player, pos, stack);
-    }
-
-
-    @Override
     public @NonNull InteractionResult use(@NonNull Level world, Player player, @NonNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
@@ -90,7 +68,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         }
         
         onOpenGui(serverPlayer, stack);
-        player.swing(hand, true);
+        player.swing(hand, SwingAnimation.DEFAULT, true);
         return InteractionResult.SUCCESS;
     }
 
@@ -108,7 +86,7 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
         ) return super.useOn(context);
 
         onOpenGui(serverPlayer, context.getItemInHand());
-        serverPlayer.swing(context.getHand(), true);
+        serverPlayer.swing(context.getHand(), SwingAnimation.DEFAULT, true);
         return InteractionResult.SUCCESS;
     }
 
@@ -138,6 +116,17 @@ public class BundleGuiItem extends BasicPolymerBlockItem  {
                 return true;
             } else return false;
         } else return false;
+    }
+
+    @Override
+    public @NonNull InteractionResult place(@NonNull BlockPlaceContext placeContext) {
+        ItemStack itemStack = placeContext.getItemInHand();
+
+        CompoundTag compound = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        compound.putString("name", this.toString());
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(compound));
+
+        return super.place(placeContext);
     }
 
     @Override

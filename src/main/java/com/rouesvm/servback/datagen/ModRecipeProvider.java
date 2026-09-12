@@ -8,11 +8,13 @@ import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemRegistry;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.*;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
@@ -20,6 +22,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -33,11 +36,11 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wrapperLookup, RecipeOutput recipeExporter) {
-        return new RecipeProvider(wrapperLookup, recipeExporter) {
+    protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, BootstrapContext<Recipe<?>> recipes, BootstrapContext<Advancement> advancements) {
+        return new RecipeProvider(recipes, advancements) {
             @Override
             public void buildRecipes() {
-                itemRecipes(wrapperLookup, output);
+                itemRecipes(registries, output);
             }
         };
     }
@@ -154,40 +157,40 @@ protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.Provider wra
                         Ingredient.of(BackpackItemRegistry.VOID_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))
-                .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
-                .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "void_upgrade_backpack")));
+                .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "void_upgrade_backpack")));
 
         BackpackUpgradeRecipeJsonBuilder.create(
                         Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.of(BackpackItemRegistry.JUKEBOX_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))
-                .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
-                .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "jukebox_upgrade_backpack")));
+                .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "jukebox_upgrade_backpack")));
 
         BackpackUpgradeRecipeJsonBuilder.create(
                         Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.of(BackpackItemRegistry.MAGNET_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))
-                .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
-                .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "magnet_upgrade_backpack")));
+                .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "magnet_upgrade_backpack")));
 
         BackpackUpgradeRecipeJsonBuilder.create(
                         Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.of(BackpackItemRegistry.CRAFTING_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))
-                .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
-                .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "crafting_upgrade_backpack")));
+                .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "crafting_upgrade_backpack")));
 
         BackpackUpgradeRecipeJsonBuilder.create(
                         Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
                         Ingredient.of(BackpackItemRegistry.STONECUTTER_UPGRADE),
                         RecipeCategory.TOOLS,
                         BackpackItemJsonRegistry.getBackpackByName("small"))
-                .criterion("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
-                .offerTo(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "stonecutter_upgrade_backpack")));
+                .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "stonecutter_upgrade_backpack")));
     }
 
     private void dyedBackpackRecipes(HolderLookup.RegistryLookup<Item> itemWrap, RecipeOutput exporter) {

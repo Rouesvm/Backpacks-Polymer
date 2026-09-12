@@ -3,13 +3,16 @@ package com.rouesvm.servback.content.block.impl;
 import com.rouesvm.servback.content.block.BasicBackpackBlockEntity;
 import com.rouesvm.servback.content.block.TickableBlockEntity;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
+import com.rouesvm.servback.content.item.impl.ContainerItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
+import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.BackpackUtils;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.manager.BackpackUUID;
+import com.rouesvm.servback.technical.ui.inventory.BackpackInventory;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
@@ -18,9 +21,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -48,6 +57,45 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
 
     public BackpackBlockEntity(BlockPos pos, BlockState state) {
         super(BackpackBlockEntityRegistry.BACKPACK_BLOCK_ENTITY, pos, state);
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        CustomData component = components.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        Optional<String> itemString = component.copyTag().getString("name");
+        ContainerItem item = (ContainerItem) itemString.map(Identifier::tryParse)
+                .map(BuiltInRegistries.ITEM::getValue)
+                .orElseGet(() -> BackpackItemJsonRegistry.getBackpackByName("small"));
+
+        setItem(item);
+        setSize(item.getSize());
+        setExtraSize(BackpackUtils.getExtendedSlots(components));
+
+        UpgradeContainerComponent container = components.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
+        if (container != null
+        ) setUpgradeList(container.baseUpgrades());
+
+        UUID uuid = BackpackUUID.getUUIDOrCreateNew(components);
+
+        if (getLevel() != null) {
+            BackpackInventory inventory = BackpackManager.getInventory(uuid);
+            if (inventory != null) BackpackUtils.resize(getLevel(), getBlockPos(), uuid, inventory,
+                    getSize() + getExtraSize());
+        }
+
+        setUuid(uuid);
+        setStorage();
+
+        Component customName = components.get(DataComponents.CUSTOM_NAME);
+        if (customName != null) {
+            setCustomName(customName);
+        }
+
+        setChanged();
+
+        if (getLevel() != null) {
+            ContainerItem.playPlaceSound(getLevel(), getBlockPos());
+        }
     }
 
     @Override
@@ -104,8 +152,9 @@ public class BackpackBlockEntity extends BasicBackpackBlockEntity implements Tic
     }
 
     public void setStorage() {
-        if (instance == null) instance = BackpackManager.getInstanceAndResize(uuid, extraSize + getSize()).get();
-        if (storage == null) {
+        Optional<BackpackInstance> instanceGet = BackpackManager.getInstanceAndResize(uuid, extraSize + getSize());;
+        if (instance == null && instanceGet.isPresent()) instance = instanceGet.get();
+        if (storage == null && instance != null) {
             instance.inventory().setEntity(this);
             storage = ContainerStorage.of(instance.inventory(), null);
         }

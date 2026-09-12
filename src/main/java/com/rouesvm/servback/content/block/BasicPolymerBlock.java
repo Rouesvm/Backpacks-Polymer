@@ -1,6 +1,5 @@
 package com.rouesvm.servback.content.block;
 
-import com.mojang.serialization.MapCodec;
 import com.rouesvm.servback.ServerBackpacks;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
@@ -11,11 +10,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import org.jspecify.annotations.NonNull;
 
 public class BasicPolymerBlock extends HorizontalDirectionalBlock implements PolymerBlock {
-    public static final MapCodec<BasicPolymerBlock> CODEC = simpleCodec(BasicPolymerBlock::new);
-
     public BasicPolymerBlock(Properties settings) {
         super(settings.noOcclusion());
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
@@ -35,11 +31,6 @@ public class BasicPolymerBlock extends HorizontalDirectionalBlock implements Pol
                 ServerBackpacks.NIL).id()))
             return state;
         return Blocks.BARRIER.defaultBlockState();
-    }
-
-    @Override
-    protected @NonNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 
     @Override

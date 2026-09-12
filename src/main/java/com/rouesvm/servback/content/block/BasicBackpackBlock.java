@@ -41,7 +41,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
                 .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name)))
                 .noCollision()
                 .instabreak()
-                .pushReaction(PushReaction.DESTROY)
+                .pushReaction(PushReaction.POPPED)
                 .isValidSpawn(Blocks::never)
                 .noOcclusion()
                 .isRedstoneConductor(Blocks::never)

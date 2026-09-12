@@ -1,7 +1,6 @@
 package com.rouesvm.servback.content.item.impl;
 
 import com.rouesvm.servback.ServerBackpacks;
-import com.rouesvm.servback.content.block.impl.BackpackBlockEntity;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.content.upgrade.Upgrade;
@@ -26,12 +25,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -85,35 +82,6 @@ public class ContainerItem extends BundleGuiItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(@NonNull BlockPos pos, Level world, @Nullable Player player, @NonNull ItemStack stack, @NonNull BlockState state) {
-        if (world.getBlockEntity(pos) instanceof BackpackBlockEntity blockEntity) {
-            BackpackUtils.resizeIfIncorrectSize((ServerPlayer) player, stack, this.slots);
-
-            blockEntity.setItem(this);
-            blockEntity.setSize(this.slots);
-            blockEntity.setExtraSize(BackpackUtils.getExtendedSlots(stack));
-
-            UpgradeContainerComponent component = stack.get(BackpackDataComponentTypes.UPGRADE_CONTAINER);
-            if (component != null
-            ) blockEntity.setUpgradeList(component.baseUpgrades());
-
-            UUID uuid = BackpackUUID.getUUIDOrCreateNew(stack);
-
-            blockEntity.setUuid(uuid);
-            blockEntity.setStorage();
-
-            if (stack.getCustomName() != null
-            ) blockEntity.setCustomName(stack.getCustomName());
-
-            blockEntity.setChanged();
-
-            ContainerItem.playOpenSound((ServerPlayer) player);
-        }
-
-        return updateCustomBlockEntityTag(world, player, pos, stack);
-    }
-
-    @Override
     public Container getInventory(@Nullable ServerPlayer player, @Nullable ItemStack stack) {
         return stack != null ? BackpackManager.getInventory(BackpackUUID.getStackUUID(stack)) : null;
     }
@@ -121,7 +89,7 @@ public class ContainerItem extends BundleGuiItem {
     @Override
     public void openGui(ServerPlayer player, ItemStack stack) {
         BackpackUUID.getUUIDOrCreateNew(stack);
-        BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
+        BackpackUtils.resizeIfIncorrectSize(player.level(), player.blockPosition(), stack, this.slots);
 
         Optional<BackpackInstance> instance = BackpackManager.getInstanceAndResize(
                 BackpackUUID.getStackUUID(stack),
@@ -197,6 +165,13 @@ public class ContainerItem extends BundleGuiItem {
                         .withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.DARK_AQUA));
     }
 
+    public static void playPlaceSound(Level world, BlockPos pos) {
+        world.playSound(null, pos, SoundEvents.BUNDLE_DROP_CONTENTS, SoundSource.UI, 0.8F, 0.8F
+                + world.getRandom().nextFloat() * 0.4F);
+        world.playSound(null, pos, SoundEvents.BUNDLE_INSERT, SoundSource.UI, 0.8F, 0.8F
+                + world.getRandom().nextFloat() * 0.4F);
+    }
+
     public static void playOpenSound(ServerPlayer player) {
         player.level().playSound(null, player.blockPosition(), SoundEvents.BUNDLE_DROP_CONTENTS, SoundSource.UI, 0.8F, 0.8F
                 + player.level().getRandom().nextFloat() * 0.4F);
@@ -210,6 +185,11 @@ public class ContainerItem extends BundleGuiItem {
 
     public static void playInsertSound(ServerPlayer player, float pitch) {
         playInsertSound(player.level(), player.blockPosition(), pitch);
+    }
+
+    public static void playDropContentsSound(Level world, BlockPos pos) {
+        world.playSound(null, pos, SoundEvents.BUNDLE_DROP_CONTENTS, SoundSource.UI, 0.8F, -0.2F
+                + world.getRandom().nextFloat() * 0.4F);
     }
 
     public static void playDropContentsSound(ServerPlayer player, float pitch) {

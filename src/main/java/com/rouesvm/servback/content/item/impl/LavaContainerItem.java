@@ -53,7 +53,7 @@ public class LavaContainerItem extends ContainerItem {
     @Override
     public void openGui(ServerPlayer player, ItemStack stack) {
         BackpackUUID.getUUIDOrCreateNew(stack);
-        BackpackUtils.resizeIfIncorrectSize(player, stack, this.slots);
+        BackpackUtils.resizeIfIncorrectSize(player.level(), player.blockPosition(), stack, this.slots);
 
         Optional<BackpackInstance> instance = BackpackManager.getInstanceAndResize(
                 BackpackUUID.getStackUUID(stack),

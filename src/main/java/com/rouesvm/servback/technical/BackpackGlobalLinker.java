@@ -159,7 +159,7 @@ public class BackpackGlobalLinker {
         if (targetUUID != null) {
             BackpackInventory inventory = BackpackManager.getInventory(targetUUID);
             if (inventory != null && !inventory.isEmpty()) {
-                BackpackUtils.dropItems(entities.getFirst(), inventory, 0);
+                BackpackUtils.dropItems(entities.getFirst().level(), entities.getFirst().blockPosition(), inventory, 0);
             }
         }
 

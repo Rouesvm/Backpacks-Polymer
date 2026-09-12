@@ -110,4 +110,8 @@ public class BackpackItemJsonRegistry {
 
         ServerBackpacks.LOGGER.info("Finished registering {} items.", registeredSize);
     }
+
+    public static Object getBackpackByName() {
+        return null;
+    }
 }

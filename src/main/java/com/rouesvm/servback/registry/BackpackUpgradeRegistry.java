@@ -20,6 +20,7 @@ public class BackpackUpgradeRegistry {
 
     public static final UpgradeType<CraftingUpgrade> CRAFTING = register("crafting", CraftingUpgrade::new);
     public static final UpgradeType<StonecutterUpgrade> STONECUTTER = register("stonecutter", StonecutterUpgrade::new);
+    public static final UpgradeType<SmithingTableUpgrade> SMITHING_TABLE = register("smithing_table", SmithingTableUpgrade::new);
 
     public static <T extends Upgrade> UpgradeType<T> register(String name, UpgradeType.UpgradeFactory<T> factory) {
         Identifier id = Identifier.fromNamespaceAndPath(ServerBackpacks.MOD_ID, name);

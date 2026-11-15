@@ -36,6 +36,7 @@ public class BackpackItemGroup {
 
         entries.accept(BackpackItemRegistry.CRAFTING_UPGRADE);
         entries.accept(BackpackItemRegistry.STONECUTTER_UPGRADE);
+        entries.accept(BackpackItemRegistry.SMITHING_TABLE_UPGRADE);
     }
 
     public static void initialize() {

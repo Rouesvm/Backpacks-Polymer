@@ -9,13 +9,24 @@ import com.rouesvm.servback.content.item.impl.LavaContainerItem;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,6 +63,11 @@ public class BackpackItemRegistry {
     public static final Item STONECUTTER_UPGRADE = register("stonecutter_upgrade", new UpgradeItem(
             new Item.Properties().stacksTo(1),
             BackpackUpgradeRegistry.STONECUTTER
+    ));
+
+    public static final Item SMITHING_TABLE_UPGRADE = register("smithing_table_upgrade", new UpgradeItem(
+            new Item.Properties().stacksTo(1),
+            BackpackUpgradeRegistry.SMITHING_TABLE
     ));
 
     public static UpgradeItem register(String name, UpgradeItem item) {

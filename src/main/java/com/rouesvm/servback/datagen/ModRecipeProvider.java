@@ -134,6 +134,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .unlockedBy("get_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
                 .save(exporter);
 
+        ShapedRecipeBuilder.shaped(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.SMITHING_TABLE_UPGRADE, 1)
+                .pattern("#L#")
+                .pattern("LEL")
+                .pattern("#L#")
+                .define('#', ItemTags.PLANKS).define('L', Items.LEATHER)
+                .define('E', Items.SMITHING_TABLE)
+                .unlockedBy("get_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
+                .save(exporter);
+
         ShapedRecipeBuilder.shaped(itemWrap, RecipeCategory.MISC, BackpackItemRegistry.STONECUTTER_UPGRADE, 1)
                 .pattern("#L#")
                 .pattern("LEL")
@@ -191,6 +200,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         BackpackItemJsonRegistry.getBackpackByName("small"))
                 .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
                 .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "stonecutter_upgrade_backpack")));
+
+        BackpackUpgradeRecipeJsonBuilder.create(
+                        Ingredient.of(itemWrap.getOrThrow(UPGRADABLE_BACKPACKS)),
+                        Ingredient.of(BackpackItemRegistry.SMITHING_TABLE_UPGRADE),
+                        RecipeCategory.TOOLS,
+                        BackpackItemJsonRegistry.getBackpackByName("small"))
+                .unlockedBy("get_chest", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CHEST))
+                .save(exporter, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "smithing_table_upgrade_backpack")));
+
     }
 
     private void dyedBackpackRecipes(HolderLookup.RegistryLookup<Item> itemWrap, RecipeOutput exporter) {

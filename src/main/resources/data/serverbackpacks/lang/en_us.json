@@ -62,6 +62,7 @@
   "item.serverbackpacks.crafting_upgrade" : "Crafting Module",
   "item.serverbackpacks.stonecutter_upgrade" : "Stonecutter Module",
   "item.serverbackpacks.jukebox_upgrade" : "Jukebox Module",
+  "item.serverbackpacks.smithing_table_upgrade" : "Smithing Table Module",
 
   "item.serverbackpacks.gui_backpacks" : "Backpacks",
   "item.serverbackpacks.gui_backpack" : "Backpack",
@@ -106,6 +107,7 @@
   "upgrade.serverbackpacks.magnet": "Vacuum",
   "upgrade.serverbackpacks.crafting": "Crafting",
   "upgrade.serverbackpacks.jukebox": "Jukebox",
+  "upgrade.serverbackpacks.smithing_table": "Smithing Table",
 
   "tooltip.serverbackpacks.disabled": "This item is disabled!",
 

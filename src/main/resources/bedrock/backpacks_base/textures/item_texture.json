@@ -178,6 +178,9 @@
     },
     "serverbackpacks:stonecutter_upgrade" : {
       "textures" : "textures/serverbackpacks/item/stonecutter_upgrade"
+    },
+    "serverbackpacks:smithing_table_upgrade" : {
+      "textures" : "textures/serverbackpacks/item/smithing_table_upgrade"
     }
   }
 }

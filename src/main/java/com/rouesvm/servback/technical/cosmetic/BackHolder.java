@@ -52,7 +52,7 @@ public class BackHolder extends ElementHolder {
 
         this.element.setItem(stack);
 
-        this.element.setTranslation(new Vector3f(0, 0.25f, 0));
+        this.element.setTranslation(entity.position().toVector3f());
         this.element.setScale(new Vector3f(0.875f));
 
         this.element.setTeleportDuration(1);

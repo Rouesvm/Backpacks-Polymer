@@ -35,45 +35,59 @@ public class BackpackCommands {
     }
 
     private static final Permission ADMIN_PERMISSION = new Permission.HasCommandLevel(PermissionLevel.ADMINS);
+    private static final Permission REGULAR_PERMISSION = new Permission.HasCommandLevel(PermissionLevel.ALL);
 
     public static void init(CommandDispatcher<CommandSourceStack> dispatcher) {
         if (ServerBackpacks.hasTrinketLoaded) TrinketsBackpack.initialize(dispatcher);
 
         dispatcher.register(literal("backpacks")
-                .requires(source -> source.permissions().hasPermission(ADMIN_PERMISSION))
+                .requires(source -> source.permissions().hasPermission(REGULAR_PERMISSION))
                 .executes(context -> {
                     context.getSource().sendSuccess(() -> Component.literal("Server Backpacks! by Rouesvm"), false);
                     return 1;
-                }).then(literal("backup").executes(context -> {
-                    context.getSource().sendSuccess(() -> Component.translatable("command.serverbackpacks.backup"), false);
-                    BackpackManager.createBackupAndSave();
-                    return 1;
-                })).then(literal("list").executes(context -> listBackpacks(context, 1))
+                }).then(literal("backup")
+                        .requires(source -> source.permissions().hasPermission(ADMIN_PERMISSION))
+                        .executes(context -> {
+                            context.getSource().sendSuccess(() -> Component.translatable("command.serverbackpacks.backup"), false);
+                            BackpackManager.createBackupAndSave();
+                            return 1;
+                })).then(literal("list")
+                        .requires(source -> source.permissions().hasPermission(ADMIN_PERMISSION))
+                        .executes(context -> listBackpacks(context, 1))
                                 .then(argument("page", IntegerArgumentType.integer(1))
                                         .executes(context -> listBackpacks(context,
                                                 IntegerArgumentType.getInteger(context, "page")))
                                 )
-                ).then(literal("open").then(argument("uuid", StringArgumentType.word()).executes(context -> {
-                    String search = StringArgumentType.getString(context, "uuid");
-                    if (!search.isEmpty()) {
-                        if (search.length() != 36) throw new CommandSyntaxException(
-                                    CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
-                                    Component.translatable("command.serverbackpacks.incorrect_uuid"));
+                ).then(literal("open")
+                        .requires(source -> source.permissions().hasPermission(ADMIN_PERMISSION))
+                        .then(argument("uuid", StringArgumentType.word())
+                                .executes(context -> {
+                                    String search = StringArgumentType.getString(context, "uuid");
+                                    if (!search.isEmpty()) {
+                                        if (search.length() != 36) throw new CommandSyntaxException(
+                                                    CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
+                                                    Component.translatable("command.serverbackpacks.incorrect_uuid"));
 
-                        UUID uuid = UUID.fromString(search);
-                        Optional<BackpackInstance> instance = BackpackManager.getInstance(uuid);
+                                        UUID uuid = UUID.fromString(search);
+                                        Optional<BackpackInstance> instance = BackpackManager.getInstance(uuid);
 
-                        if (instance.isPresent()) {
-                            new BackpackGui(context.getSource().getPlayer(), instance.get());
-                        } else throw new CommandSyntaxException(
-                                    CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
-                                    Component.translatable("command.serverbackpacks.incorrect_uuid"));
-                    } else throw new CommandSyntaxException(
-                                CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
-                                Component.translatable("command.serverbackpacks.empty"));
-                    return 1;
-                })).then(configCommand())
-        ));
+                                        if (instance.isPresent()) {
+                                            new BackpackGui(context.getSource().getPlayer(), instance.get());
+                                        } else throw new CommandSyntaxException(
+                                                    CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException(),
+                                                    Component.translatable("command.serverbackpacks.incorrect_uuid"));
+                                    } else throw new CommandSyntaxException(
+                                                CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
+                                                Component.translatable("command.serverbackpacks.empty"));
+                                    return 1;
+                                })).then(configCommand()))
+                .then(literal("toggle")
+                        .requires(source -> source.permissions().hasPermission(REGULAR_PERMISSION))
+                        .executes(context -> {
+                            context.getSource().sendSuccess(() -> Component.literal("toggled nothing"), false);
+                            return 1;
+                        }
+                )));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> configCommand() {

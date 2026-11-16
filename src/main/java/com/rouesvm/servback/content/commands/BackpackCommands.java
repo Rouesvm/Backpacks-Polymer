@@ -1,16 +1,19 @@
 package com.rouesvm.servback.content.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.rouesvm.servback.ServerBackpacks;
+import com.rouesvm.servback.registry.BackpackPersistentDataAttachmentRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.data.BackpackInstance;
 import com.rouesvm.servback.technical.manager.BackpackManager;
 import com.rouesvm.servback.technical.ui.BackpackGui;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -18,6 +21,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
 
@@ -81,13 +85,7 @@ public class BackpackCommands {
                                                 Component.translatable("command.serverbackpacks.empty"));
                                     return 1;
                                 })).then(configCommand()))
-                .then(literal("toggle")
-                        .requires(source -> source.permissions().hasPermission(REGULAR_PERMISSION))
-                        .executes(context -> {
-                            context.getSource().sendSuccess(() -> Component.literal(""), false);
-                            return 1;
-                        }
-                )));
+                .then(toggleCommand()));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> configCommand() {
@@ -106,6 +104,58 @@ public class BackpackCommands {
                     context.getSource().sendSuccess(() -> Component.translatable("command.serverbackpacks.save"), true);
                     return 1;
                 }));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> toggleCommand() {
+        return literal("set")
+                .requires(source -> source.permissions().hasPermission(REGULAR_PERMISSION))
+                .then(booleanAttachmentCommand(
+                        "place_with_mainhand_full",
+                        BackpackPersistentDataAttachmentRegistry.PLACE_WITH_HAND_FULL
+                ))
+                .then(booleanAttachmentCommand(
+                        "place_with_offhand_full",
+                        BackpackPersistentDataAttachmentRegistry.PLACE_WITH_OFFHAND_FULL
+                ))
+                .then(booleanAttachmentCommand(
+                        "backpack_self_visibility",
+                        BackpackPersistentDataAttachmentRegistry.BACKPACK_SELF_VISIBILITY
+                ))
+                .then(booleanAttachmentCommand(
+                        "hide_backpack_when_looking_down",
+                        BackpackPersistentDataAttachmentRegistry.HIDE_BACKPACK_WHEN_LOOKING_DOWN
+                ));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> booleanAttachmentCommand(String name, AttachmentType<Boolean> attachment) {
+        return literal(name)
+                .executes(context -> getAttachment(context.getSource(), attachment))
+                .then(argument("value", BoolArgumentType.bool())
+                        .executes(context -> setAttachment(
+                                context.getSource(),
+                                attachment,
+                                BoolArgumentType.getBool(context, "value")
+                        )));
+    }
+
+    private static int getAttachment(CommandSourceStack source, AttachmentType<Boolean> attachment) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) return 0;
+
+        boolean value = player.getAttachedOrElse(attachment, true);
+        source.sendSuccess(() -> Component.translatable("command.serverbackpacks.get", String.valueOf(value)), false);
+
+        return 1;
+    }
+
+    private static int setAttachment(CommandSourceStack source, AttachmentType<Boolean> attachment, boolean value) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) return 0;
+
+        player.setAttached(attachment, value);
+        source.sendSuccess(() -> Component.translatable("command.serverbackpacks.set", String.valueOf(value)), value);
+
+        return 1;
     }
 
     public static int listBackpacks(CommandContext<CommandSourceStack> context, int page) {

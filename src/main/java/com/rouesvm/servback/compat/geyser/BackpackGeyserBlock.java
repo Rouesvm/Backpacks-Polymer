@@ -107,8 +107,8 @@ public class BackpackGeyserBlock {
         BoxComponent collisionBox = BoxComponent.fullBox();
         BoxComponent selectionBox = BoxComponent.fullBox();
 
-        CustomBlockComponents components = CustomBlockComponents.builder()
-                .collisionBox(collisionBox)
+        CustomBlockComponents components = CustomBlockComponents.builder().
+                collisionBoxes(collisionBox)
                 .selectionBox(selectionBox)
                 .materialInstance("*", MaterialInstance.builder()
                         .texture("serverbackpacks:" + location.getPath())
@@ -119,7 +119,7 @@ public class BackpackGeyserBlock {
                 .geometry(GeometryComponent.builder()
                         .identifier("geometry.backpack_3")
                         .build())
-                .collisionBox(collisionBox)
+                .collisionBoxes(collisionBox)
                 .selectionBox(selectionBox)
                 .lightEmission(block.defaultBlockState().getLightEmission())
                 .lightDampening(block.defaultBlockState().getLightDampening())

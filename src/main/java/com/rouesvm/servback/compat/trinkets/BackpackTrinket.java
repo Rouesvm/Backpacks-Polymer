@@ -3,6 +3,7 @@ package com.rouesvm.servback.compat.trinkets;
 import com.rouesvm.servback.content.component.UpgradeContainerComponent;
 import com.rouesvm.servback.content.item.BundleGuiItem;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackPersistentDataAttachmentRegistry;
 import com.rouesvm.servback.technical.config.Configuration;
 import com.rouesvm.servback.technical.cosmetic.BackHolder;
 import com.rouesvm.servback.technical.cosmetic.CosmeticManager;
@@ -20,6 +21,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -75,12 +77,19 @@ public class BackpackTrinket implements TrinketCallback {
         if (!world.isClientSide()) {
             if (!Configuration.instance().placeable) return InteractionResult.PASS;
 
+            Boolean placeWithFullHand = player.getAttachedOrCreate(BackpackPersistentDataAttachmentRegistry.PLACE_WITH_HAND_FULL);
+            Boolean placeWithFullOffHand = player.getAttachedOrCreate(BackpackPersistentDataAttachmentRegistry.PLACE_WITH_OFFHAND_FULL);
+
+            boolean isBlockMainItem = player.getMainHandItem().getItem() instanceof BlockItem;
+            boolean isBlockOffItem = player.getOffhandItem().getItem() instanceof BlockItem;
+
             ItemStack stack = getStackInBackSlot(player);
             if (!stack.isEmpty()
                     && player.isShiftKeyDown()
-                    && player.getMainHandItem().isEmpty()
-                    && player.getOffhandItem().isEmpty())
+                    && ((placeWithFullHand && !isBlockMainItem) || player.getMainHandItem().isEmpty())
+                    && ((placeWithFullOffHand && !isBlockOffItem) || player.getOffhandItem().isEmpty()))
             {
+
                 BundleGuiItem item = (BundleGuiItem) stack.getItem();
                 BlockPlaceContext context = new BlockPlaceContext(player, hand, stack, blockHitResult);
                 item.place(context);

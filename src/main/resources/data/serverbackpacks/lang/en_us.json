@@ -82,6 +82,8 @@
   "command.serverbackpacks.reload": "Config has been reloaded!",
   "command.serverbackpacks.save": "Config has been saved!",
   "command.serverbackpacks.backup": "Backup created.",
+  "command.serverbackpacks.set": "Current value is set to %s",
+  "command.serverbackpacks.get": "Currently set is %s",
 
   "info.serverbackpacks.empty": "Empty",
   "info.serverbackpacks.upgrades": "Modules",

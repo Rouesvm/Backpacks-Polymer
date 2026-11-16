@@ -5,6 +5,7 @@ import com.rouesvm.servback.compat.geyser.BackpackGeyser;
 import com.rouesvm.servback.compat.trinkets.BackpackTrinket;
 import com.rouesvm.servback.content.commands.BackpackCommands;
 import com.rouesvm.servback.registry.BackpackDataComponentTypes;
+import com.rouesvm.servback.registry.BackpackPersistentDataAttachmentRegistry;
 import com.rouesvm.servback.registry.BackpackRecipeRegistry;
 import com.rouesvm.servback.registry.BackpackUpgradeRegistry;
 import com.rouesvm.servback.registry.block.BackpackBlockEntityRegistry;
@@ -71,6 +72,7 @@ public class ServerBackpacks implements ModInitializer {
 		BackpackItemGroup.initialize();
 
 		BackpackCommands.initialize();
+		BackpackPersistentDataAttachmentRegistry.initialize();
 
 		BackpackRecipeRegistry.initialize();
 		BackpackUpgradeRegistry.initialize();

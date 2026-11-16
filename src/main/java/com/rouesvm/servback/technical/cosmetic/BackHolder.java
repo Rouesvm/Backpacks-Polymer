@@ -1,6 +1,7 @@
 package com.rouesvm.servback.technical.cosmetic;
 
 import com.rouesvm.servback.content.item.impl.ContainerItem;
+import com.rouesvm.servback.registry.BackpackPersistentDataAttachmentRegistry;
 import com.rouesvm.servback.registry.item.BackpackItemJsonRegistry;
 import com.rouesvm.servback.technical.config.BackpackItemConfiguration;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -39,7 +40,8 @@ public class BackHolder extends ElementHolder {
     private Integer cosmeticRotation = 180;
     private Integer cosmeticPitchWhenSneaking = -25;
 
-    private boolean hidden;
+    private boolean hiddenForAll;
+    private boolean hiddenForSelf;
 
     private BackHolder(ItemStack stack, LivingEntity entity) {
         super();
@@ -52,11 +54,10 @@ public class BackHolder extends ElementHolder {
 
         this.element.setItem(stack);
 
-        this.element.setTranslation(entity.position().toVector3f());
+        this.element.setTranslation(entity.getEyePosition().toVector3f());
         this.element.setScale(new Vector3f(0.875f));
 
         this.element.setTeleportDuration(1);
-        this.element.ignorePositionUpdates();
 
         if (this.element.getItem().getItem() instanceof ContainerItem item) {
             BackpackItemConfiguration.BackCosmetic order = BackpackItemJsonRegistry.getBackpackCosmetic(item);
@@ -72,34 +73,50 @@ public class BackHolder extends ElementHolder {
     protected void onTick() {
         if (entity.isDeadOrDying() || entity.isRemoved()) {
             destroy();
+            return;
         }
 
+        boolean hideWhenLookingDown = entity.getAttachedOrElse(BackpackPersistentDataAttachmentRegistry.HIDE_BACKPACK_WHEN_LOOKING_DOWN, true);
+        boolean selfVisible = entity.getAttachedOrElse(BackpackPersistentDataAttachmentRegistry.BACKPACK_SELF_VISIBILITY, true);
+
         boolean facingDown = entity.getNearestViewDirection() == Direction.DOWN;
-        boolean isSpectator = entity instanceof ServerPlayer serverPlayer && serverPlayer.isSpectator();
+        boolean isSpectator = entity instanceof ServerPlayer player && player.isSpectator();
 
         Pose pose = entity.getPose();
-        boolean isHiddenPose = facingDown || pose == Pose.SWIMMING || pose == Pose.SLEEPING || isSpectator;
 
-        if (isHiddenPose) {
-            if (!hidden) {
-                hideForAll(this);
-                hidden = true;
-            }
-        } else {
-            if (hidden) {
-                showForAll(this);
-                updatePosition();
-                sendRidePacket();
-                hidden = false;
-            }
+        boolean shouldHideForSelf = (!selfVisible || (hideWhenLookingDown && facingDown));
+        boolean shouldHideForAll = pose == Pose.SWIMMING || pose == Pose.SLEEPING || isSpectator;
 
+        if (shouldHideForSelf && !hiddenForSelf && entity instanceof ServerPlayer player) {
+            hideForSelf(player, this);
+            hiddenForSelf = true;
+        } else if (!shouldHideForSelf && hiddenForSelf && entity instanceof ServerPlayer player) {
+            showForSelf(player, this);
+            hiddenForSelf = false;
+            this.element.setTranslation(entity.getEyePosition().toVector3f());
+            updatePosition();
+            sendRidePacket();
+        }
+
+        if (shouldHideForAll && !hiddenForAll) {
+            hideForAll(this);
+            hiddenForAll = true;
+        } else if (!shouldHideForAll && hiddenForAll) {
+            showForAll(this);
+            hiddenForAll = false;
+            this.element.setTranslation(entity.getEyePosition().toVector3f());
+            updatePosition();
+            sendRidePacket();
+        }
+
+        if (!hiddenForAll) {
             boolean sneaking = entity.isShiftKeyDown();
 
             this.element.setYaw(((BackInterface) entity).backpacks$bodyYaw() - cosmeticRotation);
             this.element.setPitch(sneaking ? cosmeticPitchWhenSneaking : 0);
 
-            float y = sneaking ? cosmeticPosition.y - 0.02f : cosmeticPosition.y;
-            float z = sneaking ? cosmeticPosition.z - 0.10f : cosmeticPosition.z;
+            float y = cosmeticPosition.y - (sneaking ? -0.05f : 0f);
+            float z = cosmeticPosition.z - (sneaking ? 0.2f : 0f);
 
             if (!entity.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
                 z += 0.05f;
@@ -130,10 +147,22 @@ public class BackHolder extends ElementHolder {
 
         VirtualEntityUtils.addVirtualPassenger(entity, model.getEntityIds().toIntArray());
 
-        var packet = VirtualEntityUtils.createClientboundSetPassengersPacket(entity.getId(), ((EntityExt)entity).polymerVE$getVirtualRidden());
-        model.sendPacket(packet);
+        model.sendRidePacket();
 
         return model;
+    }
+
+    public static void hideForSelf(ServerPlayer player, ElementHolder elementHolder) {
+        elementHolder.sendPacket(new ClientboundRemoveEntitiesPacket(elementHolder.getEntityIds()), (otherPlayer) -> player.getUUID() == otherPlayer.getUUID());
+    }
+
+    public static void showForSelf(ServerPlayer player, ElementHolder elementHolder) {
+        var packets = new ObjectArrayList<Packet<? super ClientGamePacketListener>>();
+        for (VirtualElement e : elementHolder.getElements()) {
+            Objects.requireNonNull(packets);
+            e.startWatching(player, packets::add);
+        }
+        elementHolder.sendPacket(new ClientboundBundlePacket(packets), (otherPlayer) -> player.getUUID() == otherPlayer.getUUID());
     }
 
     public static void hideForAll(ElementHolder elementHolder) {

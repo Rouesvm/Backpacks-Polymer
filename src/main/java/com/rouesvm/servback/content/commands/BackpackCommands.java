@@ -35,7 +35,7 @@ import static net.minecraft.commands.Commands.literal;
 
 public class BackpackCommands {
     public static void initialize() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, a, b) -> init(dispatcher));
+        CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> init(dispatcher));
     }
 
     private static final Permission ADMIN_PERMISSION = new Permission.HasCommandLevel(PermissionLevel.ADMINS);

@@ -75,7 +75,7 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
     }
 
     @Override
-    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader world, @NonNull BlockPos pos, BlockState state, boolean includeData) {
+    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader world, @NonNull BlockPos pos, @NonNull BlockState state, boolean includeData) {
         ItemStack pickStack = super.getCloneItemStack(world, pos, state, includeData);
         if (!world.isClientSide()) {
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);

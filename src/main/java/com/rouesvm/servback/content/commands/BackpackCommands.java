@@ -118,6 +118,14 @@ public class BackpackCommands {
                         BackpackPersistentDataAttachmentRegistry.PLACE_WITH_OFFHAND_FULL
                 ))
                 .then(booleanAttachmentCommand(
+                        "equip_with_mainhand_full",
+                        BackpackPersistentDataAttachmentRegistry.EQUIP_WITH_HAND_FULL
+                ))
+                .then(booleanAttachmentCommand(
+                        "equip_with_offhand_full",
+                        BackpackPersistentDataAttachmentRegistry.EQUIP_WITH_OFFHAND_FULL
+                ))
+                .then(booleanAttachmentCommand(
                         "backpack_self_visibility",
                         BackpackPersistentDataAttachmentRegistry.BACKPACK_SELF_VISIBILITY
                 ))
@@ -153,7 +161,7 @@ public class BackpackCommands {
         if (player == null) return 0;
 
         player.setAttached(attachment, value);
-        source.sendSuccess(() -> Component.translatable("command.serverbackpacks.set", String.valueOf(value)), value);
+        source.sendSuccess(() -> Component.translatable("command.serverbackpacks.set", String.valueOf(value)), false);
 
         return 1;
     }

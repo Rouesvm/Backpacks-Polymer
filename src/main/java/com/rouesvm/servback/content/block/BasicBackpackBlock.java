@@ -111,11 +111,6 @@ public class BasicBackpackBlock extends BasicPolymerBlock implements EntityBlock
             BasicBackpackBlockEntity entity = (BasicBackpackBlockEntity) world.getBlockEntity(pos);
             if (entity == null) return InteractionResult.PASS;
 
-            if (ServerBackpacks.hasTrinketLoaded
-                    && player.isShiftKeyDown()
-                    && trinketInteraction(entity, (ServerPlayer) player, world, pos))
-                return InteractionResult.SUCCESS;
-
             onOpenGui((ServerPlayer) player, entity);
             return InteractionResult.SUCCESS;
         }

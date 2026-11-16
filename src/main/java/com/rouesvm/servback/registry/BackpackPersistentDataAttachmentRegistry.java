@@ -20,6 +20,19 @@ public class BackpackPersistentDataAttachmentRegistry {
                     .initializer(() -> false)
                     .persistent(Codec.BOOL.stable())
                     .copyOnDeath());
+    public static final AttachmentType<Boolean> EQUIP_WITH_HAND_FULL = AttachmentRegistry.create(
+            Identifier.fromNamespaceAndPath(MOD_ID, "equip_with_hand_full"),
+            builder -> builder
+                    .initializer(() -> false)
+                    .persistent(Codec.BOOL.stable())
+                    .copyOnDeath());
+    public static final AttachmentType<Boolean> EQUIP_WITH_OFFHAND_FULL = AttachmentRegistry.create(
+            Identifier.fromNamespaceAndPath(MOD_ID, "equip_with_offhand_full"),
+            builder -> builder
+                    .initializer(() -> false)
+                    .persistent(Codec.BOOL.stable())
+                    .copyOnDeath());
+
     public static final AttachmentType<Boolean> BACKPACK_SELF_VISIBILITY = AttachmentRegistry.create(
             Identifier.fromNamespaceAndPath(MOD_ID, "backpack_self_visiblity"),
             builder -> builder

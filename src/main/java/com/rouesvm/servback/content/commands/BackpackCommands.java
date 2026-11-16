@@ -84,7 +84,7 @@ public class BackpackCommands {
                 .then(literal("toggle")
                         .requires(source -> source.permissions().hasPermission(REGULAR_PERMISSION))
                         .executes(context -> {
-                            context.getSource().sendSuccess(() -> Component.literal("toggled nothing"), false);
+                            context.getSource().sendSuccess(() -> Component.literal(""), false);
                             return 1;
                         }
                 )));
